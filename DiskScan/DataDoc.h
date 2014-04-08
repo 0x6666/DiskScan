@@ -1,0 +1,197 @@
+//////////////////////////////////////////////////////////////////////////
+//对设备数据的处理的文档，是一个春抽象类
+//有些方法需要在子类中实现  
+//////////////////////////////////////////////////////////////////////////
+
+#if !defined(AFX_DATADOC_H__AA942ECF_EDFA_406B_80CF_528D0D592BB5__INCLUDED_)
+#define AFX_DATADOC_H__AA942ECF_EDFA_406B_80CF_528D0D592BB5__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+#include "SectorList.h"
+// DataDoc.h : header file
+//
+
+/////////////////////////////////////////////////////////////////////////////
+// CDataDoc document
+class CHexDataView;
+
+class CDataDoc : public CDocument
+{
+protected:
+	CDataDoc();           // protected constructor used by dynamic creation
+	DECLARE_DYNCREATE(CDataDoc)
+
+// Attributes
+public:
+	//用于显示空间的列表的指针，此空间的实例在CChildFrame中定义
+	//定义为CCtrlBar的子控件
+	CListCtrl* m_pContentList;
+
+	//当前文档所处理的设备的名字
+	CString m_strDevName;
+
+	//当前显示的扇区号
+	LONG_INT m_liCurSec;
+
+	//十六精致视图
+	CHexDataView* m_pHexView;
+	
+	//可以显示的簇链
+	SectorList	m_secList;
+	//当前有效的扇区列
+	SectorList* m_pCurSecList;
+// Operations
+public:
+
+	//////////////////////////////////////////////////////////////////////////
+	//获得当前要显示的扇区号,子类不需要实现
+	//////////////////////////////////////////////////////////////////////////
+	LONG_INT GetCurSec(void);
+
+// Overrides
+
+
+	// ClassWizard generated virtual function overrides
+protected:
+
+
+
+	//{{AFX_VIRTUAL(KeyFrameViewer)
+public:
+	 virtual void Serialize(CArchive& ar);   // overridden for document i/o
+
+	//////////////////////////////////////////////////////////////////////////
+	//由十六进制视图来调用的更改当前扇区号方法
+	//param
+	//		liCurSector	当前扇区号
+	//		pSender		发送者
+	//////////////////////////////////////////////////////////////////////////
+	void ChangeCurSector(LONG_INT liCurSector , CView* pSender);
+	
+	
+	//////////////////////////////////////////////////////////////////////////
+	//创建文档，在这里还不需要这个
+	//////////////////////////////////////////////////////////////////////////
+//	virtual BOOL OnNewDocument();  //这个方法现在不需要用
+
+	//////////////////////////////////////////////////////////////////////////
+	//覆盖了父类的函数，避免设置变体时出现问题,一些其他的字符
+	//////////////////////////////////////////////////////////////////////////
+	virtual void SetTitle(LPCTSTR lpszTitle);
+
+	//////////////////////////////////////////////////////////////////////////
+	//初始化m_pContentList所指向的列表的表头
+	//////////////////////////////////////////////////////////////////////////
+	virtual	void InitContentListHead();
+	
+	//////////////////////////////////////////////////////////////////////////
+	//获得当前文档所处理的设备的扇区总数,子类必须实现
+	//////////////////////////////////////////////////////////////////////////
+	virtual LONG_INT GetSecCount();
+	
+	//////////////////////////////////////////////////////////////////////////
+	//向当前文档所处理的设备读取数据
+	//param
+	//		buf		数据缓存
+	//		offset	数据在设备的上的扇区偏移,需要返回实际扇区号
+	//		isNext	如果指定的不存在是否要往下一个有效扇区 
+	//				TRUE 如果offset不存在则读取下一个有效扇区
+	//				FALSE 如果不存在在读取上一个有效扇区
+	//		size	将要读取的数据的大小
+	//return 读取数据是否成功
+	//////////////////////////////////////////////////////////////////////////
+	virtual BOOL ReadData(void* buf , PLONG_INT offset , BOOL isNext = TRUE , DWORD size = SECTOR_SIZE);
+
+	//////////////////////////////////////////////////////////////////////////
+	//这是一个基类函数，覆盖是为了强制bAddToMRU = FALSE，避免在基类中的这个函数
+	//调用"AfxGetFileTitle",因为在次Afx函数中会耗费很久的时间。从基类中的这个函
+	//数的源码可以看出，这个函数只做了两件事，一设置文档标题（当前当前类已经自己
+	//实现了），二，在“最近使用文件列表”添加一条记录(本程序并没有使用此功能)
+	//////////////////////////////////////////////////////////////////////////
+	virtual void SetPathName(LPCTSTR lpszPathName, BOOL bAddToMRU = FALSE);
+
+	//////////////////////////////////////////////////////////////////////////
+	//获得当前设备的名字 
+	//////////////////////////////////////////////////////////////////////////
+	virtual CString GetDevName();
+
+	//////////////////////////////////////////////////////////////////////////
+	//获得显示详细信息的视图类
+	//return 用显示详细信息的视图类
+	virtual CRuntimeClass* GetInofViewClass();
+
+	//////////////////////////////////////////////////////////////////////////
+	//设置选择区域
+	//param
+	//		start	选择的字节
+	//		end		选择的结束字节
+	//////////////////////////////////////////////////////////////////////////
+	virtual void SetSel(LONG_INT start , LONG_INT end);
+
+	//////////////////////////////////////////////////////////////////////////
+	//设置当前需要显示的扇区
+	//param
+	//		sector	需要显示的扇区号
+	virtual void SetCurSector(LONG_INT sector);
+
+	//////////////////////////////////////////////////////////////////////////
+	//设置当前选择的路径
+	//param
+	//		strPath	当前选择的路径
+	virtual	void SetCurFile(CString strPath);
+
+	//////////////////////////////////////////////////////////////////////////
+	//重置扇区号列表,到默认状态
+	virtual void ReSetSectorList();
+
+	//////////////////////////////////////////////////////////////////////////
+	//这是当前显示的列表
+	//param 
+	//		pSecList 需要设置的扇区列表 如果pSecList == NULL则return FALSE
+	//return FALSE 操作失败 
+	//		 TRUE 操作成功
+	virtual BOOL SetSectorList(SectorList* pSecList);
+
+	//////////////////////////////////////////////////////////////////////////
+	//这是当前显示的列表,和SetSectorList不拷贝pSecList，而是直接使用
+	//param 
+	//		pSecList 需要设置的扇区列表 如果pSecList == NULL 则return FALSE
+	//			此参数必须动态分配，而且不能手动释放，在此类中会释放
+	//return 修改了当前扇区链表则 TRUE
+	//		 FALSE 没有修改扇区列表
+	virtual BOOL SetSectorListNoCopy(SectorList* pSecList);
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//获得十六进制视图
+	virtual CHexDataView* GetHexDataView();
+
+	//}}AFX_VIRTUAL
+
+// Implementation
+public:
+	virtual ~CDataDoc();
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+
+	// Generated message map functions
+protected:
+
+	//{{AFX_MSG(CDataDoc)
+	
+	//}}AFX_MSG(CDataDoc)
+
+	DECLARE_MESSAGE_MAP()
+// public:
+// 	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
+};
+
+//{{AFX_INSERT_LOCATION}}
+// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+
+#endif // !defined(AFX_DATADOC_H__AA942ECF_EDFA_406B_80CF_528D0D592BB5__INCLUDED_)

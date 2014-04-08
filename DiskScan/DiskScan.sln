@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DiskScan", "DiskScan.vcproj", "{D519AF24-6062-4D6C-AD78-FED9E744FC1E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DiskTool", "..\DiskTool\DiskTool.vcproj", "{5B6BDCA4-854D-4CF6-A8A9-FC6B87D6F9BB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StrTool", "..\StrTool\StrTool.vcproj", "{9EAEC041-0BA6-4022-B662-1758D64DBB56}"
+EndProject
+Global
+	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
+		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D519AF24-6062-4D6C-AD78-FED9E744FC1E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D519AF24-6062-4D6C-AD78-FED9E744FC1E}.Debug|Win32.Build.0 = Debug|Win32
+		{D519AF24-6062-4D6C-AD78-FED9E744FC1E}.Release|Win32.ActiveCfg = Release|Win32
+		{D519AF24-6062-4D6C-AD78-FED9E744FC1E}.Release|Win32.Build.0 = Release|Win32
+		{5B6BDCA4-854D-4CF6-A8A9-FC6B87D6F9BB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5B6BDCA4-854D-4CF6-A8A9-FC6B87D6F9BB}.Debug|Win32.Build.0 = Debug|Win32
+		{5B6BDCA4-854D-4CF6-A8A9-FC6B87D6F9BB}.Release|Win32.ActiveCfg = Release|Win32
+		{5B6BDCA4-854D-4CF6-A8A9-FC6B87D6F9BB}.Release|Win32.Build.0 = Release|Win32
+		{9EAEC041-0BA6-4022-B662-1758D64DBB56}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9EAEC041-0BA6-4022-B662-1758D64DBB56}.Debug|Win32.Build.0 = Debug|Win32
+		{9EAEC041-0BA6-4022-B662-1758D64DBB56}.Release|Win32.ActiveCfg = Release|Win32
+		{9EAEC041-0BA6-4022-B662-1758D64DBB56}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

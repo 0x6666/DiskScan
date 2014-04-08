@@ -1,0 +1,850 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(中华人民共和国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\DiskScan.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""l.chs\\afxres.rc""          // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\DiskScan.ico"
+IDI_FILE                ICON                    "res\\file.ico"
+IDI_FOLDER              ICON                    "res\\floder.ico"
+IDR_VOLTYPE             ICON                    "res\\Volume.ico"
+IDR_NTFSTYPE            ICON                    "res\\NTFS.ico"
+IDR_FAT32TYPE           ICON                    "res\\FAT32.ico"
+IDR_DISKSCTYPE          ICON                    "res\\disk.ico"
+IDI_DVD_ROM             ICON                    "res\\dvd_rom.ico"
+IDI_UNKNOW_VOL          ICON                    "res\\unknow_vol.ico"
+IDI_REMOTE_VOL          ICON                    "res\\remote_vol.ico"
+IDI_FLOPY_VOL           ICON                    "res\\flopy_vol.ico"
+IDI_REMOVABLE_VOL       ICON                    "res\\removable_vol.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
+        MENUITEM "打开文件(&F)",                    32820
+        MENUITEM SEPARATOR
+        MENUITEM "退出(&X)",                      ID_APP_EXIT
+    END
+    POPUP "查看(&V)"
+    BEGIN
+        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于 DiskScan(&A)...",          ID_APP_ABOUT
+    END
+END
+
+IDR_DISKSCTYPE MENU 
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN_1
+        MENUITEM "打开文件(&F)",                    IDC_OPEN_FILE_DIR
+        MENUITEM SEPARATOR
+        MENUITEM "退出(&X)",                      ID_APP_EXIT
+    END
+    POPUP "查看(&V)"
+    BEGIN
+        MENUITEM "磁盘解析列表(&C)",                  IDC_DISK_CONTENT_LIST
+        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
+    END
+    POPUP "窗口(&W)"
+    BEGIN
+        MENUITEM "层叠(&C)",                      ID_WINDOW_CASCADE
+        MENUITEM "平铺(&T)",                      ID_WINDOW_TILE_HORZ
+        MENUITEM "排列图标(&A)",                    ID_WINDOW_ARRANGE
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于 DiskScan(&A)...",          ID_APP_ABOUT
+    END
+END
+
+IDR_FAT32TYPE MENU 
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN_1
+        MENUITEM "打开文件(&F)",                    IDC_OPEN_FILE_DIR
+        MENUITEM SEPARATOR
+        MENUITEM "退出(&X)",                      ID_APP_EXIT
+    END
+    POPUP "查看(&V)"
+    BEGIN
+        MENUITEM "当前目录解析(&C)",                  IDC_FAT3_DIR_LIST
+        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "定位数据区(&D)",                   ID_FAT32_POS_DATA
+        MENUITEM "定位父目录(&P)",                   ID_FAT32_POS_PARAENT_DIR
+        MENUITEM "另存为(&S)",                     ID_FAT32_SERVE_AS
+        MENUITEM "属性(&A)",                      ID_FAT32_FILE_ATTR
+    END
+    POPUP "窗口(&W)"
+    BEGIN
+        MENUITEM "层叠(&C)",                      ID_WINDOW_CASCADE
+        MENUITEM "平铺(&T)",                      ID_WINDOW_TILE_HORZ
+        MENUITEM "排列图标(&A)",                    ID_WINDOW_ARRANGE
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于 DiskScan(&A)...",          ID_APP_ABOUT
+    END
+END
+
+IDR_NTFSTYPE MENU 
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN_1
+        MENUITEM "打开文件(&F)",                    IDC_OPEN_FILE_DIR
+        MENUITEM SEPARATOR
+        MENUITEM "退出(&X)",                      ID_APP_EXIT
+    END
+    POPUP "查看(&V)"
+    BEGIN
+        MENUITEM "当前目录列表(&C)",                  IDC_NTFS_DIR_LIST
+        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "定位MFT(&M)",                   ID_NTFS_POS_MFT
+        MENUITEM SEPARATOR
+        MENUITEM "另存为(&S)",                     ID_NTFS_SERVE_AS
+        MENUITEM "属性(&A)",                      ID_NTFS_FILE_ATTR
+    END
+    POPUP "窗口(&W)"
+    BEGIN
+        MENUITEM "层叠(&C)",                      ID_WINDOW_CASCADE
+        MENUITEM "平铺(&T)",                      ID_WINDOW_TILE_HORZ
+        MENUITEM "排列图标(&A)",                    ID_WINDOW_ARRANGE
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于 DiskScan(&A)...",          ID_APP_ABOUT
+    END
+END
+
+IDR_NTFS_FILE_MENU MENU 
+BEGIN
+    POPUP " "
+    BEGIN
+        MENUITEM "定位MFT(&M)",                   ID_NTFS_POS_MFT
+        MENUITEM "定位父目录(&P)",                   ID_NTFS_POS_PARAENT_DIR
+        MENUITEM SEPARATOR
+        MENUITEM "另存为(&S)",                     ID_NTFS_SERVE_AS
+        MENUITEM "属性(&A)",                      ID_NTFS_FILE_ATTR
+    END
+END
+
+IDR_FAT32_FILE_MENU MENU 
+BEGIN
+    POPUP " "
+    BEGIN
+        MENUITEM "定位数据区(&D)",                   ID_FAT32_POS_DATA
+        MENUITEM "定位父目录(&P)",                   ID_FAT32_POS_PARAENT_DIR
+        MENUITEM SEPARATOR
+        MENUITEM "另存为(&S)",                     ID_FAT32_SERVE_AS
+        MENUITEM "属性(&A)",                      ID_FAT32_FILE_ATTR
+        MENUITEM SEPARATOR
+        MENUITEM "查看已删除文件(&C)",                 ID_CHECK_DELETE_FILE
+    END
+END
+
+IDR_NTFS_FILE_ATTR_LIST_MENU MENU 
+BEGIN
+    POPUP " "
+    BEGIN
+        MENUITEM "定位属性头(&H)",                   ID_POS_STD_ATTR_HEAD
+        MENUITEM "定位属性数据(&D)",                  ID_POS_STD_ATTR_DATA
+        MENUITEM "保存(S)",                       ID_SEVER_ATTR
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG  0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于 DiskScan"
+FONT 9, "宋体"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "DiskScan 1.0 版",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "版权所有 (C) 2012",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "确定",IDOK,178,7,50,14,WS_GROUP
+END
+
+IDD_DISKSCAN_FORM DIALOG  0, 0, 257, 146
+STYLE DS_SETFONT | WS_CHILD
+FONT 9, "宋体"
+BEGIN
+END
+
+IDD_DVE_LIST DIALOG  0, 0, 187, 94
+STYLE DS_SETFONT | WS_CHILD
+FONT 10, "System"
+BEGIN
+END
+
+IDD_INFO DIALOGEX 0, 0, 220, 176
+STYLE DS_SETFONT | WS_CHILD
+FONT 10, "System", 0, 0, 0x0
+BEGIN
+END
+
+IDD_DVE_VOLUME DIALOGEX 0, 0, 147, 191
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "对话"
+FONT 11, "宋体", 400, 0, 0x86
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,7,170,50,14
+    PUSHBUTTON      "取消",IDCANCEL,90,170,50,14
+    CONTROL         "Tree1",IDC_DEV_AND_VOLUME,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | TVS_INFOTIP | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,133,158
+END
+
+IDD_INFOVIEW DIALOG  0, 0, 15, 11
+STYLE DS_SETFONT | WS_CHILD
+FONT 10, "System"
+BEGIN
+END
+
+IDD_FAT32_FILE DIALOGEX 0, 0, 230, 199
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "属性"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "文件路径:",IDC_STATIC,11,10,36,8
+    EDITTEXT        IDC_FILE_PATH,48,10,131,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    GROUPBOX        "文件属性",IDC_STATIC,7,23,216,49,BS_CENTER
+    CONTROL         "只读",IDC_CK_READ_ONLY,"Button",BS_AUTOCHECKBOX,30,37,28,10
+    CONTROL         "系统",IDC_CK_SYSTEM,"Button",BS_AUTOCHECKBOX,100,37,28,10
+    CONTROL         "目录",IDC_CK_DIR,"Button",BS_AUTOCHECKBOX,170,37,28,10
+    CONTROL         "归档",IDC_CK_ARTRIVE,"Button",BS_AUTOCHECKBOX,30,54,28,10
+    CONTROL         "隐藏",IDC_CK_HIDDEN,"Button",BS_AUTOCHECKBOX,100,54,28,10
+    CONTROL         "卷标",IDC_CK_VOL_ID,"Button",BS_AUTOCHECKBOX,170,54,28,10
+    GROUPBOX        "FAT1簇链",IDC_STATIC,9,79,104,94,BS_CENTER
+    GROUPBOX        "FAT2簇链",IDC_STATIC,116,79,104,94,BS_CENTER
+    PUSHBUTTON      "确定",IDC_OK,173,178,50,14
+    CONTROL         "",IDC_FAT1_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,13,90,94,78
+    CONTROL         "",IDC_FAT2_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,121,90,94,78
+END
+
+IDD_PROGRESS DIALOGEX 0, 0, 264, 71
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "复制进度"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "取消",IDCANCEL,207,50,50,14
+    CONTROL         "",IDC_COPY_PROGRESS,"msctls_progress32",WS_BORDER,7,27,250,14
+    LTEXT           "拷贝进度：",IDC_STATIC,7,14,41,8
+    LTEXT           "",IDC_ST_PROGRESS,48,14,209,8
+    PUSHBUTTON      "确定",IDOK,145,50,50,14
+END
+
+IDD_NTFS_FILE DIALOGEX 0, 0, 316, 214
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NTFS文件"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,259,193,50,14
+    LTEXT           "文件路径：",IDC_STATIC,7,7,41,8
+    EDITTEXT        IDC_FILE_PATH,49,7,260,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    GROUPBOX        "DOS属性",IDC_STATIC,7,19,173,60,BS_CENTER
+    GROUPBOX        "文件属性",IDC_STATIC,7,84,302,106,BS_CENTER
+    CONTROL         "",IDC_NTFS_FILE_ATTR_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,95,285,88
+    CONTROL         "只读",IDC_CK_READ_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,32,32,10
+    CONTROL         "隐藏",IDC_CK_HIDDEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,56,32,32,10
+    CONTROL         "归档",IDC_CK_ARCHIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,32,32,10
+    CONTROL         "设备",IDC_CK_DEVICE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,56,62,32,10
+    CONTROL         "临时",IDC_CK_TEMP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,62,32,10
+    CONTROL         "多分点",IDC_CK_REPARSE_POINT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,134,62,36,10
+    CONTROL         "稀疏",IDC_CK_SPARSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,47,32,10
+    CONTROL         "压缩",IDC_CK_COMPRESSED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,56,47,32,10
+    CONTROL         "加密",IDC_CK_ENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,47,32,10
+    CONTROL         "目录",IDC_CK_DIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,134,47,32,10
+    CONTROL         "系统",IDC_CK_SYSTEM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,134,32,32,10
+    CONTROL         "常规、",IDC_CK_NORMAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,62,32,10
+    LTEXT           "父目录MFT#:",IDC_STATIC,188,39,46,8
+    EDITTEXT        IDC_PARENT_MFT,240,39,40,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    LTEXT           "MFT#:",IDC_STATIC,212,56,22,8
+    EDITTEXT        IDC_MFT_NUM,240,57,40,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "FileDescription", "DiskScan Microsoft 基础类应用程序"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "DiskScan"
+            VALUE "LegalCopyright", "版权所有 (C) 2012"
+            VALUE "OriginalFilename", "DiskScan.EXE"
+            VALUE "ProductName", "DiskScan 应用程序"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_INFO, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 214
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 169
+    END
+
+    IDD_FAT32_FILE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 223
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 192
+    END
+
+    IDD_PROGRESS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 257
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 64
+    END
+
+    IDD_NTFS_FILE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 207
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "DiskScan"
+    IDR_DISKSCTYPE          "\nDiskSc\nDiskScan\nDiskScan 文件 (*.img)\n.img\nDiskScan.Document\nDiskScan Document"
+    IDR_FAT32TYPE           "\nDiskScan\nDiskScan\nDiskScan Files(*.fimg)\n.fimg\nDiskScan.Document\nDiskScan Document"
+    IDC_DE_LIST             "当前要显示的内容列表"
+    IDS_NTFSTYPE            "\nDiskScan\nDiskScan\nDiskScan Files(*.nimg)\n.nimg\nDiskScan.Document\nDiskScan Document"
+    IDS_DEV_NAME            "设备名字"
+    IDS_CAN_PART            "可分区大小"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "DiskScan"
+    AFX_IDS_IDLEMESSAGE     "就绪"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "扩展名"
+    ID_INDICATOR_CAPS       "大写"
+    ID_INDICATOR_NUM        "数字"
+    ID_INDICATOR_SCRL       "滚动"
+    ID_INDICATOR_OVR        "改写"
+    ID_INDICATOR_REC        "记录"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_NEW             "建立新文档\n新建"
+    ID_FILE_OPEN            "打开一个现有文档\n打开"
+    ID_FILE_CLOSE           "关闭活动文档\n关闭"
+    ID_FILE_SAVE            "保存活动文档\n保存"
+    ID_FILE_SAVE_AS         "将活动文档以一个新文件名保存\n另存为"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "显示程序信息，版本号和版权\n关于"
+    ID_APP_EXIT             "退出应用程序；提示保存文档\n退出"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_MRU_FILE1       "打开该文档"
+    ID_FILE_MRU_FILE2       "打开该文档"
+    ID_FILE_MRU_FILE3       "打开该文档"
+    ID_FILE_MRU_FILE4       "打开该文档"
+    ID_FILE_MRU_FILE5       "打开该文档"
+    ID_FILE_MRU_FILE6       "打开该文档"
+    ID_FILE_MRU_FILE7       "打开该文档"
+    ID_FILE_MRU_FILE8       "打开该文档"
+    ID_FILE_MRU_FILE9       "打开该文档"
+    ID_FILE_MRU_FILE10      "打开该文档"
+    ID_FILE_MRU_FILE11      "打开该文档"
+    ID_FILE_MRU_FILE12      "打开该文档"
+    ID_FILE_MRU_FILE13      "打开该文档"
+    ID_FILE_MRU_FILE14      "打开该文档"
+    ID_FILE_MRU_FILE15      "打开该文档"
+    ID_FILE_MRU_FILE16      "打开该文档"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_NEXT_PANE            "切换到下一个窗格\n下一窗格"
+    ID_PREV_PANE            "切换回前一个窗格\n前一窗格"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_WINDOW_NEW           "为活动文档打开另一个窗口\n新建窗口"
+    ID_WINDOW_ARRANGE       "将图标排列在窗口底部\n排列图标"
+    ID_WINDOW_CASCADE       "排列窗口成相互重叠\n层叠窗口"
+    ID_WINDOW_TILE_HORZ     "排列窗口成互不重叠\n平铺窗口"
+    ID_WINDOW_TILE_VERT     "排列窗口成互不重叠\n平铺窗口"
+    ID_WINDOW_SPLIT         "将活动的窗口分隔成窗格\n分隔"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_CLEAR           "删除被选对象\n删除"
+    ID_EDIT_CLEAR_ALL       "全部删除\n全部删除"
+    ID_EDIT_COPY            "复制被选对象并将其置于剪贴板上\n复制"
+    ID_EDIT_CUT             "剪切被选对象并将其置于剪贴板上\n剪切"
+    ID_EDIT_FIND            "查找指定的正文\n查找"
+    ID_EDIT_PASTE           "插入剪贴板内容\n粘贴"
+    ID_EDIT_REPEAT          "重复上一步操作\n重复"
+    ID_EDIT_REPLACE         "用不同的正文替换指定的正文\n替换"
+    ID_EDIT_SELECT_ALL      "选择整个文档\n选择全部"
+    ID_EDIT_UNDO            "撤消最后一步操作\n撤消"
+    ID_EDIT_REDO            "重新执行先前已撤消的操作\n重新执行"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "显示或隐藏工具栏\n显隐工具栏"
+    ID_VIEW_STATUS_BAR      "显示或隐藏状态栏\n显隐状态栏"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "改变窗口大小"
+    AFX_IDS_SCMOVE          "改变窗口位置"
+    AFX_IDS_SCMINIMIZE      "将窗口缩小成图标"
+    AFX_IDS_SCMAXIMIZE      "把窗口放大到最大尺寸"
+    AFX_IDS_SCNEXTWINDOW    "切换到下一个文档窗口"
+    AFX_IDS_SCPREVWINDOW    "切换到先前的文档窗口"
+    AFX_IDS_SCCLOSE         "关闭活动的窗口并提示保存所有文档"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "把窗口恢复到正常大小"
+    AFX_IDS_SCTASKLIST      "激活任务表"
+    AFX_IDS_MDICHILD        "激活该窗口"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PHYSC_DISK          "物理磁盘"
+    IDS_LOGICAL_DRIVER      "逻辑驱动"
+    IDS_NOT_VALIDE_NAME     "不是有效的设备名字,请正确选择"
+    IDS_PROMPT              "提示"
+    IDS_OPEN_FALIED         "打开""{_[STR_POS]_}""失败!!"
+    IDS_ERROR               "错误"
+    IDS_ID                  "ID"
+    IDS_FILE_NAME           "文件名"
+    IDS_TYPE                "类型"
+    IDS_START_SECTOR        "起始扇区"
+    IDS_SECTOR_COUNT        "总扇区数"
+    IDS_SIZE                "大小"
+    IDS_NO_USE_PART         "没使用"
+    IDS_FAT32_PART          "FAT32"
+    IDS_XENIX_ROOT_PART     "XENIX root"
+    IDS_XENIX_USR_PART      "XENIX usr"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FAT16_PART          "FAT16"
+    IDS_EXT_PART            "扩展分区"
+    IDS_NTFS_PART           "NTFS"
+    IDS_AIX_PART            "AIX"
+    IDS_AIX_BOOTABLE_PART   "可引导AIX"
+    IDS_SO2_BOOT_MG_PART    "OS/2 Boot Manage"
+    IDS_OPUS_PART           "OPUS"
+    IDS_HID_FAT12_PART      "Hidden FAT12"
+    IDS_COMPAQ_DIAG_PART    "Compaq diagnost"
+    IDS_AST_WINDOWS_SWAP_PART "AST Windows swap"
+    IDS_HID_VFAT_PART       "Hidden LAB VFAT partition"
+    IDS_NEC_DOS_PART        "NEC DOS"
+    IDS_PART_MAGIC_PART     "Partition Magic"
+    IDS_VENIX_80286_PART    "Venix 80286"
+    IDS_PPC_PREP_PART       "PPC PreP Boot"
+    IDS_SFS_PART            "SFS"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_QNX4_PART           "QNX4.x"
+    IDS_ONTRACK_DM_PART     "Ontrack DM"
+    IDS_CP_M_PART           "CP/M"
+    IDS_EZ_DRIVE_PART       "EZ-Drive"
+    IDS_GOLDEN_BOW_PART     "Golden Bow"
+    IDS_PRIAM_EDICK_PART    "Priam Edick"
+    IDS_SPEED_STOR_PART     "Speed Stor"
+    IDS_GNU_HURD_PART       "GNU HURD or Sys"
+    IDS_NOVELL_NOTWARE_PART "Novell Notware\t"
+    IDS_DISK_SECURE_MULT_PART "Disk Secure Mult"
+    IDS_PC_IX_PART          "PC/IX"
+    IDS_OLD_MINIX_PART      "Old Minix"
+    IDS_MINIX_OLD_LINUX_PART "Minix/Old Linux"
+    IDS_LINUX_SWAP_PART     "Linux交换区"
+    IDS_LINUX_PART          "Linux"
+    IDS_OS2_HID_C_PART      "OS/2 hidden C:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_LINUX_EXT_PART      "Linux externded"
+    IDS_NTFS_VOLUM_SET_PART "NTFS volume set"
+    IDS_AMOEBA_PART         "Amoeba"
+    IDS_AMOEBA_BBT_PART     "Amoeba BBT"
+    IDS_THINKPAD_HID_PART   "Thinkpad hidden partition"
+    IDS_BSD_386_PART        "BSD/386"
+    IDS_OPEN_BSD_PART       "Open BSD"
+    IDS_NEXT_STEP_PART      "NextSTEP"
+    IDS_BSDI_FS_PART        "BSDI fs"
+    IDS_BSDI_SWAP_PART      "BSDI swap"
+    IDS_SOLAIS_BOOT_PART    "Solaris Boot"
+    IDS_DR_OS_NOVELL_PART   "DR-DOS/Novell DOS secured"
+    IDS_SYRINX_PART         "Syrinx"
+    IDS_CP_M_CTOS_PART      "CP/M/CTOS"
+    IDS_DOS_ACCESS_PART     "DOS access"
+    IDS_DOS_R0_PART         "DOS R/O"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_BEOS_FS_PART        "BeOS fs"
+    IDS_DOS_3_3_PART        "DOS 3.3+  secondary"
+    IDS_LAN_STEP_PART       "LAN step"
+    IDS_BBT_PART            "BBT"
+    IDS_MBR_PART            "MBR"
+    IDS_EBR_PART            "EBR"
+    IDS_EMPTY_PART          "NOPART"
+    IDS_REMAIN_PART         "REMAIN"
+    IDS_UNKNOW_PART         "未知区域"
+    IDS_CREATE_TIME         "创建时间"
+    IDS_MODIFY_TIME         "修改时间"
+    IDS_ACCESS_TIME         "访问时间"
+    IDS_ALLOC_SIZE          "分配大小"
+    IDS_REAL_SIZE           "实际大小"
+    IDS_MFT_RECODE          "MFT记录"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_CONTENT_LIST        "显示当前物理磁盘的解析当前的区域列表"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MFT_MODIFY_TIME     "MFT修改时间"
+    IDS_FILE_MODIFY_TIME    "文件修改时间"
+    IDS_MBR_NAME            "主引导记录"
+    IDS_EBR_NAME            "扩展引导记录"
+    IDS_EMPTY_PART_NAME     "未分区区域"
+    IDS_REMAIN_PART_NAME    "剩余扇区"
+    IDS_MAIN_PART           "主分区"
+    IDS_ACTIVITY_PART       "活动分区"
+    IDS_YES                 "是"
+    IDS_NO                  "否"
+    IDS_BYTE_PER_SECTOR     "每扇区字节数"
+    IDS_SECTOR_PER_TRACK    "每磁道扇区数"
+    IDS_CAN_PART_AREA       "可分区区域"
+    IDS_TRACK_PER_CYLINDER  "每柱面磁道数"
+    IDS_CYLINDERS           "柱面数"
+    IDS_CAN_NOT_PART_AREA   "不可分区区域"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_DISK_CONTENT_LIST   "显示当前磁盘的各个区域列表"
+    IDC_FAT3_DIR_LIST       "显示当前目录的文件列表"
+    IDC_NTFS_DIR_LIST       "显示当前目录的文件列表"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CAN_NOT_PART        "不可分区大小"
+    IDS_NO_PART             "未分区大小"
+    IDS_LOGICAL_DRIVER_AREA "逻辑驱动"
+    IDS_LOGICAL_DRIVER_COUNT "分区总数"
+    IDS_MAIN_PART_COUNT     "主分区数"
+    IDS_LOGICAL_PART_COUNT  "逻辑分区数"
+    IDS_DEV_AREA_INDEX      "设备区域ID"
+    IDS_DEV_INFO_AREA       "设备信息"
+    IDS_PART_INFO           "分区信息"
+    IDS_PART_NAME           "分区名字"
+    IDS_PART_SIZE           "分区大小"
+    IDS_RESERVE_SECTOR      "保留扇区数"
+    IDS_SECTOR_PER_CLUST    "每簇扇区数"
+    IDS_FAT1                "FAT1"
+    IDS_FAT2                "FAT2"
+    IDS_FSINFO              "FSInfo"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ROOT_DIR            "根目录扇区"
+    IDS_REMAIN_SECTOR_COUNT "剩余扇区数"
+    IDS_REMAIN_SECTOR_SIZE  "剩余扇区大小"
+    IDS_SECTOR_PER_FAT      "每FAT扇区数"
+    IDS_MFT                 "MFT"
+    IDS_MFTMIRR             "MFTMirr"
+    IDS_FILE_SYSTEM         "文件系统"
+    IDS_DATA_SCAN_AREA      "数据浏览控制"
+    IDS_SECTOR_SCAN         "扇区浏览"
+    IDS_WARNING             "警告"
+    IDS_INVALID_CHAR        "无效字符 '[CHAR]'"
+    IDS_SECTOR_NUM_ERR      "扇区号越界了"
+    IDS_CLUST_SCAN          "簇浏览"
+    IDS_CLUST_NUM_ERR       "簇号越界了"
+    IDS_GET_FILE_ATTR_ERR   "获取文件""{_[STR_POS]_}""属性失败!"
+    IDS_CLUST_NUM           "簇号"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_POS_DATA             "定位到数据区"
+    ID_FAT32_POS_DATA       "在数据区与定位此文件/目录"
+    ID_FAT32_POS_PARAENT_DIR "在父目录中定位此文件/目录"
+    ID_FAT32_SERVE_AS       "将文件读取出来，保存到其他位置"
+    ID_FAT32_FILE_ATTR      "查看文件更多属性，如FAT链表"
+    ID_NTFS_POS_MFT         "在MFT中定位文件"
+    ID_NTFS_POS_PARAENT_DIR "在父目录中定位文件或者目录"
+    ID_NTFS_SERVE_AS        "将文件保存到其他位置"
+    ID_NTFS_FILE_ATTR       "查看文件或者目录的详细信息"
+    ID__32812               "定位到当前属性的标准属性头"
+    ID_POS_STD_ATTR_HEAD    "定位到当前属性的标准属性的属性头"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COPY_FAILED         "文件复制失败"
+    IDS_SCAN                "浏览"
+    IDS_ATTR_ID             "属性ID"
+    IDS_ATTR_NAME           "属性名"
+    IDS_ATTR_TYPE           "属性类型"
+    IDS_ATTR_RESIDENT       "常驻"
+    IDS_ATTR_SIZE           "字节数(hex)"
+    IDS_ATTR_COMPRESSED     "压缩"
+    IDS_ATTR_ENCRYPTED      "加密"
+    IDS_ATTR_SPARSE         "稀疏"
+    IDS_AD_STANDARD_INFORMATION "STANDARD_INFORMATION"
+    IDS_AD_ATTRIBUTE_LIST   "ATTRIBUTE_LIST"
+    IDS_AD_FILE_NAME        "FILE_NAME"
+    IDS_AD_VOLUME_VERSION   "VOLUME_VERSION"
+    IDS_AD_OBJECT_ID        "OBJECT_ID"
+    IDS_AD_SECURITY_DESCRIPTOR "SECURITY_DESCRIPTOR"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_AD_VOLUME_NAME      "VOLUME_NAME"
+    IDS_AD_VOLUME_INFORMATION "VOLUME_INFORMATION"
+    IDS_AD_DATA             "DATA"
+    IDS_AD_INDEX_ROOT       "INDEX_ROOT"
+    IDS_AD_INDEX_ALLOCATION "INDEX_ALLOCATION"
+    IDS_AD_BITMAP           "BITMAP"
+    IDS_AD_SYMBOL_LINK      "SYMBOL_LINK"
+    IDS_AD_REPARSE_POINT    "REPARSE_POINT"
+    IDS_AD_EA_INFORMATION   "EA_INFORMATION"
+    IDS_AD_EA               "EA"
+    IDS_AD_PROPERTY_SET     "PROPERTY_SET"
+    IDS_AD_LOGGED_UNTILITY_STREAM "LOGGED_UNTILITY_STREAM"
+    IDS_YES_HOOK            "√"
+    IDS_READ_ATTR_FAILED    "读取属性失败"
+    IDS_READ_ATTR_SUCCESS   "保存属性成功"
+    IDS_SELECT_FILE_DIR     "选择要打开的文件或目录"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_POS_STD_ATTR_DATA    "定位到当前属性的数据区"
+    ID_SEVER_ATTR           "将当前属性保存到文件"
+    ID_OPEN_FILE            "打开指定文件或目录"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_INVALID_PATH        "无效路径""{_[STR_POS]_}"""
+    IDS_GET_DEV_INTO_ERR    "获取设备信息失败!"
+    IDS_LINUX_LVM           "Linux LVM"
+    IDS_LOCAL_DISK          "本地磁盘"
+    IDS_REMOVEABLE_DISK     "可以动存储设备"
+    IDS_UNKOWE_DISK         "未知存储设备"
+    IDS_VOL_REMOVEABLE      "可移动磁盘"
+    IDS_VOL_LOCAL           "本地磁盘"
+    IDS_VOL_REMOTE          "网络驱动器"
+    IDS_VOL_CD_DVD          "CD/DVD驱动"
+    IDS_VOL_RAM_DISK        "RAM-Disk"
+    IDS_VOL_UNKNOW          "未知存储设备"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_CUR_VIEW   "当前数据区"
+END
+
+#endif    // 中文(中华人民共和国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE 4, 2
+#pragma code_page(936)
+#endif //_WIN32
+#include "res\DiskScan.rc2"  // non-Microsoft Visual C++ edited resources
+#include "l.chs\afxres.rc"          // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
