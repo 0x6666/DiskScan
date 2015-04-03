@@ -1,0 +1,6 @@
+*.sdf
+*.v12.suo
+*.vcxproj.filters
+*.vcxproj.user
+DiskScan/UpgradeLog.htm
+DiskScan/ipch/

@@ -62,14 +62,9 @@ typedef struct _VOLUME_DISK_EXTENTS {
 #endif
 #endif
 
+
 //字符编码的相关库
 #include "../StrTool/StrTool.h"
-#ifdef _DEBUG
-#pragma comment(lib,"../StrTool/Debug/StrTool.lib")
-#else
-#pragma comment(lib,"../StrTool/Release/StrTool.lib")
-#endif
-
 
 /*/////////////////////////////////////////////////////////////////////////
 	关闭一些windows警告开关

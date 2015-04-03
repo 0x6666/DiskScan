@@ -13,12 +13,15 @@
  *				本文件则主要是定义了一下要导出的类，以及一些依赖的数据结
  *				构、数据类型，常用宏等
  ***********************************************************************/
-
+/*
 #ifdef DISKTOOL_EXPORTS
 #define DTOOL_API __declspec(dllexport)
 #else
 #define DTOOL_API __declspec(dllimport)
 #endif
+*/
+
+#define  DTOOL_API
 
 #ifndef  _DISK_TOOL_H_
 #define  _DISK_TOOL_H_

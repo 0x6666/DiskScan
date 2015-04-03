@@ -1,11 +1,13 @@
 /*/////////////////////////////////////////////////////////////////////////
 	这个库主要是用于字符的处理,如字符编码的转换，目前只能是GBK<=>Unicode
 /////////////////////////////////////////////////////////////////////////*/
-#ifdef STRTOOL_EXPORTS
+/*#ifdef STRTOOL_EXPORTS
 #define STRTOOL_API __declspec(dllexport)
 #else
 #define STRTOOL_API __declspec(dllimport)
 #endif
+*/
+#define STRTOOL_API
 
 #ifndef	__STR_TOOL__
 #define __STR_TOOL__

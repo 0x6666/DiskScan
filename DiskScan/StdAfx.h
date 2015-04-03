@@ -36,16 +36,6 @@
 //#ifdef  _INCLUDE_LIB_  //避免库的重复加载  好像这玩意重复加载无所谓
 //#define _INCLUDE_LIB_
 
-#ifdef _DEBUG
-#pragma comment(lib,"../StrTool/Debug/StrTool.lib")
-#pragma comment(lib,"../DiskTool/Debug/DiskTool.lib")
-#else
-#pragma comment(lib,"../StrTool/Release/StrTool.lib")
-#pragma comment(lib,"../DiskTool/Release/DiskTool.lib")
-#endif
-//#endif
-
-
 //字符串中的要替换的名字的位置
 //#define		NAME_POS	_T("[NAME]")
 #define		HCAR_POS	_T("[CHAR]")
