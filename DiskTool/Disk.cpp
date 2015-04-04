@@ -665,7 +665,7 @@ DWORD* Disk::GetLogicalDrives()
 			continue;
 		}
 
-		csLogicN[4] = 'A' + i;
+		csLogicN[4] = char('A' + i);
 		hDev = CreateFileA( csLogicN , 0,
 			FILE_SHARE_READ | FILE_SHARE_WRITE,	//共享模式
 			NULL ,OPEN_EXISTING , 0 , NULL);								//不复制任何文件属性
@@ -691,7 +691,7 @@ DWORD* Disk::GetLogicalDrives()
 
 		//找到了一个属于当前设备的卷
 		pLogic[nCnt].byteOffset.QuadPart = pOutBuf->Extents[0].StartingOffset.QuadPart;
-		pLogic[nCnt++].letter = 'A' + i;
+		pLogic[nCnt++].letter = char('A' + i);
 		CloseHandle(hDev);
 	}
 

@@ -156,7 +156,7 @@ DRES DNtfs::InitMFTBlock()
 	if(DR_OK != run.InitRunList(&ntfsAttr))
 		return DR_INNER_ERR;
 
-	mMftBlockCnt = run.mRunList.size();  //快数量
+	mMftBlockCnt = DWORD(run.mRunList.size());  //快数量
 	mPMftBlock = (PMFT_BLOCK)malloc(sizeof(MFT_BLOCK) * mMftBlockCnt);  //空间分配
 	memset(mPMftBlock , 0 , sizeof(MFT_BLOCK) * mMftBlockCnt);
 
