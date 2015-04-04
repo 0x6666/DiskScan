@@ -54,7 +54,7 @@ void CNtfsInfoView::OnInitialUpdate()
 {
 	//获得当前视图对应的文档对象
 	CNtfsDoc*	pDoc = GetDocument();
-	DNtfs*		pNtfs = pDoc->m_pNtfs;
+	DNtfs*		pNtfs = pDoc->m_pNtfs.get();
 	LONG_INT	size = {0};
 	DWORD		dwSize = 0;
 	CString		strTemp;

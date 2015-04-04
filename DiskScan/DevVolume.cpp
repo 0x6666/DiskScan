@@ -23,7 +23,7 @@ CDevVolumeDlg::CDevVolumeDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CDevVolume)
 		// NOTE: the ClassWizard will add member initialization here
-	m_pImageList = new CImageList();
+	m_pImageList.reset(new CImageList());
 	//}}AFX_DATA_INIT
 }
 // CDevVolumeDlg::~CDevVolumeDlg()
@@ -69,7 +69,7 @@ BOOL CDevVolumeDlg::OnInitDialog()
 void CDevVolumeDlg::InitTreeCtrl()
 {
 	//ÉèÖÃÍ¼Æ¬ÁÐ±í
-	this->m_wndDevVolume.SetImageList(m_pImageList ,TVSIL_NORMAL);
+	this->m_wndDevVolume.SetImageList(m_pImageList.get(),TVSIL_NORMAL);
 	
 	CString	strInfo;
 	int		i = 0;

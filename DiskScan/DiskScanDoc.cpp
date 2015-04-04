@@ -244,7 +244,6 @@ void CDiskDoc::OnClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 	//相应列表的点击事件
 	if (this->m_pContentList)
 	{
-
 		//获得选中的项	
 		nItem = m_pContentList->GetSelectionMark();
 		strStartSec = m_pContentList->GetItemText(nItem , 3 );

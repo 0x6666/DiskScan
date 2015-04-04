@@ -766,7 +766,7 @@ DRES DFat32::AppLFN( WCHAR* c, BYTE* dir)
 {
 	WCHAR	temp  = 0;
 	int		i	  = 0;
-	int		len   = 0;//原有的数据长度
+	size_t	len   = 0;//原有的数据长度
 	WCHAR	buf[14] = {0};
 	
 	for(i = 0 ; i < 13 ; ++i)
@@ -878,17 +878,14 @@ BYTE DFat32::ChkSum(BYTE* pFcbName)
 
 DRES DFat32::OpenFileA(const char* path , DFat32File* file)
 {
-	int		len	  = 0;
-	WCHAR * wPath = NULL;
-
 	//参数错误
 	if (path == NULL || file == NULL) return DR_INVALED_PARAM;
 	
-	len = strlen(path);
-	wPath = new WCHAR[len + 1];
-	MultyByteToUnic(path , wPath , len + 1);
+	size_t len = strlen(path);
+	std::vector<WCHAR> wPath(len + 1, 0);
+	MultyByteToUnic(path , wPath.data(), len + 1);
 
-	return OpenFileW(wPath , file);
+	return OpenFileW(wPath.data(), file);
 	
 }
 
@@ -918,9 +915,12 @@ DRES DFat32::OpenFileW(const WCHAR* path , DFat32File *file)
 
 DRES DFat32::ListFile(DFat32File* fil, FIND_FILE listFun)
 {
+	if (0 == strlen(this->mDevName))
+		return DR_NO_OPEN;
+
 	//DFat32File*	fil		= (DFat32File*)dirc;//已经打开的目录
 	DRES		res		= DR_OK;
-	DirEntry	entry	= {0};		//入口结构
+	DirEntry	entry;		//入口结构
 	BYTE*		dir		= NULL;
 	BYTE		flag	= 0;		//第一个字节的标准
 	BYTE		attr	= 0;		//属性
@@ -929,7 +929,6 @@ DRES DFat32::ListFile(DFat32File* fil, FIND_FILE listFun)
 	WCHAR		nambuf[MAX_LFN+1] = {0}; 
 	
 	//设备还没打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
 	
 	if(!fil || !listFun )
 		return DR_INVALED_PARAM;		//参数错误
@@ -998,12 +997,13 @@ DRES DFat32::ListFile(DFat32File* fil, FIND_FILE listFun)
 
 DRES DFat32::FindFile( DFat32File* dir , FINDER* finder , BOOL findDel /*= FALSE*/ )
 {
+	if (0 == strlen(this->mDevName))
+		return DR_NO_OPEN;
+
 	DRES			 res  = DR_OK;
-	PFat32FileFinder pfff = NULL;
 	int				 len  = 0;
 
 	//设备还没打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
 
 	//先清理一下结果
 	*finder = NULL;
@@ -1014,12 +1014,11 @@ DRES DFat32::FindFile( DFat32File* dir , FINDER* finder , BOOL findDel /*= FALSE
 	if (!dir->IsDir())	 return DR_IS_FILE;
 	
 	//创建一个查找句柄
-	pfff = new Fat32FileFinder();
-	memset(pfff , 0 , sizeof(Fat32FileFinder));
-	
+	std::unique_ptr<Fat32FileFinder> pfff(new Fat32FileFinder());
+
 	//是否是要查找已经删除了的文件
 	pfff->isFindDel = findDel;
-	wcscpy(pfff->path , dir->mPath);
+	wcscpy(pfff->path , dir->mPath.c_str());
 	pfff->isEnd = FALSE;
 // 	len = wcslen(pfff->path);
 // 	//添加分割符
@@ -1034,12 +1033,11 @@ DRES DFat32::FindFile( DFat32File* dir , FINDER* finder , BOOL findDel /*= FALSE
 	res = PosEntry(&(pfff->entry) , 0);			//定位第一个山区的第一个入口结构
 	if (res){
 		//定位失败，这是文件句柄有问题
-		delete pfff;
 		return DR_INVALID_HANDLE;				//定位失败
 	}
 
 	//返回查找句柄
-	*finder = FINDER(pfff);
+	*finder = FINDER(pfff.release());
 
 	return DR_OK;
 }
@@ -1073,7 +1071,7 @@ DRES DFat32::FindNextExistFile( FINDER find , DFat32File* file )
 	BYTE		chSum	= 0;		//短文件名校验和
 	BYTE		order	= 0;		//目录项序号
 	WCHAR		nambuf[MAX_LFN+1] = {0}; 
-	int			len		= 0;
+	size_t		len = 0;
 	WCHAR		path[MAX_PATH + 1] = {0};
 	PFat32FileFinder finder = PFat32FileFinder(find);//查询结构体
 
@@ -1327,9 +1325,11 @@ void DFat32::FindClose( FINDER finder )
 
 DRES DFat32::ListDelFile(DFat32File* fil, FIND_DEL_FILE listFun)
 {
+	if (0 == strlen(this->mDevName))
+		return DR_NO_OPEN;
 //	DFat32File*	fil		= (DFat32File*)(dirc);//已经打开的目录
 	DRES		res		= DR_OK;	//操作结果
-	DirEntry	entry	= {0};		//入口结构
+	DirEntry	entry;		//入口结构
 	BYTE*		dir		= NULL;		//在缓存中的入口结构
 	BYTE		flag	= 0;		//第一个字节的标准
 	BYTE		attr	= 0;		//属性
@@ -1344,7 +1344,6 @@ DRES DFat32::ListDelFile(DFat32File* fil, FIND_DEL_FILE listFun)
 
 
 	//设备还没打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
 
 	if(!fil || !listFun )
 		return DR_INVALED_PARAM;		//参数错误
@@ -1402,7 +1401,7 @@ DRES DFat32::ListDelFile(DFat32File* fil, FIND_DEL_FILE listFun)
 
 					//创建文件句柄
 					//设置删除标志
-					wcscpy(path , fil->mPath);//父路径
+					wcscpy(path , fil->mPath.c_str());//父路径
 					if(wcslen(path) != 1)     //不是在 更目录中找
 						wcscat(path , L"/");	//分隔符
 					wcscat(path , L"*");		//删除标志
@@ -1417,7 +1416,7 @@ DRES DFat32::ListDelFile(DFat32File* fil, FIND_DEL_FILE listFun)
 					(*(char*)dir) = '*';//删除标志
 					SetSFN(nambuf ,dir);
 
-					wcscpy(path , fil->mPath);//父路径
+					wcscpy(path , fil->mPath.c_str());//父路径
 					if(wcslen(path) != 1)     //不是在 更目录中找
 						wcscat(path , L"/");	//分隔符
 					wcscat(path , nambuf);		//文件名

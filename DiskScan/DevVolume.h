@@ -19,7 +19,6 @@ public:
 	
 	CDevVolumeDlg(CWnd* pParent = NULL);   // standard constructor
 
-	virtual ~CDevVolumeDlg() {delete m_pImageList;};
 
 // Dialog Data
 	//{{AFX_DATA(CDevVolume)
@@ -39,7 +38,7 @@ private:
 	HTREEITEM	m_hLogicDrivre;
 
 	//图片列表
-	CImageList* m_pImageList;
+	std::unique_ptr<CImageList> m_pImageList;
 	//初始化图标列表
 	void InitImageList();
 

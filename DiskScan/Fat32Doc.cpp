@@ -564,7 +564,11 @@ void CFat32Doc::OnFat32PosData()
 		SectorList* secList = new SectorList();
 		secList->m_strName = strPath;  //区域名字
 		secList->AddSector(m_liCurSec , this->m_pFat32->GetSecPerClust() );   //先使用一个簇
-		SetSectorListNoCopy(secList);
+		if (FALSE == SetSectorListNoCopy(secList))
+		{
+			delete secList;
+			secList = 0;
+		}
 
 		//创建线程来获取簇链
 		m_bIsGetSeclistRun = FALSE;
@@ -669,7 +673,9 @@ void CFat32Doc::OnFat32PosParaentDir()
 	{//数据区不可能出现 为0的山区号
 		//为空就直接使用磁盘的 
 		this->ReSetSectorList();
-	}else{
+	}
+	else
+	{
 		SectorList* secList = new SectorList();
 		secList->m_strName = strCurPath;  //区域名字
 		secList->AddSector(dwSector , this->m_pFat32->GetSecPerClust() );   //先使用一个簇
@@ -693,8 +699,11 @@ void CFat32Doc::OnFat32PosParaentDir()
 			m_hGetSectorListThread = ::CreateThread(NULL , 0 , GetFAT32FileSectorList , this , 0 , NULL);
 			Sleep(50); //休息一下
 		}
+		else
+		{
+			delete secList;
+		}
 	}
-
 
 	//计算目录所在簇号  每一个目录入口32个字节
 
@@ -708,9 +717,6 @@ void CFat32Doc::OnFat32PosParaentDir()
 	liSector.QuadPart = m_pFat32->ClustToSect(dwClust);
 	liSector.QuadPart +=((parentIndex * 32) / SECTOR_SIZE) % m_pFat32->GetSecPerClust();
 
-
-
-
 	//设置当前扇区
 	this->SetCurSector(liSector);
 	
@@ -721,7 +727,6 @@ void CFat32Doc::OnFat32PosParaentDir()
 
 	//选择
 	this->SetSel(liSector , liEnd);
-
 }
 
 void CFat32Doc::OnFat32ServeAs()

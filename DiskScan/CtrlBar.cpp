@@ -12,6 +12,10 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#ifndef GCL_HBRBACKGROUND
+#define GCL_HBRBACKGROUND   (-10)
+#endif // GCL_HBRBACKGROUND
+
 /////////////////////////////////////////////////////////////////////////////
 // CCCtrlBar dialog
 
@@ -75,7 +79,7 @@ BOOL CCtrlBar::Create(CWnd* pParentWnd,UINT nIDTemplate,UINT nStyle,UINT nID , C
 }
 LRESULT CCtrlBar::OnInitDialog(UINT wParam, LONG lParam)
 {
-	BOOL bRet = HandleInitDialog(wParam, lParam);
+	LRESULT bRet = HandleInitDialog(wParam, lParam);
 	
 	if (!UpdateData(FALSE))
 		TRACE0("Warning: UpdateData failed during dialog init.\n");

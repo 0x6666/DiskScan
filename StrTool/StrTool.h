@@ -106,7 +106,7 @@ param
 return 
 	转换了的多字节字符数，或者需要的缓存空间大小(不包括NUL)
 ********************************************************************************************/
-STRTOOL_API DWORD WINAPI MultyByteToUnic(const CHAR* src , WCHAR* buf , DWORD bufLen , UINT codepage = CP_GBK);
+STRTOOL_API DWORD WINAPI MultyByteToUnic(const CHAR* src , WCHAR* buf ,size_t bufLen , UINT codepage = CP_GBK);
 
 /*******************************************************************************************
 将Unicode字符中的英文字符转换成大写形式

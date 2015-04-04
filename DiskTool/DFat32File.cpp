@@ -25,33 +25,33 @@ DFat32File::DFat32File()
 , mWrtDate(0)
 , mWrtTime(0)
 {
-	this->mPath = new WCHAR[MAX_PATH + 1];
-	memset(mPath , 0 , sizeof(WCHAR) * (MAX_PATH + 1));
 }
 
 
 DFat32File::~DFat32File()
 {
-	if (this->mPath) delete[] mPath;
+
 }
+
 const WCHAR* DFat32File::GetFileName()
 {
-	WCHAR*	p	= NULL;
-	int		len = 0;
+	size_t len = 0;
 
 
 	if (this->mFS == NULL) return NULL;	//当前文件根本就没有打开
-	len = wcslen(this->mPath);//文件路径的长度
+	len = mPath.length();//文件路径的长度
 	
-	if (!len) return NULL;
+	if (!len)
+		return NULL;
 
 	//就是跟目录
-	if (len == 1) return mPath;
+	if (len == 1)
+		return mPath.c_str();
 
-		
-	//找最后一个  路径分割符	
-	for (p = this->mPath + len -1; !IsPathSeparator(*p) ; --p);
-	
+	//找最后一个,路径分割符
+	const WCHAR* p = this->mPath.c_str() + len - 1;
+	for (; !IsPathSeparator(*p); --p);
+
 	return ++p;
 
 }
@@ -70,15 +70,13 @@ BOOL DFat32File::IsValid()
 {
 	return (this->mFS != NULL);	
 }
+
 void DFat32File::Close()
 {
-	if (this->mPath)
-	{
-		delete[] mPath;
-		mPath = NULL;
-	}
+	mPath.clear();
 	mFS = NULL;
 }
+
 DRES DFat32File::ReadFile( char* buf, DWORD* dwReaded, DWORD dwToRead /*= SECTOR_SIZE*/ )
 {
 	DRES  res		= DR_OK;
@@ -198,21 +196,16 @@ DRES DFat32File::InitFile( PVOID entr ,const WCHAR* path ,DFat32 * fs )
 	mWrtDate	= 0;
 	mWrtTime	= 0;
 
-
-	if (this->mPath)	delete[] mPath;
-	//分配路径缓存
-	mPath = new WCHAR[wcslen(path) + 1];
-	
-	//路径的拷贝
-	wcscpy(this->mPath , path);		//复制路径名
-	this->mIndex = entry->mIndex;
+	mPath = path;
 
 	if(!dir)//跟目录
 	{
 		this->mAttr = ATTR_VOLUME_ID|ATTR_DIRECTORY;
 		this->mStartClust = this->mFS->m1stDirClut;
 		this->mFileSize = 0;
-	}else{
+	}
+	else
+	{
 		this->mAttr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;	//文件属性
 		this->mStartClust = (PSDE(dir)->mFstClusHI << 16)|PSDE(dir)->mFstClusLO;//簇号
 		this->mFileSize = PSDE(dir)->mFileSize;//文件的大小

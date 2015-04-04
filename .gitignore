@@ -4,3 +4,7 @@
 *.vcxproj.user
 DiskScan/UpgradeLog.htm
 DiskScan/ipch/
+DiskScan/DiskScan.opensdf
+DiskScan/x64/
+DiskTool/x64/
+StrTool/x64/

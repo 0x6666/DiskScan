@@ -26,6 +26,10 @@
 #ifndef  _DISK_TOOL_H_
 #define  _DISK_TOOL_H_
 
+#ifdef _DEBUG
+//#include <vld.h>
+#endif
+
 //因为要导出类，所以有必要保证到处前后的内存对齐方式一致
 #pragma pack(push  , 8 )
 
@@ -56,6 +60,8 @@ typedef unsigned char		BYTE;
 #include "windows.h"
 
 #endif // _MSC_VER
+#include <vector>
+#include <memory>
 
 typedef int					DRES;    //操作结构类型
 
@@ -76,6 +82,8 @@ typedef union _tagLONG_INT{
 		long          HighPart;
 	};
 	__int64 QuadPart;
+
+	_tagLONG_INT(long v = 0) : QuadPart(v){}
 } LONG_INT , *PLONG_INT;
 
 
@@ -704,7 +712,7 @@ private:
 	DWORD	mPointer;			//当前文件读写指针
 	DWORD   mIndex;				//此文件对应的段文件入口所在父目录中的目录项索引
 	
-	WCHAR*	mPath;				//此文件的路径
+	std::wstring mPath;			//此文件的路径
 
 	DFat32* mFS;				//此文件所属的文件系统
 
@@ -1362,7 +1370,7 @@ public:	//公开方法
 
 
 /************************************************************************/
-/* Run的各种炒作方发                                                    */
+/* Run的各种操作方发                                                    */
 /************************************************************************/
 class DTOOL_API DRun{
 private://运行列表
@@ -1419,8 +1427,14 @@ public:
 		DWORD		id;			//属性id
 		DWORD		attrType;	//属性类型 ATTR_*
 		LONG_INT	mftIndex;	//当前属性所属的MFT记录 
-		BYTE*		attrDataPtr;//属性的数据地址
+		std::vector<BYTE> attrDataBuf;//属性的数据地址
 		WORD		off;		//当前属性在当前MFT中的偏移 
+
+		_AttrItem()
+			: id(0)
+			, attrType(0)
+			, off(0)
+		{}
 	}AttrItem , *PAttrItem;
 private:
 
@@ -1436,9 +1450,10 @@ private:
 
 	//这个运行时文件无名数据运行
 	//获得目录的INDEX_ALLOCATION
-	DRun*		mPRun;			//运行
+	std::unique_ptr<DRun>		m_upRun;	//数据流
 
-	BYTE*		mMftHeadPtr;	//Mft记录的头部
+	//BYTE*		mMftHeadPtr;	
+	std::vector<BYTE> mMftHeadBuf; //Mft记录的头部
 
 protected:
 	//////////////////////////////////////////////////////////////////////////
@@ -1492,7 +1507,7 @@ public:
 	//			DR_NO_OPEN			没有打开设备
 	//			DR_INVALED_PARAM	参数错误
 	//////////////////////////////////////////////////////////////////////////
-	DRES FineNoNameDataAttr(DNtfsAttr* attr);
+	DRES FindNoNameDataAttr(DNtfsAttr* attr);
 
 	//////////////////////////////////////////////////////////////////////////
 	//获得磁记录在MFT中的索引号，如果构造失败的话，返回的是-1

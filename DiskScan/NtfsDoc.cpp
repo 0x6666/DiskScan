@@ -32,25 +32,14 @@ CNtfsDoc::CNtfsDoc()
 , m_bIsRun(FALSE)
 {
 	m_liStartSec.QuadPart = 0;
-	m_pNtfs = new DNtfs();
+	m_pNtfs.reset(new DNtfs());
 	m_strOpenParam = _T("");
 /*	m_pEveIsRun = new CEvent(FALSE , TRUE , NULL , NULL);*/
-	m_pImgList = new CImageList();
+	m_upImgList.reset(new CImageList());
 }
 
 CNtfsDoc::~CNtfsDoc()
 {
-	if (this->m_pNtfs)
-	{//释放相应的资源
-		delete this->m_pNtfs;
-		this->m_pNtfs = NULL;
-	}
-
-	if (NULL != m_pImgList)
-	{
-		delete m_pImgList;
-	}
-
 // 	if (this->m_pEveIsRun)
 // 	{
 // 		m_pEveIsRun->SetEvent();  //还是先出发吧
@@ -110,12 +99,12 @@ BOOL CNtfsDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	WCHAR  volName[MAX_PATH] = {0};
 
 	//创建图标列表
-	m_pImgList->Create(12,12,ILC_COLORDDB|ILC_MASK , 0 , 1);
+	m_upImgList->Create(12,12,ILC_COLORDDB|ILC_MASK , 0 , 1);
 	//this->m_pImgList->Create(16 , 16 ,ILC_COLOR32|ILC_MASK , 0 , 4);
 	HICON hIcon = AfxGetApp()->LoadIcon(IDI_FILE);//文件  0
-	m_pImgList->Add(hIcon);
+	m_upImgList->Add(hIcon);
 	hIcon = AfxGetApp()->LoadIcon(IDI_FOLDER);//目录     1
-	m_pImgList->Add(hIcon);	
+	m_upImgList->Add(hIcon);
 
 	//获得需要的内容列表
 	POSITION pos = GetFirstViewPosition();
@@ -123,7 +112,7 @@ BOOL CNtfsDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	this->m_pContentList = &((CChildFrm*)(view->GetParentFrame()))->m_DisList;
 	//对列表进行初始化
 	InitContentListHead();
-	this->m_pContentList->SetImageList(m_pImgList , LVSIL_SMALL);
+	this->m_pContentList->SetImageList(m_upImgList.get(), LVSIL_SMALL);
 
 	//简单的数据初始化
 	this->m_liCurSec.QuadPart = 0;
@@ -755,10 +744,13 @@ void CNtfsDoc::OnCloseDocument()
 		delete m_pNtfsFileDlg;
 	}
 
-	if (NULL != m_pImgList)
+	if (m_upImgList)
 	{
-		m_pImgList->DeleteImageList();
+		m_upImgList->DeleteImageList();
 	}
+
+	if (m_pNtfs)
+		m_pNtfs->CloseDev();
 
 	CDataDoc::OnCloseDocument();
 }

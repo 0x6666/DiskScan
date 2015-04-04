@@ -539,6 +539,20 @@ typedef struct _tagDIR_ENTRY
 	BYTE	mSFN[11];	//短文件名
 	BOOL	mIsDelFile;	//是否是已经删除来的文件
 	WCHAR	mLFN[MAX_LFN];//长文件名工作空间 255个字节的大小
+
+	_tagDIR_ENTRY()
+		: mIndex(0)
+		, mStartClust(0)
+		, mCurClust(0)
+		, mCurSect(0)
+		, mDir(0)
+		, mStatus(0)
+		, mIsDelFile(0)
+	{
+		memset(mSFN, 0, 11);
+		memset(mLFN, 0, MAX_LFN);
+	}
+
 }DirEntry , *PDirEntry;
 
 
@@ -561,9 +575,11 @@ class DList
 {
 public:
 	//单向链表的节点
-	typedef struct __tagList_Node{
-	__tagList_Node*	mNext;
-	PVOID			mData;
+	typedef struct __tagList_Node {
+		__tagList_Node* mNext;
+		PVOID			mData;
+
+		__tagList_Node() :mNext(0), mData(0){}
 	}Node,*PNode;
 
 private:
@@ -616,7 +632,8 @@ public:
 			NULL            没有指定的节点
 	******************************************************************/
 	PVOID DeletePart(int index);
-	
+	void Clear();
+
 	/*****************************************************************
 	获得链表的节点数量
 	******************************************************************/
@@ -664,6 +681,13 @@ typedef struct _tagFat32FileFinder{
 	DirEntry	entry;			//一个查找的入口
 	WCHAR		path[MAX_PATH + 1];//被查找的目录路径
 
+	_tagFat32FileFinder()
+		: isFindDel(false)
+		, isEnd(false)
+	{
+		memset(path, 0, MAX_PATH + 1);
+	}
+
 }Fat32FileFinder , *PFat32FileFinder;
 
 
@@ -674,6 +698,8 @@ typedef struct _tagFileFindHander{
 	LONG_INT	vcn;		//虚拟簇号  -1 表示indexRoot中的
 	int			index;		//在制定vcn入口索引
 	DNtfsFile	dir;		//被查找的目录
+
+	_tagFileFindHander() : index(0){}
 }FIND_FILE_HANDER , *PFIND_FILE_HANDER;
 
 //////////////////////////////////////////////////////////////////////////

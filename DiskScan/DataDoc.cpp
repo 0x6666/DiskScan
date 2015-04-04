@@ -226,13 +226,9 @@ BOOL CDataDoc::SetSectorListNoCopy( SectorList* pSecList )
 	}
 	this->m_pCurSecList = pSecList;
 
-
 	CHexDataView* pView = GetHexDataView();
 
-	if (NULL == pView)
-	{//没有找到十六进制视图
-		return FALSE;
-	}
+	ASSERT(pView);
 
 	pView->SetStartSector(m_pCurSecList->GetStartSector());
 

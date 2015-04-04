@@ -55,7 +55,7 @@ BOOL CNtfsFileDlg::SetFilePath( CString strSelPath )
 	DNtfs*		pNtfs;
 	DRES		res = DR_OK;
 	
-	pNtfs = this->m_pDoc->m_pNtfs;
+	pNtfs = this->m_pDoc->m_pNtfs.get();
 
 	//先不管有没有打开，关闭一下，避免资源泄露
 	this->m_pFile->Close();
@@ -107,7 +107,7 @@ void CNtfsFileDlg::UpdateFileData()
 		//获得属性对象
 		pAttrItem = this->m_pFile->GetAttr((DWORD)i);
 		if (NULL == pAttrItem) ASSERT(FALSE);
-		ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
+		ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 		
 		//属性ID
 		strTemp.Format(_T("%d") , pAttrItem->id);
@@ -264,7 +264,7 @@ void CNtfsFileDlg::OnNMClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult)
 	this->m_pDoc->SetCurSector(liSector);
 
 	//选择
-	ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
+	ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 	liSector.QuadPart *= SECTOR_SIZE;
 	liSector.QuadPart += (pAttrItem->off % SECTOR_SIZE);
 	liEnd.QuadPart = liSector.QuadPart + ntfsAttr.GetAllLen();
@@ -284,14 +284,14 @@ void CNtfsFileDlg::UpdateDosAttr()
 	pAttrItem = this->m_pFile->FindAttribute(AD_STANDARD_INFORMATION);
 	if ( NULL != pAttrItem)
 	{
-		ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
+		ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 		dwFlags = ntfsAttr.SIGetFlags();
 	}
 	//文件名的DOS属性
 	pAttrItem = this->m_pFile->FindAttribute(AD_FILE_NAME);
 	if ( NULL != pAttrItem)
 	{
-		ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
+		ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 		dwFlags |= ntfsAttr.FNGetFlags();
 	}
 	
@@ -501,7 +501,7 @@ void CNtfsFileDlg::OnPosStdAttrHead()
 	this->m_pDoc->SetCurSector(liSector);
 
 	//选择
-	ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
+	ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 	liSector.QuadPart *= SECTOR_SIZE;
 	liSector.QuadPart += (pAttrItem->off % SECTOR_SIZE);
 
@@ -583,7 +583,7 @@ void CNtfsFileDlg::OnSeverAttr()
 			break;
 	}
 	if (i == nAttrCnt) ASSERT(FALSE);   //这是不允许出现的情况
-	ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
+	ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 
 
 	//打开要写的文件
@@ -600,7 +600,7 @@ void CNtfsFileDlg::OnSeverAttr()
 	}
 
 	//将数据写到文件
-	if(FALSE == ::WriteFile(hFile , pAttrItem->attrDataPtr ,
+	if (FALSE == ::WriteFile(hFile, pAttrItem->attrDataBuf.data(),
 		ntfsAttr.GetAllLen() , &dwWriten , NULL ))
 	{//读取属性失败
 		CString strTitle;
@@ -663,7 +663,7 @@ void CNtfsFileDlg::OnPosStdAttrData()
 	this->m_pDoc->SetCurSector(liSector);
 
 	//选择
-	ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
+	ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 	liSector.QuadPart *= SECTOR_SIZE;
 	liSector.QuadPart += (pAttrItem->off % SECTOR_SIZE);
 	liEnd.QuadPart = liSector.QuadPart + ntfsAttr.GetAllLen();

@@ -21,12 +21,6 @@
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
 
-
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_STDAFX_H__0EFB6409_A313_4567_8F5C_93EC408EBA66__INCLUDED_)
-
-
 #include "winioctl.h"
 
 //添加相关的库文件
@@ -159,3 +153,10 @@
 //定义为1时表示 WinNT，定义为0时则表示Win2K
 //////////////////////////////////////////////////////////////////////////
 #define FOR_NT	1
+
+#include <vld.h>
+
+// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+
+#endif // !defined(AFX_STDAFX_H__0EFB6409_A313_4567_8F5C_93EC408EBA66__INCLUDED_)
+

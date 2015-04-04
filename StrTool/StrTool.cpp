@@ -79,7 +79,7 @@ WCHAR SearchTable(WCHAR src , const USHORT tbl[][2] , const UINT tbLen)
 	else
 		return tbl[high][1];//找到了
 }
-DWORD WINAPI MultyByteToUnic(const CHAR* src , WCHAR* buf , DWORD bufLen , UINT codepage)
+DWORD WINAPI MultyByteToUnic(const CHAR* src, WCHAR* buf, size_t bufLen, UINT codepage)
 {
 	DWORD dwNeed = 0;
 	//计算需要的空间大小

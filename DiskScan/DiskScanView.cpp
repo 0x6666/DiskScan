@@ -168,7 +168,7 @@ LRESULT CHexDataView::OnGetData(WPARAM isNext, LPARAM ptr)
 	DataWnd::PDATA_BUF buf = (DataWnd::PDATA_BUF)ptr;
 
 	//读取指定的数据
-	if(! pDoc->ReadData((void*)(buf->mBuf) , &(buf->mOff)  , isNext, SEC_SIZE))
+	if(0 == pDoc->ReadData((void*)(buf->mBuf) , &(buf->mOff), 0 != isNext, SEC_SIZE))
 		buf->mOff.QuadPart = -1;
 	
 	return 0 ;
@@ -178,10 +178,10 @@ LRESULT CHexDataView::OnChangeWidth(WPARAM width, LPARAM ptr)
 	//子控件的大小改变了
 
 	//设置滚动条的滚动范围
-	SetScrollSizes(MM_TEXT , CSize(width - 10 , 50));
+	SetScrollSizes(MM_TEXT , CSize(int(width - 10) , 50));
 
 	//设置滚动条的最大数据区域宽度
-	((CChildFrm*)this->GetParentFrame())->m_wndSplitter.SetMinWidth(width);
+	((CChildFrm*)this->GetParentFrame())->m_wndSplitter.SetMinWidth(int(width));
 
 	return 0;
 }
@@ -192,12 +192,12 @@ void CHexDataView::SetSecCount(LONG_INT cnt)
 	//this->SetSecCount(cnt);
 }
 
-LRESULT CHexDataView::OnChangeSector( WPARAM low , LPARAM  hig)
+LRESULT CHexDataView::OnChangeSector(WPARAM low , LPARAM  hig)
 {
 	CDataDoc* pDoc = GetDocument();
-	LONG_INT liSecrot	= {0};
-	liSecrot.LowPart	= low;
-	liSecrot.HighPart	= hig;
+	LONG_INT liSecrot = {0};
+	liSecrot.LowPart = (unsigned long)low;
+	liSecrot.HighPart = (unsigned long)hig;
 
 	pDoc->ChangeCurSector(liSecrot , this);
 

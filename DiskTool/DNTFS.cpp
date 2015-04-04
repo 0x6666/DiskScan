@@ -65,20 +65,24 @@ DNtfs::DNtfs()
 	this->mCluForMFTMirr.QuadPart	= 0;
 	this->mCluForMFT.QuadPart		= 0;
 }
+
 DNtfs::~DNtfs()
 {
 }
+
 DRES DNtfs::OpenDev(const char* devName, const PLONG_INT off)
 {
+	if (!devName || !off)
+		return DR_INVALED_PARAM;	//参数错误?
+
+	if (this->mDevName)
+		return DR_ALREADY_OPENDED;	//设备已经打开？
+
 	DRES		res = DR_OK;
-	int			len = 0;
+	size_t		len = 0;
 	char		buf[SECTOR_SIZE] = {0};
 	PNTFS_DBR	pDBR = (PNTFS_DBR)buf;
 	LONG_INT	temp = {0};
-     
-	if (!devName || !off)	return DR_INVALED_PARAM;	//参数错误?
-	if (this->mDevName)		return DR_ALREADY_OPENDED;	//设备已经打开？
-
 
 	//掀背一下设备名字  
  	len = strlen(devName);
@@ -149,7 +153,7 @@ DRES DNtfs::InitMFTBlock()
 	if (res != DR_OK) return res;  //文件打开失败
 
 	//获得无名数据属性 
-	if(DR_OK != mftFile.FineNoNameDataAttr(&ntfsAttr))
+	if(DR_OK != mftFile.FindNoNameDataAttr(&ntfsAttr))
 	{//获取无名数据属性失败
 		return DR_INNER_ERR;
 	}
@@ -293,7 +297,9 @@ int DNtfs::FileNameCmp(const WCHAR * src1,const WCHAR * src2 , int len , BOOL ca
 
 DRES DNtfs::OpenFileW(DNtfsFile *file , LONG_INT idx)
 {
-	if (!file)	return DR_INVALED_PARAM;
+	if (!file)
+		return DR_INVALED_PARAM;
+
 	//设备根本就没有打开
 	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
 
@@ -321,7 +327,7 @@ DRES DNtfs::OpenFileA(const char* path , DNtfsFile *file/* , DWORD attr*/ /*= AT
 
 DRES DNtfs::OpenFileW(const WCHAR* path , DNtfsFile *file /*,DWORD attr*/)
 {
-	DWORD		nameLen		= 0;	//文件名的总长度
+	size_t		nameLen		= 0;	//文件名的总长度
 	DWORD		nameSegLen	= 0;	//文件名的一部分的长度
 	const WCHAR*  name		= path; //当前文件名
 	DWORD		i			= 0;
@@ -394,7 +400,7 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 	INDEX_ENTRY*	indexEntry	= NULL;
 	LONG_INT		vcn			= {0};	//虚拟簇号
 	LONG_INT		lcn			= {0};	//逻辑簇号
- 	void*			indexBlock  = NULL; //索引缓存区的其实地址
+	std::vector<BYTE> indexBlockBuf;//索引缓存区的其实地址
  	PFILE_NAME		fn			= NULL; //文件属性指针
 	DNtfsFile		root;
  	DNtfsAttr		attrRoot;
@@ -459,8 +465,7 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 
 
 	//先申请一块索引缓存区的缓存
-	indexBlock = new BYTE[blockSize];
-	memset(indexBlock , 0 , blockSize);//清理一下
+	indexBlockBuf.resize(blockSize, 0);
 
 	int bitCnt = attrBitMp.R_GetAttrLen() * 8;  //bitmap中的bit数
 	vcn.QuadPart = 0;//其实vcn
@@ -482,21 +487,21 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 		lcn = root.GetLCNByVCN(vcn , NULL);
 		//lcn = attrAllocation.IAGetLCNByVCN(&vcn , NULL);
 		lcn.QuadPart *= this->mSecPerClu; 
-		this->ReadData(indexBlock , &lcn ,blockSize , TRUE );//读取指定的数据
+		this->ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//读取指定的数据
 
 		//线恢复usa
-		PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlock);
+		PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlockBuf.data());
 
 		//获得usa的数量  
 		int		usaCnt = ibh->IB_USNSz ;
 		WORD	us	   = 0;
 		DWORD	offUsa = ibh->IB_USOff;
 		int		i	   = 0;
-		DWORD	usn	   = GetWORD((BYTE*)indexBlock + offUsa);
+		DWORD	usn = GetWORD(indexBlockBuf.data() + offUsa);
 
 		for (i = 1 ; i < usaCnt ; ++i){
-			us = GetWORD((BYTE*)indexBlock + offUsa + i * 2);
-			SetWORD((BYTE*)indexBlock + 512 * i -2 , us);
+			us = GetWORD(indexBlockBuf.data() + offUsa + i * 2);
+			SetWORD(indexBlockBuf.data() + 512 * i - 2, us);
 		}
 
 		//对应虚拟簇号
@@ -531,7 +536,6 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 			{//找到了
 				if(!(fn->FN_DOSAttr & attr)) 		continue;	//属性不服
 				mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16)>>16; //去掉高两个字节的mft序列号
-				if(indexBlock)	delete[] (BYTE*)indexBlock;
 				return DR_OK;   //找到了就直接返回
 			}else
 				continue;
@@ -540,10 +544,6 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 		//下一个簇号
 		++vcn.QuadPart;
 	}
-
-	//释放索引缓存空间
-	if(indexBlock)	delete[] (BYTE*)indexBlock;
-	indexBlock = NULL;    
 
 	return res;
 }
@@ -629,7 +629,7 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 		root.Close();
 		return DR_INIT_ERR;
 	}
-	attrRoot.InitAttr(pAttrItem->attrDataPtr);
+	attrRoot.InitAttr(pAttrItem->attrDataBuf.data());
 	
 
 	//索引表的第一个入口的地址
@@ -665,7 +665,7 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 						//当前MFT的INDEX_ROOT属性
 						pLIStartFDT->QuadPart += pAttrItem->off;
 						//INDEX_ROOT中的当前入口的偏移
-						pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - pAttrItem->attrDataPtr);
+						pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - pAttrItem->attrDataBuf.data());
 						
 						//当前FDT的长度
 						if (NULL != fdtLen) *fdtLen = indexEntry->IE_Size;
@@ -724,7 +724,7 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 				//当前MFT的INDEX_ROOT属性
 				pLIStartFDT->QuadPart += pAttrItem->off;
 				//INDEX_ROOT中的当前入口的偏移
-				pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - pAttrItem->attrDataPtr);
+				pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - pAttrItem->attrDataBuf.data());
 
 				//当前FDT的长度
 				if (NULL != fdtLen) *fdtLen = indexEntry->IE_Size;
@@ -739,11 +739,9 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 }
 DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int len , PLONG_INT mftIdx  , PLONG_INT pLIStartFDT , WORD* fdtLen/* , DWORD attr*/)
 {
-	void*		indexBlock	= NULL;  //索引缓存区的其实地址
 	LONG_INT	lcn			= {0};//逻辑簇号
 	DRES		res			= DR_NO;
 	DNtfsAttr	attrAllocation;
-	DWORD		blockSize	= 0;
 	DNtfsAttr	attrRoot;
 	INDEX_ENTRY* indexEntry	= NULL;
 	BYTE*		blockEnd	= 0;
@@ -761,40 +759,40 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 	if (res != DR_OK)	return DR_INIT_ERR;  //内部错误
 
 	//索引块的大小
-	blockSize = attrRoot.IRGetIndexBlockSize();
+	DWORD blockSize = attrRoot.IRGetIndexBlockSize();
 
 	//先申请一块索引缓存区的缓存
-	indexBlock = new BYTE[blockSize];
-	memset(indexBlock , 0 , blockSize);//清理一下
+	std::vector<BYTE> indexBlockBuf(blockSize, 0);
 
 	//获得逻辑簇号
 	lcn = root->GetLCNByVCN(vcn , NULL);
 	//lcn = attrAllocation.IAGetLCNByVCN(&vcn , NULL);
 	lcn.QuadPart *= this->mSecPerClu; 
-	this->ReadData(indexBlock , &lcn ,blockSize , TRUE );
+	this->ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);
 	
 	//先保存一下index_block的物理位置
-	if ( NULL != pLIStartFDT )	pLIStartFDT->QuadPart = lcn.QuadPart * SECTOR_SIZE;
+	if (NULL != pLIStartFDT)
+		pLIStartFDT->QuadPart = lcn.QuadPart * SECTOR_SIZE;
 
 	//线恢复usa
-	PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlock);
+	PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlockBuf.data());
 
 	//获得usa的数量  
 	int		usaCnt	= ibh->IB_USNSz ;
 	WORD	us		= 0;
 	DWORD	offUsa	=  ibh->IB_USOff;
 	int		i		= 0;
-	DWORD	tusn, usn = GetWORD((BYTE*)indexBlock + offUsa);
-	for (i = 1 ; i < usaCnt ; ++i){
-		us = GetWORD((BYTE*)indexBlock + offUsa + i * 2);
-		tusn = GetWORD((BYTE*)indexBlock + 512 * i -2);
-		SetWORD((BYTE*)indexBlock + 512 * i -2 , us);
+	DWORD	tusn, usn = GetWORD(indexBlockBuf.data() + offUsa);
+	for (i = 1 ; i < usaCnt ; ++i)
+	{
+		us = GetWORD(indexBlockBuf.data() + offUsa + i * 2);
+		tusn = GetWORD(indexBlockBuf.data() + 512 * i - 2);
+		SetWORD(indexBlockBuf.data() + 512 * i - 2, us);
 	}
 
 	if (vcn.QuadPart != ibh->IB_VCN.QuadPart)
-	{//虚拟簇号不匹配
-		if(indexBlock)	delete[] (BYTE*)indexBlock;
-		indexBlock = NULL;
+	{
+		//虚拟簇号不匹配
 		return DR_INIT_ERR;
 	}
 
@@ -828,7 +826,7 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 					{//计算FDT的起始位置
 
 						//INDEX_ROOT中的当前入口的偏移
-						pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - (BYTE*)indexBlock);
+						pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - indexBlockBuf.data());
 
 						//当前FDT的长度
 						if (NULL != fdtLen) *fdtLen = indexEntry->IE_Size;
@@ -875,7 +873,7 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 			{//计算FDT的起始位置
 
 				//INDEX_ROOT中的当前入口的偏移
-				pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - (BYTE*)indexBlock);
+				pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - indexBlockBuf.data());
 
 				//当前FDT的长度
 				if (NULL != fdtLen) *fdtLen = indexEntry->IE_Size;
@@ -886,28 +884,24 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 		}
 	}
 
-	//释放索引缓存空间
-	if(indexBlock)	delete[] (BYTE*)indexBlock;
-	indexBlock = NULL;
-
 	return res;
 }
 DRES DNtfs::FindFile(DNtfsFile* root , FINDER*  hFin)
 {
-	DRES			  res   = DR_OK;
-	PFIND_FILE_HANDER hFind = NULL;
+	DRES res = DR_OK;
 	*hFin = NULL;
 
 	//设备根本就没有打开
 	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
 
 	//安检
-	if (root == NULL || hFin == NULL) return DR_INVALED_PARAM;
-	if (!root->IsDir()) return DR_IS_FILE;	//需要的是目录
+	if (root == NULL || hFin == NULL)
+		return DR_INVALED_PARAM;
+	if (!root->IsDir())
+		return DR_IS_FILE;	//需要的是目录
 
 	//内存分配
-	hFind = new FIND_FILE_HANDER();
-	memset(hFind , 0 , sizeof(FIND_FILE_HANDER));
+	std::unique_ptr<FIND_FILE_HANDER> hFind(new FIND_FILE_HANDER());
 	hFind->vcn.QuadPart = -1;
 	hFind->index = 0;
 
@@ -915,15 +909,13 @@ DRES DNtfs::FindFile(DNtfsFile* root , FINDER*  hFin)
 	res = this->OpenFileW( &hFind->dir , root->GetMftIndex());
 	//无效的路径
 	if (res == DR_NO){
-		delete hFind;
 		return DR_INVALID_NAME;
 	}
 	if (res != DR_OK) {
-		delete hFind;
 		return DR_INIT_ERR;		//其他的初始化错误或者内部错粗
 	}
 	//要返回的句柄
-	*hFin = FINDER(hFind);
+	*hFin = FINDER(hFind.release());
 	
 	return DR_OK;
 
@@ -941,17 +933,18 @@ DRES DNtfs::FindFile(const char* root , FINDER*  hFind)
 }
 DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 {
-	DRES			  res	= DR_OK;
-	PFIND_FILE_HANDER hFind = NULL;
+	DRES res = DR_OK;
 	*hFin = NULL;
 	
 	//安检
-	if (!path || !hFin /*|| !mftIndx */)return DR_INVALED_PARAM;
-	if (!this->mDevName) return DR_NO_OPEN;		//系统海眉头初始化
+	if (!path || !hFin /*|| !mftIndx */)
+		return DR_INVALED_PARAM;
+
+	if (!this->mDevName)
+		return DR_NO_OPEN;		//系统海眉头初始化
 
 	//清零查找句柄
-	hFind = new FIND_FILE_HANDER();
-	memset(hFind , 0 , sizeof(FIND_FILE_HANDER));
+	std::unique_ptr<FIND_FILE_HANDER> hFind(new FIND_FILE_HANDER());
 	hFind->vcn.QuadPart = -1;
 	hFind->index = 0;
 
@@ -959,16 +952,14 @@ DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 	res = this->OpenFileW(path ,&hFind->dir /*, ATTR_DIRECTORY|ATTR_DIRECTORY_INDEX*/);
 	//无效的路径
 	if (res == DR_NO){
-		delete hFind;
 		return DR_INVALID_NAME;
 	}
 	if (res != DR_OK){
-		delete hFind;
 		return DR_INIT_ERR;		//其他的初始化错误或者内部错粗
 	}
 
 	//要返回的句柄
-	*hFin = FINDER(hFind);
+	*hFin = FINDER(hFind.release());
 
 	return res;
 }
@@ -984,7 +975,7 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 	DRES			res;
 	int				index;
 	int				bitCnt; 
-	void*			indexBlock;
+	std::vector<BYTE> indexBlockBuf;
 	DWORD			blockSize;
 	LONG_INT		lcn;
 	PFIND_FILE_HANDER hFind = (PFIND_FILE_HANDER)hFin;
@@ -993,6 +984,12 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 	if (!this->mDevName) return DR_NO_OPEN;
 	if (!hFind || !mftIndx) return DR_INVALED_PARAM;
 	if (!hFind->dir.IsFileValid()) return DR_INVALID_HANDLE;//无效的查找句柄
+
+	if (!hFind || !mftIndx)
+		return DR_INVALED_PARAM;
+
+	if (!hFind->dir.IsFileValid())
+		return DR_INVALID_HANDLE;//无效的查找句柄
 
 	//获得跟属性
 	res = hFind->dir.FindAttribute(AD_INDEX_ROOT , &attrRoot);
@@ -1062,8 +1059,7 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 	//获得缓存区的大小
 	blockSize = attrRoot.IRGetIndexBlockSize();
 	//先申请一块索引缓存区的缓存
-	indexBlock = new BYTE[blockSize];
-	memset(indexBlock , 0 , blockSize);//清理一下
+	indexBlockBuf.resize(blockSize, 0);
 
 	//获得位图属性
 	res = hFind->dir.FindAttribute(AD_BITMAP , &attrBitMp);
@@ -1080,20 +1076,20 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 		lcn = hFind->dir.GetLCNByVCN(hFind->vcn , NULL);
 		//lcn = attrAllocation.IAGetLCNByVCN(&hFind->vcn , NULL);
 		lcn.QuadPart *= this->mSecPerClu; 
-		this->ReadData(indexBlock , &lcn ,blockSize , TRUE );//读取指定的数据
+		this->ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//读取指定的数据
 
 		//线恢复usa
-		PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlock);
+		PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlockBuf.data());
 
 		//获得usa的数量  
 		int		usaCnt = ibh->IB_USNSz ;
 		WORD	us = 0;
 		DWORD	offUsa =  ibh->IB_USOff;
 		int		i = 0;
-		DWORD	usn = GetWORD((BYTE*)indexBlock + offUsa);
+		DWORD	usn = GetWORD(indexBlockBuf.data() + offUsa);
 		for (i = 1 ; i < usaCnt ; ++i){
-			us = GetWORD((BYTE*)indexBlock + offUsa + i * 2);
-			SetWORD((BYTE*)indexBlock + 512 * i -2 , us);
+			us = GetWORD(indexBlockBuf.data() + offUsa + i * 2);
+			SetWORD(indexBlockBuf.data() + 512 * i - 2, us);
 		}
 
 		//对应虚拟簇号
@@ -1160,10 +1156,6 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 		}else
 			break;
 	}
-
-	//释放索引缓存空间
-	if(indexBlock)	delete[] (BYTE*)indexBlock;
-	indexBlock = NULL;    
 
 	return res;
 }
@@ -1289,7 +1281,7 @@ LONG_INT DNtfs::GetSectorOfMFTRecode( LONG_INT mft )
 	
 
 	//获得无名数据属性 
-	if(DR_OK != mftFile.FineNoNameDataAttr(&ntfsAttr))
+	if(DR_OK != mftFile.FindNoNameDataAttr(&ntfsAttr))
 	{//获取属性失败
 		return liSector;
 	}

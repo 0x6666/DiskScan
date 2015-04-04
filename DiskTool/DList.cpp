@@ -22,28 +22,18 @@ DList::DList()
 
 DList::~DList()
 {
-	//要删除每一个节点
-	Node* node = mHead.mNext;
-	Node* temp = node;
-	while (temp)				//
-	{
-		node = temp->mNext;
-		delete temp;
-		temp = node;
-	}
-	this->mCount  = 0;
+	Clear();
 }
 
 int DList::AddPart(PVOID data)
 {
-	PNode node = NULL;
-
-	if(!data) return FALSE;		//参数不正确 
+	if(!data)
+		return FALSE;
 	
-	node = new Node;		//新建一个节点
+	PNode node = new Node; //新建一个节点
 	node->mData = data;
 
-	this->mPTail->mNext = node;		
+	this->mPTail->mNext = node;
 	this->mPTail = node;
 	this->mPTail->mNext = NULL;
 
@@ -97,6 +87,24 @@ PVOID DList::DeletePart(int index)
 	return data;
 }
 
+void DList::Clear()
+{
+	//要删除每一个节点
+	Node* node = mHead.mNext;
+	Node* temp = node;
+	while (temp)
+	{
+		node = temp->mNext;
+		delete temp;
+		temp = node;
+	}
+
+	::memset(&mHead, 0, sizeof(mHead));
+	this->mPTail = &mHead;
+
+	this->mCount = 0;
+}
+
 int DList::GetCount(void)
 {
 	return this->mCount;
@@ -146,20 +154,15 @@ DList::Node* DList::InsertSort(Node * head , NODE_COMPARE cmpFun)
 
 BOOL DList::InsertNode(int index, VOID* data)
 {
-	Node*	node = NULL;
-	int		i	 = 0; 
-	PNode	temp = NULL;
-
-	//索引越界了  或者要添加的数据不存在
+	//索引越界了,或者要添加的数据不存在
 	if(index < 0 || index > mCount || !data)
 		return FALSE;
 	
-	node = new Node;
+	Node* node = new Node;
 	node->mData = data;
-	node->mNext = NULL;
 
-	temp = &mHead;
-	for(i = 0; i != index ;++i) temp = temp->mNext;
+	PNode temp = &mHead;
+	for (int i = 0; i != index; ++i) temp = temp->mNext;
 	node->mNext = temp->mNext;
 	temp->mNext = node;
 

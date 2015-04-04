@@ -218,13 +218,12 @@ void Disk::CloseDisk(void)
 	mDevName[0] = 0;
 
 	//释放分区链表
-	if(list){
-		while (list->GetCount())
-			delete PDPart(list->DeletePart(0));
+	if(list)
+	{
+		list->Clear();
 		delete list;
+		mPPartList = NULL;
 	}
-
-	mPPartList = NULL;
 
 	//关闭已经打开的设备
 	CloseHandle(mDisk);
@@ -301,7 +300,8 @@ BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFi
 BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 {
 	//已经加载了列表
-	if(this->mPPartList) return FALSE;
+	if(this->mPPartList)
+		return FALSE;
 
 	//创建链表
 	this->mPPartList = new DList();
@@ -371,8 +371,7 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 			//需要删除原来已经建立好的链表
 			//释放分区链表
 			if(NULL != list){
-				while (list->GetCount())
-					delete PDPart(list->DeletePart(0));
+				list->Clear();
 				delete list;
 			}
 
@@ -543,19 +542,16 @@ const char* Disk::GetDevName(void)
 
 PVOID Disk::NewPart(PVOID dp, PLONG_INT off , int type , BOOL isMainPart /*= FALSE*/, DWORD* pLogicDri /*= NULL*/)
 {
+	if(!off ) return NULL;
+
 	PDPT		dpt = PDPT(dp);
-	PDPart		pn	= NULL;
 	DWORD		i = 0;
 	LONG_INT	offset = {0};
 
-	//链表的节点对象
-	if(!off ) return NULL;
-	 
-	//新建一个分区域节点	
-	pn = new DPart();
+	//新建一个分区域节点
+	PDPart pn = new DPart();
 	memset(pn , 0 , sizeof(DPart) );
 	pn->mVolIndex = -1;
-
 
 	if(NULL != dpt){  //有DPT的数据
 		pn->mIsActivity = (dpt->mGuidFlag == 0x80);
@@ -603,8 +599,8 @@ DWORD* Disk::GetLogicalDrives()
 	DWORD		temp = 0;
 	PLOGCDRI	pLogic;
 	char devNmae[MAX_PATH] = {0};
-	int			len = strlen(mDevName);
-	int			i = 0 , nCnt = 0;
+	size_t		len = strlen(mDevName);
+	size_t		i = 0, nCnt = 0;
 	DWORD		index = 0;
 	char		csLogicN[] = "\\\\?\\A:";
 	HANDLE		hDev = INVALID_HANDLE_VALUE;
@@ -748,7 +744,7 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 		//创建一个新的节点
 		pn = (PDPart)NewPart(NULL , &mPartableSecCnt  , PART_UNPARTBLE );
 		if(pn){
-			pn->mSecCount.QuadPart = mUnPartSize / SECTOR_SIZE;				
+			pn->mSecCount.QuadPart = mUnPartSize / SECTOR_SIZE;
 			PDList(this->mPPartList)->AddPart( pn);
 			mIsGetUnPartSec = TRUE;
 		}

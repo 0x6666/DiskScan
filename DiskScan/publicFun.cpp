@@ -766,7 +766,7 @@ DWORD WINAPI EnumNtfsFile(PVOID wParam)
 {
 	CNtfsDoc*	pDoc	= (CNtfsDoc*)wParam;
 	CListCtrl*	pList	= pDoc->m_pContentList;
-	DNtfs*		pNtfs	= pDoc->m_pNtfs;
+	DNtfs*		pNtfs	= pDoc->m_pNtfs.get();
 	CString     curPath = pDoc->m_strCurPath;
 	DNtfsFile    file;
 	WCHAR		path[MAX_PATH + 1] = {0};
@@ -1113,7 +1113,7 @@ DWORD WINAPI CopyNtfsFile( PVOID wParam )
 	//获得进度信息的控件
 	pStatic = (CStatic*)pDlg->GetDlgItem(IDC_ST_PROGRESS );
 
-	pNtfs = ((CNtfsDoc*)pDlg->m_pDoc)->m_pNtfs;
+	pNtfs = ((CNtfsDoc*)pDlg->m_pDoc)->m_pNtfs.get();
 	//打开将要读取文件
 	res = pNtfs->OpenFileA((LPCSTR)(LPCTSTR)pDlg->m_strFileToRead , &dFile);
 	if ( DR_OK != res )

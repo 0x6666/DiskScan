@@ -147,7 +147,7 @@ public:
 
 public:
 	// Ntfs卷实例
-	DNtfs* m_pNtfs;
+	std::unique_ptr<DNtfs> m_pNtfs;
 	// 本文件系统的起始扇区
 	LONG_INT m_liStartSec;
 	// 当前列表显示的路径
@@ -159,7 +159,7 @@ public:
 	CNtfsFileDlg* m_pNtfsFileDlg;
 
 	//图标列表
-	CImageList* m_pImgList;
+	std::unique_ptr<CImageList> m_upImgList;
 
 	//读取文件列表线程
 	HANDLE m_hThread;

@@ -26,12 +26,10 @@
 
 
 DNtfsFile::DNtfsFile()
-: mAttrCnt(0)
-, mAttrArr(0)
-, mPRun(0)
-, mMftHeadPtr(0)
-, mFS(0)
-, mFDTLen(0)
+	: mAttrCnt(0)
+	, mAttrArr(0)
+	, mFS(0)
+	, mFDTLen(0)
 {
 	this->mFilePointer.QuadPart = 0;
 	this->mMftIdx.QuadPart = -1;
@@ -59,10 +57,9 @@ DRES DNtfsFile::InitRecode(DNtfs* fs ,LONG_INT mftIndex)
 
 	//初始化文件记录头部
 	pfrh = PFILE_RECODE_HEAD(mRecodeBuf);
-	this->mMftHeadPtr = new BYTE[pfrh->FR_1stAttrOff];
-	memcpy(this->mMftHeadPtr ,mRecodeBuf , pfrh->FR_1stAttrOff );
+	this->mMftHeadBuf.resize(pfrh->FR_1stAttrOff, 0);
+	memcpy(this->mMftHeadBuf.data(), mRecodeBuf, pfrh->FR_1stAttrOff );
 
-	
 	//读取数据成功
 	this->mMftIdx = mftIndex;	
 	//this->head = PFILE_RECODE_HEAD(this->mRecodeBuf);
@@ -86,8 +83,8 @@ DRES DNtfsFile::InitRecode(DNtfs* fs ,LONG_INT mftIndex)
 WORD DNtfsFile::GetUSAItem(int index)
 {
 	//跟心序列号的偏移
-	WORD offUSN = PFILE_RECODE_HEAD(this->mMftHeadPtr)->FR_USOff; 
-	offUSN = GetWORD(this->mMftHeadPtr + offUSN + 2 + index * 2);
+	WORD offUSN = PFILE_RECODE_HEAD(mMftHeadBuf.data())->FR_USOff;
+	offUSN = GetWORD(mMftHeadBuf.data() + offUSN + 2 + index * 2);
 	return offUSN;
 }
 
@@ -198,7 +195,7 @@ LONG_INT DNtfsFile::GetReadTime()
 BOOL DNtfsFile::IsDir()
 {
 	if (/*PFILE_RECODE_HEAD(this->mRecodeBuf)->FR_Flags == ATTR_DIRECTORY 
-		|| */PFILE_RECODE_HEAD(this->mMftHeadPtr)->FR_Flags & 0x2
+		|| */PFILE_RECODE_HEAD(mMftHeadBuf.data())->FR_Flags & 0x2
 		)
 		return TRUE;
 	else 
@@ -331,7 +328,7 @@ LONG_INT DNtfsFile::GetAllocSize()
 	LONG_INT off = {0};
 
 	//获取无名数据属性
-	if (DR_OK != this->FineNoNameDataAttr(&attr))
+	if (DR_OK != this->FindNoNameDataAttr(&attr))
 		return off;  //木有无名数据属性
 	else
 	{
@@ -378,7 +375,7 @@ DRES DNtfsFile::ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead)
 	LONG_INT secOff   = {0};
 	BYTE	 SecPerClust = 0;
 	DWORD	 dwClustSize = 0;	//每簇字节数
-	char*	 dataBuf  = NULL;
+	std::vector<BYTE> dataBuf;
 	DWORD	 dBufoff  = 0;		//dataBuf中写数据的偏移
 	DWORD	 clustOff = 0;		//读取到的簇中的有效数据偏移(FP)
 	DWORD	 toReadThisTime = 0;//本次独到的有效数据
@@ -391,7 +388,7 @@ DRES DNtfsFile::ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead)
 	if(this->IsDir())	return DR_IS_DIR;	//不是文件
 
 	//获得文件无名数据属性
-	res = this->FineNoNameDataAttr(&dataAttr);
+	res = this->FindNoNameDataAttr(&dataAttr);
 	if (res != DR_OK)	return DR_OK;	//系统数据文件
 
 	//文件的实际大小
@@ -419,7 +416,7 @@ DRES DNtfsFile::ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead)
 	curPtr		= this->mFilePointer;			//文件内的当前度写指针
 	SecPerClust = this->mFS->GetSecPerClust();	//每簇扇区数
 	dwClustSize = SecPerClust  * SECTOR_SIZE;	//每簇字节数
-	dataBuf		= new char[dwClustSize];		//一簇作为换成空间
+	dataBuf.resize(dwClustSize, 0);				//一簇作为换成空间
 	dBufoff		= 0;							//dataBuf中写数据的偏移
 	clustOff	= DWORD(curPtr.QuadPart % dwClustSize);//读取到的簇中的有效数据偏移(FP)
 	toReadThisTime = 0;							//本次读到的有效数据
@@ -437,7 +434,6 @@ DRES DNtfsFile::ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead)
 		//获得虚拟簇号对应的逻辑簇号
 		lcn = this->GetLCNByVCN(vcn , &clustCnt);
 		if (lcn.QuadPart == -1) {//居然出错了
-			delete[] dataBuf;
 			return DR_INIT_ERR;
 		}
 
@@ -446,13 +442,12 @@ DRES DNtfsFile::ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead)
 		{
 			if (lcn.QuadPart == -2)
 			{//稀疏文件
-				memset(dataBuf , 0 , dwClustSize);
+				memset(dataBuf.data(), 0, dwClustSize);
 			}else{
 				secOff.QuadPart = lcn.QuadPart * SecPerClust;
-				res = this->mFS->ReadData(dataBuf , &secOff , dwClustSize);
+				res = this->mFS->ReadData(dataBuf.data(), &secOff , dwClustSize);
 				if (res != DR_OK)
 				{//这下麻烦大了
-					delete[] dataBuf;
 					return DR_INIT_ERR;
 				}
 				++lcn.QuadPart;
@@ -464,7 +459,7 @@ DRES DNtfsFile::ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead)
 				toReadThisTime = dwClustSize - clustOff - clustLeave;
 			
 			//复制到有效的数据
-			memcpy(buf + dBufoff , dataBuf + clustOff , toReadThisTime );
+			memcpy(buf + dBufoff , dataBuf.data() + clustOff , toReadThisTime );
 			dwToRead -=toReadThisTime;
 			dBufoff +=toReadThisTime;
 			*dwReaded += toReadThisTime;
@@ -478,8 +473,6 @@ DRES DNtfsFile::ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead)
 	}
 	//文件的当前读写指针 
 	this->mFilePointer = curPtr;
-	//释放缓存空间
-	delete[] dataBuf;
 	return DR_OK;
 }
 BOOL DNtfsFile::IsEOF()
@@ -532,7 +525,7 @@ LONG_INT DNtfsFile::GetRealSize()
 	off.QuadPart = 0;
 
 	//获取无名数据属性
-	if (DR_OK != this->FineNoNameDataAttr(&attr))
+	if (DR_OK != this->FindNoNameDataAttr(&attr))
 		return off;  //木有无名数据属性
 	else
 	{
@@ -578,8 +571,8 @@ DRES DNtfsFile::FindAttribute(DWORD dwAttrType , VOID* att , DWORD* startIdx)
 	{
 		if (pai[i].attrType == dwAttrType)
 		{
-			//attr->InitAttr(this->mRecodeBuf + pai[i].off/* , &dwLen*/);		
-			attr->InitAttr(pai[i].attrDataPtr);		
+			//attr->InitAttr(this->mRecodeBuf + pai[i].off/* , &dwLen*/);
+			attr->InitAttr(pai[i].attrDataBuf.data());
 			//返回当前的索引
 			
 			if (startIdx) *startIdx = i;
@@ -588,7 +581,7 @@ DRES DNtfsFile::FindAttribute(DWORD dwAttrType , VOID* att , DWORD* startIdx)
 	}
 	return res;
 }
-DRES DNtfsFile::FineNoNameDataAttr( DNtfsAttr* attr )
+DRES DNtfsFile::FindNoNameDataAttr( DNtfsAttr* attr )
 {
 	DRES		res = DR_NO;
 	DWORD		i	= 0;
@@ -604,7 +597,7 @@ DRES DNtfsFile::FineNoNameDataAttr( DNtfsAttr* attr )
 		if (pai[i].attrType == AD_DATA )
 		{
 			//attr->InitAttr(this->mRecodeBuf + pai[i].off/* , &dwLen*/);	
-			attr->InitAttr(pai[i].attrDataPtr);	
+			attr->InitAttr(pai[i].attrDataBuf.data());
 			if (attr->GetNameLen()) 
 				continue; //对不起我要的是无名数据属性
 			//返回当前的索引
@@ -626,7 +619,7 @@ DRES DNtfsFile::InitAttrList(BYTE* attrBuf)
 	//先分配换从空间
 	this->mAttrCnt = prh->FR_NxtAttrId;				//属性数量
 	this->mAttrArr = new AttrItem[prh->FR_NxtAttrId];
-	memset(mAttrArr , 0 , sizeof(AttrItem) * prh->FR_NxtAttrId);
+	//memset(mAttrArr , 0 , sizeof(AttrItem) * prh->FR_NxtAttrId);
 	pai = PAttrItem(mAttrArr);
 
 	//遍历每一个属性
@@ -639,8 +632,8 @@ DRES DNtfsFile::InitAttrList(BYTE* attrBuf)
 		pai[i].off		= (WORD)dwOff;			//当前属性在当前MFT中的偏移
 		pai[i].attrType = attr.GetAttrType();	//属性类型
 		pai[i].id		= attr.GetAttrID();		//属性id
-		pai[i].attrDataPtr = new BYTE[attrLen];	//属性数据缓存区
-		memcpy(pai[i].attrDataPtr ,attrBuf + dwOff , attrLen);
+		pai[i].attrDataBuf.resize(attrLen, 0);	//属性数据缓存区
+		memcpy(pai[i].attrDataBuf.data(), attrBuf + dwOff , attrLen);
 		//pai[i++].off = (WORD)dwOff;				//属性在缓冲中的偏移
 		dwOff += attrLen;				//先一个属性的偏移
 		++i;
@@ -748,29 +741,30 @@ LONG_INT DNtfsFile::GetLCNByVCN(LONG_INT vcn , PLONG_INT clustCnt)
 
 	lcn.QuadPart = -1;	
 	
-	if (NULL == this->mPRun)
-	{//还没有初始化Runlist
-		this->mPRun = new DRun();
+	if (!m_upRun)
+	{
+		//还没有初始化Runlist
+		m_upRun.reset(new DRun());
 
 		if (this->IsDir())
 		{//是目录的话
 			res = this->FindAttribute(AD_INDEX_ALLOCATION , &attr);
 			if (res != DR_OK) return lcn;//没有指定的属性
-			res = mPRun->InitRunList(&attr);
+			res = m_upRun->InitRunList(&attr);
 
 			if (res != DR_OK) return lcn;//没有指定的属性
 		}else{
-			res = this->FineNoNameDataAttr(&attr);
+			res = this->FindNoNameDataAttr(&attr);
 			if (res != DR_OK) return lcn;//没有指定的属性
 			if (!attr.IsNonResident()) return lcn;//不是非常驻属性  没有Runlist
 
-			res = mPRun->InitRunList(&attr);
+			res = m_upRun->InitRunList(&attr);
 			if (res != DR_OK) return lcn;//没有指定的属性
 		}
 	}
 
 	//获得运行列表
-	lcn = this->mPRun->GetLCNByVCN(vcn , clustCnt);
+	lcn = this->m_upRun->GetLCNByVCN(vcn, clustCnt);
 
 	return lcn;
 }
@@ -780,27 +774,14 @@ void DNtfsFile::Close()
 	DWORD i = 0;
 	if(this->mAttrArr)
 	{
-		//释放已分配的缓存
-		for (i = 0 ; i < this->mAttrCnt ; ++i)
-			if(PAttrItem(mAttrArr)[i].attrDataPtr)
-				delete[] PAttrItem(mAttrArr)[i].attrDataPtr;
-
 		this->mAttrCnt = 0;
 		delete[] PAttrItem(this->mAttrArr);
 		this->mAttrArr = NULL;
 	}
 
-	if (NULL != this->mPRun)
-	{
-		this->mPRun->Close();
-		delete this->mPRun;
-		this->mPRun = NULL;
-	}
-	if (this->mMftHeadPtr)
-	{
-		delete[] this->mMftHeadPtr;
-		this->mMftHeadPtr = 0;
-	}
+	m_upRun.reset();
+
+	mMftHeadBuf.clear();
 
 	this->mFS = NULL;
 	this->mMftIdx.QuadPart = 0;
