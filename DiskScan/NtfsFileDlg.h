@@ -21,7 +21,7 @@ public:
 	//NTFS文档类
 	CNtfsDoc*	m_pDoc;
 	//当前的文件
-	DNtfsFile*	m_pFile;	
+	std::unique_ptr<DNtfsFile> m_upFile;
 	//当前文件路径
 	CString		m_strFilePath;
 

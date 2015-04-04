@@ -14,13 +14,14 @@ CNtfsFileDlg::CNtfsFileDlg(CNtfsDoc* pDoc ,CWnd* pParent /*=NULL*/)
 	: CDialog(CNtfsFileDlg::IDD, pParent)
 	, m_pDoc(pDoc)
 {
-	m_pFile = new DNtfsFile();
+	m_upFile.reset(new DNtfsFile());
 
 }
 
 CNtfsFileDlg::~CNtfsFileDlg()
 {
-	delete m_pFile;
+	if (m_upFile)
+		m_upFile->Close();
 }
 
 void CNtfsFileDlg::DoDataExchange(CDataExchange* pDX)
@@ -55,12 +56,12 @@ BOOL CNtfsFileDlg::SetFilePath( CString strSelPath )
 	DNtfs*		pNtfs;
 	DRES		res = DR_OK;
 	
-	pNtfs = this->m_pDoc->m_pNtfs.get();
+	pNtfs = m_pDoc->m_pNtfs.get();
 
 	//先不管有没有打开，关闭一下，避免资源泄露
-	this->m_pFile->Close();
+	m_upFile->Close();
 	//打开指定的文件
-	res = pNtfs->OpenFile((LPCSTR)(LPCTSTR)strSelPath , this->m_pFile);
+	res = pNtfs->OpenFile((LPCSTR)(LPCTSTR)strSelPath, m_upFile.get());
 	if (DR_OK != res)
 	{//打开指定的文件失败
 		return FALSE;
@@ -98,14 +99,14 @@ void CNtfsFileDlg::UpdateFileData()
 
 
 	//获得文件属性数量
-	nCunt = this->m_pFile->GetAttrCount();
+	nCunt = m_upFile->GetAttrCount();
 	//加载属性列表
 	pList = (CListCtrl*)this->GetDlgItem(IDC_NTFS_FILE_ATTR_LIST);
 	pList->DeleteAllItems();
 	for (i = 0 ; i < nCunt; ++i)
 	{
 		//获得属性对象
-		pAttrItem = this->m_pFile->GetAttr((DWORD)i);
+		pAttrItem = m_upFile->GetAttr((DWORD)i);
 		if (NULL == pAttrItem) ASSERT(FALSE);
 		ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 		
@@ -161,13 +162,13 @@ void CNtfsFileDlg::UpdateFileData()
 
 	//更新MFT记录号
 	pWnd = this->GetDlgItem(IDC_MFT_NUM);
-	mft = this->m_pFile->GetMftIndex();
+	mft = m_upFile->GetMftIndex();
 	mft.HighPart?strTemp.Format(_T("%X%08X") , mft.HighPart , mft.LowPart):strTemp.Format(_T("%X") , mft.LowPart);
 	pWnd->SetWindowText(strTemp);
 
 	//更新父目录记录号
 	pWnd = this->GetDlgItem(IDC_PARENT_MFT);
-	mft = this->m_pFile->GetParentMftIndex();
+	mft = m_upFile->GetParentMftIndex();
 	mft.HighPart?strTemp.Format(_T("%X%08X") , mft.HighPart , mft.LowPart):strTemp.Format(_T("%X") , mft.LowPart);
 	pWnd->SetWindowText(strTemp);
 }
@@ -246,10 +247,10 @@ void CNtfsFileDlg::OnNMClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult)
 	nAttrID = atoi((LPCSTR)(LPCTSTR)strTemp);
 
 	//获得具体的属性
-	nAttrCnt = this->m_pFile->GetAttrCount();
+	nAttrCnt = m_upFile->GetAttrCount();
 	for (i = 0 ; i < nAttrCnt ; ++i )
 	{
-		pAttrItem = this->m_pFile->GetAttr((DWORD)i);
+		pAttrItem = m_upFile->GetAttr((DWORD)i);
 		if (NULL == pAttrItem) ASSERT(FALSE);
 		if (pAttrItem->id == nAttrID)
 			break;
@@ -281,14 +282,14 @@ void CNtfsFileDlg::UpdateDosAttr()
 	DNtfsFile::PAttrItem pAttrItem = NULL;  //文件属性节点
 
 	//标准属性中的dos属性
-	pAttrItem = this->m_pFile->FindAttribute(AD_STANDARD_INFORMATION);
+	pAttrItem = m_upFile->FindAttribute(AD_STANDARD_INFORMATION);
 	if ( NULL != pAttrItem)
 	{
 		ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 		dwFlags = ntfsAttr.SIGetFlags();
 	}
 	//文件名的DOS属性
-	pAttrItem = this->m_pFile->FindAttribute(AD_FILE_NAME);
+	pAttrItem = m_upFile->FindAttribute(AD_FILE_NAME);
 	if ( NULL != pAttrItem)
 	{
 		ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
@@ -483,10 +484,10 @@ void CNtfsFileDlg::OnPosStdAttrHead()
 	nAttrID = atoi((LPCSTR)(LPCTSTR)strTemp);
 	
 	//获得具体的属性
-	nAttrCnt = this->m_pFile->GetAttrCount();
+	nAttrCnt = m_upFile->GetAttrCount();
 	for (i = 0 ; i < nAttrCnt ; ++i )
 	{
-		pAttrItem = this->m_pFile->GetAttr((DWORD)i);
+		pAttrItem = m_upFile->GetAttr((DWORD)i);
 		if (NULL == pAttrItem) ASSERT(FALSE);
 		if (pAttrItem->id == nAttrID)
 			break;
@@ -574,10 +575,10 @@ void CNtfsFileDlg::OnSeverAttr()
 
 	//获取指定的属性
 	//获得具体的属性
-	nAttrCnt = this->m_pFile->GetAttrCount();
+	nAttrCnt = m_upFile->GetAttrCount();
 	for (i = 0 ; i < nAttrCnt ; ++i )
 	{
-		pAttrItem = this->m_pFile->GetAttr((DWORD)i);
+		pAttrItem = m_upFile->GetAttr((DWORD)i);
 		if (NULL == pAttrItem) ASSERT(FALSE);
 		if (pAttrItem->id == nAttrID)
 			break;
@@ -645,10 +646,10 @@ void CNtfsFileDlg::OnPosStdAttrData()
 	nAttrID = atoi((LPCSTR)(LPCTSTR)strTemp);
 
 	//获得具体的属性
-	nAttrCnt = this->m_pFile->GetAttrCount();
+	nAttrCnt = m_upFile->GetAttrCount();
 	for (i = 0 ; i < nAttrCnt ; ++i )
 	{
-		pAttrItem = this->m_pFile->GetAttr((DWORD)i);
+		pAttrItem = m_upFile->GetAttr((DWORD)i);
 		if (NULL == pAttrItem) ASSERT(FALSE);
 		if (pAttrItem->id == nAttrID)
 			break;
@@ -698,6 +699,4 @@ void CNtfsFileDlg::OnNMRClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult)
 	menu.LoadMenu(IDR_NTFS_FILE_ATTR_LIST_MENU);
 	pMenu = menu.GetSubMenu(0);
 	pMenu->TrackPopupMenu(TPM_LEFTALIGN|TPM_TOPALIGN , p.x , p.y , this/*AfxGetMainWnd()*/ , NULL);
-
-
 }

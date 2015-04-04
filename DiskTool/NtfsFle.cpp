@@ -27,7 +27,6 @@
 
 DNtfsFile::DNtfsFile()
 	: mAttrCnt(0)
-	, mAttrArr(0)
 	, mFS(0)
 	, mFDTLen(0)
 {
@@ -299,14 +298,14 @@ DNtfsFile::PAttrItem DNtfsFile::GetAttr( DWORD index )
 	if ( mAttrCnt <= index)//索引越界?
 		return NULL;
 
-	return PAttrItem(mAttrArr) + index;
+	return PAttrItem(mAttrArr.get()) + index;
 }
 
 DNtfsFile::PAttrItem DNtfsFile::FindAttribute( DWORD dwAttrType , const DWORD* startIdx /*= 0*/ )
 {
 	if (NULL == this->mFS)  //设备还没有打开
 		return NULL;
-	PAttrItem attr = PAttrItem(mAttrArr);
+	PAttrItem attr = mAttrArr.get();
 	DWORD i = 0;
 
 	for( i = (NULL != startIdx ? (*startIdx) : 0) ; i < mAttrCnt ; ++i )
@@ -557,14 +556,16 @@ DRES DNtfsFile::FindAttribute(DWORD dwAttrType , VOID* att , DWORD* startIdx)
 	//DWORD dwLen = MFT_RECODE_SIZE - dwOff;//属性集合的允许长度
 	DRES  res   = DR_NO;
 	DWORD i = 0;
-	PAttrItem pai = NULL;
+	PAttrItem pai = mAttrArr.get();
 	DNtfsAttr* attr = (DNtfsAttr*)att;
 
-	if (startIdx){
-		if (*startIdx >= this->mAttrCnt) return DR_INVALED_PARAM;
-		else i = *startIdx;
+	if (startIdx)
+	{
+		if (*startIdx >= this->mAttrCnt)
+			return DR_INVALED_PARAM;
+		else
+			i = *startIdx;
 	}
-	pai = PAttrItem(this->mAttrArr);
 
 	//遍历属性表
 	for (; i < this->mAttrCnt /*&& pai[i].off*/ ; ++i)
@@ -585,7 +586,7 @@ DRES DNtfsFile::FindNoNameDataAttr( DNtfsAttr* attr )
 {
 	DRES		res = DR_NO;
 	DWORD		i	= 0;
-	PAttrItem	pai = PAttrItem(this->mAttrArr);
+	PAttrItem	pai = mAttrArr.get();
 
 	if (NULL == this->mFS) return DR_NO_OPEN;
 
@@ -618,9 +619,8 @@ DRES DNtfsFile::InitAttrList(BYTE* attrBuf)
 
 	//先分配换从空间
 	this->mAttrCnt = prh->FR_NxtAttrId;				//属性数量
-	this->mAttrArr = new AttrItem[prh->FR_NxtAttrId];
-	//memset(mAttrArr , 0 , sizeof(AttrItem) * prh->FR_NxtAttrId);
-	pai = PAttrItem(mAttrArr);
+	mAttrArr.reset(new AttrItem[prh->FR_NxtAttrId]);
+	pai = mAttrArr.get();
 
 	//遍历每一个属性
 	while(GetDWORD(attrBuf + dwOff) != 0xFFFFFFFF){
@@ -771,20 +771,11 @@ LONG_INT DNtfsFile::GetLCNByVCN(LONG_INT vcn , PLONG_INT clustCnt)
 
 void DNtfsFile::Close()
 {
-	DWORD i = 0;
-	if(this->mAttrArr)
-	{
-		this->mAttrCnt = 0;
-		delete[] PAttrItem(this->mAttrArr);
-		this->mAttrArr = NULL;
-	}
-
+	mAttrArr.reset();
 	m_upRun.reset();
-
 	mMftHeadBuf.clear();
-
-	this->mFS = NULL;
-	this->mMftIdx.QuadPart = 0;
+	mFS = NULL;
+	mMftIdx.QuadPart = 0;
 }
 
 LONG_INT DNtfsFile::GetMftStartSec()

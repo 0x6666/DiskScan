@@ -181,7 +181,7 @@ LONG_INT SectorList::FixToPreSector( LONG_INT sector )
 	return res;  //²»´æÔÚ
 }
 
-SectorList* SectorList::GetCopy()
+SectorList* SectorList::Clone()
 {
 	SectorList* t_copy = new SectorList();
 	

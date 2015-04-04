@@ -209,19 +209,31 @@ DWORD Disk::GetUnPartableSize()
 	return mUnPartSize;
 }
 
+void clearDList(DList* pList)
+{
+	if (!pList || pList->GetCount() == 0)
+		return;
+
+	//要删除每一个节点
+	int nCount = pList->GetCount();
+	for (int i = 0; i < nCount; ++i)
+	{
+		PDPart pPart = (PDPart)pList->GetPart(i);
+		delete pPart;
+	}
+	pList->Clear();
+}
 
 void Disk::CloseDisk(void)
 {
-	PDList list = PDList(this->mPPartList);
-	
 	//清理一下名字
 	mDevName[0] = 0;
 
 	//释放分区链表
-	if(list)
+	if (mPPartList)
 	{
-		list->Clear();
-		delete list;
+		clearDList(mPPartList);
+		delete mPPartList;
 		mPPartList = NULL;
 	}
 
@@ -286,8 +298,10 @@ BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFi
 				continue;
 			ListPartion(/*mDisk , */&(ebr.mDPT[i]) ,o  , FALSE , pLogicDir);
 		}
-	}else{//不是逻辑分区	
-
+	}
+	else
+	{
+		//不是逻辑分区	
 		//新建一个相应的节点添加到表中去
 		pn = NewPart(&dpt , &o  , 0  , isFirstDPT , pLogicDir);
 		if(NULL != pn) {
@@ -296,7 +310,8 @@ BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFi
 		}
 	}
 	return TRUE;
-}  
+}
+
 BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 {
 	//已经加载了列表
@@ -311,7 +326,7 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 	MBR			mbr		= {0};      //磁盘的MBR
 	int			i	    = 0 ;
 	DWORD		dwRead	= 0;
-	PDList      list	= PDList(this->mPPartList);
+	PDList		list	= PDList(this->mPPartList);
 	PVOID		pn		= NULL;
 	DWORD*		pLogicDir = NULL;		//逻辑驱动信息
 	BOOL		res		= TRUE;		//一些操作结果 
@@ -331,8 +346,7 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 
 	
 	//新建一个相应的节点添加到表中去
-	pn = NewPart(NULL , &offert  , PART_MBR );
-	if(NULL != pn)
+	if (pn = NewPart(NULL, &offert, PART_MBR))
 		list->AddPart(pn); //将节点添加到链表中去
 	
 	res = TRUE;
@@ -359,8 +373,8 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 		if (!ReadSecter(liSecOff , extBuf , &dwRead , SECTOR_SIZE))
 		{//读取数据失败
 			res = FALSE;
-		}	
-		
+		}
+
 		if ((res != FALSE) && (PLONG_INT(PExtDPT(extBuf)->partName)->QuadPart != EXT_DPT_FLAG))
 		{//不是一个扩展分区表
 			res = FALSE;
@@ -371,7 +385,7 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 			//需要删除原来已经建立好的链表
 			//释放分区链表
 			if(NULL != list){
-				list->Clear();
+				clearDList(list);
 				delete list;
 			}
 
@@ -385,7 +399,6 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 			if(NULL != pn)
 				list->AddPart(pn); //将节点添加到链表中去
 		}
-
 
 		while (TRUE == res)
 		{
@@ -418,7 +431,7 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 				if (!ReadSecter(liSecOff , extBuf , &dwRead , SECTOR_SIZE))
 				{//读取数据失败
 					break;
-				}	
+				}
 			}
 		}
 	}
@@ -542,7 +555,8 @@ const char* Disk::GetDevName(void)
 
 PVOID Disk::NewPart(PVOID dp, PLONG_INT off , int type , BOOL isMainPart /*= FALSE*/, DWORD* pLogicDri /*= NULL*/)
 {
-	if(!off ) return NULL;
+	if(!off)
+		return NULL;
 
 	PDPT		dpt = PDPT(dp);
 	DWORD		i = 0;
@@ -553,7 +567,9 @@ PVOID Disk::NewPart(PVOID dp, PLONG_INT off , int type , BOOL isMainPart /*= FAL
 	memset(pn , 0 , sizeof(DPart) );
 	pn->mVolIndex = -1;
 
-	if(NULL != dpt){  //有DPT的数据
+	if(NULL != dpt)
+	{
+		//有DPT的数据
 		pn->mIsActivity = (dpt->mGuidFlag == 0x80);
 		pn->mRelativeSectors = dpt->mRelativeSectors;
 		pn->mSecCount.QuadPart = dpt->mSectorCount;
@@ -570,7 +586,7 @@ PVOID Disk::NewPart(PVOID dp, PLONG_INT off , int type , BOOL isMainPart /*= FAL
 			//当前区域在物理设备上的字节偏移
 			offset = *off;
 			offset.QuadPart *= SECTOR_SIZE;
-			
+
 			for(i = 0 ; i < 26 ; ++i)
 			{
 				if (PLOGCDRI(pLogicDri)[i].byteOffset.QuadPart == offset.QuadPart )
@@ -579,8 +595,11 @@ PVOID Disk::NewPart(PVOID dp, PLONG_INT off , int type , BOOL isMainPart /*= FAL
 				}
 			}
 		}
-	}else
+	}
+	else
+	{
 		pn->mVolIndex = -1;
+	}
 
 	return pn;
 }
@@ -606,11 +625,11 @@ DWORD* Disk::GetLogicalDrives()
 	HANDLE		hDev = INVALID_HANDLE_VALUE;
 	//STORAGE_DEVICE_NUMBER deviceInfo;
 	DWORD		bytesReturned = 0;
-	char        outBuf[100] = {0};		//数据查询时的输出Buf
+	char		outBuf[100] = {0};		//数据查询时的输出Buf
 	VOLUME_DISK_EXTENTS* pOutBuf = (VOLUME_DISK_EXTENTS*)outBuf;
 
 	DWORD res = 0;
-	
+
 	strcpy(devNmae , mDevName);
 
 	//17 == strlen("\\\\.\\PHYSICALDRIVE")
@@ -618,10 +637,11 @@ DWORD* Disk::GetLogicalDrives()
 	if (len < 18 || len > 20) return NULL;
 	
 	//先全部转换陈大写
-	for(i = 0 ; i < len  ; ++i)
-		if (devNmae[i] >= 'a' && devNmae[i] <= 'z')
-			devNmae[i] = devNmae[i] - 0x20;
-		
+	for (i = 0; i < len; ++i)
+	{
+		devNmae[i] = toupper(devNmae[i]);
+	}
+
 	//获得当前设备的索引
 	if(0 == sscanf(devNmae , "\\\\.\\PHYSICALDRIVE%d" , &index ))
 		return NULL;  //获取设备索引失败
@@ -629,8 +649,9 @@ DWORD* Disk::GetLogicalDrives()
 	//获得当前系统中所有的逻辑驱动器
 	dwDris = ::GetLogicalDrives();
 	
-	if ( 0 == dwDris ) return NULL; //获得逻辑驱动器失败
-	
+	if ( 0 == dwDris )
+		return NULL;
+
 	//分配空间
 	pLogic = new LOGCDRI[27];  //最多26个逻辑驱动还有用与表示数组的结束
 	memset(pLogic , 0 , sizeof(LOGCDRI)*27);
@@ -664,11 +685,10 @@ DWORD* Disk::GetLogicalDrives()
 
 		if (pOutBuf->Extents[0].DiskNumber != index)
 		{//不是当前设备的
-
 			CloseHandle(hDev);
 			continue;
 		}
-		
+
 		//找到了一个属于当前设备的卷
 		pLogic[nCnt].byteOffset.QuadPart = pOutBuf->Extents[0].StartingOffset.QuadPart;
 		pLogic[nCnt++].letter = 'A' + i;
@@ -677,8 +697,6 @@ DWORD* Disk::GetLogicalDrives()
 
 	return (DWORD*)pLogic;
 }
-
-
 
 BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 {
@@ -694,9 +712,9 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 	GET_LENGTH_INFORMATION gli = {0};
 	DWORD		dwOutBytes = 0;
 	BOOL		res		= FALSE;
-	
+
 	if(nCount)	t1		= PDPart(list->GetPart(0));
-	
+
 	for (int i = 1 ; i < nCount ; ++ i )
 	{
 		t2 = PDPart(list->GetPart(i));
@@ -715,8 +733,11 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 				++nCount;
 				++i;
 			}
-		}else	//没有分区大小
-			t1->mSecCount.QuadPart =  t2->mOffset.QuadPart -t1->mOffset.QuadPart;
+		}
+		else	//没有分区大小
+		{
+			t1->mSecCount.QuadPart = t2->mOffset.QuadPart - t1->mOffset.QuadPart;
+		}
 		t1 = t2;
 	}
 
@@ -726,9 +747,9 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 	unPartCount.QuadPart = this->mPartableSecCnt.QuadPart - offset.QuadPart;//不可分区的区域大小
 	if(unPartCount.QuadPart > 0 )				    //这里默认当中是LAB模式
 	{//后面有没有分区的区域
-		pn = (PDPart)NewPart(NULL , &offset  , PART_UN_PART );
-		if(pn){
-			pn->mSecCount = unPartCount;				
+		if (pn = (PDPart)NewPart(NULL, &offset, PART_UN_PART))
+		{
+			pn->mSecCount = unPartCount;
 			list->AddPart( pn);
 		}
 	}
@@ -736,14 +757,14 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 	//计算磁盘的不可分区空间大小
 	res = ::DeviceIoControl(mDisk , IOCTL_DISK_GET_LENGTH_INFO , NULL ,
 		0 , &gli , sizeof(gli) , &dwOutBytes,   NULL);			// 用同步I/O
-	if(res) 
+	if(res)
 	{//成功获取磁盘的大小
 		//不可分区的扇区数
 		mUnPartSize = (DWORD)(gli.Length.QuadPart  - mPartableSecCnt.QuadPart * SECTOR_SIZE);
 
 		//创建一个新的节点
-		pn = (PDPart)NewPart(NULL , &mPartableSecCnt  , PART_UNPARTBLE );
-		if(pn){
+		if (pn = (PDPart)NewPart(NULL, &mPartableSecCnt, PART_UNPARTBLE))
+		{
 			pn->mSecCount.QuadPart = mUnPartSize / SECTOR_SIZE;
 			PDList(this->mPPartList)->AddPart( pn);
 			mIsGetUnPartSec = TRUE;

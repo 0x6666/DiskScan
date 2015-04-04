@@ -17,10 +17,9 @@
 
 #include "disktool.h"
 #include "stut_connf.h"
+#include <assert.h>
 
 DRun::DRun()
-: mRunList(NULL)
-, mRunCnt(0)
 {
 }
 
@@ -32,72 +31,61 @@ DRun::~DRun()
 
 DRES DRun::InitRunList( DNtfsAttr* attr )
 {
-	LONG_INT	start	= {0};
 	DWORD		runOff	= 0;		//运行中的数据偏移
 	DWORD		temp	= 0;
 	PRunHead	runHead = NULL;
 	LONG_INT	lcn		= {0};
 	BYTE*		run		= NULL;
-	PRunList	runListPtr = NULL;
 	LONG_INT	dataBuf = {0};
 	int			i		= 0;
-	DWORD		runCnt;
 
 	//安检
 	if (NULL == attr)
 		return DR_INVALED_PARAM;
 	//已经初始化好了的就直接删除
-	if (NULL != this->mRunList)		
-		delete[] this->mRunList;
+	if (!mRunList.empty())
+		mRunList.clear();
 
 	//只有非常驻属性才有运行列表
 	if (!attr->IsNonResident()) 
 		return DR_INIT_ERR;
 
-	//runlist的节点总数
-	start = attr->NR_GetStartVCN();
 // 	this->mRunCnt = (DWORD)(attr->NR_GetEndVCN().QuadPart - start.QuadPart + 1);
 // 	this->mRunList = new RunList[this->mRunCnt];
 
-	//先默认是3个节点  2012-07-18 1:18	
-	runCnt = 3;
-	this->mRunList = (PRunList)malloc(sizeof(RunList) * runCnt);
-	memset(mRunList , 0 , sizeof(RunList) * runCnt);
-
-	run	   = attr->NR_GetDataPtr();//运行的起始数据地址
-
-	runListPtr = PRunList(this->mRunList);
+	run = attr->NR_GetDataPtr();//运行的起始数据地址
 
 	//我不知道Run的第二个和第三个字段的的数据最大能占多少个字节
 	//这里去8个字节，这应该没问题吧, 
-	for (i = 0 ;; ++i , ++mRunCnt)
-	{	
-		runHead = PRunHead(run + runOff++);  //读取run的头部
+	for (i = 0;; ++i)
+	{
+		runHead = PRunHead(run + runOff++);	//读取run的头部
 		if (runHead->all == 0)
-			break;			     //遍历完了当前属性的所有运行
+			break;	//遍历完了当前属性的所有运行
 
-		if (i == runCnt)    // 2012-07-18 1:18	
+		/*if (i == runCnt)    // 2012-07-18 1:18	
 		{//节点不够了
 			runCnt += 2;  //添加两个节点的空间
-			this->mRunList = (PRunList)realloc(mRunList ,sizeof(RunList) * runCnt);
+			this->mRunList = (PRunList)realloc(mRunList, sizeof(RunList)* runCnt);
 			runListPtr = PRunList(this->mRunList);
-		}
+		}*/
 
+		RunList tmpRunNode = { 0 };
 		if (i == 0)//第一个
-			runListPtr[i].vcn = start;
+			tmpRunNode.vcn = attr->NR_GetStartVCN();
 		else//当前vcn是前一个run节点的vcn+簇数
-			runListPtr[i].vcn.QuadPart = 
-			runListPtr[i-1].vcn.QuadPart + runListPtr[i-1].clustCnt.QuadPart;
+			tmpRunNode.vcn.QuadPart =
+			mRunList.back().vcn.QuadPart + mRunList.back().clustCnt.QuadPart;
 
 		//簇数
-		runListPtr[i].clustCnt.QuadPart = 0;//先清理一下
+		tmpRunNode.clustCnt.QuadPart = 0;//先清理一下
 		//读取数据簇数  length
-		memcpy(&(runListPtr[i].clustCnt) , run + runOff , runHead->length);
+		memcpy(&(tmpRunNode.clustCnt), run + runOff, runHead->length);
 		runOff += runHead->length;
 
-		if (runHead->offset == 0)   
+		if (runHead->offset == 0)
 		{//稀疏文件的Run  ，表示当前vcn没有数据
-			runListPtr[i].lcn.QuadPart = -1;
+			tmpRunNode.lcn.QuadPart = -1;
 			continue;
 		}
 
@@ -113,7 +101,8 @@ DRES DRun::InitRunList( DNtfsAttr* attr )
 		//实际的lcn
 		lcn.QuadPart += dataBuf.QuadPart;
 
-		runListPtr[i].lcn = lcn;
+		tmpRunNode.lcn = lcn;
+		mRunList.push_back(tmpRunNode);
 
 		//下一个run的位置
 		runOff += runHead->offset;
@@ -127,35 +116,30 @@ DRES DRun::InitRunList( DNtfsAttr* attr )
 LONG_INT DRun::GetLCNByVCN( LONG_INT vcn , PLONG_INT clustCnt )
 {
 	LONG_INT	lcn = {0};
-	DWORD		i	= 0;
-	PRunList	runListPtr = NULL;
 	DNtfsAttr	attr;
 
-	runListPtr = PRunList(this->mRunList);
 	lcn.QuadPart = -1;
-
-	for (i = 0 ; i < this->mRunCnt ; ++i)
+	for (size_t i = 0; i < mRunList.size(); ++i)
 	{
 		//获得虚拟簇号所对应的起始逻辑簇号时，应该是
 		//（当前run的起始逻辑簇号）加上（当前run起始
 		//虚拟簇号与所需要虚拟簇号只差）。
 		//而簇数的话，则是（当前run簇数）减去（当前run
 		//起始虚拟簇号与所需虚拟簇号只差）。 2012-05-21 15:12
-		if (vcn.QuadPart >= runListPtr[i].vcn.QuadPart &&
-			vcn.QuadPart < runListPtr[i].vcn.QuadPart + runListPtr[i].clustCnt.QuadPart)
+		if (vcn.QuadPart >= mRunList[i].vcn.QuadPart &&
+			vcn.QuadPart < mRunList[i].vcn.QuadPart + mRunList[i].clustCnt.QuadPart)
 		{//当前vcn找到了
 			
-			if (runListPtr[i].lcn.QuadPart == -1)
+			if (mRunList[i].lcn.QuadPart == -1)
 			{//稀疏簇
 				lcn.QuadPart = -2;
-				return lcn;				
+				return lcn;
 			}
 			lcn.QuadPart = 
-				runListPtr[i].lcn.QuadPart +  //当前run的其实逻辑号
-				(vcn.QuadPart - runListPtr[i].vcn.QuadPart);//实际需要粗虚拟簇号和其实粗豪只差
-			if (clustCnt) clustCnt->QuadPart 
-				= runListPtr[i].clustCnt.QuadPart -
-				(vcn.QuadPart - runListPtr[i].vcn.QuadPart);
+				mRunList[i].lcn.QuadPart +  //当前run的其实逻辑号
+				(vcn.QuadPart - mRunList[i].vcn.QuadPart);//实际需要粗虚拟簇号和其实粗豪只差
+			if (clustCnt)
+				clustCnt->QuadPart = mRunList[i].clustCnt.QuadPart - (vcn.QuadPart - mRunList[i].vcn.QuadPart);
 			break;
 		}
 	}
@@ -164,10 +148,5 @@ LONG_INT DRun::GetLCNByVCN( LONG_INT vcn , PLONG_INT clustCnt )
 
 void DRun::Close()
 {
-	if (NULL != this->mRunList)
-	{
-		free(this->mRunList);
-		this->mRunList = NULL;
-		this->mRunCnt = 0;
-	}
+	mRunList.clear();
 }

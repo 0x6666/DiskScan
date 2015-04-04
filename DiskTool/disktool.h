@@ -60,6 +60,7 @@ typedef unsigned char		BYTE;
 #include "windows.h"
 
 #endif // _MSC_VER
+
 #include <vector>
 #include <memory>
 
@@ -71,6 +72,7 @@ class DFat32;
 class DFat32File;
 class DNtfs;
 class DNtfsFile;
+class DList;
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -342,9 +344,9 @@ public:
 		CHAR		mLogicalLetter;	//逻辑驱动的字符
 	}DPart , *PDPart;
 private:
-	PVOID			mPPartList;		//此次盘的分区链表  该成员不得使用 
-									//malloc 和 free系列函数  因为这样
-									//不会他的构造函数 和 析构函数
+	DList* mPPartList;		//此次盘的分区链表  该成员不得使用 
+							//malloc 和 free系列函数  因为这样
+							//不会他的构造函数 和 析构函数
 	HANDLE			mDisk;			//一个已经打开的磁盘设备句柄
 	LONG_INT		mPartableSecCnt;//磁盘的可分配扇区数
 	LONG_INT		mExtPos;        //磁盘中扩展分区的其实位置(扇区)
@@ -1384,8 +1386,9 @@ public:
 	DRun();
 	~DRun();
 
-	PRunList mRunList;	//运行的实际数据
-	DWORD	 mRunCnt;	//运行的数量
+	std::vector<RunList> mRunList;
+	//PRunList mRunList;	//run的实际数据
+	//DWORD	 mRunCnt;	//run的数量
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1446,7 +1449,7 @@ private:
 	WORD		mFDTLen;		//对应的FDT字节数
 
 	DWORD		mAttrCnt;		//当前文件记录中的属性总数
-	void*		mAttrArr;		//属性数组
+	std::unique_ptr<AttrItem[]> mAttrArr; //属性数组
 
 	//这个运行时文件无名数据运行
 	//获得目录的INDEX_ALLOCATION
@@ -1691,7 +1694,7 @@ class DTOOL_API DNtfs
 	}MFT_BLOCK , *PMFT_BLOCK;
 
 private:
-	char*		mDevName;	//设备的名字  ,更具此值判断文件系统是否已经开好了
+	std::string mDevName;	//设备的名字  ,更具此值判断文件系统是否已经开好了
 	LONG_INT	mFSOff;		//设备上的ntfs文件文件系统的物理偏移  (扇区)
 	LONG_INT	mCluForMFT;	//$MFT的逻辑簇号
 	LONG_INT	mCluForMFTMirr;	//$MFTMirr的逻辑簇号

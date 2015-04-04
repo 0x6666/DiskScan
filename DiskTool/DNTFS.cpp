@@ -56,10 +56,9 @@
 
 
 DNtfs::DNtfs()
-: mPMftBlock(NULL)
-, mDevName(NULL)
-, mDev(INVALID_HANDLE_VALUE)
-, mMftBlockCnt(0)
+	: mPMftBlock(NULL)
+	, mDev(INVALID_HANDLE_VALUE)
+	, mMftBlockCnt(0)
 {
 	this->mFSOff.QuadPart			= 0;
 	this->mCluForMFTMirr.QuadPart	= 0;
@@ -75,7 +74,7 @@ DRES DNtfs::OpenDev(const char* devName, const PLONG_INT off)
 	if (!devName || !off)
 		return DR_INVALED_PARAM;	//参数错误?
 
-	if (this->mDevName)
+	if (!mDevName.empty())
 		return DR_ALREADY_OPENDED;	//设备已经打开？
 
 	DRES		res = DR_OK;
@@ -84,19 +83,16 @@ DRES DNtfs::OpenDev(const char* devName, const PLONG_INT off)
 	PNTFS_DBR	pDBR = (PNTFS_DBR)buf;
 	LONG_INT	temp = {0};
 
-	//掀背一下设备名字  
- 	len = strlen(devName);
- 	this->mDevName = new char[len + 1 ];
- 	strcpy(this->mDevName , devName);
+	mDevName = devName;
  	//设备的偏移
  	this->mFSOff = *off;
 
 	//打开设备
-	mDev = ::CreateFileA(this->mDevName , GENERIC_READ | GENERIC_WRITE,
+	mDev = ::CreateFileA(this->mDevName.c_str(), GENERIC_READ | GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL , OPEN_EXISTING , 0 , NULL);	
 	if (mDev == INVALID_HANDLE_VALUE)
 	{//打开设备失败
-		strcpy(this->mDevName , "");
+		mDevName.clear();
 		this->mFSOff.QuadPart = 0;
 		return DR_OPEN_DEV_ERR;			//打开设备失败
 	}
@@ -122,10 +118,8 @@ DRES DNtfs::OpenDev(const char* devName, const PLONG_INT off)
 
 	if (res != DR_OK)
 	{//操作失败
-		if (this->mDevName)
-			delete[] this->mDevName;
+		mDevName.clear();
 		this->mFSOff.QuadPart = 0;
-		this->mDevName = 0;
 		CloseHandle(mDev);
 		mDev = INVALID_HANDLE_VALUE;
 		if (NULL != this->mPMftBlock)
@@ -162,7 +156,7 @@ DRES DNtfs::InitMFTBlock()
 	if(DR_OK != run.InitRunList(&ntfsAttr))
 		return DR_INNER_ERR;
 
-	mMftBlockCnt = run.mRunCnt;  //快数量
+	mMftBlockCnt = run.mRunList.size();  //快数量
 	mPMftBlock = (PMFT_BLOCK)malloc(sizeof(MFT_BLOCK) * mMftBlockCnt);  //空间分配
 	memset(mPMftBlock , 0 , sizeof(MFT_BLOCK) * mMftBlockCnt);
 
@@ -190,14 +184,14 @@ DRES DNtfs::InitMFTBlock()
 
 BOOL DNtfs::IsDevOpened()
 {
-	return this->mDevName != NULL;
+	return !mDevName.empty();
 }
 void DNtfs::CloseDev()
 {
 	//释放名字空间
-	if (mDevName) {
-		delete[] mDevName;
-		mDevName = NULL;
+	if (!mDevName.empty())
+	{
+		mDevName.clear();
 		this->mFSOff.QuadPart = 0;
 		CloseHandle(mDev);
 		mDev = INVALID_HANDLE_VALUE;
@@ -218,23 +212,21 @@ DRES DNtfs::ReadData(void* buf , PLONG_INT off , DWORD dwReadCnt , BOOL isOffSec
 	LONG_INT offset;
 
 	//设备根本就没有打开
-	if ((NULL == this->mDevName) || (0 == strlen(this->mDevName))) return DR_NO_OPEN;
+	if (mDevName.empty())
+		return DR_NO_OPEN;
 
-	if (isOffSec){//扇区偏移
-
+	if (isOffSec) //扇区偏移
+	{
 		if (off->QuadPart >= this->mAllSec.QuadPart)
-		{//越界了
-			return DR_DEV_CTRL_ERR;
-		}
+			return DR_DEV_CTRL_ERR; //越界了
 
 		offset.QuadPart = this->mFSOff.QuadPart + off->QuadPart;	//读取数据的实际偏移
 		offset.QuadPart *= SECTOR_SIZE;		//字节偏移
-	}else{//字节偏移
-
+	}
+	else //字节偏移
+	{
 		if (off->QuadPart / SECTOR_SIZE >= this->mAllSec.QuadPart)
-		{//越界了
-			return DR_DEV_CTRL_ERR;
-		}
+			return DR_DEV_CTRL_ERR; //越界了
 
 		offset.QuadPart = this->mFSOff.QuadPart * SECTOR_SIZE;
 		offset.QuadPart += off->QuadPart;
@@ -301,10 +293,12 @@ DRES DNtfs::OpenFileW(DNtfsFile *file , LONG_INT idx)
 		return DR_INVALED_PARAM;
 
 	//设备根本就没有打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
+	if (mDevName.empty())
+		return DR_NO_OPEN;
 
 	return file->InitRecode(this , idx);
 }
+
 DRES DNtfs::OpenFileW(DNtfsFile *file , int idx)
 {
 	LONG_INT i;
@@ -338,9 +332,9 @@ DRES DNtfs::OpenFileW(const WCHAR* path , DNtfsFile *file /*,DWORD attr*/)
 	LONG_INT	liFDTOff	= {0};
 	WORD		fdtLen		= 0;
 
-
 	//文件系统是否已经打开了?
-	if (!this->mDevName)return DR_NO_OPEN;	//
+	if (mDevName.empty())
+		return DR_NO_OPEN;
 
 	//安检
 	if (!path || ! file /*|| !attr*/)
@@ -557,33 +551,35 @@ LONG_INT DNtfs::GetSecCount()
 }
 DRES DNtfs::GetVolumeName(WCHAR * nameBuf , DWORD bufLen)
 {
-	DRES		res = DR_OK;
-	DNtfsFile	file;
-	DNtfsAttr    attr;
-	DWORD		len = 0;
-
 	//安检
-	if (!nameBuf) return DR_INVALED_PARAM;
+	if (!nameBuf)
+		return DR_INVALED_PARAM;
 
 	//文件系统是否已经打开了?
-	if (!this->mDevName)return DR_NO_OPEN;	//
+	if (mDevName.empty())
+		return DR_NO_OPEN;
 
+	DNtfsFile file;
 	//打开卷文件
-	res = this->OpenFileW(&file , SYS_FILE_VOLUME);
-	if (res != DR_OK) return res;
+	DRES res = this->OpenFileW(&file, SYS_FILE_VOLUME);
+	if (res != DR_OK)
+		return res;
 
+	DNtfsAttr attr;
 	//查找文件名属性
 	res = file.FindAttribute(AD_VOLUME_NAME , &attr);
-	if (res != DR_OK) {
+	if (res != DR_OK)
+	{
 		file.Close();
 		return DR_NO_FILE_NAME;
 	}
 
 	//获得名字的字符数
-	len = attr.R_GetAttrLen();
-	if (bufLen <= len ){//缓存不够
+	DWORD len = attr.R_GetAttrLen();
+	if (bufLen <= len) //缓存不够
+	{
 		file.Close();
-		return DR_BUF_OVER;		
+		return DR_BUF_OVER;
 	}
 
 	//拷贝文件名
@@ -594,8 +590,13 @@ DRES DNtfs::GetVolumeName(WCHAR * nameBuf , DWORD bufLen)
 	file.Close();
 	return res;
 }
+
 DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_INT mftIdx , PLONG_INT pLIStartFDT , WORD* fdtLen/* , DWORD attr*/)
 {
+	//安检
+	if (!name || len <= 0 || len > 255 || !mftIdx)
+		return DR_INVALED_PARAM;
+
 	DRES		res = DR_OK;
 	LONG_INT	parentMft;	//被查找的目录的mft记录号
 	DNtfsFile	root;
@@ -606,9 +607,6 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 	INDEX_ENTRY* indexEntry;
 	PFILE_NAME	fn = NULL;			//文件属性指针
 	DNtfsFile::PAttrItem pAttrItem;	//文件属性
-
-	//安检
-	if (!name || len <= 0 || len > 255 || !mftIdx) return DR_INVALED_PARAM; 
 
 	if (dir.QuadPart == -1)  //在指定的目录中查找
 		parentMft.QuadPart = SYS_FILE_ROOT;
@@ -886,13 +884,13 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 
 	return res;
 }
-DRES DNtfs::FindFile(DNtfsFile* root , FINDER*  hFin)
+DRES DNtfs::FindFile(DNtfsFile* root, FINDER* hFin)
 {
-	DRES res = DR_OK;
 	*hFin = NULL;
 
 	//设备根本就没有打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
+	if (mDevName.empty())
+		return DR_NO_OPEN;
 
 	//安检
 	if (root == NULL || hFin == NULL)
@@ -906,41 +904,38 @@ DRES DNtfs::FindFile(DNtfsFile* root , FINDER*  hFin)
 	hFind->index = 0;
 
 	//打开指定的文件目录
-	res = this->OpenFileW( &hFind->dir , root->GetMftIndex());
+	DRES res = this->OpenFileW(&hFind->dir, root->GetMftIndex());
 	//无效的路径
-	if (res == DR_NO){
+	if (res == DR_NO)
 		return DR_INVALID_NAME;
-	}
-	if (res != DR_OK) {
+	if (res != DR_OK)
 		return DR_INIT_ERR;		//其他的初始化错误或者内部错粗
-	}
+
 	//要返回的句柄
 	*hFin = FINDER(hFind.release());
 	
 	return DR_OK;
-
 }
-DRES DNtfs::FindFile(const char* root , FINDER*  hFind)
+
+DRES DNtfs::FindFile(const char* root, FINDER* hFind)
 {
 	WCHAR wPath[MAX_PATH + 1] = {0};
 	//安检
 	if (root == NULL || hFind == NULL) return DR_INVALED_PARAM;
 
-	MultyByteToUnic(root , wPath , MAX_PATH + 1);
+	MultyByteToUnic(root, wPath, MAX_PATH + 1);
 
-	return FindFile(wPath , hFind);
-
+	return FindFile(wPath, hFind);
 }
 DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 {
-	DRES res = DR_OK;
 	*hFin = NULL;
-	
+
 	//安检
 	if (!path || !hFin /*|| !mftIndx */)
 		return DR_INVALED_PARAM;
 
-	if (!this->mDevName)
+	if (mDevName.empty())
 		return DR_NO_OPEN;		//系统海眉头初始化
 
 	//清零查找句柄
@@ -949,14 +944,12 @@ DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 	hFind->index = 0;
 
 	//打开指定的文件目录
-	res = this->OpenFileW(path ,&hFind->dir /*, ATTR_DIRECTORY|ATTR_DIRECTORY_INDEX*/);
+	DRES res = this->OpenFileW(path, &hFind->dir /*, ATTR_DIRECTORY|ATTR_DIRECTORY_INDEX*/);
 	//无效的路径
-	if (res == DR_NO){
+	if (res == DR_NO)
 		return DR_INVALID_NAME;
-	}
-	if (res != DR_OK){
+	if (res != DR_OK)
 		return DR_INIT_ERR;		//其他的初始化错误或者内部错粗
-	}
 
 	//要返回的句柄
 	*hFin = FINDER(hFind.release());
@@ -981,9 +974,12 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 	PFIND_FILE_HANDER hFind = (PFIND_FILE_HANDER)hFin;
 
 	//检查是否已经初始化了文件洗系统
-	if (!this->mDevName) return DR_NO_OPEN;
-	if (!hFind || !mftIndx) return DR_INVALED_PARAM;
-	if (!hFind->dir.IsFileValid()) return DR_INVALID_HANDLE;//无效的查找句柄
+	if (mDevName.empty())
+		return DR_NO_OPEN;
+	if (!hFind || !mftIndx)
+		return DR_INVALED_PARAM;
+	if (!hFind->dir.IsFileValid())
+		return DR_INVALID_HANDLE;//无效的查找句柄
 
 	if (!hFind || !mftIndx)
 		return DR_INVALED_PARAM;
@@ -994,9 +990,8 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 	//获得跟属性
 	res = hFind->dir.FindAttribute(AD_INDEX_ROOT , &attrRoot);
 	//出问题
-	if (res != DR_OK)	{
+	if (res != DR_OK)
 		return DR_INIT_ERR;
-	}
 
 	//索引表的第一个入口的地址
 	indexEntry = PINDEX_ENTRY(attrRoot.IRGetFistEntry());
@@ -1004,8 +999,9 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 	blockEnd = (BYTE*)indexEntry + attrRoot.IRGetAlloIndexEntriesSize();
 
 	//遍历整个索引表
-	if (hFind->vcn.QuadPart == -1){//mft记录中查找
-		for (index = 0;(BYTE*)indexEntry < blockEnd 
+	if (hFind->vcn.QuadPart == -1)//mft记录中查找
+	{
+		for (index = 0;(BYTE*)indexEntry < blockEnd
 			;indexEntry = PINDEX_ENTRY((BYTE*)indexEntry + indexEntry->IE_Size) 
 			, ++index )
 		{
@@ -1043,15 +1039,15 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 		//获得第一个vcn
 		bitCnt = attrBitMp.R_GetAttrLen() * 8;  //bitmap中的bit数
 		hFind->vcn.QuadPart = 0;
-		for(; hFind->vcn.QuadPart < bitCnt ; ++hFind->vcn.QuadPart) {
+		for(; hFind->vcn.QuadPart < bitCnt ; ++hFind->vcn.QuadPart)
+		{
 			if (attrBitMp.BMIsBitSet(hFind->vcn , this))
 				break;
 		}
 		if (hFind->vcn.QuadPart == bitCnt)
-		{//没有找到有效的vcn
-			return DR_FAT_EOF;
-		}else//找到了第一个vcn
-			hFind->index = 0;
+			return DR_FAT_EOF;//没有找到有效的vcn
+		else
+			hFind->index = 0;//找到了第一个vcn
 	}
 	
 	//rootIndex中已经找过了,接下来找indexBlock区域
@@ -1179,15 +1175,15 @@ DRES DNtfs::IsContainNTFSFlag(const char* cDevName, LONG_INT offset)
 	DWORD		dwReaded = 0;
 	
 	//参数错误
-	if (cDevName == NULL ) return DR_INVALED_PARAM;
+	if (cDevName == NULL)
+		return DR_INVALED_PARAM;
 	
 	//打开设备
 	hDev = ::CreateFileA(cDevName , GENERIC_READ | GENERIC_WRITE,		 //访问模式
 		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL ,OPEN_EXISTING, 0 ,NULL);
 	if (hDev == INVALID_HANDLE_VALUE) //打开设备失败
 		return DR_OPEN_DEV_ERR;
-	
-	
+
 	if (offset.QuadPart > 0)
 	{//偏移
 		//设置文件指针
@@ -1229,13 +1225,13 @@ DRES DNtfs::IsContainNTFSFlag(const char* cDevName, LONG_INT offset)
 
 const char* DNtfs::GetDevName()
 {
-	return mDevName;
+	return mDevName.c_str();
 }
 
 LONG_INT DNtfs::GetClustForMFT()
 {
 	LONG_INT clust = {0};
-	if (NULL == mDevName)
+	if (mDevName.empty())
 		return clust;
 
 	return mCluForMFT;
@@ -1244,7 +1240,7 @@ LONG_INT DNtfs::GetClustForMFT()
 LONG_INT DNtfs::GetClustForMFTMirr()
 {
 	LONG_INT clust = {0};
-	if (NULL == mDevName)
+	if (mDevName.empty())
 		return clust;
 
 	return mCluForMFTMirr;
@@ -1313,7 +1309,8 @@ LONG_INT DNtfs::GetSectorOfMFTRecode( LONG_INT mft )
 	LONG_INT	curMft;	//在当前块的相对MFT记录号
 
 	//设备还没有打开的？
-	if (NULL == this->mDevName) return liSector;
+	if (mDevName.empty())
+		return liSector;
 // 	res = this->OpenFileW(&mftFile , SYS_FILE_MFT);
 // 	if (res != DR_OK) liSector;  //文件打开失败
 //

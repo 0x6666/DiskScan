@@ -193,7 +193,7 @@ BOOL CDataDoc::SetSectorList( SectorList* pSecList )
 		}
 		delete m_pCurSecList;
 	}
-	this->m_pCurSecList = pSecList->GetCopy();
+	this->m_pCurSecList = pSecList->Clone();
 
 
 	CHexDataView* pView = GetHexDataView();
