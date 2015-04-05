@@ -124,14 +124,13 @@ BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName)
 	//如果是一个物理的话传过来的是一个物理的名字和一个偏移，如"\\\\.\\PhysicalDrive ABCDEF10"
 	CString sPath = lpszPathName;
 	CString strTemp = _T("");
-	CString strOff  =_T("");
-	char denName[DEVICE_NAME_LEN + 1] = {0};
+	CString strOff = _T("");
 	DRES res = DR_OK;
 	CView * view;
 
 	//创建图标列表
 	m_pImgList->Create(12,12,ILC_COLORDDB|ILC_MASK , 0 , 1);
-	//this->m_pImgList->Create(16 , 16 ,ILC_COLOR32|ILC_MASK , 0 , 4);
+	//m_pImgList->Create(16 , 16 ,ILC_COLOR32|ILC_MASK , 0 , 4);
 	HICON hIcon = AfxGetApp()->LoadIcon(IDI_FILE);//文件  0
 	m_pImgList->Add(hIcon);
 	hIcon = AfxGetApp()->LoadIcon(IDI_FOLDER);//目录     1
@@ -141,19 +140,19 @@ BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName)
 	//获得需要的内容列表
 	POSITION pos = GetFirstViewPosition();
 	view = 	GetNextView(pos);
-	this->m_pContentList = &((CChildFrm*)(view->GetParentFrame()))->m_DisList;
+	m_pContentList = &((CChildFrm*)(view->GetParentFrame()))->m_DisList;
 	//对列表进行初始化
 	InitContentListHead();
-	this->m_pContentList->SetImageList(m_pImgList , LVSIL_SMALL);
-	
+	m_pContentList->SetImageList(m_pImgList , LVSIL_SMALL);
+
 	//简单的数据初始化
-	this->m_liCurSec.QuadPart = 0;
-	this->m_liStartSec.QuadPart = 0;
+	m_liCurSec.QuadPart = 0;
+	m_liStartSec.QuadPart = 0;
 
 	//在这里进行卷的打开处理
-	
+
 	//释放两边的空格
-	sPath.TrimLeft();	
+	sPath.TrimLeft();
 	sPath.TrimRight();
 
 	//获得设备的名字
@@ -165,46 +164,40 @@ BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName)
 		m_strDevStartSec = strOff;
 	}
 //要打开的设备名字
-#ifdef  UNICODE
-	UnicToMultyByte(strTemp , denName ,DEVICE_NAME_LEN + 1);
-#else
-	strcpy(denName , strTemp);
-#endif
-
-	res = this->m_pFat32->OpenDev(denName , m_liStartSec);
+	m_strTitle = strTemp;
+	res = m_pFat32->OpenDev(strTemp.GetBuffer(), m_liStartSec);
 	if (res != DR_OK)
 	{//TODO 打开设备失败
 		sPath.LoadString(IDS_OPEN_FALIED);
 		sPath.Replace(STR_POS , lpszPathName);
 		strTemp.LoadString(IDS_ERROR);
 		::MessageBox(NULL , sPath  , strTemp  , MB_OK|MB_ICONERROR);
-		this->m_strTitle = _T("");
+		m_strTitle = _T("");
 		return FALSE;
 	}
 
 	//打开设备成功
 	strTemp = GetPathParam(sPath , PT_INDEX);
-	this->m_strTitle = denName;
 	if (strTemp.GetLength() != 0)
 	{
-		this->m_strTitle += _T("->");
-		this->m_strTitle += strTemp;
+		m_strTitle += _T("->");
+		m_strTitle += strTemp;
 		m_strDevAreaIdx = strTemp;
 	}	
 	
 	//加上卷标
-	this->m_strTitle += _T(" ");
-	m_pFat32->GetVolumeName(denName , DEVICE_NAME_LEN + 1);
-	this->m_strTitle += (LPCTSTR)denName;
+	m_strTitle += _T(" ");
+	WCHAR volName[DEVICE_NAME_LEN + 1] = { 0 };
+	m_pFat32->GetVolumeName(volName, DEVICE_NAME_LEN + 1);
+	m_strTitle += volName;
 
-	this->m_secList.AddSector(0 , m_pFat32->GetSecCount());
-	this->m_secList.m_strName = m_strTitle;
+	m_secList.AddSector(0 , m_pFat32->GetSecCount());
+	m_secList.m_strName = m_strTitle;
 
 	//设置当前要显示的列表
 	SetCurPath(_T("/"));
 
-
-	if (NULL == this->m_pDlgFileAttr)
+	if (NULL == m_pDlgFileAttr)
 	{//属性对话框还没有创建
 		m_pDlgFileAttr = new CFat32FileDlg( this );
 		m_pDlgFileAttr->Create(CFat32FileDlg::IDD , AfxGetMainWnd());
@@ -256,21 +249,21 @@ void CFat32Doc::InitContentListHead()
 LONG_INT CFat32Doc::GetSecCount()
 {
 	LONG_INT liCnt = {0};
-	liCnt.QuadPart = this->m_pFat32->GetSecCount();
+	liCnt.QuadPart = m_pFat32->GetSecCount();
 	return liCnt;
 }
 
 BOOL CFat32Doc::ReadData( void* buf , PLONG_INT offset , BOOL isNext /*= TRUE*/ , DWORD size /*= SECTOR_SIZE*/ )
 {
-	if (NULL == this->m_pFat32)
+	if (NULL == m_pFat32)
 		return FALSE;
 	if (isNext)
 	{
-		*offset = this->m_pCurSecList->FixToNextSector(*offset);
+		*offset = m_pCurSecList->FixToNextSector(*offset);
 	}else{
-		*offset = this->m_pCurSecList->FixToPreSector(*offset);
+		*offset = m_pCurSecList->FixToPreSector(*offset);
 	}
-	return DR_OK == this->m_pFat32->ReadData(buf , DWORD(offset->QuadPart) , size) ;
+	return DR_OK == m_pFat32->ReadData(buf , DWORD(offset->QuadPart) , size) ;
 }
 
 void CFat32Doc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
@@ -285,7 +278,7 @@ void CFat32Doc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 	
 	//这里还没有获得列表的指针
-	if (this->m_pContentList == NULL) return ;
+	if (m_pContentList == NULL) return ;
 	nItem = m_pContentList->GetSelectionMark();
 	if (-1 == nItem)//没有选择?
 		return;
@@ -298,7 +291,7 @@ void CFat32Doc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 	strPath = GetSelPath(strName);
 
 	//判断路径是否可以打开
-	res = this->m_pFat32->OpenFile(strPath , &dfile);
+	res = m_pFat32->OpenFile(strPath , &dfile);
 	if (res != DR_OK)
 	{//TODO 打开指定的文件或者目录失败
 		strPath.LoadString(IDS_OPEN_FALIED);
@@ -308,7 +301,7 @@ void CFat32Doc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 	}else{
 		//打开成功
 		//要显示的数据的扇区号
-		this->m_liCurSec.QuadPart = dfile.GetStartSec();
+		m_liCurSec.QuadPart = dfile.GetStartSec();
 		dfile.Close();
 		SetCurPath(strPath);
 		//更新视图
@@ -329,7 +322,7 @@ CString CFat32Doc::GetCurPath()
 
 void CFat32Doc::SetCurPath( CString path )
 {
-	this->m_strCurPath = path;
+	m_strCurPath = path;
 
 	m_bIsRun = FALSE;
 
@@ -359,11 +352,11 @@ CRuntimeClass* CFat32Doc::GetInofViewClass()
 void CFat32Doc::OnBnClickedPreSector()
 {
 	//重置默认扇区列表
-	this->ReSetSectorList();
+	ReSetSectorList();
 
-	if (0 != this->m_liCurSec.QuadPart )
+	if (0 != m_liCurSec.QuadPart )
 	{//当前显示的不是第一扇区
-		--this->m_liCurSec.QuadPart;
+		--m_liCurSec.QuadPart;
 		UpdateAllViews(NULL);
 	}
 }
@@ -371,14 +364,14 @@ void CFat32Doc::OnBnClickedPreSector()
 void CFat32Doc::OnBnClickedNextSector()
 {
 	//总扇区数
-	DWORD dwSecCnt = this->m_pFat32->GetSecCount();
+	DWORD dwSecCnt = m_pFat32->GetSecCount();
 
 	//重置默认扇区列表
-	this->ReSetSectorList();
+	ReSetSectorList();
 
-	if (this->m_liCurSec.QuadPart < dwSecCnt - 1)
+	if (m_liCurSec.QuadPart < dwSecCnt - 1)
 	{//当前不是最后一个扇区
-		++this->m_liCurSec.QuadPart;
+		++m_liCurSec.QuadPart;
 		UpdateAllViews(NULL);
 	}
 }
@@ -386,11 +379,11 @@ void CFat32Doc::OnBnClickedNextSector()
 void CFat32Doc::OnBnClickedFirstSector()
 {
 	//重置默认扇区列表
-	this->ReSetSectorList();
+	ReSetSectorList();
 
-	if (0 != this->m_liCurSec.QuadPart )
+	if (0 != m_liCurSec.QuadPart )
 	{//当前显示的不是第一扇区
-		this->m_liCurSec.QuadPart = 0;
+		m_liCurSec.QuadPart = 0;
 		UpdateAllViews(NULL);
 	}
 }
@@ -398,14 +391,14 @@ void CFat32Doc::OnBnClickedFirstSector()
 void CFat32Doc::OnBnClickedLastSector()
 {
 	//总扇区数
-	DWORD dwSecCnt = this->m_pFat32->GetSecCount();
+	DWORD dwSecCnt = m_pFat32->GetSecCount();
 
 	//重置默认扇区列表
-	this->ReSetSectorList();
+	ReSetSectorList();
 
-	if (this->m_liCurSec.QuadPart != dwSecCnt - 1)
+	if (m_liCurSec.QuadPart != dwSecCnt - 1)
 	{//当前不是最后一个扇区
-		this->m_liCurSec.QuadPart = dwSecCnt - 1;
+		m_liCurSec.QuadPart = dwSecCnt - 1;
 		UpdateAllViews(NULL);
 	}
 }
@@ -413,12 +406,12 @@ void CFat32Doc::OnBnClickedLastSector()
 void CFat32Doc::OnBnClickedPreClust()
 {
 	//当前扇区号
-	LONG_INT liCurSec = this->m_liCurSec;
+	LONG_INT liCurSec = m_liCurSec;
 	//当前扇区号所在的簇号
-	DWORD dwCurClust = this->m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
+	DWORD dwCurClust = m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
 	
 	//重置默认扇区列表
-	this->ReSetSectorList();
+	ReSetSectorList();
 
 	if (0 == dwCurClust)
 	{//无效的簇号
@@ -427,7 +420,7 @@ void CFat32Doc::OnBnClickedPreClust()
 
 	//前一簇
 	--dwCurClust;
-	this->m_liCurSec.QuadPart = this->m_pFat32->ClustToSect(dwCurClust);
+	m_liCurSec.QuadPart = m_pFat32->ClustToSect(dwCurClust);
 
 	//更新所有的视图
 	UpdateAllViews(NULL);
@@ -437,21 +430,21 @@ void CFat32Doc::OnBnClickedPreClust()
 void CFat32Doc::OnBnClickedNextClust()
 {
 	//当前扇区号
-	LONG_INT liCurSec = this->m_liCurSec;
+	LONG_INT liCurSec = m_liCurSec;
 	//当前扇区号所在的簇号
-	DWORD dwCurClust = this->m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
+	DWORD dwCurClust = m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
 
 	//重置默认扇区列表
-	this->ReSetSectorList();
+	ReSetSectorList();
 
 	if (0 == dwCurClust)//当前还在第二号簇之前
 		dwCurClust = 2;
-	else if (this->m_pFat32->GetMaxClustNum() == dwCurClust)
+	else if (m_pFat32->GetMaxClustNum() == dwCurClust)
 	{//已经是最后一簇了
 		return ;
 	}else
 		++dwCurClust;
-	this->m_liCurSec.QuadPart = this->m_pFat32->ClustToSect(dwCurClust);
+	m_liCurSec.QuadPart = m_pFat32->ClustToSect(dwCurClust);
 
 	//更新所有的视图
 	UpdateAllViews(NULL);
@@ -460,16 +453,16 @@ void CFat32Doc::OnBnClickedNextClust()
 void CFat32Doc::OnBnClickedFirstClust()
 {
 	//当前扇区号
-	LONG_INT liCurSec = this->m_liCurSec;
+	LONG_INT liCurSec = m_liCurSec;
 	//当前扇区号所在的簇号
-	DWORD dwCurClust = this->m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
+	DWORD dwCurClust = m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
 
 	//重置默认扇区列表
-	this->ReSetSectorList();
+	ReSetSectorList();
 
 	if ( 2 != dwCurClust )
 	{
-		this->m_liCurSec.QuadPart = this->m_pFat32->ClustToSect(2);
+		m_liCurSec.QuadPart = m_pFat32->ClustToSect(2);
 
 		//更新所有的视图
 		UpdateAllViews(NULL);
@@ -480,14 +473,14 @@ void CFat32Doc::OnBnClickedLastClust()
 {
 	//要计算最后一簇的簇号
 	//总扇区数
-	DWORD dwSecCnt = this->m_pFat32->GetSecCount();
+	DWORD dwSecCnt = m_pFat32->GetSecCount();
 	//数据区的扇区号
-	DWORD firstClustSec = this->m_pFat32->ClustToSect(2);
+	DWORD firstClustSec = m_pFat32->ClustToSect(2);
 	//每簇扇区数
-	BYTE secPerClust = this->m_pFat32->GetSecPerClust();
+	BYTE secPerClust = m_pFat32->GetSecPerClust();
 
 	//重置默认扇区列表
-	this->ReSetSectorList();
+	ReSetSectorList();
 
 	if (0 == secPerClust)
 	{//仿佛设备还没有打开
@@ -500,7 +493,7 @@ void CFat32Doc::OnBnClickedLastClust()
 	//最后一簇的簇号
 	(dwClustCnt += 2)--;
 
-	this->m_liCurSec.QuadPart = this->m_pFat32->ClustToSect(dwClustCnt);
+	m_liCurSec.QuadPart = m_pFat32->ClustToSect(dwClustCnt);
 
 	//更新所有的视图
 	UpdateAllViews(NULL);
@@ -517,7 +510,7 @@ void CFat32Doc::OnRClickContextList(NMHDR *pNMHDR, LRESULT *pResult)
 	CMenu	menu;
 	CMenu*	pMenu;
 
-	::GetWindowRect(AfxGetMainWnd()->GetSafeHwnd()/*this->m_pContentList->GetParent()->GetSafeHwnd()*//*AfxGetMainWnd()->GetSafeHwnd()*/ , &cRect);
+	::GetWindowRect(AfxGetMainWnd()->GetSafeHwnd()/*m_pContentList->GetParent()->GetSafeHwnd()*//*AfxGetMainWnd()->GetSafeHwnd()*/ , &cRect);
 	::GetCursorPos(&p);
 	if(!cRect.PtInRect(p)) 
 		return ;//只在列表空中显示快捷菜单
@@ -525,7 +518,7 @@ void CFat32Doc::OnRClickContextList(NMHDR *pNMHDR, LRESULT *pResult)
 	//快捷菜单
 	menu.LoadMenu(IDR_FAT32_FILE_MENU);
 	pMenu = menu.GetSubMenu(0);
-	pMenu->TrackPopupMenu(TPM_LEFTALIGN|TPM_TOPALIGN , p.x , p.y , AfxGetMainWnd()/*this->m_pContentList->GetParent()*//*AfxGetMainWnd()*/ , NULL);
+	pMenu->TrackPopupMenu(TPM_LEFTALIGN|TPM_TOPALIGN , p.x , p.y , AfxGetMainWnd()/*m_pContentList->GetParent()*//*AfxGetMainWnd()*/ , NULL);
 }
 
 void CFat32Doc::OnFat32PosData()
@@ -542,7 +535,7 @@ void CFat32Doc::OnFat32PosData()
 
 
 	//判断路径是否可以打开
-	res = this->m_pFat32->OpenFileA(strPath , &dfile);
+	res = m_pFat32->OpenFile(strPath , &dfile);
 	if (res != DR_OK)
 	{//TODO 打开指定的文件或者目录失败
 		strPath.LoadString(IDS_OPEN_FALIED);
@@ -554,16 +547,16 @@ void CFat32Doc::OnFat32PosData()
 	}
 
 	//要显示的数据的扇区号
-	this->m_liCurSec.QuadPart = dfile.GetStartSec();
+	m_liCurSec.QuadPart = dfile.GetStartSec();
 
 	if (0 == m_liCurSec.QuadPart)
 	{//数据区不可能出现 为0的山区号
 		//为空就直接使用磁盘的 
-		this->ReSetSectorList();
+		ReSetSectorList();
 	}else{
 		SectorList* secList = new SectorList();
 		secList->m_strName = strPath;  //区域名字
-		secList->AddSector(m_liCurSec , this->m_pFat32->GetSecPerClust() );   //先使用一个簇
+		secList->AddSector(m_liCurSec , m_pFat32->GetSecPerClust() );   //先使用一个簇
 		if (FALSE == SetSectorListNoCopy(secList))
 		{
 			delete secList;
@@ -599,14 +592,14 @@ void CFat32Doc::OnFat32FileAttr()
 {
 	CString strName;
 	//获得当前选择的文件的完整路径
-	CString strSelPath = this->GetSelPath(strName);
+	CString strSelPath = GetSelPath(strName);
 	if (0 == strSelPath.GetLength())
 	{//仿佛有点不对劲啊！
 		return;
 	}
 
 	//设置需要显示的文件的路径
-	if(FALSE == this->m_pDlgFileAttr->SetFilePath(strSelPath))
+	if(FALSE == m_pDlgFileAttr->SetFilePath(strSelPath))
 	{//设置成功
 		CString strTitle;
 		CString strMsg;
@@ -635,7 +628,7 @@ void CFat32Doc::OnFat32PosParaentDir()
 	int				i;
 	CString			strName;
 	//当前列表的路径  也是所谓的父目录
-	CString strCurPath = this->m_strCurPath;
+	CString strCurPath = m_strCurPath;
 	//获得当前选中的路径
 	CString strSelPath = GetSelPath(strName);
 	if (1 == strSelPath.GetLength() && IsPathSeparator(strSelPath.GetAt(0)))
@@ -644,7 +637,7 @@ void CFat32Doc::OnFat32PosParaentDir()
 	}
 
 	//打开指定的文件
-	res = this->m_pFat32->OpenFileA(strSelPath , &file);
+	res = m_pFat32->OpenFile(strSelPath , &file);
 
 	if ( DR_OK != res )
 	{//打开指定的文件失败
@@ -663,7 +656,7 @@ void CFat32Doc::OnFat32PosParaentDir()
 	file.Close();
 
 	//打开父目录
-	res = this->m_pFat32->OpenFileA(strCurPath , &file);
+	res = m_pFat32->OpenFile(strCurPath , &file);
 	dwClust = file.GetStartClust();
 
 
@@ -672,13 +665,13 @@ void CFat32Doc::OnFat32PosParaentDir()
 	if (0 == dwSector)
 	{//数据区不可能出现 为0的山区号
 		//为空就直接使用磁盘的 
-		this->ReSetSectorList();
+		ReSetSectorList();
 	}
 	else
 	{
 		SectorList* secList = new SectorList();
 		secList->m_strName = strCurPath;  //区域名字
-		secList->AddSector(dwSector , this->m_pFat32->GetSecPerClust() );   //先使用一个簇
+		secList->AddSector(dwSector , m_pFat32->GetSecPerClust() );   //先使用一个簇
 		if(TRUE == SetSectorListNoCopy(secList))
 		{
 			//创建线程来获取簇链
@@ -718,7 +711,7 @@ void CFat32Doc::OnFat32PosParaentDir()
 	liSector.QuadPart +=((parentIndex * 32) / SECTOR_SIZE) % m_pFat32->GetSecPerClust();
 
 	//设置当前扇区
-	this->SetCurSector(liSector);
+	SetCurSector(liSector);
 	
 	//字节偏移
 	liSector.QuadPart *= SECTOR_SIZE;
@@ -726,7 +719,7 @@ void CFat32Doc::OnFat32PosParaentDir()
 	liEnd.QuadPart = liSector.QuadPart + 32;
 
 	//选择
-	this->SetSel(liSector , liEnd);
+	SetSel(liSector , liEnd);
 }
 
 void CFat32Doc::OnFat32ServeAs()
@@ -735,7 +728,7 @@ void CFat32Doc::OnFat32ServeAs()
 	int len = 0;
 	CString strName;
 	//获得当前选中的文件
-	CString strFilePath = this->GetSelPath(strName);
+	CString strFilePath = GetSelPath(strName);
 	CString strFileName;
 	CString	strWrite;
 	
@@ -763,7 +756,7 @@ void CFat32Doc::OnUpdateFat32ServeAs(CCmdUI *pCmdUI)
 {
 	CString strTemp;
 	CString strName;
-	int nSelItem = this->m_pContentList->GetSelectionMark();
+	int nSelItem = m_pContentList->GetSelectionMark();
 	if (-1 == nSelItem)
 	{ //没有选择任何东西
 		return ;
@@ -781,9 +774,9 @@ void CFat32Doc::OnUpdateFat32ServeAs(CCmdUI *pCmdUI)
 void CFat32Doc::OnCloseDocument()
 {
 	// TODO: 在此添加专用代码和/或调用基类
-	if (NULL != this->m_pDlgFileAttr)
+	if (NULL != m_pDlgFileAttr)
 	{//销毁窗口
-		this->m_pDlgFileAttr->DestroyWindow();
+		m_pDlgFileAttr->DestroyWindow();
 		delete m_pDlgFileAttr;
 	}
 
@@ -800,7 +793,7 @@ CString CFat32Doc::GetSelPath(CString& strName)
 	CString		strPath = _T("/");
 	int			pathLen;		//原路径的长度
 
-	if (this->m_pContentList == NULL)//这里还没有获得列表的指针?
+	if (m_pContentList == NULL)//这里还没有获得列表的指针?
 		return strPath;
 	nItem = m_pContentList->GetSelectionMark();
 	if (-1 == nItem) {//没有选中任何有效数据
@@ -809,7 +802,7 @@ CString CFat32Doc::GetSelPath(CString& strName)
 
 	//获得文件名
 	strName = m_pContentList->GetItemText( nItem , 1 );
-	strPath = this->m_strCurPath;
+	strPath = m_strCurPath;
 	pathLen = strPath.GetLength();
 
 	if (!IsSelFAT32File(m_pContentList , nItem , strTemp ))
@@ -854,10 +847,10 @@ void CFat32Doc::SetCurFile( CString strPath )
 	if (len == 0) return;
 	else if(len == 1){
 		//根目录
-		if (this->m_strCurPath.GetLength() != 0)
+		if (m_strCurPath.GetLength() != 0)
 		{//原路径不在根目录 
-			this->m_pFat32->OpenFileA(strPath  , &dfile);
-			this->m_liCurSec.QuadPart = dfile.GetStartSec();
+			m_pFat32->OpenFile(strPath  , &dfile);
+			m_liCurSec.QuadPart = dfile.GetStartSec();
 			dfile.Close();
 			//更新视图
 			UpdateAllViews(NULL);
@@ -902,8 +895,8 @@ void CFat32Doc::SetCurFile( CString strPath )
 			/*SetCurPath(strParent);*/
 		if (i != len)
 		{//新旧路径不同 
-			this->m_pFat32->OpenFileA(strParent  , &dfile);
-			this->m_liCurSec.QuadPart = dfile.GetStartSec();
+			m_pFat32->OpenFile(strParent  , &dfile);
+			m_liCurSec.QuadPart = dfile.GetStartSec();
 			dfile.Close();
 			//更新视图
 			UpdateAllViews(NULL);
@@ -912,7 +905,7 @@ void CFat32Doc::SetCurFile( CString strPath )
 	}
 
 	//设置需要显示的文件的路径
-	if(FALSE == this->m_pDlgFileAttr->SetFilePath(strPath))
+	if(FALSE == m_pDlgFileAttr->SetFilePath(strPath))
 	{//设置成功
 		CString strTitle;
 		CString strMsg;

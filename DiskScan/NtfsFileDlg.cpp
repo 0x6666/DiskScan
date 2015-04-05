@@ -61,7 +61,7 @@ BOOL CNtfsFileDlg::SetFilePath( CString strSelPath )
 	//先不管有没有打开，关闭一下，避免资源泄露
 	m_upFile->Close();
 	//打开指定的文件
-	res = pNtfs->OpenFile((LPCSTR)(LPCTSTR)strSelPath, m_upFile.get());
+	res = pNtfs->OpenFile(strSelPath, m_upFile.get());
 	if (DR_OK != res)
 	{//打开指定的文件失败
 		return FALSE;

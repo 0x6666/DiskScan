@@ -20,249 +20,264 @@
 
 DFat32::DFat32(void)
 {
-	this->mDev				= INVALID_HANDLE_VALUE;
-	this->mDevName[0]		= 0;
-	this->mFSOff.QuadPart	= 0;
-/*	this->mIsInit			= FALSE;*/
-	this->mSecPerClus		= 0;
-	this->mResSec			= 0;
-	this->mFATs				= 0;
-	this->mSecsPerFAT		= 0;
-	this->mSectors			= 0;
-	this->m1stDirClut		= 0;
-	this->mFSinfoSec		= 0;
-	this->mIsViewChged		= 0;
-	this->mViewSec			= 0;
-	this->mMaxClust			= 0;
-	memset(this->mView , 0 , SECTOR_SIZE);
+	mDev				= INVALID_HANDLE_VALUE;
+	mDevName[0]		= 0;
+	mFSOff.QuadPart	= 0;
+/*	mIsInit			= FALSE;*/
+	mSecPerClus		= 0;
+	mResSec			= 0;
+	mFATs				= 0;
+	mSecsPerFAT		= 0;
+	mSectors			= 0;
+	m1stDirClut		= 0;
+	mFSinfoSec		= 0;
+	mIsViewChged		= 0;
+	mViewSec			= 0;
+	mMaxClust			= 0;
+	memset(mView , 0 , SECTOR_SIZE);
 }
 
 DFat32::~DFat32(void)
 {
 }
 
-DRES DFat32::OpenDev(const char* name, LONG_INT offset)
+DRES DFat32::OpenDev(const WCHAR* name, LONG_INT offset)
 {
-	DRES		res = DR_OK;
-	char		buf[SECTOR_SIZE] = {0};			//数据缓存
-	PFAT32_DBR	pDBR = PFAT32_DBR(buf);
-	
-	if (strlen(this->mDevName))	return DR_ALREADY_OPENDED;				//已经初始化
-	if (!strlen(name))	return DR_INVALED_PARAM;	//参数错误
-	::strcpy(this->mDevName , name);
-	this->mFSOff = offset;
-	
+	if (!wcslen(name))
+		return DR_INVALED_PARAM;
+
+	if (wcslen(mDevName))
+		return DR_ALREADY_OPENDED;
+
+	wcscpy(mDevName, name);
+	mFSOff = offset;
+
 	//打开设备
-	this->mDev = ::CreateFileA( this->mDevName , GENERIC_READ | GENERIC_WRITE,		 //访问模式
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL ,OPEN_EXISTING, 0 ,NULL);
-	if (mDev == INVALID_HANDLE_VALUE)				
+	mDev = ::CreateFile(mDevName,
+						GENERIC_READ | GENERIC_WRITE,
+						FILE_SHARE_READ | FILE_SHARE_WRITE,
+						NULL,
+						OPEN_EXISTING,
+						0,
+						NULL);
+
+	if (mDev == INVALID_HANDLE_VALUE)
 	{//打开设备失败
-		strcpy(mDevName , "");
+		wcscpy(mDevName, L"");
 		return DR_OPEN_DEV_ERR;
 	}
-	
-	this->mSectors = 1;  //为了读取第一个扇区暂时设置为1
-	res = ReadData(buf , 0 ,SECTOR_SIZE );	//读取分区的第一个扇区的数据
-	this->mSectors = 0;  //还原数据
-	if(res)	return res;						//读取数据失败
-	if(pDBR->bsEndSig != MBR_END)//数据无效
+
+	char		buf[SECTOR_SIZE] = { 0 };			//数据缓存
+	PFAT32_DBR	pDBR = PFAT32_DBR(buf);
+
+	mSectors = 1;  //为了读取第一个扇区暂时设置为1
+	DRES res = ReadData(buf, 0, SECTOR_SIZE);	//读取分区的第一个扇区的数据
+	mSectors = 0;  //还原数据
+	if(res)
+		return res;
+
+	if (MBR_END != pDBR->bsEndSig)//数据无效
 		return DR_INIT_ERR;
-	
-	this->mSecPerClus = pDBR->bsSecPerClus;	//每簇扇区数
-	this->m1stDirClut = pDBR->bsFirstDirEntry32;//第一个跟目录所在的簇号
-	this->mFATs		  = pDBR->bsFATs;		//fat表数
-	this->mFSinfoSec  = pDBR->bsFsInfo32;	//FSinfo所在的扇区
-	this->mResSec	  = pDBR->bsResSectors; //保留扇区数	
-	this->mSecsPerFAT = pDBR->bsFATsecs32;	//每个FAT表所占的扇区数
-	this->mSectors	  = pDBR->bsHugeSectors;//本分区的扇数
-	this->mMaxClust   = (mSectors - (mResSec + (mFATs * mSecsPerFAT))) / mSecPerClus + 2 -1;
+
+	mSecPerClus = pDBR->bsSecPerClus;	//每簇扇区数
+	m1stDirClut = pDBR->bsFirstDirEntry32;//第一个跟目录所在的簇号
+	mFATs = pDBR->bsFATs;		//fat表数
+	mFSinfoSec = pDBR->bsFsInfo32;	//FSinfo所在的扇区
+	mResSec = pDBR->bsResSectors; //保留扇区数	
+	mSecsPerFAT = pDBR->bsFATsecs32;	//每个FAT表所占的扇区数
+	mSectors = pDBR->bsHugeSectors;//本分区的扇数
+	mMaxClust = (mSectors - (mResSec + (mFATs * mSecsPerFAT))) / mSecPerClus + 2 - 1;
 
 	//设备打开失败
-	if(res)	strcpy(mDevName , "");
+	if(res)
+		wcscpy(mDevName, L"");
 
 	return res;
 }
 
 void DFat32::CloseDev()
 {
-	strcpy(mDevName , "");
+	mDevName[0] = 0;
 	CloseHandle(mDev);
-	this->mDev				= INVALID_HANDLE_VALUE;
-	this->mFSOff.QuadPart	= 0;
-	this->mSecPerClus		= 0;
-	this->mResSec			= 0;
-	this->mFATs				= 0;
-	this->mSecsPerFAT		= 0;
-	this->mSectors			= 0;
-	this->m1stDirClut		= 0;
-	this->mFSinfoSec		= 0;
-	this->mIsViewChged		= 0;
-	this->mViewSec			= 0;
-	this->mMaxClust			= 0;
-	memset(this->mView , 0 , SECTOR_SIZE);
-}
-
-
-BOOL DFat32::IsDevOpened()
-{
-	return strlen(this->mDevName) != 0;
+	mDev = INVALID_HANDLE_VALUE;
+	mFSOff.QuadPart = 0;
+	mSecPerClus = 0;
+	mResSec = 0;
+	mFATs = 0;
+	mSecsPerFAT = 0;
+	mSectors = 0;
+	m1stDirClut = 0;
+	mFSinfoSec = 0;
+	mIsViewChged = 0;
+	mViewSec = 0;
+	mMaxClust = 0;
+	memset(mView, 0, SECTOR_SIZE);
 }
 
 DRES DFat32::ReadData(void* buf , DWORD off , DWORD dwReadCnt)
 {
-	DRES	 res = DR_OK;
-	DWORD	 dwReaded = 0;
-	LONG_INT offset;
-
-	//设备还没打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
+	if (IsDevOpened())
+		return DR_NO_OPEN;
 
 	//需要判断读取数据时是否越界
-	if (off  >= this->mSectors )
+	if (off  >= mSectors )
 	{//读取数据越界了
 		return DR_DEV_CTRL_ERR;
 	}
-	
-	offset.QuadPart = this->mFSOff.QuadPart + off;						//读取数据的实际偏移
+
+	LONG_INT offset;
+	offset.QuadPart = mFSOff.QuadPart + off;						//读取数据的实际偏移
 	offset.QuadPart *= SECTOR_SIZE;					//字节偏移
 
-
-
+	DRES res = DR_OK;
 	//设置文件指针
-	offset.LowPart = SetFilePointer(this->mDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
+	offset.LowPart = SetFilePointer(mDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 	if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 		res = DR_DEV_CTRL_ERR;
 
 	//读取数据
-	if(!res && !::ReadFile(this->mDev , buf , dwReadCnt ,&dwReaded ,NULL) && dwReaded != dwReadCnt)	
+	DWORD dwReaded = 0;
+	if(!res && !::ReadFile(mDev , buf , dwReadCnt ,&dwReaded ,NULL) && dwReaded != dwReadCnt)	
 		res =  DR_DEV_IO_ERR;
-// 
-// 	CloseDevice(hDev);								//关闭已经打开的设备
+
 	return res;
 }
 
 DRES DFat32::WriteData(void* buf , DWORD off , DWORD dwWrite)
 {
-	DRES	 res = DR_OK;
-	DWORD	 dwWrited = 0;
 	LONG_INT offset = {0};
-
-	offset.QuadPart = this->mFSOff.QuadPart + off;	//读取数据的实际偏移
-	offset.QuadPart *= SECTOR_SIZE;					//字节偏移
+	offset.QuadPart = mFSOff.QuadPart + off; //读取数据的实际偏移
+	offset.QuadPart *= SECTOR_SIZE; //字节偏移
 
 	//设置文件指针
-	offset.LowPart = SetFilePointer(this->mDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
+	DRES res = DR_OK;
+	offset.LowPart = SetFilePointer(mDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 	if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 		res = DR_DEV_CTRL_ERR;
 
 	//读取数据
-	if(!res && !WriteFile(this->mDev , buf , dwWrite , &dwWrited ,NULL) && dwWrited != dwWrite)	
+	DWORD dwWrited = 0;
+	if(!res && !WriteFile(mDev , buf , dwWrite , &dwWrited ,NULL) && dwWrited != dwWrite)	
 		res =  DR_DEV_IO_ERR;
 
-/*	CloseDevice(hDev);								//关闭已经打开的设备*/
 	return res;
 }
 DWORD DFat32::GetFATFromFAT1(DWORD clust)
 {
 	DWORD fsect;
 
-	if (clust < 2 || clust > this->mMaxClust)	//簇号检查
+	if (clust < 2 || clust > mMaxClust)	//簇号检查
 		return 1;
-	fsect = this->mResSec;
+
+	fsect = mResSec;
 	if (MoveView(fsect + (clust / (SECTOR_SIZE / 4))))//移动窗口到clust所在的扇区
-		0xFFFFFFFF;
+		return 0xFFFFFFFF;
 
 	return GetDWORD(mView + (clust % (SECTOR_SIZE / 4) *4)) & FAT_MASK;
 }
 DWORD DFat32::GetFATFromFAT2(DWORD clust)
 {
-	DWORD fsect;
-
-	if (clust < 2 || clust > this->mMaxClust)	//簇号检查
+	if (clust < 2 || clust > mMaxClust)	//簇号检查
 		return 1;
-	fsect = this->mResSec + this->mSecsPerFAT;
+
+	DWORD fsect = mResSec + mSecsPerFAT;
 	if (MoveView(fsect + (clust / (SECTOR_SIZE / 4))))//移动窗口到clust所在的扇区
-		0xFFFFFFFF;
+		return 0xFFFFFFFF;
 
 	return GetDWORD(mView + (clust % (SECTOR_SIZE / 4) *4)) & FAT_MASK;
 }
 
 DWORD DFat32::ClustToSect(DWORD clust)
 {
-	if (0 == strlen(mDevName)) return 0;
-	if (clust < 2 || clust > this->mMaxClust) 
-		return 0;				//无效的簇号
-	return ((clust - 2) * this->mSecPerClus) + this->mResSec + (this->mFATs * this->mSecsPerFAT);
+	if (!IsDevOpened())
+		return 0;
+
+	//无效的簇号?
+	if (clust < 2 || clust > mMaxClust) 
+		return 0;
+
+	return ((clust - 2) * mSecPerClus) + mResSec + (mFATs * mSecsPerFAT);
 }
 
 DWORD DFat32::SectToClust(DWORD sector)
 {
-	if (0 == strlen(mDevName)) 
+	if (!IsDevOpened())
 		return 0;
 
-	if (sector < (this->mResSec + (this->mFATs * this->mSecsPerFAT)))
-	{//无效扇区号
+	//无效扇区号
+	if (sector < (mResSec + (mFATs * mSecsPerFAT)))
+	{
 		return 0;
 	}
 
 	//相对根目录的第一簇
-	sector -= (this->mResSec + (this->mFATs * this->mSecsPerFAT));
+	sector -= (mResSec + (mFATs * mSecsPerFAT));
 
 	//获得实际的簇号
-	return (sector/ this->mSecPerClus) + 2;
+	return (sector/ mSecPerClus) + 2;
 }
 
 DRES DFat32::MoveView(DWORD sec)
 {
-	DWORD	vSect = this->mViewSec;
+	DWORD	vSect = mViewSec;
 	DRES	res = DR_OK;
 
-	if (vSect != sec) {					//要改变当前的数据窗口
-		if (this->mIsViewChged) {		//数据视图中的数据需要写会磁盘
-			if ((res = WriteData(this->mView, vSect ,SECTOR_SIZE)) != DR_OK)
+	if (vSect != sec) //要改变当前的数据窗口
+	{
+		if (mIsViewChged) //数据视图中的数据需要写会磁盘
+		{
+			if ((res = WriteData(mView, vSect ,SECTOR_SIZE)) != DR_OK)
 				return res;
-			this->mIsViewChged = FALSE;
-			if (vSect < (this->mResSec + this->mSecsPerFAT)) {	//在FAT表区域
+
+			mIsViewChged = FALSE;
+			if (vSect < (mResSec + mSecsPerFAT)) //在FAT表区域
+			{
 				int nf;
-				for (nf = this->mFATs; nf > 1; nf--) {			//将数据写到每一个FAT表中去
-					vSect += this->mSecsPerFAT;
-					WriteData(this->mView, vSect  ,SECTOR_SIZE);
+				for (nf = mFATs; nf > 1; nf--) //将数据写到每一个FAT表中去
+				{
+					vSect += mSecsPerFAT;
+					WriteData(mView, vSect  ,SECTOR_SIZE);
 				}
 			}
 		}
-		if (sec) {
-			if ((res = ReadData(this->mView, sec  , SECTOR_SIZE)) != DR_OK)
+
+		if (sec)
+		{
+			if ((res = ReadData(mView, sec, SECTOR_SIZE)) != DR_OK)
 				return res;
-			this->mViewSec = sec;
+
+			mViewSec = sec;
 		}
 	}
+
 	return DR_OK;
 }
+
 DRES DFat32::PosEntry(PVOID entr , WORD index)
 {
-	DWORD	  clst;
-	USHORT	  ic;
 	PDirEntry entry = PDirEntry(entr);
-
 	entry->mIndex = index;						//要定位的目录号
-	clst = entry->mStartClust;					//起始簇号
-	if (clst == 1 || clst > this->mMaxClust)	//检查起始簇号是否哈合法
+	DWORD clst = entry->mStartClust;					//起始簇号
+	if (clst == 1 || clst > mMaxClust)	//检查起始簇号是否哈合法
 		return DR_INIT_ERR;
 
-	ic = SECTOR_SIZE / 32 * this->mSecPerClus;	//每簇的入口数
-	while (index >= ic) {						//跟进到簇链
-		clst = GetFATFromFAT1( clst	);					//获得下一簇的簇号
-		if (clst == 0xFFFFFFFF) 
-			return DR_DEV_IO_ERR;				//设备IO出错
-		if (clst < 2 || clst > this->mMaxClust)//超出了范围
+	USHORT ic = SECTOR_SIZE / 32 * mSecPerClus;	//每簇的入口数
+	while (index >= ic) //跟进到簇链
+	{
+		clst = GetFATFromFAT1( clst	); //获得下一簇的簇号
+		if (clst == 0xFFFFFFFF)
+			return DR_DEV_IO_ERR; //设备IO出错
+
+		if (clst < 2 || clst > mMaxClust)//超出了范围
 			return DR_INIT_ERR;
+
 		index -= ic;
 	}
 
-	entry->mCurClust = clst;						//当前簇号
+	entry->mCurClust = clst; //当前簇号
 	entry->mCurSect = ClustToSect( clst) + index / (SECTOR_SIZE / 32);	//扇区号
-	entry->mDir = this->mView + (index % (SECTOR_SIZE / 32)) * 32;//定位index所指定的入口
-	return DR_OK;								//定位成功  只需在用的时候移动数据窗口了
+	entry->mDir = mView + (index % (SECTOR_SIZE / 32)) * 32;//定位index所指定的入口
+	return DR_OK; //定位成功  只需在用的时候移动数据窗口了
 }
 
 DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
@@ -283,10 +298,13 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 	{//已经删除了的文件
 		p = *path + 1;
 		entry->mIsDelFile =  TRUE;
-	}else{
+	}
+	else
+	{
 		entry->mIsDelFile =  FALSE;
 		p = *path;
 	}
+
 	entry->mStatus = 0;				//先清理一下状态
 	::memset(entry->mLFN , 0 ,sizeof(WCHAR)*MAX_LFN);
 	::memset(entry->mSFN , 0 ,11);
@@ -302,15 +320,18 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 
 		lfn[lfni++] = w;
 	}
+
 	if(!w)	//到了最后一段
 		entry->mStatus |= ST_LAST;
 	*path = p + i +1;//返回剩下的路径
-	
+
 	lfn[lfni] = 0;	
 	//去掉后面的空格和点
 	for (; lfni > 0 &&(lfn[lfni-1]== 0x20 || lfn[lfni-1]== '.');--lfni)
 		lfn[lfni-1] = 0;
-	if(!lfni)  return DR_INVALID_NAME;//没有名字
+
+	if(!lfni)//没有名字
+		return DR_INVALID_NAME;
 
 	//同时有大写和写的时候也只能用长文件名
 	if(entry->mStatus & ST_UPPER && entry->mStatus & ST_LOWER)
@@ -322,10 +343,14 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 	//查找扩展名的位置  //第一个字符不可能是点
 	for (doti = lfni-1; doti >= 0 && lfn[doti] != '.';--doti);  //windows 其实是可以存在一点开头的文件的     
 	//doti==-1  没扩展名
-	if(doti == -1) 
+	if (doti == -1)
+	{
 		doti = 0;
-	else if(entry->mIsDelFile == FALSE && doti >/*=*/ 8)	//超出了8.3命名法   //此处不得有等于 "."的最大位置是可以等于8的  2012-5-13
+	}
+	else if (entry->mIsDelFile == FALSE && doti >/*=*/ 8)	//超出了8.3命名法   //此处不得有等于 "."的最大位置是可以等于8的  2012-5-13
+	{
 		entry->mStatus |= ST_LFN;
+	}
 	else if (entry->mIsDelFile && doti >/*=*/ 7)
 	{
 		entry->mStatus |= ST_LFN;
@@ -336,14 +361,16 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 	//先来文件的名字
 
 	sfni = 0;
-	if (entry->mIsDelFile && !(entry->mStatus & ST_LFN)){  //已经删除了的文件的短文件名第一个字节替换成 '*'
+	if (entry->mIsDelFile && !(entry->mStatus & ST_LFN)) //已经删除了的文件的短文件名第一个字节替换成 '*'
+	{
 		sfn[sfni++] = '*';
-
 	}
 
 	for (i = 0 ; i < lfni; ++i )
 	{
-		if(i == doti && doti)  break;  //该扩展名了
+		if(i == doti && doti) //该扩展名了
+			break;
+
 		w = lfn[i];
 		if (IsSingleByteChar(w) && strchr(" .+,/;=[\\]", w))  //除掉长文件名中不可以的 就是" +,/;=[\\]"  有一个空格
 		{//出现了非法字符  只能用长文件名
@@ -396,6 +423,7 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 
 	return DR_OK;
 }
+
 // DRES DFat32::GetDelSegName(const WCHAR** path, PVOID entr)
 // {
 // 	PDirEntry	entry	= PDirEntry(entr);
@@ -516,7 +544,7 @@ DRES DFat32::GetDirEntry( const WCHAR* path ,PVOID entr)
 	PDirEntry	entry= PDirEntry(entr);
 
 	if (IsPathSeparator(path[0]))	++path;	//跳过前面的分隔符
-	entry->mStartClust = this->m1stDirClut;	//从根目录开始
+	entry->mStartClust = m1stDirClut;	//从根目录开始
 	if(path[0] == 0){						//空路径也就一位置是当前分区本身
 		res = PosEntry(entry , 0);			//定位到制定的入口所在的山区
 		entry->mDir = 0;					//因为没有只想任何目录 而是当前分区 所以没有入口
@@ -843,14 +871,14 @@ DRES DFat32::NextEntry(PVOID entr)
 	{								//需要进入下一个扇区了
 		++entry->mCurSect;			//物理扇区下移
 		idxSec = i / (SECTOR_SIZE /32);
-		if(idxSec && !(idxSec % this->mSecPerClus))
+		if(idxSec && !(idxSec % mSecPerClus))
 		{
 			clust = GetFATFromFAT1(entry->mCurClust);
 			if(clust == 1)
 				return DR_INIT_ERR;	//无效簇号
 			if(clust == 0xFFFFFFFF)
 				return DR_DEV_IO_ERR;//设备IO错误
-			if(clust > this->mMaxClust)
+			if(clust > mMaxClust)
 				return DR_FAT_EOF;	//到了结尾了
 			
 			entry->mCurClust = clust;
@@ -858,7 +886,7 @@ DRES DFat32::NextEntry(PVOID entr)
 		}
 	}
 	entry->mIndex = i;
-	entry->mDir = this->mView + (i % (SECTOR_SIZE / 32)) * 32;
+	entry->mDir = mView + (i % (SECTOR_SIZE / 32)) * 32;
 
 	return DR_OK;
 }
@@ -876,6 +904,7 @@ BYTE DFat32::ChkSum(BYTE* pFcbName)
 	return (Sum);
 }
 
+/*
 DRES DFat32::OpenFileA(const char* path , DFat32File* file)
 {
 	//参数错误
@@ -888,26 +917,26 @@ DRES DFat32::OpenFileA(const char* path , DFat32File* file)
 	return OpenFileW(wPath.data(), file);
 	
 }
+*/
 
 DRES DFat32::OpenFileW(const WCHAR* path , DFat32File *file)
 {
-	DRES	 res = DR_OK;
+	if (!IsDevOpened())
+		return DR_NO_OPEN;
+
+	if (path == NULL || file == NULL)
+		return DR_INVALED_PARAM;
+
 	DirEntry entry;
-
-	//当前设备没有打开
-	//设备还没打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
-
-	//参数错误
-	if (path == NULL || file == NULL) return DR_INVALED_PARAM;
-
 	::memset(&entry , 0 , sizeof(entry));
 
-	res = GetDirEntry(path , &entry );
-	if (res){			//跟进失败
+	DRES res = GetDirEntry(path, &entry);
+	if (res) //跟进失败
+	{
 		file->mFS = NULL;	//返回的文件句柄NULL
-		return res;			
+		return res;
 	}
+
 	file->mFS = this;
 	//开始创建文件对象
 	return NewFileHandle(file , &entry , path);
@@ -915,42 +944,35 @@ DRES DFat32::OpenFileW(const WCHAR* path , DFat32File *file)
 
 DRES DFat32::ListFile(DFat32File* fil, FIND_FILE listFun)
 {
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return DR_NO_OPEN;
 
-	//DFat32File*	fil		= (DFat32File*)dirc;//已经打开的目录
-	DRES		res		= DR_OK;
-	DirEntry	entry;		//入口结构
-	BYTE*		dir		= NULL;
-	BYTE		flag	= 0;		//第一个字节的标准
-	BYTE		attr	= 0;		//属性
-	BYTE		chSum	= 0;		//短文件名校验和
-	BYTE		order	= 0;		//目录项序号
-	WCHAR		nambuf[MAX_LFN+1] = {0}; 
-	
-	//设备还没打开
-	
-	if(!fil || !listFun )
+	if (!fil || !listFun)
 		return DR_INVALED_PARAM;		//参数错误
-	if(!(fil->mAttr & ATTR_DIRECTORY))
+	if (!(fil->mAttr & ATTR_DIRECTORY))
 		return DR_INVALED_PARAM;		//需要的是一个目录而不是一个文件
 
+	DirEntry	entry;		//入口结构
+	BYTE		chSum	= 0;		//短文件名校验和
+	BYTE		order	= 0;		//目录项序号
+	WCHAR		nambuf[MAX_LFN+1] = {0};
 
 	entry.mStartClust = fil->mStartClust;//进入指定的目录的第一簇
-	res = PosEntry(&entry , 0);			//定位第一个山区的第一个入口结构
-	if (res) return res;				//定位失败
+	DRES res = PosEntry(&entry, 0);			//定位第一个山区的第一个入口结构
+	if (res)
+		return res;				//定位失败
 
 	do{	//遍历目录中每一个入口
 		res = MoveView(entry.mCurSect);
 		if(res)  break;				//出错
-		dir = entry.mDir;			//入口的位置
-		flag = dir[0];				//第一个字节的标志位
+		BYTE* dir = entry.mDir;			//入口的位置
+		BYTE flag = dir[0];				//第一个字节的标志位
 		if( flag == 0){				//到了目录的末尾
 			(*listFun)(NULL);		//通知回调者查找完毕
 			break;		
 		}
-			
-		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//目录项的属性
+
+		BYTE attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//目录项的属性
 
 		if (flag == 0xE5||\
 			((attr & ATTR_VOLUME_ID) && attr != ATTR_LONG_NAME)) {	//不是一个有效的入口
@@ -997,22 +1019,20 @@ DRES DFat32::ListFile(DFat32File* fil, FIND_FILE listFun)
 
 DRES DFat32::FindFile( DFat32File* dir , FINDER* finder , BOOL findDel /*= FALSE*/ )
 {
-	if (0 == strlen(this->mDevName))
-		return DR_NO_OPEN;
-
-	DRES			 res  = DR_OK;
-	int				 len  = 0;
-
-	//设备还没打开
-
 	//先清理一下结果
 	*finder = NULL;
 
+	if (!IsDevOpened())
+		return DR_NO_OPEN;
+
 	//例行安全检查
-	if (!dir || !finder) return DR_INVALED_PARAM;
-	if (!dir->IsValid()) return DR_INVALID_HANDLE;
-	if (!dir->IsDir())	 return DR_IS_FILE;
-	
+	if (!dir || !finder)
+		return DR_INVALED_PARAM;
+	if (!dir->IsValid())
+		return DR_INVALID_HANDLE;
+	if (!dir->IsDir())
+		return DR_IS_FILE;
+
 	//创建一个查找句柄
 	std::unique_ptr<Fat32FileFinder> pfff(new Fat32FileFinder());
 
@@ -1028,10 +1048,10 @@ DRES DFat32::FindFile( DFat32File* dir , FINDER* finder , BOOL findDel /*= FALSE
 // 		pfff->path[len + 1] = 0;
 // 	}
 
-
 	pfff->entry.mStartClust = dir->mStartClust;//进入指定的目录的第一簇
-	res = PosEntry(&(pfff->entry) , 0);			//定位第一个山区的第一个入口结构
-	if (res){
+	DRES res = PosEntry(&(pfff->entry), 0);			//定位第一个山区的第一个入口结构
+	if (res)
+	{
 		//定位失败，这是文件句柄有问题
 		return DR_INVALID_HANDLE;				//定位失败
 	}
@@ -1044,26 +1064,27 @@ DRES DFat32::FindFile( DFat32File* dir , FINDER* finder , BOOL findDel /*= FALSE
 
 DRES DFat32::FindNextFileW( FINDER finder , DFat32File* file )
 {
-	PFat32FileFinder pfff = PFat32FileFinder(finder);
-	//设备还没打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
- 	//参数检查
-	if (!finder && !file) return DR_INVALED_PARAM;
+	if (!IsDevOpened())
+		return DR_NO_OPEN;
+	if (!finder && !file)
+		return DR_INVALED_PARAM;
 
 	//进行具体的查找
+	PFat32FileFinder pfff = PFat32FileFinder(finder);
 	if (pfff->isFindDel)
-	{//查找的是已经删除了的文件或者目录
-		return FindNextDelFile(finder , file);
-	}else{
-		//查找的是普通文件或者目录
-		return FindNextExistFile(finder , file);
-	}
+		return FindNextDelFile(finder, file);
+	else
+		return FindNextExistFile(finder, file);
 
 	return DR_OK;
 }
 
 DRES DFat32::FindNextExistFile( FINDER find , DFat32File* file )
 {
+	PFat32FileFinder finder = PFat32FileFinder(find);//查询结构体
+	if (finder->isEnd)
+		return DR_FAT_EOF;
+
 	DRES		res		= DR_OK;
 	BYTE*		dir		= NULL;
 	BYTE		flag	= 0;		//第一个字节的标准
@@ -1073,12 +1094,7 @@ DRES DFat32::FindNextExistFile( FINDER find , DFat32File* file )
 	WCHAR		nambuf[MAX_LFN+1] = {0}; 
 	size_t		len = 0;
 	WCHAR		path[MAX_PATH + 1] = {0};
-	PFat32FileFinder finder = PFat32FileFinder(find);//查询结构体
 
-	//查找已经结束了
-	if (finder->isEnd) return DR_FAT_EOF;
-	
-	
 	do{	//遍历目录中每一个入口
 		res = MoveView(finder->entry.mCurSect);
 		if(res)  break;				//出错
@@ -1176,6 +1192,10 @@ DRES DFat32::FindNextExistFile( FINDER find , DFat32File* file )
 
 DRES DFat32::FindNextDelFile( FINDER find , DFat32File* file )
 {
+	PFat32FileFinder finder = PFat32FileFinder(find);
+	if (finder->isEnd)
+		return DR_FAT_EOF;
+
 	DRES		res		= DR_OK;	//操作结果
 	BYTE*		dir		= NULL;		//在缓存中的入口结构
 	BYTE		flag	= 0;		//第一个字节的标准
@@ -1188,11 +1208,6 @@ DRES DFat32::FindNextDelFile( FINDER find , DFat32File* file )
 	WCHAR       path[MAX_PATH] = {0};	//路径缓存
 	DFat32File	df;
 	W_CHAR		w_w;					//用于计算校验和
-	PFat32FileFinder finder = PFat32FileFinder(find);
-
-	//已经超找结束了
-	if (finder->isEnd) return DR_FAT_EOF;
-
 
 	do{	//遍历目录中每一个入口
 		res = MoveView(finder->entry.mCurSect);
@@ -1319,15 +1334,20 @@ DRES DFat32::FindNextDelFile( FINDER find , DFat32File* file )
 
 void DFat32::FindClose( FINDER finder )
 {
-	if (finder) delete PFat32FileFinder(finder);
+	if (finder)
+		delete PFat32FileFinder(finder);
 }
-
 
 DRES DFat32::ListDelFile(DFat32File* fil, FIND_DEL_FILE listFun)
 {
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return DR_NO_OPEN;
-//	DFat32File*	fil		= (DFat32File*)(dirc);//已经打开的目录
+
+	if (!fil || !listFun)
+		return DR_INVALED_PARAM;		//参数错误
+	if (!(fil->mAttr & ATTR_DIRECTORY))
+		return DR_INVALED_PARAM;		//需要的是一个目录而不是一个文件
+
 	DRES		res		= DR_OK;	//操作结果
 	DirEntry	entry;		//入口结构
 	BYTE*		dir		= NULL;		//在缓存中的入口结构
@@ -1341,14 +1361,6 @@ DRES DFat32::ListDelFile(DFat32File* fil, FIND_DEL_FILE listFun)
 	WCHAR       path[MAX_PATH] = {0};	//路径缓存
 	DFat32File	df;
 	W_CHAR		w_w;					//用于计算校验和
-
-
-	//设备还没打开
-
-	if(!fil || !listFun )
-		return DR_INVALED_PARAM;		//参数错误
-	if(!(fil->mAttr & ATTR_DIRECTORY))
-		return DR_INVALED_PARAM;		//需要的是一个目录而不是一个文件
 
 	entry.mStartClust = fil->mStartClust;//进入指定的目录的第一簇
 	res = PosEntry(&entry , 0);			//定位第一个山区的第一个入口结构
@@ -1444,49 +1456,55 @@ DRES DFat32::NewFileHandle( DFat32File* file, PVOID entr ,const WCHAR* path )
 {
 	return file->InitFile(entr , path , this);
 }
+
 DWORD DFat32::GetSecCount()
 {
-	return this->mSectors;
+	return mSectors;
 }
+
 BYTE DFat32::GetSecPerClust()
 {
-	return strlen(this->mDevName) != 0 ? this->mSecPerClus : 0 ;
+	return IsDevOpened() ? mSecPerClus : 0;
 }
 
-DRES DFat32::IsContainFat32Flag(const char* cDevName , LONG_INT offset)
+DRES DFat32::IsContainFat32Flag(const WCHAR* cDevName, LONG_INT offset)
 {
-	DRES		res  = DR_OK;
-	HANDLE		hDev = INVALID_HANDLE_VALUE;
-	FAT32_DBR	fDbr = {0};
-	DWORD		dwReaded = 0;
+	if (cDevName == NULL)
+		return DR_INVALED_PARAM;
 
-	//参数错误
-	if (cDevName == NULL ) return DR_INVALED_PARAM;
-	
 	//打开设备
-	hDev = ::CreateFileA(cDevName , GENERIC_READ | GENERIC_WRITE,		 //访问模式
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL ,OPEN_EXISTING, 0 ,NULL);
+	HANDLE hDev = ::CreateFile(cDevName,
+								GENERIC_READ | GENERIC_WRITE,
+								FILE_SHARE_READ | FILE_SHARE_WRITE,
+								NULL,
+								OPEN_EXISTING,
+								0,
+								NULL);
 	if (hDev == INVALID_HANDLE_VALUE) //打开设备失败
 		return DR_OPEN_DEV_ERR;
 
-
+	DRES res = DR_OK;
 	if (offset.QuadPart > 0)
-	{//偏移
+	{
 		//设置文件指针
 		offset.LowPart = SetFilePointer(hDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 		if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 			res = DR_DEV_CTRL_ERR;
 	}
-	
+
 	//读取数据
-	if(DR_OK == res && !::ReadFile(hDev , &fDbr , sizeof(FAT32_DBR) 
-		,&dwReaded ,NULL) && dwReaded != sizeof(FAT32_DBR))	
+	DWORD dwReaded = 0;
+	FAT32_DBR fDbr = {0};
+	if((DR_OK == res)
+		&& !::ReadFile(hDev, &fDbr, sizeof(FAT32_DBR), &dwReaded, NULL)
+		&& (dwReaded != sizeof(FAT32_DBR)))
 		res =  DR_DEV_IO_ERR;
 	
 	//不需要了
 	CloseHandle(hDev);
 	//设备相关操作失败
-	if (res != DR_OK) return res;
+	if (res != DR_OK)
+		return res;
 	
 	if ( ( fDbr.bsEndSig  != MBR_END)	//dbr结束标记检查 
 		||(fDbr.bsBytesPerSec != 512)	//每扇区的字节数是512的倍数，一般是512 ，我这里也处理512的情况
@@ -1514,54 +1532,50 @@ DRES DFat32::IsContainFat32Flag(const char* cDevName , LONG_INT offset)
 		||(fDbr.bsFSType[7] != 0x20))	//空格
 		return DR_NO;
 
-	
-	//OK 能跑到这里的话，一般是没问题的
 	return DR_OK;
 }
 
-DRES DFat32::GetVolumeName(char* cNameBuf , int len)
+DRES DFat32::GetVolumeName(OUT WCHAR* cNameBuf, IN int len)
 {
-	DRES	res		= DR_OK;
-	DWORD	offset	= 0;
-	UCHAR	buf[SECTOR_SIZE] = {0}; 
-	int		i		= 0;
+	if (!IsDevOpened())
+		return DR_NO_OPEN;
+
+	if (NULL == cNameBuf)
+		return DR_INVALED_PARAM;
+
+	wcscpy(cNameBuf, L"");
+
+	UCHAR	buf[SECTOR_SIZE] = {0};
 	PSDE	sde		= PSDE(buf);
 
-
-	//当前是否卷打开
-	if (0 == strlen(this->mDevName)) return DR_NO_OPEN;
-	//参数检查
-	if (NULL == cNameBuf) return DR_INVALED_PARAM;
-	strcpy(cNameBuf , "");
-
 	//第一个根目录的扇区号
-	offset = ClustToSect(m1stDirClut);
-	res = this->ReadData(buf , offset , SECTOR_SIZE);
-	if (DR_OK != res) return res;
+	DRES res = ReadData(buf, ClustToSect(m1stDirClut), SECTOR_SIZE);
+	if (DR_OK != res)
+		return res;
 
 	if (sde->mAttr & ATTR_VOLUME_ID)
-	{//这个卷有一个卷标
-		//计算名字的长度
+	{
+		int i = 0;
 		for ( i = 0 ; i< 11 && buf[i] != 0x20 ; ++i );
 		buf[i] = 0;
 
-		//缓存不够
-		if (len < i)return DR_BUF_OVER;
+		if (MultyByteToUnic((char*)buf, NULL, 0) > len)
+			return DR_BUF_OVER;
 
-		//拷贝名字
-		strcpy(cNameBuf , (char*)buf);	
-	}else{
-		//拷贝名字
-		strcpy(cNameBuf , "NO NAME");
+		MultyByteToUnic((char*)buf, cNameBuf, len);
+	}
+	else
+	{
+		wcscpy(cNameBuf , L"NO NAME");
 		return DR_NO_FILE_NAME;
 	}
+
 	return res;
 }
 
-const char* DFat32::GetDevName()
+const WCHAR* DFat32::GetDevName()
 {
-	//当前是否卷打开
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return NULL;
 
 	return mDevName;
@@ -1569,7 +1583,7 @@ const char* DFat32::GetDevName()
 
 USHORT DFat32::GetReserveSector()
 {
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return 0;
 
 	return mResSec;
@@ -1577,7 +1591,7 @@ USHORT DFat32::GetReserveSector()
 
 DWORD DFat32::GetSectorPerFAT()
 {
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return 0;
 
 	return mSecsPerFAT;
@@ -1585,7 +1599,7 @@ DWORD DFat32::GetSectorPerFAT()
 
 USHORT DFat32::GetFSInfoSec()
 {
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return 0;
 
 	return mFSinfoSec;
@@ -1593,29 +1607,25 @@ USHORT DFat32::GetFSInfoSec()
 
 DWORD DFat32::Get1stDirClust()
 {
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return 0;
 
 	return m1stDirClut;
 }
 
-
 DWORD DFat32::GetRemainSectorCnt()
 {
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return 0;
 
 	//（总扇区数-第一个目录所在簇号扇区）%每簇扇区数
 	return (mSectors - (mResSec + (mFATs * mSecsPerFAT))) % mSecPerClus;
 }
 
-
 DWORD DFat32::GetMaxClustNum()
 {
-	if (0 == strlen(this->mDevName))
+	if (!IsDevOpened())
 		return 0;
+
 	return mMaxClust;
-
 }
-
-

@@ -101,7 +101,7 @@ STRTOOL_API DWORD WINAPI UnicToMultyByte(const WCHAR* src , CHAR* buf , DWORD bu
 param
 	src		待转换的多字节字符串  以NUL结尾
 	buf		转换后的Unicode字符串
-	bufLen	buf的大小（字符数包括NUL） ,如果此域为0则只是计算转换所以需要的缓存空间
+	bufLen	buf的大小（字符数包括NUL）,如果此域为0则只是计算转换所以需要的缓存空间
 	codepage 当前的编码表
 return 
 	转换了的多字节字符数，或者需要的缓存空间大小(不包括NUL)

@@ -60,22 +60,22 @@ DNtfs::DNtfs()
 	, mDev(INVALID_HANDLE_VALUE)
 	, mMftBlockCnt(0)
 {
-	this->mFSOff.QuadPart			= 0;
-	this->mCluForMFTMirr.QuadPart	= 0;
-	this->mCluForMFT.QuadPart		= 0;
+	mFSOff.QuadPart			= 0;
+	mCluForMFTMirr.QuadPart	= 0;
+	mCluForMFT.QuadPart		= 0;
 }
 
 DNtfs::~DNtfs()
 {
 }
 
-DRES DNtfs::OpenDev(const char* devName, const PLONG_INT off)
+DRES DNtfs::OpenDev(const WCHAR* devName, const PLONG_INT off)
 {
 	if (!devName || !off)
-		return DR_INVALED_PARAM;	//参数错误?
+		return DR_INVALED_PARAM;
 
 	if (!mDevName.empty())
-		return DR_ALREADY_OPENDED;	//设备已经打开？
+		return DR_ALREADY_OPENDED;
 
 	DRES		res = DR_OK;
 	size_t		len = 0;
@@ -84,34 +84,39 @@ DRES DNtfs::OpenDev(const char* devName, const PLONG_INT off)
 	LONG_INT	temp = {0};
 
 	mDevName = devName;
- 	//设备的偏移
- 	this->mFSOff = *off;
+	//设备的偏移
+	mFSOff = *off;
 
 	//打开设备
-	mDev = ::CreateFileA(this->mDevName.c_str(), GENERIC_READ | GENERIC_WRITE,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL , OPEN_EXISTING , 0 , NULL);	
+	mDev = ::CreateFile(mDevName.c_str(),
+						GENERIC_READ | GENERIC_WRITE,
+						FILE_SHARE_READ | FILE_SHARE_WRITE,
+						NULL,
+						OPEN_EXISTING,
+						0,
+						NULL);
 	if (mDev == INVALID_HANDLE_VALUE)
 	{//打开设备失败
 		mDevName.clear();
-		this->mFSOff.QuadPart = 0;
-		return DR_OPEN_DEV_ERR;			//打开设备失败
+		mFSOff.QuadPart = 0;
+		return DR_OPEN_DEV_ERR;
 	}
 
 	//读取dbr的数据
 	temp.QuadPart = 0;
-	this->mAllSec.QuadPart = 1;
+	mAllSec.QuadPart = 1;
 	res = ReadData(buf , &temp , SECTOR_SIZE );	//读取分区的第一个扇区的数据
-	this->mAllSec.QuadPart = 0;
+	mAllSec.QuadPart = 0;
 	if(DR_OK != res)	return res;				//读取数据失败?
 	if(pDBR->dbrEnd != MBR_END)//数据无效
 		return DR_INIT_ERR;
 
 	//读取MFT的起始逻辑簇号
-	this->mSecPerClu		= pDBR->bpbSecPerClu;	//每簇的山区数
-//	this->mResSec			= pDBR->bpbResSec;		//保留扇区数
-	this->mAllSec			= pDBR->bpbAllSec;		//总的扇区数
-	this->mCluForMFT		= pDBR->bpbCluForMFT;	//MFT
-	this->mCluForMFTMirr	= pDBR->bpbCluForMFTMirr;//MFTMirr
+	mSecPerClu		= pDBR->bpbSecPerClu;	//每簇的山区数
+//	mResSec			= pDBR->bpbResSec;		//保留扇区数
+	mAllSec			= pDBR->bpbAllSec;		//总的扇区数
+	mCluForMFT		= pDBR->bpbCluForMFT;	//MFT
+	mCluForMFTMirr	= pDBR->bpbCluForMFTMirr;//MFTMirr
 	
 	//初始化MFT块结构
 	res = InitMFTBlock();
@@ -119,10 +124,10 @@ DRES DNtfs::OpenDev(const char* devName, const PLONG_INT off)
 	if (res != DR_OK)
 	{//操作失败
 		mDevName.clear();
-		this->mFSOff.QuadPart = 0;
+		mFSOff.QuadPart = 0;
 		CloseHandle(mDev);
 		mDev = INVALID_HANDLE_VALUE;
-		if (NULL != this->mPMftBlock)
+		if (NULL != mPMftBlock)
 		{
 			free(mPMftBlock);
 			mPMftBlock = NULL;
@@ -130,7 +135,6 @@ DRES DNtfs::OpenDev(const char* devName, const PLONG_INT off)
 	}
 	return res;
 }
-
 
 DRES DNtfs::InitMFTBlock()
 {
@@ -143,7 +147,7 @@ DRES DNtfs::InitMFTBlock()
 	LONG_INT	liStartMft;	//起始MFT记录号
 
 	//打开$MFT文件
-	res = this->OpenFileW(&mftFile , SYS_FILE_MFT);
+	res = OpenFileW(&mftFile , SYS_FILE_MFT);
 	if (res != DR_OK) return res;  //文件打开失败
 
 	//获得无名数据属性 
@@ -168,11 +172,11 @@ DRES DNtfs::InitMFTBlock()
 
 		//起始扇区号
 		mPMftBlock[i].liStartSector.QuadPart 
-			= run.mRunList[i].lcn.QuadPart * this->mSecPerClu;
+			= run.mRunList[i].lcn.QuadPart * mSecPerClu;
 		
 		//记录数
 		mPMftBlock[i].liMftCnt.QuadPart
-			= (run.mRunList[i].clustCnt.QuadPart * this->mSecPerClu) / SECTOR_PER_RECODE;
+			= (run.mRunList[i].clustCnt.QuadPart * mSecPerClu) / SECTOR_PER_RECODE;
 
 		//写一个MFT记录块的起始记录号
 		liStartMft.QuadPart += mPMftBlock[i].liMftCnt.QuadPart;
@@ -181,18 +185,18 @@ DRES DNtfs::InitMFTBlock()
 	return DR_OK;
 }
 
-
 BOOL DNtfs::IsDevOpened()
 {
 	return !mDevName.empty();
 }
+
 void DNtfs::CloseDev()
 {
 	//释放名字空间
 	if (!mDevName.empty())
 	{
 		mDevName.clear();
-		this->mFSOff.QuadPart = 0;
+		mFSOff.QuadPart = 0;
 		CloseHandle(mDev);
 		mDev = INVALID_HANDLE_VALUE;
 	}
@@ -217,21 +221,20 @@ DRES DNtfs::ReadData(void* buf , PLONG_INT off , DWORD dwReadCnt , BOOL isOffSec
 
 	if (isOffSec) //扇区偏移
 	{
-		if (off->QuadPart >= this->mAllSec.QuadPart)
+		if (off->QuadPart >= mAllSec.QuadPart)
 			return DR_DEV_CTRL_ERR; //越界了
 
-		offset.QuadPart = this->mFSOff.QuadPart + off->QuadPart;	//读取数据的实际偏移
+		offset.QuadPart = mFSOff.QuadPart + off->QuadPart;	//读取数据的实际偏移
 		offset.QuadPart *= SECTOR_SIZE;		//字节偏移
 	}
 	else //字节偏移
 	{
-		if (off->QuadPart / SECTOR_SIZE >= this->mAllSec.QuadPart)
+		if (off->QuadPart / SECTOR_SIZE >= mAllSec.QuadPart)
 			return DR_DEV_CTRL_ERR; //越界了
 
-		offset.QuadPart = this->mFSOff.QuadPart * SECTOR_SIZE;
+		offset.QuadPart = mFSOff.QuadPart * SECTOR_SIZE;
 		offset.QuadPart += off->QuadPart;
 	}
-
 
 	//设置文件指针
 	offset.LowPart = SetFilePointer(mDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
@@ -245,6 +248,7 @@ DRES DNtfs::ReadData(void* buf , PLONG_INT off , DWORD dwReadCnt , BOOL isOffSec
 /*	CloseHandle(hDev);								//关闭已经打开的设备*/
 	return res;
 }
+
 DRES DNtfs::ReadMFT(void* buf , PLONG_INT index)
 {
 	//先计算一下偏移吧
@@ -252,16 +256,16 @@ DRES DNtfs::ReadMFT(void* buf , PLONG_INT index)
 
 	if (index->QuadPart != 0)
 	{//只有第一个文件需要查找，否则不需要查找
-		off =this->GetSectorOfMFTRecode(*index);
+		off =GetSectorOfMFTRecode(*index);
 	}else
 	{
-		off = this->mCluForMFT;
-		off.QuadPart *= this->mSecPerClu;	//MFT其实扇区号
+		off = mCluForMFT;
+		off.QuadPart *= mSecPerClu;	//MFT其实扇区号
 /*		off.QuadPart += index->QuadPart * RECODE_PER_SEC;*/
 	}
 	
 	//读取指定的数据
-	return this->ReadData(buf , &off , MFT_RECODE_SIZE , TRUE);
+	return ReadData(buf , &off , MFT_RECODE_SIZE , TRUE);
 }
 
 int DNtfs::FileNameCmp(const WCHAR * src1,const WCHAR * src2 , int len , BOOL caseSensitiv)
@@ -305,8 +309,9 @@ DRES DNtfs::OpenFileW(DNtfsFile *file , int idx)
 	i.QuadPart = idx;
 	return OpenFileW( file , i);
 }
+/*
 
-DRES DNtfs::OpenFileA(const char* path , DNtfsFile *file/* , DWORD attr*/ /*= ATTR_NTFS_MASK*/)
+DRES DNtfs::OpenFileA(const char* path , DNtfsFile *file/ * , DWORD attr* / / *= ATTR_NTFS_MASK* /)
 {
 	WCHAR wPath[MAX_PATH + 1] = {0};
 	if (path == NULL)return DR_INVALED_PARAM;
@@ -315,9 +320,9 @@ DRES DNtfs::OpenFileA(const char* path , DNtfsFile *file/* , DWORD attr*/ /*= AT
 	MultyByteToUnic(path , wPath , MAX_PATH + 1);
 
 	//调用Unicode接口
-	return OpenFileW(wPath , file /*, attr*/);
+	return OpenFileW(wPath , file / *, attr* /);
 }
-
+*/
 
 DRES DNtfs::OpenFileW(const WCHAR* path , DNtfsFile *file /*,DWORD attr*/)
 {
@@ -369,14 +374,14 @@ DRES DNtfs::OpenFileW(const WCHAR* path , DNtfsFile *file /*,DWORD attr*/)
 
 		//在目录查找文件
 		//遍历所有的vcn对应的block
-		//res = this->FindItemByName(mftIdx , name ,nameSegLen , &mftIdx ,  attrT);
+		//res = FindItemByName(mftIdx , name ,nameSegLen , &mftIdx ,  attrT);
 		//收索b+树
-		res = this->FindItemByName2(mftIdx , name ,nameSegLen , &mftIdx  , &liFDTOff , &fdtLen);
+		res = FindItemByName2(mftIdx , name ,nameSegLen , &mftIdx  , &liFDTOff , &fdtLen);
 		//出错了
 		if (res != DR_OK) return res;
 		name += nameSegLen;
 	}
-	res = this->OpenFileW(file ,mftIdx);
+	res = OpenFileW(file ,mftIdx);
 	if (DR_OK == res)
 	{
 		file->mLIStartFDT = liFDTOff;
@@ -385,6 +390,7 @@ DRES DNtfs::OpenFileW(const WCHAR* path , DNtfsFile *file /*,DWORD attr*/)
 	
 	return res ;
 }
+
 DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_INT mftIdx , DWORD attr)
 {
  	DRES			res			= DR_OK;
@@ -412,7 +418,7 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 
 
 	//获得指定的附文件记录
-	res = this->OpenFileW(&root , parentMft);
+	res = OpenFileW(&root , parentMft);
 	
 	//获得跟属性
 	res = root.FindAttribute(AD_INDEX_ROOT , &attrRoot);
@@ -440,7 +446,7 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 
 		fn = PFILE_NAME(indexEntry->IE_Stream);  //获取文件名属性
 		if(fn->FN_NameSize != len || !(fn->FN_DOSAttr & attr)) 		continue;			//文件名的长度不匹配
-		if (!this->FileNameCmp(fn->FN_FileName ,  name , len , FALSE ))
+		if (!FileNameCmp(fn->FN_FileName ,  name , len , FALSE ))
 		{//找到了
 			mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16)>>16; //去掉高两个字节的mft序列号
 			root.Close();
@@ -480,8 +486,8 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 		//获得逻辑簇号
 		lcn = root.GetLCNByVCN(vcn , NULL);
 		//lcn = attrAllocation.IAGetLCNByVCN(&vcn , NULL);
-		lcn.QuadPart *= this->mSecPerClu; 
-		this->ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//读取指定的数据
+		lcn.QuadPart *= mSecPerClu; 
+		ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//读取指定的数据
 
 		//线恢复usa
 		PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlockBuf.data());
@@ -541,14 +547,17 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 
 	return res;
 }
+
 BYTE DNtfs::GetSecPerClust()
 {
 	return mSecPerClu;
 }
+
 LONG_INT DNtfs::GetSecCount()
 {
-	return this->mAllSec;
+	return mAllSec;
 }
+
 DRES DNtfs::GetVolumeName(WCHAR * nameBuf , DWORD bufLen)
 {
 	//安检
@@ -561,7 +570,7 @@ DRES DNtfs::GetVolumeName(WCHAR * nameBuf , DWORD bufLen)
 
 	DNtfsFile file;
 	//打开卷文件
-	DRES res = this->OpenFileW(&file, SYS_FILE_VOLUME);
+	DRES res = OpenFileW(&file, SYS_FILE_VOLUME);
 	if (res != DR_OK)
 		return res;
 
@@ -614,7 +623,7 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 		parentMft = dir;
 
 	//获得被查找的目录
-	res = this->OpenFileW(&root , parentMft);
+	res = OpenFileW(&root , parentMft);
 	if (res != DR_OK) return res;  //查找文件失败了
 	if (!root.IsDir()){//这不是一个目录
 		root.Close();
@@ -659,7 +668,7 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 					{//计算FDT的起始位置
 
 						//计算当前MFT的偏移
-						pLIStartFDT->QuadPart = this->GetSectorOfMFTRecode(parentMft).QuadPart * SECTOR_SIZE;
+						pLIStartFDT->QuadPart = GetSectorOfMFTRecode(parentMft).QuadPart * SECTOR_SIZE;
 						//当前MFT的INDEX_ROOT属性
 						pLIStartFDT->QuadPart += pAttrItem->off;
 						//INDEX_ROOT中的当前入口的偏移
@@ -718,7 +727,7 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 			{//计算FDT的起始位置
 
 				//计算当前MFT的偏移
-				pLIStartFDT->QuadPart = this->GetSectorOfMFTRecode(parentMft).QuadPart * SECTOR_SIZE;
+				pLIStartFDT->QuadPart = GetSectorOfMFTRecode(parentMft).QuadPart * SECTOR_SIZE;
 				//当前MFT的INDEX_ROOT属性
 				pLIStartFDT->QuadPart += pAttrItem->off;
 				//INDEX_ROOT中的当前入口的偏移
@@ -735,6 +744,7 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 	root.Close();
 	return res;
 }
+
 DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int len , PLONG_INT mftIdx  , PLONG_INT pLIStartFDT , WORD* fdtLen/* , DWORD attr*/)
 {
 	LONG_INT	lcn			= {0};//逻辑簇号
@@ -765,8 +775,8 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 	//获得逻辑簇号
 	lcn = root->GetLCNByVCN(vcn , NULL);
 	//lcn = attrAllocation.IAGetLCNByVCN(&vcn , NULL);
-	lcn.QuadPart *= this->mSecPerClu; 
-	this->ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);
+	lcn.QuadPart *= mSecPerClu; 
+	ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);
 	
 	//先保存一下index_block的物理位置
 	if (NULL != pLIStartFDT)
@@ -884,6 +894,7 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 
 	return res;
 }
+
 DRES DNtfs::FindFile(DNtfsFile* root, FINDER* hFin)
 {
 	*hFin = NULL;
@@ -904,7 +915,7 @@ DRES DNtfs::FindFile(DNtfsFile* root, FINDER* hFin)
 	hFind->index = 0;
 
 	//打开指定的文件目录
-	DRES res = this->OpenFileW(&hFind->dir, root->GetMftIndex());
+	DRES res = OpenFileW(&hFind->dir, root->GetMftIndex());
 	//无效的路径
 	if (res == DR_NO)
 		return DR_INVALID_NAME;
@@ -927,6 +938,7 @@ DRES DNtfs::FindFile(const char* root, FINDER* hFind)
 
 	return FindFile(wPath, hFind);
 }
+
 DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 {
 	*hFin = NULL;
@@ -944,7 +956,7 @@ DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 	hFind->index = 0;
 
 	//打开指定的文件目录
-	DRES res = this->OpenFileW(path, &hFind->dir /*, ATTR_DIRECTORY|ATTR_DIRECTORY_INDEX*/);
+	DRES res = OpenFileW(path, &hFind->dir /*, ATTR_DIRECTORY|ATTR_DIRECTORY_INDEX*/);
 	//无效的路径
 	if (res == DR_NO)
 		return DR_INVALID_NAME;
@@ -956,6 +968,7 @@ DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 
 	return res;
 }
+
 DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 {
 	//一个入口的其起始位置
@@ -1071,8 +1084,8 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 		//获得逻辑簇号
 		lcn = hFind->dir.GetLCNByVCN(hFind->vcn , NULL);
 		//lcn = attrAllocation.IAGetLCNByVCN(&hFind->vcn , NULL);
-		lcn.QuadPart *= this->mSecPerClu; 
-		this->ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//读取指定的数据
+		lcn.QuadPart *= mSecPerClu; 
+		ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//读取指定的数据
 
 		//线恢复usa
 		PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlockBuf.data());
@@ -1166,24 +1179,24 @@ void DNtfs::CloseFind(/*PFIND_FILE_HANDER*/FINDER hFin)
 	}
 }
 
-
-DRES DNtfs::IsContainNTFSFlag(const char* cDevName, LONG_INT offset)
+DRES DNtfs::IsContainNTFSFlag(const WCHAR* cDevName, LONG_INT offset)
 {
-	DRES		res  = DR_OK;
-	HANDLE		hDev = INVALID_HANDLE_VALUE;
-	NTFS_DBR	nDbr = {0};
-	DWORD		dwReaded = 0;
-	
 	//参数错误
 	if (cDevName == NULL)
 		return DR_INVALED_PARAM;
-	
+
 	//打开设备
-	hDev = ::CreateFileA(cDevName , GENERIC_READ | GENERIC_WRITE,		 //访问模式
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL ,OPEN_EXISTING, 0 ,NULL);
+	HANDLE hDev = ::CreateFile(cDevName,
+								GENERIC_READ | GENERIC_WRITE,
+								FILE_SHARE_READ | FILE_SHARE_WRITE,
+								NULL,
+								OPEN_EXISTING,
+								0,
+								NULL);
 	if (hDev == INVALID_HANDLE_VALUE) //打开设备失败
 		return DR_OPEN_DEV_ERR;
 
+	DRES		res = DR_OK;
 	if (offset.QuadPart > 0)
 	{//偏移
 		//设置文件指针
@@ -1191,8 +1204,10 @@ DRES DNtfs::IsContainNTFSFlag(const char* cDevName, LONG_INT offset)
 		if (offset.LowPart == -1 && ::GetLastError() != NO_ERROR )
 			res = DR_DEV_CTRL_ERR;
 	}
-	
+
 	//读取数据
+	NTFS_DBR	nDbr = { 0 };
+	DWORD		dwReaded = 0;
 	if(DR_OK == res && !::ReadFile(hDev , &nDbr , sizeof(NTFS_DBR) 
 		,&dwReaded ,NULL) && dwReaded != sizeof(NTFS_DBR))	
 		res =  DR_DEV_IO_ERR;
@@ -1223,7 +1238,7 @@ DRES DNtfs::IsContainNTFSFlag(const char* cDevName, LONG_INT offset)
 	return DR_OK;
 }
 
-const char* DNtfs::GetDevName()
+const WCHAR* DNtfs::GetDevName()
 {
 	return mDevName.c_str();
 }
@@ -1261,8 +1276,8 @@ LONG_INT DNtfs::GetSectorOfMFTRecode( LONG_INT mft )
 	DRun		run;
 
 	//设备还没有打开的？
-	if (NULL == this->mDevName) return liSector;
-	res = this->OpenFileW(&mftFile , SYS_FILE_MFT);
+	if (NULL == mDevName) return liSector;
+	res = OpenFileW(&mftFile , SYS_FILE_MFT);
 	if (res != DR_OK) liSector;  //文件打开失败
 
 	//查找位图属性
@@ -1287,7 +1302,7 @@ LONG_INT DNtfs::GetSectorOfMFTRecode( LONG_INT mft )
 		return liSector;
 
 	//计算文件所在vcn
-	vcn.QuadPart = (mft.QuadPart * SECTOR_PER_RECODE) / this->GetSecPerClust();
+	vcn.QuadPart = (mft.QuadPart * SECTOR_PER_RECODE) / GetSecPerClust();
 
 	//查询LCN
 	vcn = run.GetLCNByVCN(vcn , NULL);
@@ -1296,7 +1311,7 @@ LONG_INT DNtfs::GetSectorOfMFTRecode( LONG_INT mft )
 		return liSector;
 
 	//计算簇内扇区偏移
-	liSector.QuadPart = (vcn.QuadPart * this->mSecPerClu) + ((mft.QuadPart * SECTOR_PER_RECODE) % this->mSecPerClu);
+	liSector.QuadPart = (vcn.QuadPart * mSecPerClu) + ((mft.QuadPart * SECTOR_PER_RECODE) % mSecPerClu);
 
 	//资源还是需要释放的
 	mftFile.Close();
@@ -1311,7 +1326,7 @@ LONG_INT DNtfs::GetSectorOfMFTRecode( LONG_INT mft )
 	//设备还没有打开的？
 	if (mDevName.empty())
 		return liSector;
-// 	res = this->OpenFileW(&mftFile , SYS_FILE_MFT);
+// 	res = OpenFileW(&mftFile , SYS_FILE_MFT);
 // 	if (res != DR_OK) liSector;  //文件打开失败
 //
 // 	//查找位图属性

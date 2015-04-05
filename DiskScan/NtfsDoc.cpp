@@ -131,13 +131,8 @@ BOOL CNtfsDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		m_liStartSec = HexStrToLONG_INT(strOff);
 
 	//要打开的设备名字
-#ifdef  UNICODE
-	UnicToMultyByte(strTemp , denName ,DEVICE_NAME_LEN + 1);
-#else
-	strcpy(denName , strTemp);
-#endif
-
-	res = this->m_pNtfs->OpenDev(/*(LPCSTR)(LPCTSTR)strTemp*/denName , &m_liStartSec);
+	this->m_strTitle = strTemp;
+	res = this->m_pNtfs->OpenDev(/*(LPCSTR)(LPCTSTR)strTemp*/strTemp.GetBuffer(), &m_liStartSec);
 	if (res != DR_OK)
 	{//TODO 打开设备失败
 		sPath.LoadString(IDS_OPEN_FALIED);
@@ -150,12 +145,12 @@ BOOL CNtfsDoc::OnOpenDocument(LPCTSTR lpszPathName)
 
 	//打开设备成功
 	strTemp = GetPathParam(sPath , PT_INDEX);
-	this->m_strTitle = denName;
+
 	if (strTemp.GetLength() != 0)
 	{
 		this->m_strTitle += _T("->");
 		this->m_strTitle += strTemp;
-	}	
+	}
 
 	//加上卷标
 	this->m_strTitle += _T(" ");
@@ -580,7 +575,7 @@ void CNtfsDoc::OnNtfsFileAttr()
 	}
 
 	//判断路径是否可以打开
-	res = this->m_pNtfs->OpenFileA((LPCSTR)(LPCTSTR)strSelPath , &nfile);
+	res = this->m_pNtfs->OpenFile(strSelPath , &nfile);
 	if (res != DR_OK)
 	{//TODO 打开指定的文件或者目录失败
 		strName.LoadString(IDS_OPEN_FALIED);
@@ -656,7 +651,7 @@ void CNtfsDoc::OnNtfsPosParaentDir()
 	}
 
 	//打开指定的文件
-	res = this->m_pNtfs->OpenFileA(strSelPath , &file);
+	res = this->m_pNtfs->OpenFile(strSelPath , &file);
 
 	if ( DR_OK != res )
 	{//打开指定的文件失败

@@ -10,13 +10,13 @@
 
 #pragma warning(disable:4996) 
 
-CString GetPartName( USHORT format , const char* cDevname , LONG_INT off)
+CString GetPartName(USHORT format, const WCHAR* cDevname, LONG_INT off)
 {
 	CString res;
 	DFat32	fat32;
 	DNtfs	ntfs;
 	WCHAR	wBuf[MAX_NTFS_VOLUME_NAME_LEN + 1] = {0};
-	char*	cBuf = (char*)wBuf; // len = 2*(MAX_NTFS_VOLUME_NAME_LEN + 1)
+	//char*	cBuf = (char*)wBuf; // len = 2*(MAX_NTFS_VOLUME_NAME_LEN + 1)
 
 	switch(format)
 	{
@@ -29,11 +29,14 @@ CString GetPartName( USHORT format , const char* cDevname , LONG_INT off)
 		
 		if(DR_OK == fat32.OpenDev(cDevname , off))
 		{//打开设备成功
-			fat32.GetVolumeName(cBuf , 2*(MAX_NTFS_VOLUME_NAME_LEN + 1));
+			fat32.GetVolumeName(wBuf, (MAX_NTFS_VOLUME_NAME_LEN + 1));
 			fat32.CloseDev();	//关闭已经打开的设备
-			res = cBuf;
-		}else
+			res = wBuf;
+		}
+		else
+		{
 			res = GetPartFormatName(format);
+		}
 		break;
 
 	case 0x07://	HPFS/NTFS
@@ -44,9 +47,12 @@ CString GetPartName( USHORT format , const char* cDevname , LONG_INT off)
 			ntfs.GetVolumeName(wBuf , (MAX_NTFS_VOLUME_NAME_LEN + 1));
 			ntfs.CloseDev();	//关闭已经打开的设备
 			res = wBuf;
-		}else
+		}
+		else
+		{
 			res = GetPartFormatName(format);
-		break; 
+		}
+		break;
 
 		//一下是我自己定义的几种类型
 	case 0x100://			//MBR
@@ -787,7 +793,7 @@ DWORD WINAPI EnumNtfsFile(PVOID wParam)
 
 	if (1 < curPath.GetLength()) //非根目录
 	{
-		res = pNtfs->OpenFileA(curPath , &file );
+		res = pNtfs->OpenFile(curPath , &file );
 		if (DR_OK != res) return 0;//出错了
 		
 		//在Ntfs的目录中是没有dot(.)和dotdot(..)目录的,在这里我为了方便自己添加
@@ -1115,7 +1121,7 @@ DWORD WINAPI CopyNtfsFile( PVOID wParam )
 
 	pNtfs = ((CNtfsDoc*)pDlg->m_pDoc)->m_pNtfs.get();
 	//打开将要读取文件
-	res = pNtfs->OpenFileA((LPCSTR)(LPCTSTR)pDlg->m_strFileToRead , &dFile);
+	res = pNtfs->OpenFile(pDlg->m_strFileToRead, &dFile);
 	if ( DR_OK != res )
 	{//打开文件失败
 		::SendMessage(pDlg->GetSafeHwnd() , DMSG_OPEN_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToRead) , 0);

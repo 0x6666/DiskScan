@@ -33,27 +33,26 @@ Disk::~Disk(void)
 
 int Disk::GetDiskCount(void)
 {
-	HANDLE   hDrive = NULL;             //驱动设备
-	int      nCount = 0;                //设备数量
-	char     czhDriveName[30] = {0};    //设备名字
-	int		 i		=	 0;
+	int nCount = 0; //设备数量
 
-	//车老板说windows最多可以挂载0x80个物理磁盘
-	//但是我在一个国外的源程序中看到他是以0x40为上限的
-	for (i = 0 ; i < MAX_DISK_COUNT ; ++i)
+	for (int i = 0; i < MAX_DISK_COUNT; ++i)
 	{
-		sprintf(czhDriveName ,"%s%d",DISK_PRE_NAME , i);
-		hDrive = CreateFileA(
-			czhDriveName,						//要打开的设备 
-			0,									//访问模式
-			FILE_SHARE_READ | FILE_SHARE_WRITE,	//共享模式
-			NULL,								//默认的安全属性
-			OPEN_EXISTING,						//打开方式
-			0,									//默认的文件的属性
-			NULL);								//不复制任何文件属性
-		if(hDrive == INVALID_HANDLE_VALUE)		//没有了   
+		WCHAR czhDriveName[30] = {0};    //设备名字
+		wsprintf(czhDriveName, L"%s%d", DISK_PRE_NAME, i);
+		HANDLE hDrive = CreateFile(
+						czhDriveName,						//要打开的设备 
+						0,									//访问模式
+						FILE_SHARE_READ | FILE_SHARE_WRITE,	//共享模式
+						NULL,								//默认的安全属性
+						OPEN_EXISTING,						//打开方式
+						0,									//默认的文件的属性
+						NULL);								//不复制任何文件属性
+		if (hDrive == INVALID_HANDLE_VALUE)		//没有了
+		{
 			continue;
-		else{  
+		}
+		else
+		{
 			::CloseHandle(hDrive);
 			++nCount;
 		}
@@ -67,30 +66,36 @@ BOOL Disk::OpenDisk(int index)
 	//序号无效则是是不
 	if(index < 0)	return FALSE;
 
-	char name[30] = {0};
-	::sprintf(name ,"%s%d" ,DISK_PRE_NAME, index);
+	WCHAR name[30] = {0};
+	wsprintf(name, L"%s%d",DISK_PRE_NAME, index);
 	
 	return OpenDisk(name);
 }
 
-BOOL Disk::OpenDisk(char* czName)
+BOOL Disk::OpenDisk(const WCHAR* czName)
 {
-	DWORD		  dwOutBytes = 0; 
-	DISK_GEOMETRY mGeometry  = {0};
-	BOOL		  res		 = FALSE;  //操作结构
-
 	//如果已经打开了一个磁盘就不能在打开了
-	if (czName == NULL || strlen(mDevName)) return FALSE;
+	if ((NULL == czName) || wcslen(mDevName))
+		return FALSE;
 
-	this->mDisk =   CreateFile( czName , GENERIC_READ | GENERIC_WRITE ,
-		FILE_SHARE_READ | FILE_SHARE_WRITE,  //共享模式
-		NULL , OPEN_EXISTING , 0 , NULL);
+	this->mDisk = CreateFile(czName,
+							GENERIC_READ | GENERIC_WRITE,
+							FILE_SHARE_READ | FILE_SHARE_WRITE,
+							NULL,
+							OPEN_EXISTING,
+							0,
+							NULL);
 
-	if(mDisk == INVALID_HANDLE_VALUE)  
-		res = FALSE;                        //打开磁盘失败
-	else{
-	
-		//计算磁盘的可分区的扇区数 
+	BOOL res = FALSE;
+	if (mDisk == INVALID_HANDLE_VALUE)
+	{
+		res = FALSE;
+	}
+	else
+	{
+		//计算磁盘的可分区的扇区数
+		DWORD dwOutBytes = 0;
+		DISK_GEOMETRY mGeometry  = {0};
 		res = ::DeviceIoControl(mDisk,		// 设备句柄
 			IOCTL_DISK_GET_DRIVE_GEOMETRY,	// 取磁盘参数
 			NULL , 0 , &mGeometry,
@@ -105,21 +110,24 @@ BOOL Disk::OpenDisk(char* czName)
 		}
 		//计算磁盘的可分区的扇区数
 		this->mPartableSecCnt.QuadPart = mGeometry.Cylinders.QuadPart \
-			* mGeometry.TracksPerCylinder *  mGeometry.SectorsPerTrack;     
+			* mGeometry.TracksPerCylinder *  mGeometry.SectorsPerTrack;
 
-		strcpy(mDevName , czName);//先保存一下名字
+		wcscpy(mDevName, czName);//先保存一下名字
 		mSecPerTrack = mGeometry.SectorsPerTrack;
 		mTracksPerCylinder = mGeometry.TracksPerCylinder;
 		mCylinders.QuadPart = mGeometry.Cylinders.QuadPart;
-		
+
 		//获取磁盘的分区列表
-		if(LoadPartList(/*hDisk*/)){
+		if(LoadPartList(/*hDisk*/))
+		{
 			//排序
-			PDList(this->mPPartList)->SortList(ComparePart);
+			mPPartList->SortList(ComparePart);
 			//添加各个空隙节点
 			MakeListContinue(/*hDisk*/);
 			res = TRUE;
-		}else{
+		}
+		else
+		{
 			mDisk = INVALID_HANDLE_VALUE;
 			mDevName[0] = 0;
 			res = FALSE;
@@ -140,33 +148,32 @@ BOOL Disk::ReadSecter(/*HANDLE hDisk ,*/LONG_INT offert , PVOID buf  ,DWORD* dwR
 
 DRES Disk::ReadData(void* buf , LONG_INT off , DWORD dwRead)
 {
-	DRES	 res		= DR_OK;
-	DWORD	 dwReaded   = 0;
-	LONG_INT offset		= {0};
-	/*	HANDLE hDev = INVALID_HANDLE_VALUE;*/
-	
 	//设备没有打开
-	if (0 == strlen(this->mDevName)) return DR_INIT_ERR;
+	if (0 == wcslen(mDevName))
+		return DR_INIT_ERR;
 
 	if (off.QuadPart >= this->mPartableSecCnt.QuadPart + this->mUnPartSize / SECTOR_SIZE)
 	{//指针越界
 		return DR_DEV_CTRL_ERR;
 	}
-	
-	offset.QuadPart = off.QuadPart;						//读取数据的实际偏移
-	offset.QuadPart *= SECTOR_SIZE;					//字节偏移
-	
+
+	DRES	 res = DR_OK;
+	DWORD	 dwReaded = 0;
+	LONG_INT offset = { 0 };
+
+	offset.QuadPart = off.QuadPart; //读取数据的实际偏移
+	offset.QuadPart *= SECTOR_SIZE; //字节偏移
+
 	//设置文件指针
 	offset.LowPart = SetFilePointer(mDisk , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 	if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 		res = DR_DEV_CTRL_ERR;
-	
+
 	//读取数据
 	if(!res && !::ReadFile(mDisk , buf ,
 		dwRead ,&dwReaded ,NULL) && dwReaded != dwRead)	
 		res =  DR_DEV_IO_ERR;
-	
-	/*	CloseHandle(hDev);								//关闭已经打开的设备*/
+
 	return res;
 }
 
@@ -179,7 +186,8 @@ int Disk::GetBytePerSec()
 int Disk::GetSectorPerTrack()
 {
 	//设备没有打开
-	if (0 == strlen(this->mDevName)) return -1;
+	if (0 == wcslen(mDevName))
+		return -1;
 
 	return  mSecPerTrack;
 }
@@ -187,7 +195,8 @@ int Disk::GetSectorPerTrack()
 DWORD Disk::GetTracksPerCylinder()
 {
 	//设备没有打开
-	if (0 == strlen(this->mDevName)) return 0;
+	if (0 == wcslen(mDevName))
+		return 0;
 
 	return  mTracksPerCylinder;
 }
@@ -197,7 +206,8 @@ LONG_INT Disk::GetCylinders()
 	LONG_INT res;
 	res.QuadPart = -1;
 	//设备没有打开
-	if (0 == strlen(this->mDevName)) return res;
+	if (0 == wcslen(mDevName))
+		return res;
 
 	return  mCylinders;
 }
@@ -205,7 +215,9 @@ LONG_INT Disk::GetCylinders()
 
 DWORD Disk::GetUnPartableSize()
 {
-	if (0 == strlen(mDevName)) return 0;
+	if (0 == wcslen(mDevName))
+		return 0;
+
 	return mUnPartSize;
 }
 
@@ -242,11 +254,6 @@ void Disk::CloseDisk(void)
 	mDisk = INVALID_HANDLE_VALUE;
 
 }
-BOOL Disk::IsDiskOpened()
-{
-	return ((strlen(this->mDevName) != 0) &&
-		(mDisk != INVALID_HANDLE_VALUE || mDisk != NULL));
-}
 
 BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFirstDPT ,DWORD* pLogicDir)
 {
@@ -262,11 +269,14 @@ BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFi
 	//那么EBR的偏移就是当前DPT中的相对偏移加上扩展分区的偏移
 	//而分区的偏移则是想对当前DPT的
 	//扩展分区的偏移就是 第一个DPT表中的扩展分区表项的相对偏移
-	if(isFirstDPT){
+	if(isFirstDPT)
+	{
 		o.QuadPart = dpt.mRelativeSectors;
 		if(IsExtPart(&dpt))//第一个分区表中的扩展就是整个磁盘的扩展分区
 			this->mExtPos.QuadPart = dpt.mRelativeSectors;
-	}else{
+	}
+	else
+	{
 		if(IsExtPart(&dpt))
 			o.QuadPart = this->mExtPos.QuadPart + dpt.mRelativeSectors;
 		else
@@ -287,7 +297,6 @@ BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFi
 		pn = NewPart(NULL , &o  ,PART_EBR );
 		if(NULL != pn)
 			list->AddPart(PVOID(pn)); //将节点添加到链表中去
-		
 
 		//在EBR中 只有两条DPT有效 ，
 		//第一条DPT 指向当前逻辑驱动器
@@ -341,10 +350,9 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 	//获得逻辑驱动信息
 	pLogicDir = GetLogicalDrives();
 
-	//还要判断是否是DBR或者MBR  这里暂时默认为MBR
+	//TODO: 还要判断是否是DBR或者MBR  这里暂时默认为MBR
 
 
-	
 	//新建一个相应的节点添加到表中去
 	if (pn = NewPart(NULL, &offert, PART_MBR))
 		list->AddPart(pn); //将节点添加到链表中去
@@ -436,7 +444,6 @@ BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 		}
 	}
 
-
 	//需要的话就清理一下
 	if (pLogicDir)
 		delete[] pLogicDir;
@@ -448,38 +455,40 @@ int Disk::GetPartCount(void)
 {
 	return PDList(this->mPPartList)->GetCount();
 }
+
 DWORD Disk::GetVolumeCount()
 {
-	if (0 == strlen(mDevName)) return 0;
+	if (!IsDiskOpened())
+		return 0;
+
 	return mVolCnt;
 }
 DWORD Disk::GetMainVolCount()
 {
-	if (0 == strlen(mDevName)) return 0;
+	if (!IsDiskOpened())
+		return 0;
+
 	return mMainVolCount;
 }
 
-
-const Disk::PDPart Disk::GetPart( int index )
+const Disk::PDPart Disk::GetPart(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
 	//指定分区不存在
-	if (!p)	return NULL;
-	
-	return p;	
-}
+	if (!p)
+		return NULL;
 
+	return p;
+}
 
 const Disk::PDPart Disk::GetPart( char letter )
 {
 	PDList list = PDList(this->mPPartList);
 	int cnt = list->GetCount();
-	PDPart pp = NULL;
-	int i;
 
-	for (i = 0 ; i < cnt ; ++i)
+	for (int i = 0 ; i < cnt ; ++i)
 	{
-		pp = (PDPart)list->GetPart(i);
+		PDPart pp = (PDPart)list->GetPart(i);
 		if (pp->mLogicalLetter == letter)
 		{
 			return pp;
@@ -489,21 +498,22 @@ const Disk::PDPart Disk::GetPart( char letter )
 	return NULL;
 }
 
-
 USHORT Disk::GetPartFormat(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
 	//指定分区不存在
-	if (!p)	return 0xFFFF;
+	if (!p)
+		return 0xFFFF;
 
-	return p->mType;	
+	return p->mType;
 }
 
 DWORD Disk::GetRelativeSectors(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
 	//指定分区不存在
-	if (!p) return 0xFFFFFFFF;
+	if (!p)
+		return 0xFFFFFFFF;
 
 	return p->mRelativeSectors;
 	//return p->GetRelativeSectors();	
@@ -512,45 +522,45 @@ LONG_INT Disk::GetPartSectorCount(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
 	//指定分区不存在
-	if (!p){
+	if (!p)
+	{
 		LONG_INT li;
 		li.QuadPart = -1;
 		return li;
 	}
+
 	return p->mSecCount;
 	//return p->GetSectorCount();	
 }
+
 LONG_INT Disk::GetPartOffset(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
 	//指定分区不存在
-	if (!p){
+	if (!p)
+	{
 		LONG_INT li;
 		li.QuadPart = -1;
 		return li;
 	}
+
 	return p->mOffset;
 	//return p->GetPartOffset();	
 }
-
 
 BOOL Disk::IsActivityPart( int index )
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
 	//指定分区不存在
-	if (!p){
+	if (!p)
+	{
 		LONG_INT li;
 		li.QuadPart = -1;
 		return FALSE;
 	}
+
 	return p->mIsActivity;
 	//return p->IsActivityPart();	
-}
-
-
-const char* Disk::GetDevName(void)
-{
-	return mDevName;
 }
 
 PVOID Disk::NewPart(PVOID dp, PLONG_INT off , int type , BOOL isMainPart /*= FALSE*/, DWORD* pLogicDri /*= NULL*/)
@@ -575,6 +585,7 @@ PVOID Disk::NewPart(PVOID dp, PLONG_INT off , int type , BOOL isMainPart /*= FAL
 		pn->mSecCount.QuadPart = dpt->mSectorCount;
 		type = dpt->mPartType;
 	}
+
 	pn->mType		= type;				//节点的类型
 	pn->mOffset		= *off;	            //节点变量的物理偏移地址
 	pn->mIsMainPart = isMainPart;		//是否为主分区
@@ -609,55 +620,45 @@ BOOL Disk::ComparePart(VOID* p1, VOID* p2)
 	return (PDPart(p1)->mOffset.QuadPart < PDPart(p2)->mOffset.QuadPart);
 }
 
-
-
 DWORD* Disk::GetLogicalDrives()
 {
-	//逻辑驱动信息
-	DWORD		dwDris = 0;
-	DWORD		temp = 0;
-	PLOGCDRI	pLogic;
-	char devNmae[MAX_PATH] = {0};
-	size_t		len = strlen(mDevName);
-	size_t		i = 0, nCnt = 0;
-	DWORD		index = 0;
-	char		csLogicN[] = "\\\\?\\A:";
-	HANDLE		hDev = INVALID_HANDLE_VALUE;
-	//STORAGE_DEVICE_NUMBER deviceInfo;
-	DWORD		bytesReturned = 0;
-	char		outBuf[100] = {0};		//数据查询时的输出Buf
-	VOLUME_DISK_EXTENTS* pOutBuf = (VOLUME_DISK_EXTENTS*)outBuf;
-
-	DWORD res = 0;
-
-	strcpy(devNmae , mDevName);
+	WCHAR devNmae[MAX_PATH] = {0};
+	wcscpy(devNmae, mDevName);
 
 	//17 == strlen("\\\\.\\PHYSICALDRIVE")
 	//20 == strlen("\\\\.\\PHYSICALDRIVE127")  最多只有128(0x80)个磁盘
-	if (len < 18 || len > 20) return NULL;
-	
+	size_t		len = wcslen(mDevName);
+	if (len < 18 || len > 20)
+		return NULL;
+
 	//先全部转换陈大写
-	for (i = 0; i < len; ++i)
+	for (int i = 0; i < len; ++i)
 	{
 		devNmae[i] = toupper(devNmae[i]);
 	}
 
 	//获得当前设备的索引
-	if(0 == sscanf(devNmae , "\\\\.\\PHYSICALDRIVE%d" , &index ))
+	DWORD index = 0;
+	if (0 == swscanf(devNmae, L"\\\\.\\PHYSICALDRIVE%d", &index))
 		return NULL;  //获取设备索引失败
 
 	//获得当前系统中所有的逻辑驱动器
-	dwDris = ::GetLogicalDrives();
-	
-	if ( 0 == dwDris )
+	DWORD dwDris = ::GetLogicalDrives();
+
+	if (0 == dwDris)
 		return NULL;
 
 	//分配空间
-	pLogic = new LOGCDRI[27];  //最多26个逻辑驱动还有用与表示数组的结束
+	PLOGCDRI pLogic = new LOGCDRI[27];  //最多26个逻辑驱动还有用与表示数组的结束
 	memset(pLogic , 0 , sizeof(LOGCDRI)*27);
 
+	size_t nCnt = 0;
+	WCHAR csLogicN[] = L"\\\\?\\A:";
+	char outBuf[100] = { 0 }; //数据查询时的输出Buf
+	VOLUME_DISK_EXTENTS* pOutBuf = (VOLUME_DISK_EXTENTS*)outBuf;
+
 	//最多只有26个逻辑驱动器
-	for ( i = 0 ; i < 26 ; ++i)
+	for (int i = 0; i < 26; ++i)
 	{
 		if (0 == (dwDris & 0x00000001))
 		{//当前没有
@@ -665,20 +666,28 @@ DWORD* Disk::GetLogicalDrives()
 			continue;
 		}
 
-		csLogicN[4] = char('A' + i);
-		hDev = CreateFileA( csLogicN , 0,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,	//共享模式
-			NULL ,OPEN_EXISTING , 0 , NULL);								//不复制任何文件属性
+		csLogicN[4] = WCHAR('A' + i);
+		HANDLE hDev = CreateFile(csLogicN,
+							0,
+							FILE_SHARE_READ | FILE_SHARE_WRITE,
+							NULL,
+							OPEN_EXISTING,
+							0,
+							NULL);
 		if (hDev == INVALID_HANDLE_VALUE)
 			continue;
-		
+
 		//获取每一个在当前磁盘上的每一个卷的偏移位置，以便于获取每一个分区的逻辑驱动字符
-		if(0 == ::DeviceIoControl( hDev,
-			IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
-			NULL, 0 , pOutBuf ,	100,
-			&bytesReturned,	NULL ))
+		DWORD bytesReturned = 0;
+		if(0 == ::DeviceIoControl(hDev,
+								IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
+								NULL,
+								0,
+								pOutBuf,
+								100,
+								&bytesReturned,
+								NULL))
 		{//获取信息失败
-			res = GetLastError();
 			CloseHandle(hDev);
 			continue;
 		}
@@ -894,19 +903,23 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 LONG_INT Disk::GetPartableSecCount()
 {
 	LONG_INT li = {0};
-	if (0 == strlen(this->mDevName))
+	if (!IsDiskOpened())
 		li.QuadPart = -1;
+
 	li.QuadPart = this->mPartableSecCnt.QuadPart;
 	return li;
 }
+
 LONG_INT Disk::GetSecCount()
 {
 	LONG_INT li = {0};
-	if (0 == strlen(this->mDevName))
+	if (!IsDiskOpened())
 		li.QuadPart = -1;
+
 	li.QuadPart = this->mPartableSecCnt.QuadPart + this->mUnPartSize / SECTOR_SIZE;
 	return li;
 }
+
 // DWORD Disk::GetUnPartableSecCount()
 // {
 // 	if (0 == strlen(this->mDevName)) return 0;

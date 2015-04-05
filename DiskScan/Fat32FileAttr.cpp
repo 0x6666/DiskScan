@@ -64,7 +64,7 @@ BOOL CFat32FileDlg::SetFilePath( CString file )
 
 	this->m_pFile->Close();
 	//打开指定的文件
-	res = pDFat32->OpenFileA(file , this->m_pFile);
+	res = pDFat32->OpenFile(file , this->m_pFile);
 	if (DR_OK != res)
 	{//打开指定的文件失败
 		return FALSE;

@@ -219,7 +219,7 @@ DECLARE_HANDLE(FINDER);
 
 
 /*/一些常量的定义///////////////////////////////////////////////////////////////////////*/
-#define DISK_PRE_NAME	"\\\\.\\PhysicalDrive"	//磁盘设备名字的前缀
+#define DISK_PRE_NAME	L"\\\\.\\PhysicalDrive"	//磁盘设备名字的前缀
 #define EXT_DPT_FLAG	0x705A5A5A5A			//扩展分区表的起始标记
 
 //车老板说windows最多可以挂载0x80个物理磁盘
@@ -354,7 +354,7 @@ private:
 	DWORD			mVolCnt;		//卷的总数
 	DWORD			mMainVolCount;	//主分区数量
 	BOOL			mIsGetUnPartSec;//已经获得了不可分配了的空间大小
-	char			mDevName[DEVICE_NAME_LEN];		//设备名字 ,通过此属性判断设备是否打开
+	WCHAR			mDevName[DEVICE_NAME_LEN];		//设备名字 ,通过此属性判断设备是否打开
 	DWORD			mSecPerTrack;//每磁道扇区数
 	DWORD			mTracksPerCylinder;//每柱面磁道数
 	LONG_INT		mCylinders;		//柱面数
@@ -519,7 +519,7 @@ public:
 	//			失败的原因可能是 已经打开一了一个磁盘，但还没关闭，又继续打开
 	//			或者也可能是名字不正确
 	//////////////////////////////////////////////////////////////////////////
-	BOOL OpenDisk(char* name);
+	BOOL OpenDisk(const WCHAR* name);
 	
 	//////////////////////////////////////////////////////////////////////////
 	//关闭当前打开的磁盘  在这里只是释放磁盘的分区链表的数据等一些数据的清理
@@ -529,8 +529,8 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	//判断当前设备是否已经正确打开
 	//////////////////////////////////////////////////////////////////////////
-	BOOL IsDiskOpened();
-	
+	inline BOOL IsDiskOpened() { return ((wcslen(mDevName) != 0) && (mDisk != INVALID_HANDLE_VALUE) && (mDisk != NULL)); }
+
 	//////////////////////////////////////////////////////////////////////////
 	//获得当前磁盘的分区数量,不是逻辑驱动数，被划分区域数
 	//return   
@@ -623,8 +623,8 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	//获得设备的名字
 	//////////////////////////////////////////////////////////////////////////
-	const char* GetDevName(void);
-	
+	inline const WCHAR* GetDevName(void) { return mDevName; }
+
 	//////////////////////////////////////////////////////////////////////////
 	//从磁盘读取数据
 	//param
@@ -821,7 +821,7 @@ class DTOOL_API DFat32
 	friend DFat32File;
 private:
 	HANDLE		mDev;							//设备
-	char		mDevName[DEVICE_NAME_LEN+1];	//设备名字
+	WCHAR		mDevName[DEVICE_NAME_LEN+1];	//设备名字
 	LONG_INT	mFSOff;							//文件系统化的偏移(扇区)
 	BYTE		mSecPerClus;					//每簇扇区数
 	DWORD		mMaxClust;						//最大的可分配簇号
@@ -1068,12 +1068,12 @@ public:
 	//	操作结果
 	//			DR_ALREADY_OPENDED  当前设备已经打开了，样重新打开的话要先关闭
 	//////////////////////////////////////////////////////////////////////////
-	DRES OpenDev(const char* name, LONG_INT offset);
+	DRES OpenDev(const WCHAR* name, LONG_INT offset);
 
 	//////////////////////////////////////////////////////////////////////////
 	//判断当前设备是否已经打开了
 	//////////////////////////////////////////////////////////////////////////
-	BOOL IsDevOpened();
+	inline BOOL IsDevOpened() { return wcslen(mDevName) > 0; }
 
 	//////////////////////////////////////////////////////////////////////////
 	//关闭当前打开的设备
@@ -1109,7 +1109,7 @@ public:
 	//return
 	//	操作结果
 	//////////////////////////////////////////////////////////////////////////
-	DRES OpenFileA(const char* path , DFat32File* file);
+	//DRES OpenFileA(const char* path , DFat32File* file);
 		
 	//////////////////////////////////////////////////////////////////////////
 	//列举一个目录中的所有文件或者目录
@@ -1182,7 +1182,7 @@ public:
 	//			DR_INVALED_PARAM	参数错误
 	//			其他（如DR_OPEN_DEV_ERR）设备错误
 	//////////////////////////////////////////////////////////////////////////
-	static DRES IsContainFat32Flag(const char* cDevName , LONG_INT offset);
+	static DRES IsContainFat32Flag(const WCHAR* cDevName , LONG_INT offset);
 
 	//////////////////////////////////////////////////////////////////////////
 	//获得当前卷的卷标
@@ -1191,14 +1191,14 @@ public:
 	//		len			缓存的长度
 	//return 操作结果 DR_BUF_OVER缓存不够
 	//////////////////////////////////////////////////////////////////////////
-	DRES GetVolumeName(char* cNameBuf , int len);
+	DRES GetVolumeName(OUT WCHAR* cNameBuf, IN int len);
 
 	//////////////////////////////////////////////////////////////////////////
 	//获得设备的名字
 	//return	设备的名字
 	//				如果设备以打开的话就返回设备名字，否则NULL
 	//////////////////////////////////////////////////////////////////////////
-	const char* GetDevName();
+	const WCHAR* GetDevName();
 
 	//////////////////////////////////////////////////////////////////////////
 	//获得保留扇区数
@@ -1694,7 +1694,7 @@ class DTOOL_API DNtfs
 	}MFT_BLOCK , *PMFT_BLOCK;
 
 private:
-	std::string mDevName;	//设备的名字  ,更具此值判断文件系统是否已经开好了
+	std::wstring mDevName;	//设备的名字  ,更具此值判断文件系统是否已经开好了
 	LONG_INT	mFSOff;		//设备上的ntfs文件文件系统的物理偏移  (扇区)
 	LONG_INT	mCluForMFT;	//$MFT的逻辑簇号
 	LONG_INT	mCluForMFTMirr;	//$MFTMirr的逻辑簇号
@@ -1804,7 +1804,7 @@ public:
 	//		off			在设备上的ntfs物理偏移
 	//return			操作结果，正常时（DR_OK）
 	//////////////////////////////////////////////////////////////////////////
-	DRES OpenDev(const char* devName, const PLONG_INT off);
+	DRES OpenDev(const WCHAR* devName, const PLONG_INT off);
 
 	//////////////////////////////////////////////////////////////////////////
 	//关闭当前打开的设备
@@ -1841,7 +1841,7 @@ public:
 	//return	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES OpenFileW(const WCHAR* path , DNtfsFile *file /*, DWORD attr = ATTR_NTFS_MASK*/);
-	DRES OpenFileA(const char* path , DNtfsFile *file /*, DWORD attr = ATTR_NTFS_MASK*/);
+	//DRES OpenFileA(const char* path , DNtfsFile *file /*, DWORD attr = ATTR_NTFS_MASK*/);
 
 	//////////////////////////////////////////////////////////////////////////
 	//初始化一个查找句柄,用于在指定的目录中查找文件,在调用这个方法成功之后需要
@@ -1899,14 +1899,14 @@ public:
 	//			DR_NO	没有包含NTFS标记
 	//			其他	出错了
 	//////////////////////////////////////////////////////////////////////////
-	static DRES IsContainNTFSFlag(const char* cDevName, LONG_INT offset);
+	static DRES IsContainNTFSFlag(const WCHAR* cDevName, LONG_INT offset);
 
 	//////////////////////////////////////////////////////////////////////////
 	//获得设备的名字
 	//return 设备名字
 	//		如果设备没有打开的话返回NULL
 	//////////////////////////////////////////////////////////////////////////
-	const char* GetDevName();
+	const WCHAR* GetDevName();
 
 	//////////////////////////////////////////////////////////////////////////
 	//获得MFT的第一个VCN对应的LCN

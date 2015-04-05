@@ -84,7 +84,7 @@ protected:
 
 	// Generated message map functions
 	//{{AFX_MSG(CCtrlBar)
-	afx_msg LRESULT OnInitDialog (UINT wParam, LONG lParam);
+	afx_msg LRESULT OnInitDialog(WPARAM wParam, LPARAM lParam);
     afx_msg void OnWindowPosChanging(WINDOWPOS FAR* lpwndpos);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg LRESULT OnNcHitTest(CPoint point);  //鼠标光标的位置

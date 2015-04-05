@@ -79,7 +79,6 @@ void CDiskDoc::Dump(CDumpContext& dc) const
 BOOL CDiskDoc::OnOpenDocument(LPCTSTR lpszPathName) 
 {
 	CString		pDevName(lpszPathName);
-	char		denName[DEVICE_NAME_LEN + 1] = {0};
 	BOOL		bRes = FALSE;
 	CView*		view;
 	CString		strTemp;
@@ -94,13 +93,8 @@ BOOL CDiskDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	InitContentListHead();
 	
 	//要打开的设备名字
-#ifdef  UNICODE
-	UnicToMultyByte(lpszPathName , denName ,DEVICE_NAME_LEN + 1);
-#else
-	strcpy(denName , lpszPathName);
-#endif
 	//打开指定的设备
-	bRes = m_pDisk->OpenDisk(denName);
+	bRes = m_pDisk->OpenDisk(lpszPathName);
 
 	if (!bRes)
 	{//打开指定设备失败

@@ -125,89 +125,81 @@ void CMainFrame::Dump(CDumpContext& dc) const
 // CMainFrame message handlers
 
 
-void CMainFrame::OnFileOpen() 
+void CMainFrame::OnFileOpen()
 {
-	CString				strDevName;
-	CString				sTemp;
-	HANDLE				hDev  = INVALID_HANDLE_VALUE;
-	LONG_INT			off = {0};//设备的偏移
-	DRES				res = DR_OK;
-	CMultiDocTemplate*	pTemp = NULL;
-	CDocument*			pDoc  = NULL;
-	POSITION			pos   = NULL;
-	CString				sTitle;			//已经存在的设备名字
-	int					index = 0;
-
-
 	CDevVolumeDlg dlg;
-	if( IDOK != dlg.DoModal()) //选择了一个正确设备名字
+	if(IDOK != dlg.DoModal()) //选择了一个正确设备名字
 		return;
 
 	//获得选择了的设备
-	strDevName = dlg.GetSelDevName();
-		
+	CString strDevName = dlg.GetSelDevName();
+	CMultiDocTemplate*	pTemp = NULL;
+
 	//判断打开的是物理磁盘还是卷
 	if (SEL_DISK == dlg.m_bSelDisk)
-	{//是物理磁盘
-		//创建指定的视图
+	{
 		pTemp =  ((CDiskScanApp*)AfxGetApp())->m_pDiskDocTemplate;//->OpenDocumentFile(
 			//strDevName ,TRUE);
-	}else if (SEL_VOLUME == dlg.m_bSelDisk)
-	{//是一个卷 逻辑驱动器
-
-		if ((res = DFat32::IsContainFat32Flag( strDevName , off )) == DR_OK)
-		{//一个FAT32卷
+	}
+	else if (SEL_VOLUME == dlg.m_bSelDisk)
+	{
+		LONG_INT off = { 0 };//设备的偏移
+		DRES res = DR_OK;
+		if ((res = DFat32::IsContainFat32Flag(strDevName, off)) == DR_OK)
+		{
 			pTemp =  ((CDiskScanApp*)AfxGetApp())->m_pFat32DocTemplate ;//->OpenDocumentFile(
 			//strDevName ,TRUE);
-
-		}else if((res == DR_NO) &&
-			( (res = DNtfs::IsContainNTFSFlag( strDevName , off )) == DR_OK))
-		{//是一个NTFS卷
+		}
+		else if((res == DR_NO) && ((res = DNtfs::IsContainNTFSFlag(strDevName, off)) == DR_OK))
+		{
 			pTemp = ((CDiskScanApp*)AfxGetApp())->m_pNtfsDocTemplate;//->OpenDocumentFile(
 			//strDevName ,TRUE);
-
-		}else if(res != DR_NO){
-			//设备错误  
+		}
+		else if(res != DR_NO)
+		{
+			CString sTemp;
 			sTemp.LoadString(IDS_OPEN_FALIED);
 			sTemp.Replace(STR_POS , strDevName);
 			strDevName.LoadString(IDS_ERROR);
-			::MessageBox(NULL , sTemp  , strDevName  , MB_OK|MB_ICONERROR);
-			return ;
-		
-		}else{
-			//这里是不支持直接打开的类型
-			return ;
+			::MessageBox(NULL, sTemp, strDevName, MB_OK|MB_ICONERROR);
+			return;
 		}
-	}else
-		return ;
-
+		else
+		{
+			//这里是不支持直接打开的类型
+			return;
+		}
+	}
+	else
+	{
+		return;
+	}
 
 	//设备名字
-	//strDevName	
-	
+	//strDevName
+
 	//检查是否是已经打开了
-	pos = pTemp->GetFirstDocPosition();
-	
+	POSITION pos = pTemp->GetFirstDocPosition();
+
 	while( NULL != pos)
 	{
 		//获得文档指针
-		pDoc = pTemp->GetNextDoc(pos);
-		sTitle = pDoc->GetTitle();
-		index = sTitle.Find(_T(" "));
+		CDocument* pDoc = pTemp->GetNextDoc(pos);
+		CString sTitle = pDoc->GetTitle();
+		int index = sTitle.Find(_T(" "));
 		if (-1 != index)
 			sTitle = sTitle.Mid(0 , index);
-		
+
 		if (0 == strDevName.CompareNoCase(sTitle))
 		{//找到了
 			//	pDoc->se
 			//激活找到的窗口
 			pos = pDoc->GetFirstViewPosition();
 			this->MDIActivate(pDoc->GetNextView(pos)->GetParentFrame());
-			
 			return ;
 		}
 	}
-	
+
 	//没有的话就打开一个新的
 	pTemp->OpenDocumentFile( strDevName ,TRUE);
 
@@ -286,10 +278,10 @@ void CMainFrame::OnOpenFileDir()
 	CString	strTemp;
 	strTemp.LoadString(IDS_SELECT_FILE_DIR);
 	BROWSEINFO bi = {0};
-	char szPathName[MAX_PATH];
+	WCHAR szPathName[MAX_PATH] = {0};
 	bi.hwndOwner = GetSafeHwnd();
 	bi.pszDisplayName = szPathName;
-	bi.lpszTitle = (LPCSTR)(LPCTSTR)strTemp;
+	bi.lpszTitle = strTemp;
 	bi.ulFlags = BIF_NONEWFOLDERBUTTON | BIF_NEWDIALOGSTYLE | BIF_BROWSEFORCOMPUTER | BIF_BROWSEINCLUDEFILES; 
 	CString str;
 	CString strDir;  //选择的目录

@@ -31,7 +31,7 @@ CString GetPartFormatName( USHORT format);
 //		off			要获取区域的名字
 //return 指定类型的描述
 //////////////////////////////////////////////////////////////////////////
-CString GetPartName( USHORT format , const char* cDevname , LONG_INT off);
+CString GetPartName( USHORT format , const WCHAR* cDevname , LONG_INT off);
 
 //////////////////////////////////////////////////////////////////////////
 //将大小的表示方式转换为字符串形式.如512=》512B ,1024=>1KB,

@@ -70,7 +70,7 @@ void CDevVolumeDlg::InitTreeCtrl()
 {
 	//设置图片列表
 	this->m_wndDevVolume.SetImageList(m_pImageList.get(),TVSIL_NORMAL);
-	
+
 	CString	strInfo;
 	int		i = 0;
 	char	cDev;
@@ -80,7 +80,6 @@ void CDevVolumeDlg::InitTreeCtrl()
 	DWORD	dwOutBytes = 0;
 	CString	strTemp;
 	UINT	devType;
-
 
 	//添加根节点
 	//物理存储设备的根节点

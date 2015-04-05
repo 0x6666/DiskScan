@@ -77,7 +77,7 @@ BOOL CCtrlBar::Create(CWnd* pParentWnd,UINT nIDTemplate,UINT nStyle,UINT nID , C
 	this->m_dwCtrlStyle |= CTRL_SHOWEDGES;
 	return bRes;
 }
-LRESULT CCtrlBar::OnInitDialog(UINT wParam, LONG lParam)
+LRESULT CCtrlBar::OnInitDialog(WPARAM wParam, LPARAM lParam)
 {
 	LRESULT bRet = HandleInitDialog(wParam, lParam);
 	
