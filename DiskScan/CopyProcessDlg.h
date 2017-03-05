@@ -1,55 +1,55 @@
-#pragma once
+ï»¿#pragma once
 
 
 
 class CDataDoc;
-// CCopyProcessDlg ¶Ô»°¿ò
+// CCopyProcessDlg å¯¹è¯æ¡†
 
 class CCopyProcessDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CCopyProcessDlg)
 
 public:
-	CCopyProcessDlg(CString src , CString dis , CDataDoc* pDoc , CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
+	CCopyProcessDlg(CString src , CString dis , CDataDoc* pDoc , CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
 	virtual ~CCopyProcessDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_PROGRESS };
 
-	//½«¸´ÖÆµÄÎÄ¼ş
+	//å°†å¤åˆ¶çš„æ–‡ä»¶
 	CString m_strFileToRead;
-	//½«ÒªĞ´µÄÎÄ¼ş
+	//å°†è¦å†™çš„æ–‡ä»¶
 	CString	m_strFileToWrite;
-	//¶ÔÓ¦µÄÎÄµµ
+	//å¯¹åº”çš„æ–‡æ¡£
 	CDataDoc* m_pDoc;
 
-	//ÓÃÓÚÏß³ÌÍ¬²½
+	//ç”¨äºçº¿ç¨‹åŒæ­¥
 	volatile BOOL	m_bIsCopying;
 
-	//¿½±´Ïß³Ì
+	//æ‹·è´çº¿ç¨‹
 	HANDLE m_hCopyThread;
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÎÄ¼ş¿½±´Ïß³ÌÖĞÎÄ¼ş´ò¿ªÊ§°Ü
+	//æ–‡ä»¶æ‹·è´çº¿ç¨‹ä¸­æ–‡ä»¶æ‰“å¼€å¤±è´¥
 	//param
-	//		wParma=>CString*	Ê§°ÜµÄÂ·¾¶
+	//		wParma=>CString*	å¤±è´¥çš„è·¯å¾„
 	//////////////////////////////////////////////////////////////////////////
 	afx_msg LRESULT OnOpenFileFaild(WPARAM wParam , LPARAM lParam);
 
 	//////////////////////////////////////////////////////////////////////////
-	//¸´ÖÆÎÄ¼şÊ§°Ü
+	//å¤åˆ¶æ–‡ä»¶å¤±è´¥
 	//param
-	//		wParam=>CString*	±»¸´ÖÆµÄÎÄ¼ş
-	//		lParam=>CString*	±»Ğ´µÄÎÄ¼ş
+	//		wParam=>CString*	è¢«å¤åˆ¶çš„æ–‡ä»¶
+	//		lParam=>CString*	è¢«å†™çš„æ–‡ä»¶
 	//////////////////////////////////////////////////////////////////////////
 	afx_msg LRESULT OnCopyFileFaild(WPARAM wParam , LPARAM lParam);
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÎÄ¼ş¸´ÖÆ½áÊø
+	//æ–‡ä»¶å¤åˆ¶ç»“æŸ
 	afx_msg LRESULT OnCopySuccess(WPARAM wParam , LPARAM lParam);
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
 	DECLARE_MESSAGE_MAP()
 public:

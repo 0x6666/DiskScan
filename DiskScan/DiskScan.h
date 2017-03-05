@@ -1,4 +1,4 @@
-// DiskScan.h : main header file for the DISKSCAN application
+ï»¿// DiskScan.h : main header file for the DISKSCAN application
 //
 
 #if !defined(AFX_DISKSCAN_H__283E6228_61B8_42DA_BC9A_4BEAC24E208C__INCLUDED_)
@@ -25,13 +25,13 @@ class CDiskScanApp : public CWinApp
 public:
 	CDiskScanApp();
 
-	//´ÅÅÌµÄÎÄµµ¹ÜÀíÆ÷
+	//ç£ç›˜çš„æ–‡æ¡£ç®¡ç†å™¨
 	CMultiDocTemplate* m_pDiskDocTemplate;
 
-	//Fat32¾íµÄÎÄµµ¹ÜÀíÆ÷
+	//Fat32å·çš„æ–‡æ¡£ç®¡ç†å™¨
 	CMultiDocTemplate* m_pFat32DocTemplate;
 
-	//Ntfs¾íµÄÎÄµµ¹ÜÀíÆ÷
+	//Ntfså·çš„æ–‡æ¡£ç®¡ç†å™¨
 	CMultiDocTemplate* m_pNtfsDocTemplate;
 
 

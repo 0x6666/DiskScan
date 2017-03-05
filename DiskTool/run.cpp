@@ -1,16 +1,16 @@
-/***********************************************************************
+ï»¿/***********************************************************************
  * FileName:	run.cpp 
- * Author:		ÑîËÉ
- * Created:		2012Äê7ÔÂ1ÈÕ ÐÇÆÚÈÕ
- * Purpose:		ÕâÊÇrunµÄ¾ßÌåÊµÏÖ
- * Comment:		Õâ¸öÀàÊÇ¶ÔÒ»¸ö·Ç³£×¤ÊôÐÔÖÐrunµÄÒ»¸ö³éÏó£¬Ìá¹©ÁË¶ÔrunµÄ¼ò
- *				µ¥²Ù×÷·½·¨.
+ * Author:		æ¨æ¾
+ * Created:		2012å¹´7æœˆ1æ—¥ æ˜ŸæœŸæ—¥
+ * Purpose:		è¿™æ˜¯runçš„å…·ä½“å®žçŽ°
+ * Comment:		è¿™ä¸ªç±»æ˜¯å¯¹ä¸€ä¸ªéžå¸¸é©»å±žæ€§ä¸­runçš„ä¸€ä¸ªæŠ½è±¡ï¼Œæä¾›äº†å¯¹runçš„ç®€
+ *				å•æ“ä½œæ–¹æ³•.
  *
- * Modify:		ÐÞ¸´BUG¡£ÔÚÖ®Ç°¼ÆËãRun½ÚµãÊý£¬ÊÇÍ¨¹ýµ±Ç°·Ç³£×¤ÊôÐÔµÄ½áÊø
- *				VCN¼õÈ¥ÆðÊ¼VCN£¬Ò²¾ÍÊÇËµÃ¿Ò»¸öVCN¶¼»á·ÖÅäÒ»¸öRunListµÄ¿Õ
- *				¼ä,ÕâÊÇ²»ºÏÀíµÄ£¬Ö®Ç°Éè¼ÆµÄÊÇÃ¿Ò»¿éÁ¬ÐøµÄLCN·ÖÅäÒ»¸öRunList
- *				Ò²¾ÍÊÇËµÄÇÊÇ²»·ûºÏÉè¼ÆµÄ¡£ÏÖÔÚÊÇÄ¬ÈÏ·ÖÅä3¸öRunList£¬È»ºó
- *				ÔÚÐèÒªµÄÊ±ºòÔÚ¼ÌÐøÌí¼Ó¿Õ¼ä¡£2012-07-18 1:18				
+ * Modify:		ä¿®å¤BUGã€‚åœ¨ä¹‹å‰è®¡ç®—RunèŠ‚ç‚¹æ•°ï¼Œæ˜¯é€šè¿‡å½“å‰éžå¸¸é©»å±žæ€§çš„ç»“æŸ
+ *				VCNå‡åŽ»èµ·å§‹VCNï¼Œä¹Ÿå°±æ˜¯è¯´æ¯ä¸€ä¸ªVCNéƒ½ä¼šåˆ†é…ä¸€ä¸ªRunListçš„ç©º
+ *				é—´,è¿™æ˜¯ä¸åˆç†çš„ï¼Œä¹‹å‰è®¾è®¡çš„æ˜¯æ¯ä¸€å—è¿žç»­çš„LCNåˆ†é…ä¸€ä¸ªRunList
+ *				ä¹Ÿå°±æ˜¯è¯´é‚£æ˜¯ä¸ç¬¦åˆè®¾è®¡çš„ã€‚çŽ°åœ¨æ˜¯é»˜è®¤åˆ†é…3ä¸ªRunListï¼Œç„¶åŽ
+ *				åœ¨éœ€è¦çš„æ—¶å€™åœ¨ç»§ç»­æ·»åŠ ç©ºé—´ã€‚2012-07-18 1:18				
  *
  ***********************************************************************/
 
@@ -31,7 +31,7 @@ DRun::~DRun()
 
 DRES DRun::InitRunList( DNtfsAttr* attr )
 {
-	DWORD		runOff	= 0;		//ÔËÐÐÖÐµÄÊý¾ÝÆ«ÒÆ
+	DWORD		runOff	= 0;		//è¿è¡Œä¸­çš„æ•°æ®åç§»
 	DWORD		temp	= 0;
 	PRunHead	runHead = NULL;
 	LONG_INT	lcn		= {0};
@@ -39,72 +39,72 @@ DRES DRun::InitRunList( DNtfsAttr* attr )
 	LONG_INT	dataBuf = {0};
 	int			i		= 0;
 
-	//°²¼ì
+	//å®‰æ£€
 	if (NULL == attr)
 		return DR_INVALED_PARAM;
-	//ÒÑ¾­³õÊ¼»¯ºÃÁËµÄ¾ÍÖ±½ÓÉ¾³ý
+	//å·²ç»åˆå§‹åŒ–å¥½äº†çš„å°±ç›´æŽ¥åˆ é™¤
 	if (!mRunList.empty())
 		mRunList.clear();
 
-	//Ö»ÓÐ·Ç³£×¤ÊôÐÔ²ÅÓÐÔËÐÐÁÐ±í
+	//åªæœ‰éžå¸¸é©»å±žæ€§æ‰æœ‰è¿è¡Œåˆ—è¡¨
 	if (!attr->IsNonResident()) 
 		return DR_INIT_ERR;
 
 // 	this->mRunCnt = (DWORD)(attr->NR_GetEndVCN().QuadPart - start.QuadPart + 1);
 // 	this->mRunList = new RunList[this->mRunCnt];
 
-	run = attr->NR_GetDataPtr();//ÔËÐÐµÄÆðÊ¼Êý¾ÝµØÖ·
+	run = attr->NR_GetDataPtr();//è¿è¡Œçš„èµ·å§‹æ•°æ®åœ°å€
 
-	//ÎÒ²»ÖªµÀRunµÄµÚ¶þ¸öºÍµÚÈý¸ö×Ö¶ÎµÄµÄÊý¾Ý×î´óÄÜÕ¼¶àÉÙ¸ö×Ö½Ú
-	//ÕâÀïÈ¥8¸ö×Ö½Ú£¬ÕâÓ¦¸ÃÃ»ÎÊÌâ°É, 
+	//æˆ‘ä¸çŸ¥é“Runçš„ç¬¬äºŒä¸ªå’Œç¬¬ä¸‰ä¸ªå­—æ®µçš„çš„æ•°æ®æœ€å¤§èƒ½å å¤šå°‘ä¸ªå­—èŠ‚
+	//è¿™é‡ŒåŽ»8ä¸ªå­—èŠ‚ï¼Œè¿™åº”è¯¥æ²¡é—®é¢˜å§, 
 	for (i = 0;; ++i)
 	{
-		runHead = PRunHead(run + runOff++);	//¶ÁÈ¡runµÄÍ·²¿
+		runHead = PRunHead(run + runOff++);	//è¯»å–runçš„å¤´éƒ¨
 		if (runHead->all == 0)
-			break;	//±éÀúÍêÁËµ±Ç°ÊôÐÔµÄËùÓÐÔËÐÐ
+			break;	//éåŽ†å®Œäº†å½“å‰å±žæ€§çš„æ‰€æœ‰è¿è¡Œ
 
 		/*if (i == runCnt)    // 2012-07-18 1:18	
-		{//½Úµã²»¹»ÁË
-			runCnt += 2;  //Ìí¼ÓÁ½¸ö½ÚµãµÄ¿Õ¼ä
+		{//èŠ‚ç‚¹ä¸å¤Ÿäº†
+			runCnt += 2;  //æ·»åŠ ä¸¤ä¸ªèŠ‚ç‚¹çš„ç©ºé—´
 			this->mRunList = (PRunList)realloc(mRunList, sizeof(RunList)* runCnt);
 			runListPtr = PRunList(this->mRunList);
 		}*/
 
 		RunList tmpRunNode = { 0 };
-		if (i == 0)//µÚÒ»¸ö
+		if (i == 0)//ç¬¬ä¸€ä¸ª
 			tmpRunNode.vcn = attr->NR_GetStartVCN();
-		else//µ±Ç°vcnÊÇÇ°Ò»¸örun½ÚµãµÄvcn+´ØÊý
+		else//å½“å‰vcnæ˜¯å‰ä¸€ä¸ªrunèŠ‚ç‚¹çš„vcn+ç°‡æ•°
 			tmpRunNode.vcn.QuadPart =
 			mRunList.back().vcn.QuadPart + mRunList.back().clustCnt.QuadPart;
 
-		//´ØÊý
-		tmpRunNode.clustCnt.QuadPart = 0;//ÏÈÇåÀíÒ»ÏÂ
-		//¶ÁÈ¡Êý¾Ý´ØÊý  length
+		//ç°‡æ•°
+		tmpRunNode.clustCnt.QuadPart = 0;//å…ˆæ¸…ç†ä¸€ä¸‹
+		//è¯»å–æ•°æ®ç°‡æ•°  length
 		memcpy(&(tmpRunNode.clustCnt), run + runOff, runHead->length);
 		runOff += runHead->length;
 
 		if (runHead->offset == 0)
-		{//Ï¡ÊèÎÄ¼þµÄRun  £¬±íÊ¾µ±Ç°vcnÃ»ÓÐÊý¾Ý
+		{//ç¨€ç–æ–‡ä»¶çš„Run  ï¼Œè¡¨ç¤ºå½“å‰vcnæ²¡æœ‰æ•°æ®
 			tmpRunNode.lcn.QuadPart = -1;
 			continue;
 		}
 
-		//×îºóÒ»¸ö×Ö·ûµÄ»º´æÏÂ±ê
+		//æœ€åŽä¸€ä¸ªå­—ç¬¦çš„ç¼“å­˜ä¸‹æ ‡
 		temp = runOff + runHead->offset -1;
 
-		//»ñµÃlcn£¬Õâ¸ö¿ÉÄÜÊÇÒ»¸ö¸ºÊý £¬ËùÒÔÏÈ×öÓÐ·ûºÅÊý¶ÁÈ¡¶ÁÈ¡³öÀ´
+		//èŽ·å¾—lcnï¼Œè¿™ä¸ªå¯èƒ½æ˜¯ä¸€ä¸ªè´Ÿæ•° ï¼Œæ‰€ä»¥å…ˆåšæœ‰ç¬¦å·æ•°è¯»å–è¯»å–å‡ºæ¥
 		dataBuf.QuadPart = (char)run[temp--];
-		//Ò»´Î¶ÁÈ¡Ê£ÏÂµÄ×Ö½Ú
+		//ä¸€æ¬¡è¯»å–å‰©ä¸‹çš„å­—èŠ‚
 		for (; temp >= runOff; --temp)
 			dataBuf.QuadPart = (dataBuf.QuadPart << 8) + GetBYTE(run + temp);
 
-		//Êµ¼ÊµÄlcn
+		//å®žé™…çš„lcn
 		lcn.QuadPart += dataBuf.QuadPart;
 
 		tmpRunNode.lcn = lcn;
 		mRunList.push_back(tmpRunNode);
 
-		//ÏÂÒ»¸örunµÄÎ»ÖÃ
+		//ä¸‹ä¸€ä¸ªrunçš„ä½ç½®
 		runOff += runHead->offset;
 	}
 
@@ -121,23 +121,23 @@ LONG_INT DRun::GetLCNByVCN( LONG_INT vcn , PLONG_INT clustCnt )
 	lcn.QuadPart = -1;
 	for (size_t i = 0; i < mRunList.size(); ++i)
 	{
-		//»ñµÃÐéÄâ´ØºÅËù¶ÔÓ¦µÄÆðÊ¼Âß¼­´ØºÅÊ±£¬Ó¦¸ÃÊÇ
-		//£¨µ±Ç°runµÄÆðÊ¼Âß¼­´ØºÅ£©¼ÓÉÏ£¨µ±Ç°runÆðÊ¼
-		//ÐéÄâ´ØºÅÓëËùÐèÒªÐéÄâ´ØºÅÖ»²î£©¡£
-		//¶ø´ØÊýµÄ»°£¬ÔòÊÇ£¨µ±Ç°run´ØÊý£©¼õÈ¥£¨µ±Ç°run
-		//ÆðÊ¼ÐéÄâ´ØºÅÓëËùÐèÐéÄâ´ØºÅÖ»²î£©¡£ 2012-05-21 15:12
+		//èŽ·å¾—è™šæ‹Ÿç°‡å·æ‰€å¯¹åº”çš„èµ·å§‹é€»è¾‘ç°‡å·æ—¶ï¼Œåº”è¯¥æ˜¯
+		//ï¼ˆå½“å‰runçš„èµ·å§‹é€»è¾‘ç°‡å·ï¼‰åŠ ä¸Šï¼ˆå½“å‰runèµ·å§‹
+		//è™šæ‹Ÿç°‡å·ä¸Žæ‰€éœ€è¦è™šæ‹Ÿç°‡å·åªå·®ï¼‰ã€‚
+		//è€Œç°‡æ•°çš„è¯ï¼Œåˆ™æ˜¯ï¼ˆå½“å‰runç°‡æ•°ï¼‰å‡åŽ»ï¼ˆå½“å‰run
+		//èµ·å§‹è™šæ‹Ÿç°‡å·ä¸Žæ‰€éœ€è™šæ‹Ÿç°‡å·åªå·®ï¼‰ã€‚ 2012-05-21 15:12
 		if (vcn.QuadPart >= mRunList[i].vcn.QuadPart &&
 			vcn.QuadPart < mRunList[i].vcn.QuadPart + mRunList[i].clustCnt.QuadPart)
-		{//µ±Ç°vcnÕÒµ½ÁË
+		{//å½“å‰vcnæ‰¾åˆ°äº†
 			
 			if (mRunList[i].lcn.QuadPart == -1)
-			{//Ï¡Êè´Ø
+			{//ç¨€ç–ç°‡
 				lcn.QuadPart = -2;
 				return lcn;
 			}
 			lcn.QuadPart = 
-				mRunList[i].lcn.QuadPart +  //µ±Ç°runµÄÆäÊµÂß¼­ºÅ
-				(vcn.QuadPart - mRunList[i].vcn.QuadPart);//Êµ¼ÊÐèÒª´ÖÐéÄâ´ØºÅºÍÆäÊµ´ÖºÀÖ»²î
+				mRunList[i].lcn.QuadPart +  //å½“å‰runçš„å…¶å®žé€»è¾‘å·
+				(vcn.QuadPart - mRunList[i].vcn.QuadPart);//å®žé™…éœ€è¦ç²—è™šæ‹Ÿç°‡å·å’Œå…¶å®žç²—è±ªåªå·®
 			if (clustCnt)
 				clustCnt->QuadPart = mRunList[i].clustCnt.QuadPart - (vcn.QuadPart - mRunList[i].vcn.QuadPart);
 			break;

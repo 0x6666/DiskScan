@@ -1,4 +1,4 @@
-// ChildFrm.cpp : implementation of the CChildFrame class
+ï»¿// ChildFrm.cpp : implementation of the CChildFrame class
 //
 
 #include "stdafx.h"
@@ -67,11 +67,11 @@ BOOL CChildFrm::PreCreateWindow(CREATESTRUCT& cs)
 void CChildFrm::ActivateFrame(int nCmdShow)
 {
 	// TODO: Modify this function to change how the frame is activated.
-	//´ò¿ªÊ±×î´ó»¯
+	//æ‰“å¼€æ—¶æœ€å¤§åŒ–
 	nCmdShow = SW_SHOWMAXIMIZED;
 	CMDIChildWnd::ActivateFrame(nCmdShow);
 
-	//ÉèÖÃ·ÖÇÐ´°¿ÚµÄ×î´ó¿í¶È
+	//è®¾ç½®åˆ†åˆ‡çª—å£çš„æœ€å¤§å®½åº¦
 	CHexDataView* pDSV =  (CHexDataView*)this->m_wndSplitter.GetPane( 0 , 0);
   	this->m_wndSplitter.SetMinWidth(pDSV->GetMinWidth());
 }
@@ -108,7 +108,7 @@ int CChildFrm::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	size = CSize(rc.right - ::GetSystemMetrics(SM_CXEDGE)*2
 		, rc.bottom - rc.top - ::GetSystemMetrics(SM_CYMENUCHECK) - ::GetSystemMetrics(SM_CYEDGE));
 
-	//´´½¨´ÅÅÌÁÐ±ðBar
+	//åˆ›å»ºç£ç›˜åˆ—åˆ«Bar
 	if (!m_DisBar.Create(this, IDD_DVE_LIST, CBRS_LEFT|CBRS_TOOLTIPS|CBRS_FLYBY,
 		IDD_DVE_LIST ,size))
 	{
@@ -125,14 +125,14 @@ int CChildFrm::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TRACE0("Failed to create List Ctrl\n");
 		return -1;      // fail to create
 	}
-	//ÉèÖÃÒ»ÏÂÁÐ±íµÄÊôÐÔ
+	//è®¾ç½®ä¸€ä¸‹åˆ—è¡¨çš„å±žæ€§
 	DWORD dwStyle = m_DisList.GetExtendedStyle();
-	dwStyle |= LVS_EX_FULLROWSELECT;//Ñ¡ÖÐÄ³ÐÐÊ¹ÕûÐÐ¸ßÁÁ
-	dwStyle |= LVS_EX_GRIDLINES;	//Íø¸ñÏß
-	m_DisList.SetExtendedStyle(dwStyle); //ÉèÖÃÀ©Õ¹·ç¸ñ
+	dwStyle |= LVS_EX_FULLROWSELECT;//é€‰ä¸­æŸè¡Œä½¿æ•´è¡Œé«˜äº®
+	dwStyle |= LVS_EX_GRIDLINES;	//ç½‘æ ¼çº¿
+	m_DisList.SetExtendedStyle(dwStyle); //è®¾ç½®æ‰©å±•é£Žæ ¼
 
 
-	//ÉèÖÃÉè±¸ÁÐ±í¿ÉÍ£¿¿
+	//è®¾ç½®è®¾å¤‡åˆ—è¡¨å¯åœé 
 	m_DisBar.SetBarStyle(CBRS_ALIGN_TOP|CBRS_GRIPPER |\
 		CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 	m_DisBar.EnableDocking(CBRS_ALIGN_TOP|CBRS_ALIGN_BOTTOM);
@@ -161,11 +161,11 @@ void CChildFrm::OnUpdateContentList(CCmdUI* pCmdUI)
 
 BOOL CChildFrm::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext) 
 {
-	///////Ò»ÐÐÁ½ÁÐ
+	///////ä¸€è¡Œä¸¤åˆ—
 	if(!m_wndSplitter.CreateStatic(this , 1 , 2))
 		return FALSE;
 	 
-	/////µÚ0ÐÐ 0ÁÐ 
+	/////ç¬¬0è¡Œ 0åˆ— 
 	if(!this->m_wndSplitter.CreateView(0,0,RUNTIME_CLASS(CHexDataView),
 		CSize(638,300),pContext))
 		return FALSE;
@@ -174,7 +174,7 @@ BOOL CChildFrm::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	if(!pContext->m_pCurrentDoc->IsKindOf(RUNTIME_CLASS(CDataDoc)))
 		ASSERT(FALSE);
 
-	//////µÚ0ÐÐ 1ÁÐ  
+	//////ç¬¬0è¡Œ 1åˆ—  
 	if(!this->m_wndSplitter.CreateView( 0 , 1 , 
 		((CDataDoc*)pContext->m_pCurrentDoc)->GetInofViewClass()
 		,CSize(270,200),pContext))
@@ -183,7 +183,7 @@ BOOL CChildFrm::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	 return TRUE;
 }
 
-// »ñµÃÓÃÓÚÏÔÊ¾ÐÅÏ¢µÄÊÓÍ¼Àà
+// èŽ·å¾—ç”¨äºŽæ˜¾ç¤ºä¿¡æ¯çš„è§†å›¾ç±»
 // 
 // CRuntimeClass* CChildFrm::GetInofViewClass(void)
 // {
@@ -192,9 +192,9 @@ BOOL CChildFrm::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 
 BOOL CChildFrm::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle , const RECT& rect , CMDIFrameWnd* pParentWnd , CCreateContext* pContext)
 {
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 	
-	//È¥µôºáÏò»òÕßË®Æ½¸Ä±ä´°¿Ú´óÐ¡Ê±ÖØ»æ´°¿ÚµÄÊôÐÔ  ·Â·ðÃ»ÓÃ
+	//åŽ»æŽ‰æ¨ªå‘æˆ–è€…æ°´å¹³æ”¹å˜çª—å£å¤§å°æ—¶é‡ç»˜çª—å£çš„å±žæ€§  ä»¿ä½›æ²¡ç”¨
 	dwStyle &= ~(CS_VREDRAW|CS_HREDRAW);
 
 	return CMDIChildWnd::Create(lpszClassName, lpszWindowName, dwStyle, rect, pParentWnd, pContext);
@@ -202,7 +202,7 @@ BOOL CChildFrm::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwSt
 
 //void CChildFrm::OnPosParaentDir()
 //{
-//	AfxMessageBox(_T("¶¨Î»¸¸Ä¿Â¼"));
+//	AfxMessageBox(_T("å®šä½çˆ¶ç›®å½•"));
 //}
 
 //void CChildFrm::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
@@ -210,7 +210,7 @@ BOOL CChildFrm::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwSt
 //	CMDIChildWnd::OnActivate(nState, pWndOther, bMinimized);
 //
 //	if (nState == WA_CLICKACTIVE || nState == WA_ACTIVE )
-//	{//´°¿Ú¼¤»îÁË
+//	{//çª—å£æ¿€æ´»äº†
 //		CDataDoc * pDoc = (CDataDoc *)(((CMainFrame*)AfxGetMainWnd())->GetActiveDocument());
 //		if (NULL == pDoc) return;
 //		AfxGetMainWnd()->SendMessage(DMSG_SET_CUR_DATA_VIEW_NAME , WPARAM(&(pDoc->m_pCurSecList->m_strName)) , 0);
@@ -228,7 +228,7 @@ BOOL CChildFrm::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwSt
 //	CMDIChildWnd::OnSetFocus(pOldWnd);
 //
 //	//if (nState == WA_CLICKACTIVE || nState == WA_ACTIVE )
-//	//{//´°¿Ú¼¤»îÁË
+//	//{//çª—å£æ¿€æ´»äº†
 //	CView* pView = ((CMainFrame*)AfxGetMainWnd())->GetActiveView();
 //	if (NULL == pView) return;
 //	CDataDoc * pDoc = (CDataDoc *)(pView->GetDocument());

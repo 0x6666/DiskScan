@@ -1,4 +1,4 @@
-// Fat32InfoView.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// Fat32InfoView.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -35,7 +35,7 @@ CFat32Doc* CFat32InfoView::GetDocument()
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CFat32Doc)));
 	return (CFat32Doc*)m_pDocument;
 }
-// CFat32InfoView Õï¶Ï
+// CFat32InfoView è¯Šæ–­
 
 #ifdef _DEBUG
 void CFat32InfoView::AssertValid() const
@@ -54,7 +54,7 @@ void CFat32InfoView::Dump(CDumpContext& dc) const
 
 void CFat32InfoView::OnInitialUpdate()
 {
-	//»ñµÃµ±Ç°ÊÓÍ¼¶ÔÓ¦µÄÎÄµµ¶ÔÏó
+	//è·å¾—å½“å‰è§†å›¾å¯¹åº”çš„æ–‡æ¡£å¯¹è±¡
 	CFat32Doc*	pDoc = GetDocument();
 	DFat32*		pFat32 = pDoc->m_pFat32;
 	LONG_INT	size = {0};
@@ -63,39 +63,39 @@ void CFat32InfoView::OnInitialUpdate()
 
 	CInfoView::OnInitialUpdate();
 
-	//Éè±¸Ãû×Ö±êÇ©
+	//è®¾å¤‡åå­—æ ‡ç­¾
 	CRT_STATIC(m_wndSTName ,IDC_ST_DEV_NAME ,  IDS_DEV_NAME);
 
-	//Éè±¸Ãû×Ö
-	strTemp = pFat32->GetDevName();  //Éè±¸µÄÃû×Ö
+	//è®¾å¤‡åå­—
+	strTemp = pFat32->GetDevName();  //è®¾å¤‡çš„åå­—
 	CRT_EDIT(m_wndETDevName , IDC_ET_DEV_NAME ,strTemp );
 
-	//Éè±¸ÇøÓòĞòºÅ
+	//è®¾å¤‡åŒºåŸŸåºå·
 	CRT_STATIC(m_wndSTDevAreaIdx ,IDC_ST_DEV_AREA_INDEX , IDS_DEV_AREA_INDEX );
 	CRT_EDIT(m_wndETDevAreaIdx , IDC_ET_DEV_AREA_INDEX , pDoc->m_strDevAreaIdx);
 
-	//ÆğÊ¼ÉÈÇøºÅ
+	//èµ·å§‹æ‰‡åŒºå·
 	CRT_STATIC(m_wndSTStartSector ,IDC_ST_START_SECTOR , IDS_START_SECTOR );
 	CRT_EDIT(m_wndETStartSector , IDC_ET_START_SECTOR , pDoc->m_strDevStartSec);
 
-	//´ÅÅÌÏêÏ¸ĞÅÏ¢µÄ¿ò¼Ü
+	//ç£ç›˜è¯¦ç»†ä¿¡æ¯çš„æ¡†æ¶
 	CRT_STATIC_AREA(m_wndSTDevInfoArea , IDC_ST_DEV_INFO_AREA, IDS_DEV_INFO_AREA);
 
-	//·ÖÇøĞÅÏ¢ÇøÓò
+	//åˆ†åŒºä¿¡æ¯åŒºåŸŸ
 	CRT_STATIC_AREA(m_wndSTPartInfoArea , IDC_ST_PART_INFO_AREA , IDS_PART_INFO);
 
-	//·ÖÇøÃû×Ö
+	//åˆ†åŒºåå­—
 	CRT_STATIC(m_wndSTPartName , IDC_ST_PART_NAME , IDS_PART_NAME);
 	pFat32->GetVolumeName(strTemp.GetBuffer(50) , 50);
 	strTemp.ReleaseBuffer();
 	CRT_EDIT(m_wndETPartName , IDC_ET_PART_NAME , strTemp);
 
-	//ÎÄ¼şÏµÍ³
+	//æ–‡ä»¶ç³»ç»Ÿ
 	CRT_STATIC(m_wndSTFileSys , IDC_ST_FILE_SYSTEM , IDS_FILE_SYSTEM);
 	strTemp.LoadString(IDS_FAT32_PART);
 	CRT_EDIT(m_wndETFileSys , IDC_ET_FILE_SYSTEM , strTemp);
 
-	//·ÖÇø´óĞ¡
+	//åˆ†åŒºå¤§å°
 	CRT_STATIC(m_wndSTPartSize , IDC_ST_PART_SIZE , IDS_PART_SIZE);
 	size.QuadPart = pFat32->GetSecCount();
 	size.QuadPart *= SECTOR_SIZE;
@@ -104,33 +104,33 @@ void CFat32InfoView::OnInitialUpdate()
 	strTemp = GetSizeToString(size);
 	CRT_EDIT(m_wndETPartSize , IDC_ET_PART_SIZE , strTemp);
 
-	//×ÜÉÈÇøÊı
+	//æ€»æ‰‡åŒºæ•°
 	CRT_STATIC(m_wndSTSectorCount , IDC_ST_SECTOR_COUNT , IDS_SECTOR_COUNT);
 	size.QuadPart = pFat32->GetSecCount();
 	size.HighPart == 0 ? strTemp.Format(_T("%X") ,size.LowPart) : strTemp.Format(_T("%X%08X") , size.HighPart , size.LowPart);
 	CRT_EDIT(m_wndETSectorCount , IDC_ET_SECTOR_COUNT , strTemp);
 
-	//±£ÁôÉÈÇøÊı 
+	//ä¿ç•™æ‰‡åŒºæ•° 
 	CRT_STATIC(m_wndSTReserveSector , IDC_ST_RESERVE_SECTOR , IDS_RESERVE_SECTOR);
 	strTemp.Format(_T("%X") , pFat32->GetReserveSector());
 	CRT_EDIT(m_wndETReserveSector , IDC_ET_RESERVE_SECTOR , strTemp);
 
-	//Ã¿´ØÉÈÇøÊı
+	//æ¯ç°‡æ‰‡åŒºæ•°
 	CRT_STATIC(m_wndSTSectorPerClust , IDC_ST_SECTOR_PER_CLUST , IDS_SECTOR_PER_CLUST);
 	strTemp.Format(_T("%X") , pFat32->GetSecPerClust());
 	CRT_EDIT(m_wndETSectorPerClust , IDC_ET_SECTOR_PER_CLUST , strTemp);
 
-	//Ã¿FATÉÈÇøÊı
+	//æ¯FATæ‰‡åŒºæ•°
 	CRT_STATIC(m_wndSTSectorPerFAT , IDC_ST_SECTOR_PER_FAT , IDS_SECTOR_PER_FAT);
 	strTemp.Format(_T("%X") ,pFat32->GetSectorPerFAT() );
 	CRT_EDIT(m_wndETSectorPerFAT , IDC_ET_SECTOR_PER_FAT , strTemp);
 
-	//µÚÒ»¸öFATÉÈÇøÊı
+	//ç¬¬ä¸€ä¸ªFATæ‰‡åŒºæ•°
 	CRT_STATIC(m_wndSTFAT1 , IDC_ST_FAT1 , IDS_FAT1);
 	strTemp.Format(_T("%X") ,pFat32->GetReserveSector() );
 	CRT_EDIT(m_wndETFAT1 , IDC_ET_FAT1 , strTemp);
 
-	//µÚ¶ş¸öFATÎ»ÖÃ
+	//ç¬¬äºŒä¸ªFATä½ç½®
 	CRT_STATIC(m_wndSTFAT2 , IDC_ST_FAT2 , IDS_FAT2);
 	strTemp.Format(_T("%X") ,pFat32->GetReserveSector() + pFat32->GetSectorPerFAT() );
 	CRT_EDIT(m_wndETFAT2 , IDC_ET_FAT2 , strTemp);
@@ -140,50 +140,50 @@ void CFat32InfoView::OnInitialUpdate()
 	strTemp.Format(_T("%X") ,pFat32->GetFSInfoSec());
 	CRT_EDIT(m_wndETFSInfo , IDC_ET_FSINFO , strTemp);
 
-	//¸úÄ¿Â¼ÉÈÇø
+	//è·Ÿç›®å½•æ‰‡åŒº
 	CRT_STATIC(m_wndSTRootDir , IDC_ST_ROOT_DIR , IDS_ROOT_DIR);
 	strTemp.Format(_T("%X") ,pFat32->ClustToSect(pFat32->Get1stDirClust()));
 	CRT_EDIT(m_wndETRootDir , IDC_ET_ROOT_DIR , strTemp);
 
-	//Ê£ÓàÉÈÇø
+	//å‰©ä½™æ‰‡åŒº
 	CRT_STATIC_AREA(m_wndSTRemainSectorArea , IDC_ST_REMAIN_SECTOR_ARER , IDS_REMAIN_PART_NAME);
- 	//Ê£ÓàÉÈÇøµÄÆğÊ¼ÉÈÇøºÅ
+ 	//å‰©ä½™æ‰‡åŒºçš„èµ·å§‹æ‰‡åŒºå·
 	CRT_STATIC(m_wndSTRemainStartSector , IDC_ST_REMAIN_SECTOR_POS , IDS_START_SECTOR);
 	strTemp.Format(_T("%X") , pFat32->GetSecCount() - pFat32->GetRemainSectorCnt());
 	CRT_EDIT(m_wndETRemainStartSector , IDC_ET_REMAIN_SECTOR_POS , strTemp);
 
-	//Ê£ÓàÉÈÇøÊı
+	//å‰©ä½™æ‰‡åŒºæ•°
 	CRT_STATIC(m_wndSTRemainCount , IDC_ST_REMAIN_SECTOR_COUNT , IDS_REMAIN_SECTOR_COUNT);
 	strTemp.Format(_T("%X") , pFat32->GetRemainSectorCnt());
 	CRT_EDIT(m_wndETRemainCount , IDC_ET_REMAIN_SECTOR_COUNT , strTemp);
 
-	//Ê£ÓàÉÈÇø´óĞ¡
+	//å‰©ä½™æ‰‡åŒºå¤§å°
 	CRT_STATIC(m_wndSTRemainSize , IDC_ST_REMAIN_SECTOR_SIZE , IDS_REMAIN_SECTOR_SIZE);
 	strTemp = GetSizeToString(pFat32->GetRemainSectorCnt() * SECTOR_SIZE);
 	CRT_EDIT(m_wndETRemainSize , IDC_ET_REMAIN_SECTOR_SIZE , strTemp);
 
 
-	//Êı¾İä¯ÀÀ¿ØÖÆÇøÓò
+	//æ•°æ®æµè§ˆæ§åˆ¶åŒºåŸŸ
 	CRT_STATIC_AREA(m_wndSTDataScanArea , IDC_ST_DATA_SCAN_AREA , IDS_DATA_SCAN_AREA);
 
-	//ÉÈÇøä¯ÀÀ¿ØÖÆ
-	CRT_SCAN_CTRLS(m_wndSTSectorScan   , IDS_SECTOR_SCAN  , IDC_ST_SECTOR_SCAN ,	//±êÇ©
-		m_wndETSectorNum    , IDC_ET_SECTOR_NUM ,						//ÓÃÓÚÏÔÊ¾ÉÈÇøºÅ
-		m_wndBtnPreSector   , IDC_BTN_PRE_SECTOR ,						//Ç°Ò»¸öÉÈÇø
-		m_wndBtnNextSector  , IDC_BTN_NEXT_SECTOR ,						//ÏÂÒ»¸öÉÈÇø
-		m_wndBtnFirstSector , IDC_BTN_FIRST_SECTOR ,						//µÚÒ»¸öÉÈÇø
-		m_wndBtnLastSector  , IDC_BTN_LAST_SECTOR);						//×îºóÒ»¸öÉÈÇø
+	//æ‰‡åŒºæµè§ˆæ§åˆ¶
+	CRT_SCAN_CTRLS(m_wndSTSectorScan   , IDS_SECTOR_SCAN  , IDC_ST_SECTOR_SCAN ,	//æ ‡ç­¾
+		m_wndETSectorNum    , IDC_ET_SECTOR_NUM ,						//ç”¨äºæ˜¾ç¤ºæ‰‡åŒºå·
+		m_wndBtnPreSector   , IDC_BTN_PRE_SECTOR ,						//å‰ä¸€ä¸ªæ‰‡åŒº
+		m_wndBtnNextSector  , IDC_BTN_NEXT_SECTOR ,						//ä¸‹ä¸€ä¸ªæ‰‡åŒº
+		m_wndBtnFirstSector , IDC_BTN_FIRST_SECTOR ,						//ç¬¬ä¸€ä¸ªæ‰‡åŒº
+		m_wndBtnLastSector  , IDC_BTN_LAST_SECTOR);						//æœ€åä¸€ä¸ªæ‰‡åŒº
 
-	//´Øä¯ÀÀ¿ØÖÆ
-	CRT_SCAN_CTRLS(	m_wndSTClustScan   , IDS_CLUST_SCAN  , IDC_ST_CLUST_SCAN ,	//±êÇ©
-		m_wndETClustNum    , IDC_ET_CLUST_NUM ,						//ÓÃÓÚÏÔÊ¾ÉÈÇøºÅ
-		m_wndBtnPreClust   , IDC_BTN_PRE_CLUST ,						//Ç°Ò»¸öÉÈÇø
-		m_wndBtnNextClust  , IDC_BTN_NEXT_CLUST ,						//ÏÂÒ»¸öÉÈÇø
-		m_wndBtnFirstClust , IDC_BTN_FIRST_CLUST ,						//µÚÒ»¸öÉÈÇø
-		m_wndBtnLastClust  , IDC_BTN_LAST_CLUST);						//×îºóÒ»¸öÉÈÇø
+	//ç°‡æµè§ˆæ§åˆ¶
+	CRT_SCAN_CTRLS(	m_wndSTClustScan   , IDS_CLUST_SCAN  , IDC_ST_CLUST_SCAN ,	//æ ‡ç­¾
+		m_wndETClustNum    , IDC_ET_CLUST_NUM ,						//ç”¨äºæ˜¾ç¤ºæ‰‡åŒºå·
+		m_wndBtnPreClust   , IDC_BTN_PRE_CLUST ,						//å‰ä¸€ä¸ªæ‰‡åŒº
+		m_wndBtnNextClust  , IDC_BTN_NEXT_CLUST ,						//ä¸‹ä¸€ä¸ªæ‰‡åŒº
+		m_wndBtnFirstClust , IDC_BTN_FIRST_CLUST ,						//ç¬¬ä¸€ä¸ªæ‰‡åŒº
+		m_wndBtnLastClust  , IDC_BTN_LAST_CLUST);						//æœ€åä¸€ä¸ªæ‰‡åŒº
 
 
-	//Ç¿ÖÆ¸üĞÂÊÓÍ¼ĞÅÏ¢
+	//å¼ºåˆ¶æ›´æ–°è§†å›¾ä¿¡æ¯
 	this->OnUpdate(NULL , 0 , NULL);
 }
 
@@ -191,30 +191,30 @@ void CFat32InfoView::OnInitialUpdate()
 
 int CFat32InfoView::RePositionCtrl()
 {
-	CRect	cr;			//µ±Ç°ÊÓÍ¼µÄ¿É¿Í»§ÇøµÄ´óĞ¡
-	CRect	cr2;		//×Ô¿öÄÚµÄ¿Í»§Çø
+	CRect	cr;			//å½“å‰è§†å›¾çš„å¯å®¢æˆ·åŒºçš„å¤§å°
+	CRect	cr2;		//è‡ªå†µå†…çš„å®¢æˆ·åŒº
 	CRect	ctlRc1;
 	CString strTemp;
-	int		top = 5 ;		//¿Ø¼şµÄ¶¥²¿Î»ÖÃ
-	int		topbak = 0;	//¶¥²¿Î»ÖÃµÄÒ»¸ö±¸·İ  ¿ÉÄÜÔÚÆäËûµÄµØ·½ĞèÒªÊ¹ÓÃ
+	int		top = 5 ;		//æ§ä»¶çš„é¡¶éƒ¨ä½ç½®
+	int		topbak = 0;	//é¡¶éƒ¨ä½ç½®çš„ä¸€ä¸ªå¤‡ä»½  å¯èƒ½åœ¨å…¶ä»–çš„åœ°æ–¹éœ€è¦ä½¿ç”¨
 	int		width = 0 ;
 	int btnW , btnH;
-	//°´Å¥µÄÎ¨¶À
+	//æŒ‰é’®çš„å”¯ç‹¬
 	btnW = this->m_szChar.cx * 2 + 2 * CTRL_X_GAP;
 	btnH = CTRL_Y_GAP + m_szChar.cy;
 
-	//»ñµÃµ±Ç°ÊÓÍ¼µÄ¿Í»§Çø´óĞ¡
+	//è·å¾—å½“å‰è§†å›¾çš„å®¢æˆ·åŒºå¤§å°
 	::GetWindowRect(this->GetSafeHwnd() , &cr);
-	cr.DeflateRect(11 , 7);		//ÊÓÍ¼ÖĞ»æÖÆ¿Ø¼şµÄÇøÓò
-	this->ScreenToClient(&cr);  //¿Í»§ÇøÖĞ¿Õ¼ä¿ÉÒÔ·ÀÖ¹µÄÇøÓò
+	cr.DeflateRect(11 , 7);		//è§†å›¾ä¸­ç»˜åˆ¶æ§ä»¶çš„åŒºåŸŸ
+	this->ScreenToClient(&cr);  //å®¢æˆ·åŒºä¸­ç©ºé—´å¯ä»¥é˜²æ­¢çš„åŒºåŸŸ
 	cr2 = cr;
-	cr2.DeflateRect(2 * CTRL_X_GAP , 0);	//×Ó¿òÖĞµÄ¿Ø¼ş»ÓÖ®ÇøÓò
+	cr2.DeflateRect(2 * CTRL_X_GAP , 0);	//å­æ¡†ä¸­çš„æ§ä»¶æŒ¥ä¹‹åŒºåŸŸ
 
-	//µ÷ÕûµÚÒ»¸ö¾²Ì¬¿Ø¼ş
+	//è°ƒæ•´ç¬¬ä¸€ä¸ªé™æ€æ§ä»¶
 	CRect c1stRc;
 	m_wndSTName.GetWindowRect(c1stRc);
 	if (c1stRc.Height() == 0)
-	{//ÊÇµÚÒ»´Îµ÷ÕûÎ»ÖÃ 
+	{//æ˜¯ç¬¬ä¸€æ¬¡è°ƒæ•´ä½ç½® 
 		top += 3 * CTRL_Y_GAP;
 		topbak = top;
 	}else{
@@ -224,59 +224,59 @@ int CFat32InfoView::RePositionCtrl()
 	}
 
 
-	//Éè±¸Ãû×Ö
+	//è®¾å¤‡åå­—
 	MV_STATIC_NO_PRE(m_wndSTName , cr2 , top);
 	MV_EDITE(m_wndSTName , m_wndETDevName  , cr2 , top);
 
-	//Éè±¸ÇøÓòĞòºÅ
+	//è®¾å¤‡åŒºåŸŸåºå·
 	MV_STATIC(m_wndETDevName , m_wndSTDevAreaIdx , cr2 , top);
 	MV_EDITE(m_wndSTDevAreaIdx , m_wndETDevAreaIdx , cr2  , top);
 
-	//ÆğÊ¼ÉÈÇøºÅ
+	//èµ·å§‹æ‰‡åŒºå·
 	MV_STATIC(m_wndETDevAreaIdx , m_wndSTStartSector , cr2, top);
 	MV_EDITE(m_wndSTStartSector , m_wndETStartSector , cr2  , top);
 
-	//Éè±¸ĞÅÏ¢ÇøÓò
+	//è®¾å¤‡ä¿¡æ¯åŒºåŸŸ
 	MV_STATIC_AREA(m_wndETStartSector , m_wndSTDevInfoArea , topbak , top);
 
 	top += 7 * CTRL_Y_GAP;
 	topbak = top;
 	
-	//·ÖÇøÃû×Ö
+	//åˆ†åŒºåå­—
 	MV_STATIC_NO_PRE(m_wndSTPartName , cr2  , top);
 	MV_EDITE(m_wndSTPartName ,m_wndETPartName ,   cr2  , top);
 
-	//ÎÄ¼şÏµÍ³
+	//æ–‡ä»¶ç³»ç»Ÿ
 	MV_STATIC(m_wndETPartName ,m_wndSTFileSys , cr2 , top);
 	MV_EDITE(m_wndSTFileSys ,m_wndETFileSys ,   cr2  , top);
 
-	//·ÖÇø´óĞ¡
+	//åˆ†åŒºå¤§å°
 	MV_STATIC(m_wndETPartName ,m_wndSTPartSize , cr2 , top);
 	MV_EDITE(m_wndSTPartSize ,m_wndETPartSizeByte ,   cr2  , top);
 	m_wndETPartSizeByte.GetWindowRect(&ctlRc1);
 	m_wndETPartSize.MoveWindow(cr2.left + CTRL_X_GAP , top += ctlRc1.Height() ,cr2.Width() - CTRL_X_GAP , ctlRc1.Height() , FALSE );
 
-	//×ÜÉÈÇøÊı
+	//æ€»æ‰‡åŒºæ•°
 	MV_STATIC(m_wndETPartSize ,m_wndSTSectorCount , cr2 , top);
 	MV_EDITE(m_wndSTSectorCount ,m_wndETSectorCount ,   cr2  , top);
 
-	//±£ÁôÉÈÇøÊı
+	//ä¿ç•™æ‰‡åŒºæ•°
 	MV_STATIC(m_wndETSectorCount ,m_wndSTReserveSector , cr2 , top);
 	MV_EDITE(m_wndSTReserveSector ,m_wndETReserveSector ,   cr2  , top);
 
-	//Ã¿´ØÉÈÇøÊı
+	//æ¯ç°‡æ‰‡åŒºæ•°
 	MV_STATIC(m_wndETReserveSector ,m_wndSTSectorPerClust , cr2 , top);
 	MV_EDITE(m_wndSTSectorPerClust ,m_wndETSectorPerClust ,   cr2  , top);
 
-	//Ã¿FATÉÈÇøÊı
+	//æ¯FATæ‰‡åŒºæ•°
 	MV_STATIC(m_wndETSectorPerClust ,m_wndSTSectorPerFAT , cr2 , top);
 	MV_EDITE(m_wndSTSectorPerFAT ,m_wndETSectorPerFAT ,   cr2  , top);
 
-	//µÚÒ»¸öFATÎ»ÖÃ
+	//ç¬¬ä¸€ä¸ªFATä½ç½®
 	MV_STATIC(m_wndETSectorPerFAT ,m_wndSTFAT1 , cr2 , top);
 	MV_EDITE(m_wndSTFAT1 ,m_wndETFAT1 ,   cr2  , top);
 
-	//µÚ¶ş¸öFATÎ»ÖÃ
+	//ç¬¬äºŒä¸ªFATä½ç½®
 	MV_STATIC(m_wndETFAT1 ,m_wndSTFAT2 , cr2 , top);
 	MV_EDITE(m_wndSTFAT2 ,m_wndETFAT2 ,   cr2  , top);
 
@@ -284,35 +284,35 @@ int CFat32InfoView::RePositionCtrl()
 	MV_STATIC(m_wndETFAT2 ,m_wndSTFSInfo , cr2 , top);
 	MV_EDITE(m_wndSTFSInfo ,m_wndETFSInfo ,   cr2  , top);
 
-	//¸úÄ¿Â¼ÉÈÇø
+	//è·Ÿç›®å½•æ‰‡åŒº
 	MV_STATIC(m_wndETFSInfo ,m_wndSTRootDir , cr2 , top);
 	MV_EDITE(m_wndSTRootDir ,m_wndETRootDir ,   cr2  , top);
 
-	//·ÖÇøĞÅÏ¢ÏÔÊ¾ÇøÓò
+	//åˆ†åŒºä¿¡æ¯æ˜¾ç¤ºåŒºåŸŸ
 	MV_STATIC_AREA(m_wndETRootDir , m_wndSTPartInfoArea , topbak , top );
 
 	top += 7 * CTRL_Y_GAP;
 	topbak = top;
 
-	//Ê£ÓàÉÈÇøµÄÆğÊ¼ÉÈÇøºÅ
+	//å‰©ä½™æ‰‡åŒºçš„èµ·å§‹æ‰‡åŒºå·
 	MV_STATIC_NO_PRE(m_wndSTRemainStartSector , cr2  , top);
 	MV_EDITE(m_wndSTRemainStartSector ,m_wndETRemainStartSector ,   cr2  , top);
 	
-	//Ê£ÓàÉÈÇøÊı
+	//å‰©ä½™æ‰‡åŒºæ•°
 	MV_STATIC(m_wndETRemainStartSector ,m_wndSTRemainCount , cr2 , top);
 	MV_EDITE(m_wndSTRemainCount ,m_wndETRemainCount ,   cr2  , top);
 
-	//Ê£ÓàÉÈÇø´óĞ¡
+	//å‰©ä½™æ‰‡åŒºå¤§å°
 	MV_STATIC(m_wndETRemainCount ,m_wndSTRemainSize , cr2 , top);
 	MV_EDITE(m_wndSTRemainSize ,m_wndETRemainSize ,   cr2 , top);
 
-	//·ÖÇøĞÅÏ¢ÏÔÊ¾ÇøÓò
+	//åˆ†åŒºä¿¡æ¯æ˜¾ç¤ºåŒºåŸŸ
 	MV_STATIC_AREA(m_wndETRemainSize , m_wndSTRemainSectorArea , topbak , top );
 
 	top += (7 * CTRL_Y_GAP );
 	topbak = top;
 
-	//ÉÈÇøä¯ÀÀ
+	//æ‰‡åŒºæµè§ˆ
 	MV_SCAN_CTRLS(top , cr2 , btnW , btnH ,	m_wndSTSectorScan ,
 		m_wndBtnFirstSector ,
 		m_wndBtnLastSector , 
@@ -323,7 +323,7 @@ int CFat32InfoView::RePositionCtrl()
 	m_wndETSectorNum.GetWindowRect(&ctlRc1);
 	top +=(ctlRc1.Height() + CTRL_Y_GAP);
 
-	//´Øä¯ÀÀ
+	//ç°‡æµè§ˆ
 	MV_SCAN_CTRLS(top , cr2 , btnW , btnH ,	m_wndSTClustScan ,
 		m_wndBtnFirstClust ,
 		m_wndBtnLastClust , 
@@ -331,10 +331,10 @@ int CFat32InfoView::RePositionCtrl()
 		m_wndBtnNextClust ,
 		m_wndETClustNum);
 
-	//´ÅÅÌĞÅÏ¢µÄÇøÓò
+	//ç£ç›˜ä¿¡æ¯çš„åŒºåŸŸ
 	MV_STATIC_AREA( m_wndETClustNum  ,m_wndSTDataScanArea , topbak , top);
 
-	//³õÊ¼»¯¹ö¶¯ÌõµÄ¹ö¶¯·¶Î§
+	//åˆå§‹åŒ–æ»šåŠ¨æ¡çš„æ»šåŠ¨èŒƒå›´
 	m_wndETClustNum.GetWindowRect(ctlRc1);
 	SetScrollSizes(MM_TEXT , CSize( 0 , top + ctlRc1.Height() +  2*CTRL_Y_GAP ));
 
@@ -350,7 +350,7 @@ void CFat32InfoView::OnSize(UINT nType, int cx, int cy)
 
 void CFat32InfoView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*/)
 {
-	//¸üĞÂÊôÖĞĞèÒª¸üĞÂµÄÊı¾İÏÔÊ¾ 
+	//æ›´æ–°å±ä¸­éœ€è¦æ›´æ–°çš„æ•°æ®æ˜¾ç¤º 
 	CFat32Doc*	pDoc = this->GetDocument();
 	LONG_INT	liCurSec = {0};
 	CString		strTemp;
@@ -359,17 +359,17 @@ void CFat32InfoView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint
 	if (!IsWindow(m_wndETSectorNum.GetSafeHwnd()))
 		return ;
 
-	if (this == pSender)  //×Ô¼º³ö·¢µÄ¸üĞÂ£¿
+	if (this == pSender)  //è‡ªå·±å‡ºå‘çš„æ›´æ–°ï¼Ÿ
 		return ;
 
-	//µ±Ç°ÉÈÇøºÅÏÔÊ¾³öÀ´
+	//å½“å‰æ‰‡åŒºå·æ˜¾ç¤ºå‡ºæ¥
 	liCurSec = pDoc->GetCurSec();
 
-	//½«ÒªÏÔÊ¾µÄÊı¾İ×ª»»³É×Ö·û´®
+	//å°†è¦æ˜¾ç¤ºçš„æ•°æ®è½¬æ¢æˆå­—ç¬¦ä¸²
 	liCurSec.HighPart ? strTemp.Format(_T("%X%08X") , liCurSec.HighPart , liCurSec.LowPart):strTemp.Format(_T("%X") , liCurSec.LowPart);
 	this->m_wndETSectorNum.SetWindowText(strTemp);
 
-	//´ØºÅ
+	//ç°‡å·
 	dwClust = pDoc->m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
 	strTemp.Format(_T("%X") , dwClust);
 	this->m_wndETClustNum.SetWindowText(strTemp);
@@ -382,13 +382,13 @@ BOOL CFat32InfoView::PreTranslateMessage(MSG* pMsg)
 	{    
 		CWnd* pFocus = GetFocus();
 		if(&m_wndETSectorNum ==  pFocus)
-		{//µ±Ç°ÉÈÇø±à¼­¿òÉÏ°´ÁË»Ø³µ
+		{//å½“å‰æ‰‡åŒºç¼–è¾‘æ¡†ä¸ŠæŒ‰äº†å›è½¦
 
 			OnEnterCurSector();
 		}
 
 		if(&m_wndETClustNum ==  pFocus)
-		{//µ±Ç°´ØºÅ±à¼­¿òÉÏ°´ÁË»Ø³µ
+		{//å½“å‰ç°‡å·ç¼–è¾‘æ¡†ä¸ŠæŒ‰äº†å›è½¦
 			OnEnterCurClust();
 		}
 	}
@@ -409,23 +409,23 @@ void CFat32InfoView::OnEnterCurSector()
 	LONG_INT	liSecCnt = {0};
 	BYTE		secPerClust = pDoc->m_pFat32->GetSecPerClust();
 
-	//»ñµÃÊäÈëµÄÉÈÇøºÅ
+	//è·å¾—è¾“å…¥çš„æ‰‡åŒºå·
 	m_wndETSectorNum.GetWindowText(strCurSector);
 	strCurSector.TrimLeft();
 	strCurSector.TrimRight();
 
-	//ÖØÖÃÎªÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®ä¸ºé»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	pDoc->ReSetSectorList();
 
 	len = strCurSector.GetLength();
 	if (0 == len)
-		return ;	//Ã»ÓĞÈÎºÎÊı¾İ
+		return ;	//æ²¡æœ‰ä»»ä½•æ•°æ®
 
 	for(i = 0 ; i < len ; ++i)
 	{
 		chr = strCurSector.GetAt(i);
 		if (!isHexChar(chr))
-		{//ÎŞĞ§×Ö·û 
+		{//æ— æ•ˆå­—ç¬¦ 
 			strCap.LoadString(IDS_WARNING);
 			strCurSector.LoadString(IDS_INVALID_CHAR);
 			strTemp.Format(_T("%c") , chr);
@@ -435,11 +435,11 @@ void CFat32InfoView::OnEnterCurSector()
 		}
 	}
 
-	//½øĞĞÊı¾İ×ª»»
+	//è¿›è¡Œæ•°æ®è½¬æ¢
 	liSec = HexStrToLONG_INT(strCurSector);
 	liSecCnt = pDoc->GetSecCount();
 	if (liSecCnt.QuadPart <= liSec.QuadPart)
-	{//Ô½½çÁË 
+	{//è¶Šç•Œäº† 
 		strCap.LoadString(IDS_WARNING);
 		strCurSector.LoadString(IDS_SECTOR_NUM_ERR);
 		::MessageBox(this->GetSafeHwnd() , strCurSector , strCap , MB_OK | MB_ICONWARNING );
@@ -448,7 +448,7 @@ void CFat32InfoView::OnEnterCurSector()
 
 	liSecCnt.QuadPart = pDoc->m_pFat32->SectToClust(DWORD(liSec.QuadPart));
 
-	//ÉèÖÃ´ØºÅ
+	//è®¾ç½®ç°‡å·
 	liSecCnt.HighPart ? strTemp.Format(_T("%X%08X") , liSecCnt.HighPart , liSecCnt.LowPart):strTemp.Format(_T("%X") , liSecCnt.LowPart);
 	this->m_wndETClustNum.SetWindowText(strTemp);
 
@@ -470,23 +470,23 @@ void CFat32InfoView::OnEnterCurClust()
 	LONG_INT	liClustCnt = {0};
 	BYTE		secPerClust = pDoc->m_pFat32->GetSecPerClust();
 
-	//»ñµÃÊäÈëµÄÉÈÇøºÅ
+	//è·å¾—è¾“å…¥çš„æ‰‡åŒºå·
 	m_wndETClustNum.GetWindowText(strCurClust);
 	strCurClust.TrimLeft();
 	strCurClust.TrimRight();
 
-	//ÖØÖÃÎªÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®ä¸ºé»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	pDoc->ReSetSectorList();
 
 	len = strCurClust.GetLength();
 	if (0 == len)
-		return ;	//Ã»ÓĞÈÎºÎÊı¾İ
+		return ;	//æ²¡æœ‰ä»»ä½•æ•°æ®
 
 	for(i = 0 ; i < len ; ++i)
 	{
 		chr = strCurClust.GetAt(i);
 		if (!isHexChar(chr))
-		{//ÎŞĞ§×Ö·û 
+		{//æ— æ•ˆå­—ç¬¦ 
 			strCap.LoadString(IDS_WARNING);
 			strCurClust.LoadString(IDS_INVALID_CHAR);
 			strTemp.Format(_T("%c") , chr);
@@ -496,21 +496,21 @@ void CFat32InfoView::OnEnterCurClust()
 		}
 	}
 
-	//½øĞĞÊı¾İ×ª»»
+	//è¿›è¡Œæ•°æ®è½¬æ¢
 	liClust = HexStrToLONG_INT(strCurClust);
 	if (2 > liClust.QuadPart)
-	{//ÎŞĞ§µÄ´ØºÅ
+	{//æ— æ•ˆçš„ç°‡å·
 		strCap.LoadString(IDS_WARNING);
 		strCurClust.LoadString(IDS_CLUST_NUM_ERR);
 		::MessageBox(this->GetSafeHwnd() , strCurClust , strCap , MB_OK | MB_ICONWARNING );
 		return ;
 	}
 
-	//×ÜµÄ´ØÊı
+	//æ€»çš„ç°‡æ•°
 	liClustCnt.QuadPart = pDoc->m_pFat32->GetMaxClustNum();
 
 	if (liClustCnt.QuadPart < liClust.QuadPart)
-	{//Ô½½çÁË 
+	{//è¶Šç•Œäº† 
 		strCap.LoadString(IDS_WARNING);
 		strCurClust.LoadString(IDS_CLUST_NUM_ERR);
 		::MessageBox(this->GetSafeHwnd() , strCurClust , strCap , MB_OK | MB_ICONWARNING );
@@ -518,7 +518,7 @@ void CFat32InfoView::OnEnterCurClust()
 	}
 
 	liClustCnt.QuadPart = pDoc->m_pFat32->ClustToSect(DWORD(liClust.QuadPart));
-	//ÉèÖÃÉÈÇøºÅ
+	//è®¾ç½®æ‰‡åŒºå·
 	liClustCnt.HighPart ? strTemp.Format(_T("%X%08X") , liClustCnt.HighPart , liClustCnt.LowPart):strTemp.Format(_T("%X") , liClustCnt.LowPart);
 	this->m_wndETSectorNum.SetWindowText(strTemp);
 

@@ -1,4 +1,4 @@
-// ChildFrm.h : interface of the CChildFrame class
+ï»¿// ChildFrm.h : interface of the CChildFrame class
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -20,9 +20,9 @@ public:
 
 // Attributes
 public:
-	CCtrlBar		m_DisBar;		//´ÅÅÌÉè±¸µÄÏÔBar
-	CListCtrl		m_DisList;		//´ÅÅÌÁĞ±í
-	CColumnSplitter	m_wndSplitter;	//·ÖÇĞ´°¿Ú¿Õ¼ä
+	CCtrlBar		m_DisBar;		//ç£ç›˜è®¾å¤‡çš„æ˜¾Bar
+	CListCtrl		m_DisList;		//ç£ç›˜åˆ—è¡¨
+	CColumnSplitter	m_wndSplitter;	//åˆ†åˆ‡çª—å£ç©ºé—´
 
 // Operations
 public:
@@ -55,7 +55,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 // 	//////////////////////////////////////////////////////////////////////////
-// 	//»ñµÃÓÃÓÚÏÔÊ¾ĞÅÏ¢µÄÊÓÍ¼Àà£¬Õâ¸ö·½·¨ĞèÒªÓÉ¾ßÌåµÄ×Ó¿ò¼ÜÊµÏÖ
+// 	//è·å¾—ç”¨äºæ˜¾ç¤ºä¿¡æ¯çš„è§†å›¾ç±»ï¼Œè¿™ä¸ªæ–¹æ³•éœ€è¦ç”±å…·ä½“çš„å­æ¡†æ¶å®ç°
 // 	virtual CRuntimeClass* GetInofViewClass(void);
 	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW, const RECT& rect = rectDefault, CMDIFrameWnd* pParentWnd = NULL, CCreateContext* pContext = NULL);
 //	afx_msg void OnPosParaentDir();

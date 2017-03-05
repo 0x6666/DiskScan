@@ -1,4 +1,4 @@
-// DevVolume.cpp : implementation file
+ï»¿// DevVolume.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -53,13 +53,13 @@ BOOL CDevVolumeDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	
-	//³õÊ¼»¯Í¼±êÁĞ±í
+	//åˆå§‹åŒ–å›¾æ ‡åˆ—è¡¨
 	InitImageList();
 
-	//³õÊ¼»¯¿Ø¼ş
+	//åˆå§‹åŒ–æ§ä»¶
 	this->InitTreeCtrl();
 
-	//Êı¿Ø¼şĞèÒªÕ¹¿ªÏÔÊ¾
+	//æ•°æ§ä»¶éœ€è¦å±•å¼€æ˜¾ç¤º
 	this->m_wndDevVolume.Expand( this->m_hPhsycDisk , TVE_EXPAND);
 	this->m_wndDevVolume.Expand( this->m_hLogicDrivre , TVE_EXPAND);
 	
@@ -68,7 +68,7 @@ BOOL CDevVolumeDlg::OnInitDialog()
 
 void CDevVolumeDlg::InitTreeCtrl()
 {
-	//ÉèÖÃÍ¼Æ¬ÁĞ±í
+	//è®¾ç½®å›¾ç‰‡åˆ—è¡¨
 	this->m_wndDevVolume.SetImageList(m_pImageList.get(),TVSIL_NORMAL);
 
 	CString	strInfo;
@@ -81,41 +81,41 @@ void CDevVolumeDlg::InitTreeCtrl()
 	CString	strTemp;
 	UINT	devType;
 
-	//Ìí¼Ó¸ù½Úµã
-	//ÎïÀí´æ´¢Éè±¸µÄ¸ù½Úµã
+	//æ·»åŠ æ ¹èŠ‚ç‚¹
+	//ç‰©ç†å­˜å‚¨è®¾å¤‡çš„æ ¹èŠ‚ç‚¹
 	strInfo.LoadString(IDS_PHYSC_DISK);
 	this->m_hPhsycDisk = this->m_wndDevVolume.InsertItem(strInfo , 0 , 0 , TVI_ROOT);
 
-	//»ñÈ¡Ã¿Ò»¸öÎïÀí´ÅÅÌµÄµÄµÄÃû×Ö
+	//è·å–æ¯ä¸€ä¸ªç‰©ç†ç£ç›˜çš„çš„çš„åå­—
 	for (i = 0 ; i < MAX_DISK_COUNT ; ++i)
 	{
-		strInfo.Format(_T("%s%d") , DISK_PRE_NAME , i);  //Éè±¸Ãû×Ö
+		strInfo.Format(_T("%s%d") , DISK_PRE_NAME , i);  //è®¾å¤‡åå­—
 		hDev = CreateFile( strInfo, 0, FILE_SHARE_READ |
 			FILE_SHARE_WRITE , NULL, OPEN_EXISTING , 0 ,  NULL);								
-		if(hDev == INVALID_HANDLE_VALUE) continue;	//µ±Ç°Éè±¸Ã»ÓĞ   
+		if(hDev == INVALID_HANDLE_VALUE) continue;	//å½“å‰è®¾å¤‡æ²¡æœ‰   
 		else{  
 
-			//²éÑ¯Éè±¸ÀàĞÍ
-			res = ::DeviceIoControl(hDev,		// Éè±¸¾ä±ú
-				IOCTL_DISK_GET_DRIVE_GEOMETRY,	// È¡´ÅÅÌ²ÎÊı
+			//æŸ¥è¯¢è®¾å¤‡ç±»å‹
+			res = ::DeviceIoControl(hDev,		// è®¾å¤‡å¥æŸ„
+				IOCTL_DISK_GET_DRIVE_GEOMETRY,	// å–ç£ç›˜å‚æ•°
 				NULL , 0 , &geometry,
-				sizeof(DISK_GEOMETRY),			// Êä³öÊı¾İ»º³åÇø
-				&dwOutBytes , (LPOVERLAPPED)NULL);// ÓÃÍ¬²½I/O
+				sizeof(DISK_GEOMETRY),			// è¾“å‡ºæ•°æ®ç¼“å†²åŒº
+				&dwOutBytes , (LPOVERLAPPED)NULL);// ç”¨åŒæ­¥I/O
 			::CloseHandle(hDev);
 
-			//»ñµÃĞÅÏ¢Éè±¸Ê§°Ü
+			//è·å¾—ä¿¡æ¯è®¾å¤‡å¤±è´¥
 			if (FALSE == res) continue;
 
 			if (FixedMedia == geometry.MediaType)
-			{//±¾µØ´ÅÅÌ
+			{//æœ¬åœ°ç£ç›˜
 				strTemp.LoadString(IDS_LOCAL_DISK);
 				strInfo.Format(_T("%d\t%s") , i , strTemp);
 			}else if (RemovableMedia == geometry.MediaType)
-			{//¿ÉÒÔ¶¯´ÅÅÌ
+			{//å¯ä»¥åŠ¨ç£ç›˜
 				strTemp.LoadString(IDS_REMOVEABLE_DISK);
 				strInfo.Format(_T("%d\t%s") , i , strTemp);
 			}else{
-				//Î´ÖªÉè±¸
+				//æœªçŸ¥è®¾å¤‡
 				strTemp.LoadString(IDS_UNKOWE_DISK);
 				strInfo.Format(_T("%d\t%s") , i , strTemp);
 			}
@@ -124,32 +124,32 @@ void CDevVolumeDlg::InitTreeCtrl()
 		}
 	}
 
-	//Âß¼­Çı¶¯Æ÷
+	//é€»è¾‘é©±åŠ¨å™¨
 	strInfo.LoadString(IDS_LOGICAL_DRIVER);
 	this->m_hLogicDrivre = this->m_wndDevVolume.InsertItem(strInfo , 0 , 0 , TVI_ROOT);
 
-	//¾í±ê»º´æ
+	//å·æ ‡ç¼“å­˜
 	TCHAR volName[MAX_NTFS_VOLUME_NAME_LEN] = {0};
 // 	PULARGE_INTEGER lpFreeBytesAvailable = {0};    // bytes available to caller
 // 	PULARGE_INTEGER lpTotalNumberOfBytes = {0};    // bytes on disk
 // 	PULARGE_INTEGER lpTotalNumberOfFreeBytes = {0}; // free bytes on disk
-	int nImgIndex = 2;	//Ä¬ÈÏÊÇ±¾µØ´ÅÅÌ
+	int nImgIndex = 2;	//é»˜è®¤æ˜¯æœ¬åœ°ç£ç›˜
 
-	//±éÀúÃ¿Ò»¸öÇı¶¯
+	//éå†æ¯ä¸€ä¸ªé©±åŠ¨
 	for(cDev = 'A' ; cDev < 'Z' ; ++cDev)
 	{
 		strInfo.Format(_T("%s%c:") , _T("\\\\?\\") , cDev);
 		hDev = CreateFile( strInfo , 0 , FILE_SHARE_READ | FILE_SHARE_WRITE,
 			NULL , OPEN_EXISTING , 0 , NULL );
-		if(hDev == INVALID_HANDLE_VALUE) continue;		//Ã»ÓĞÁË   
+		if(hDev == INVALID_HANDLE_VALUE) continue;		//æ²¡æœ‰äº†   
 		else{  
 			::CloseHandle(hDev);
 
-			//Éè±¸ÀàĞÍ
+			//è®¾å¤‡ç±»å‹
 			strInfo.Format(_T("%c:\\") , cDev);
 			devType = GetDriveType(strInfo);
 
-// 			//»ñµÃ¾í±ê
+// 			//è·å¾—å·æ ‡
 // 			if (GetDiskFreeSpaceExA(strInfo , lpFreeBytesAvailable ,
 //  				lpTotalNumberOfBytes ,lpTotalNumberOfFreeBytes)// &&
 // // 				(TRUE == GetVolumeInformation(strInfo , volName ,
@@ -161,11 +161,11 @@ void CDevVolumeDlg::InitTreeCtrl()
 
 			switch(devType)
 			{
-			case DRIVE_REMOVABLE:	//¿ÉÒÆ¶¯´ÅÅÌ ÈçUÅÌ¡¢ÈíÅÌµÈ 		
+			case DRIVE_REMOVABLE:	//å¯ç§»åŠ¨ç£ç›˜ å¦‚Uç›˜ã€è½¯ç›˜ç­‰ 		
 				strTemp.LoadString(IDS_VOL_REMOVEABLE);
 				nImgIndex = 7;
 				break;
-			case DRIVE_FIXED:		//±¾µØ´ÅÅÌ 
+			case DRIVE_FIXED:		//æœ¬åœ°ç£ç›˜ 
 				if (TRUE == GetVolumeInformation(strInfo , volName ,
 					MAX_NTFS_VOLUME_NAME_LEN , NULL , NULL , NULL , NULL , 0 ))
 				{
@@ -175,7 +175,7 @@ void CDevVolumeDlg::InitTreeCtrl()
 				}
 				nImgIndex = 2;
 				break;
-			case DRIVE_REMOTE:		//ÍøÅÌ 
+			case DRIVE_REMOTE:		//ç½‘ç›˜ 
 				strTemp.LoadString(IDS_VOL_REMOTE);
 				nImgIndex = 5;
 				break;
@@ -183,11 +183,11 @@ void CDevVolumeDlg::InitTreeCtrl()
 				strTemp.LoadString(IDS_VOL_CD_DVD);
 				nImgIndex = 3;
 				break;
-			case DRIVE_RAMDISK:		//ÄÚ´æÅÌ
+			case DRIVE_RAMDISK:		//å†…å­˜ç›˜
 				strTemp.LoadString(IDS_VOL_RAM_DISK);
 				nImgIndex = 2;
 				break;
-			default:				//ÎŞ·¨½âÎö´ÅÅÌ
+			default:				//æ— æ³•è§£æç£ç›˜
 				strTemp.LoadString(IDS_VOL_UNKNOW);
 				nImgIndex = 4;
 				break;
@@ -205,21 +205,21 @@ void CDevVolumeDlg::OnDblclkDevAndVolume(NMHDR* pNMHDR, LRESULT* pResult)
 	HTREEITEM hParent;
 	if (hParent = m_wndDevVolume.GetParentItem(hitem))
 	{
-		//»ñµÃÑ¡ÔÚÁËµÄÉè±¸Ãû×Ö
+		//è·å¾—é€‰åœ¨äº†çš„è®¾å¤‡åå­—
 		CString strSel = this->m_wndDevVolume.GetItemText(hitem);
 		strSel = strSel.Left(strSel.Find(_T('\t')));
 
 		if (hParent == m_hPhsycDisk)
-		{//ÎïÀí´æ´¢Éè±¸
+		{//ç‰©ç†å­˜å‚¨è®¾å¤‡
 			this->m_strSelItem.Format(_T("%s%s") , DISK_PRE_NAME , (LPCSTR)(LPCTSTR)strSel );
 			this->m_bSelDisk = SEL_DISK;
 		}else if (hParent == m_hLogicDrivre)
-		{//Âß¼­Çı¶¯Æ÷
+		{//é€»è¾‘é©±åŠ¨å™¨
 			this->m_strSelItem.Format(_T("%s%s") , "\\\\?\\" , (LPCSTR)(LPCTSTR)strSel );
 			this->m_bSelDisk = SEL_VOLUME;
 		}
 
-		//¹Ø±Õ¶Ô»°¿ò
+		//å…³é—­å¯¹è¯æ¡†
  		EndDialog(IDOK); 
 	}
 	
@@ -233,24 +233,24 @@ void CDevVolumeDlg::OnOK()
 
 	if (hParent = m_wndDevVolume.GetParentItem(hitem))
 	{
-		//»ñµÃÑ¡ÔÚÁËµÄÉè±¸Ãû×Ö
+		//è·å¾—é€‰åœ¨äº†çš„è®¾å¤‡åå­—
 		CString strSel = this->m_wndDevVolume.GetItemText(hitem);
 		strSel = strSel.Left(strSel.Find(_T('\t')));
 
 		if (hParent == m_hPhsycDisk)
-		{//ÎïÀí´æ´¢Éè±¸
+		{//ç‰©ç†å­˜å‚¨è®¾å¤‡
 			this->m_strSelItem.Format(_T("%s%s") , DISK_PRE_NAME , (LPCSTR)(LPCTSTR)strSel );
 			this->m_bSelDisk = SEL_DISK;
 		}else if (hParent == m_hLogicDrivre)
-		{//Âß¼­Çı¶¯Æ÷
+		{//é€»è¾‘é©±åŠ¨å™¨
 			this->m_strSelItem.Format(_T("%s%s") , "\\\\?\\" , (LPCSTR)(LPCTSTR)strSel );
 			this->m_bSelDisk = SEL_VOLUME;
 		}
 
-		//¹Ø±Õ¶Ô»°¿ò
+		//å…³é—­å¯¹è¯æ¡†
 		EndDialog(IDOK); 
 	}else
-	{//Ñ¡ÔñµÄ²»ÊÇÒ»¸öÓĞĞ§µÄÉè±¸Ãû×Ö
+	{//é€‰æ‹©çš„ä¸æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„è®¾å¤‡åå­—
 		CString strInfo;
 		CString strTitle;
 		strInfo.LoadString(IDS_NOT_VALIDE_NAME);
@@ -261,23 +261,23 @@ void CDevVolumeDlg::OnOK()
 
 void CDevVolumeDlg::InitImageList()
 {
-	//³ÌĞòÒªÊ¹ÓÃµÄÍ¼±êÁĞ±í
+	//ç¨‹åºè¦ä½¿ç”¨çš„å›¾æ ‡åˆ—è¡¨
 	this->m_pImageList->Create(16 , 16 ,ILC_COLOR32|ILC_MASK , 0 , 4);
-	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);	//³ÌĞòµÄÖ÷Í¼±ê  0
+	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);	//ç¨‹åºçš„ä¸»å›¾æ ‡  0
 	m_pImageList->Add(hIcon);
-	hIcon = AfxGetApp()->LoadIcon(IDR_DISKSCTYPE);		//´ÅÅÌÍ¼±ê    1
+	hIcon = AfxGetApp()->LoadIcon(IDR_DISKSCTYPE);		//ç£ç›˜å›¾æ ‡    1
 	m_pImageList->Add(hIcon);	
-	hIcon = AfxGetApp()->LoadIcon(IDR_VOLTYPE);			//¾í  2
+	hIcon = AfxGetApp()->LoadIcon(IDR_VOLTYPE);			//å·  2
 	m_pImageList->Add(hIcon);
 	hIcon = AfxGetApp()->LoadIcon(IDI_DVD_ROM);			//dvd_rom 3
 	m_pImageList->Add(hIcon);
-	hIcon = AfxGetApp()->LoadIcon(IDI_UNKNOW_VOL);		//Î´ÖªÉè±¸ 4
+	hIcon = AfxGetApp()->LoadIcon(IDI_UNKNOW_VOL);		//æœªçŸ¥è®¾å¤‡ 4
 	m_pImageList->Add(hIcon);
-	hIcon = AfxGetApp()->LoadIcon(IDI_REMOTE_VOL);		//ÍøÂç´ÅÅÌ 5 
+	hIcon = AfxGetApp()->LoadIcon(IDI_REMOTE_VOL);		//ç½‘ç»œç£ç›˜ 5 
 	m_pImageList->Add(hIcon);							
-	hIcon = AfxGetApp()->LoadIcon(IDI_FLOPY_VOL);		//ÈíÅÌ 6 
+	hIcon = AfxGetApp()->LoadIcon(IDI_FLOPY_VOL);		//è½¯ç›˜ 6 
 	m_pImageList->Add(hIcon);	
-	hIcon = AfxGetApp()->LoadIcon(IDI_REMOVABLE_VOL);	//¿ÉÒÆ¶¯Éè±¸ 7 
+	hIcon = AfxGetApp()->LoadIcon(IDI_REMOVABLE_VOL);	//å¯ç§»åŠ¨è®¾å¤‡ 7 
 	m_pImageList->Add(hIcon);	
 }
 

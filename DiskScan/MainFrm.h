@@ -1,4 +1,4 @@
-// MainFrm.h : interface of the CMainFrame class
+﻿// MainFrm.h : interface of the CMainFrame class
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -20,7 +20,7 @@ public:
 // Attributes
 public:
 
-// 	//�������ά��һ��ͼ���б�
+// 	//由主框架维护一个图标列表
 // 	CImageList m_wndImageList;
 
 // Operations
@@ -48,34 +48,34 @@ protected:  // control bar embedded members
 
 // Generated message map functions
 protected:
-/*	void InitImageList();//��ʼ��imagelist*/
+/*	void InitImageList();//初始化imagelist*/
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnFileOpen();
 
 	//////////////////////////////////////////////////////////////////////////
 	//param
-	//		wParam=��CString* ���ڴ��ĵ��Ĳ���
-	//		lParam			  Ҫ�򿪵��豸����	PART_*  ����ֻ֧�� PART_FAT32
-	//return	���ش��豸��ָ��,���ʧ�ܵĻ�����NULL
+	//		wParam=》CString* 用于打开文档的参数
+	//		lParam			  要打开的设备类型	PART_*  现在只支持 PART_FAT32
+	//return	返回打开设备的指针,如果失败的话返回NULL
 	//////////////////////////////////////////////////////////////////////////
 	afx_msg LRESULT OnOpenNewDoc(WPARAM, LPARAM);
 
 	//////////////////////////////////////////////////////////////////////////
-	//���õ�ǰ������������
+	//设置当前数据区的名字
 	//param
-	//		wParam=>CString* Ҫ���õ�����
+	//		wParam=>CString* 要设置的名字
 	afx_msg LRESULT OnSetCurDataViewName(WPARAM wParam, LPARAM);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ָ�����ļ�����Ŀ¼,���豸�϶�λָ�����ļ�
+	//打开指定的文件或者目录,在设备上定位指定的文件
 	//////////////////////////////////////////////////////////////////////////
 	afx_msg void OnOpenFileDir();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��λѡ����˵��ļ�·��
+	//定位选择好了的文件路径
 	//param
-	//		strPath	��Ҫ��λ��·��  ��"c:\teste.fuck"
+	//		strPath	需要定位的路径  如"c:\teste.fuck"
 	//////////////////////////////////////////////////////////////////////////
 	void	PosFileDir(CString	strPath);
 	//}}AFX_MSG

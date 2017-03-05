@@ -1,17 +1,17 @@
 /***********************************************************************
  * Module:		DiskDll.dll
- * FileName��	disktool.h 
- * Author:		����
- * Modified:	2012��5��12�� ������ 
- * Purpose:		�������̣�FAT32��NTFS�Լ�����ļ��Ĳ����ķ���
- * Comment:		��ģ����Ҫ�Ƿ�װ�˴��̡�FAT32����FAT32�ļ���NTFS����NTFS
- *				�ļ��Ĳ�����
- *				�ڱ�����ʹ���˵�windows API�У�CreateFile��ReadFile��WriteFile
+ * FileName：	disktool.h 
+ * Author:		杨松
+ * Modified:	2012年5月12日 星期六 
+ * Purpose:		声明磁盘，FAT32，NTFS以及相关文件的操作的方法
+ * Comment:		本模块主要是封装了磁盘、FAT32卷、FAT32文件、NTFS卷和NTFS
+ *				文件的操作。
+ *				在本库中使用了的windows API有，CreateFile，ReadFile，WriteFile
  *				SetFilePointer,DeviceIoControl,CloseHandle,
  *
  *
- *				���ļ�����Ҫ�Ƕ�����һ��Ҫ�������࣬�Լ�һЩ���������ݽ�
- *				�����������ͣ����ú��
+ *				本文件则主要是定义了一下要导出的类，以及一些依赖的数据结
+ *				构、数据类型，常用宏等
  ***********************************************************************/
 /*
 #ifdef DISKTOOL_EXPORTS
@@ -30,16 +30,16 @@
 //#include <vld.h>
 #endif
 
-//��ΪҪ�����࣬�����б�Ҫ��֤����ǰ����ڴ���뷽ʽһ��
+//因为要导出类，所以有必要保证到处前后的内存对齐方式一致
 #pragma pack(push  , 8 )
 
-#ifndef _MSC_VER  //����vc������
+#ifndef _MSC_VER  //不是vc编译器
 //////////////////////////////////////////////////////////////////////////
-//һЩ���õĻ�������������
-//һ��Ҳ�Ǻ�windows����һ�µ�
+//一些常用的基本的数据类型
+//一般也是和windows保持一致的
 //////////////////////////////////////////////////////////////////////////
 
-typedef unsigned short		WCHAR;//��vc6.0�н�WCHAR����Ϊunsigned short��������vs2008���߸��ߵİ汾����Ҫ����Ϊwchar_t
+typedef unsigned short		WCHAR;//在vc6.0中将WCHAR定义为unsigned short，但是在vs2008或者跟高的版本中则要定义为wchar_t
 typedef int					INT;
 typedef unsigned short		WORD;
 typedef unsigned long		ULONG;
@@ -55,7 +55,7 @@ typedef unsigned char		BYTE;
 #define TRUE				1
 #define FALSE				0
 
-#else  //��vc������
+#else  //是vc编译器
 
 #include "windows.h"
 
@@ -64,9 +64,9 @@ typedef unsigned char		BYTE;
 #include <vector>
 #include <memory>
 
-typedef int					DRES;    //�����ṹ����
+typedef int					DRES;    //操作结构类型
 
-//�ڴ��ļ�����������
+//在此文件中申明的类
 class Disk;
 class DFat32;
 class DFat32File;
@@ -76,7 +76,7 @@ class DList;
 
 
 //////////////////////////////////////////////////////////////////////////
-//���ڱ�ʾ64λ���ݵ���������
+//用于表示64位数据的数据类型
 //////////////////////////////////////////////////////////////////////////
 typedef union _tagLONG_INT{
 	struct {
@@ -89,7 +89,7 @@ typedef union _tagLONG_INT{
 } LONG_INT , *PLONG_INT;
 
 
-//���������
+//句柄的声明
 #ifndef DECLARE_HANDLE
 #define DECLARE_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
 #endif
@@ -98,69 +98,69 @@ typedef union _tagLONG_INT{
 typedef void*  HANDLE;
 #endif
 
-//һ�������ļ����ҵľ��
+//一个用于文件查找的句柄
 #ifndef FINDER
 DECLARE_HANDLE(FINDER);
 #endif
 
 
 /*////////////////////////////////////////////////////////////////////////*/
-#define	DR_OK				0x00	//�����ɹ�
-#define DR_NO				0x01	//�����ķ�
-#define	DR_INVALED_PARAM	0x02	//��������
-#define	DR_OPEN_DEV_ERR		0x03	//���豸ʧ�� ���Ѿ�����豸�������Ƿ�������ȷ
-#define	DR_DEV_CTRL_ERR		0x04	//�豸���Ƴ��� ���ƶ���дָ��
-#define	DR_DEV_IO_ERR		0x05	//�豸IO���� ���д����
-#define	DR_INIT_ERR			0x06	//�豸(�ļ���)��ʼ������  ���ȡ�����������,�����ǲ��������ݴ���ָ�������
-#define	DR_INVALID_NAME		0x07	//·�������Ϸ�
-#define	DR_NO_FILE			0x08	//û���ҵ�ָ�����ļ�
-#define DR_NO_PATH			0x09	//û��ָ����·��
-#define DR_IS_DIR			0x0A	//��Ŀ¼
-#define DR_IS_FILE			0x0B	//���ļ�
-#define DR_FAT_EOF			0x0C	//�����Ľ�β,�����������ĩβ��,���ntfs�ļ���������,FAT32�ļ����ҵ��˽�β
-#define DR_INVALID_HANDLE	0x0D	//����ľ��
-#define DR_ALREADY_OPENDED  0x0E	//�Ѿ��򿪣������Ѿ����ڣ����豸�Ѿ��򿪣�ntfs�����Ѿ���ʼ��
-#define DR_NO_FILE_NAME		0x0F	//û���ļ���,��ntfs���ļ���û���ļ�������
-#define DR_INNER_ERR		0x10	//�ڲ�����Ŷ
-#define DR_BUF_OVER			0x11	//����������
-#define DR_NO_FILE_DATA		0x12	//�ļ�û���������ԣ�������ϵͳ�ļ�(NTFS)
-#define DR_NO_OPEN			0x13	//��ǰ�豸�����ļ�������û�д�,�����Ǵ�ʱ������
+#define	DR_OK				0x00	//操作成功
+#define DR_NO				0x01	//操作的否定
+#define	DR_INVALED_PARAM	0x02	//参数错误
+#define	DR_OPEN_DEV_ERR		0x03	//打开设备失败 可已经检查设备的名字是否设置正确
+#define	DR_DEV_CTRL_ERR		0x04	//设备控制出错 如移动读写指针
+#define	DR_DEV_IO_ERR		0x05	//设备IO出错 如读写操作
+#define	DR_INIT_ERR			0x06	//设备(文件等)初始化错误  如读取到错误的数据,或者是参数的内容错误（指针参数）
+#define	DR_INVALID_NAME		0x07	//路径名不合法
+#define	DR_NO_FILE			0x08	//没有找到指定的文件
+#define DR_NO_PATH			0x09	//没有指定的路径
+#define DR_IS_DIR			0x0A	//是目录
+#define DR_IS_FILE			0x0B	//是文件
+#define DR_FAT_EOF			0x0C	//簇链的结尾,获得属性链的末尾了,获得ntfs文件查找完了,FAT32文件查找到了结尾
+#define DR_INVALID_HANDLE	0x0D	//错误的句柄
+#define DR_ALREADY_OPENDED  0x0E	//已经打开，或者已经存在，如设备已经打开，ntfs属性已经初始化
+#define DR_NO_FILE_NAME		0x0F	//没有文件名,如ntfs的文件，没有文件名属性
+#define DR_INNER_ERR		0x10	//内部错误哦
+#define DR_BUF_OVER			0x11	//缓存区不够
+#define DR_NO_FILE_DATA		0x12	//文件没有数据属性，可能是系统文件(NTFS)
+#define DR_NO_OPEN			0x13	//当前设备或者文件根本就没有打开,或者是打开时出错了
 
 
-/*////���õĺ꺯��/////////////////////////////////////////////////////////*/
-//�ж�dpt����ֻ����Ƿ���һ����չ����
+/*////常用的宏函数/////////////////////////////////////////////////////////*/
+//判断dpt表象只向的是否是一个扩展分区
 #define  IsExtPart(pdpt)  ((0x5 == (pdpt)->mPartType ||\
 							0xF == (pdpt)->mPartType )&& \
 							(0x8 == (pdpt)->mGuidFlag || \
 							0x00 == (pdpt)->mGuidFlag))
-//�ǲ���FAT32�ķ���
+//是不是FAT32的分区
 #define	IsFAT32fs(x)	((x == 0x01) || \
 						 (x == 0x0B) || \
 						 (x == 0x0C) || \
 						 (x == 0x1B) || \
 						 (x == 0x1C))
 #define IsNTFSfs(x)		(((x) == 0x7) || ((x) == 0x17))
-//�ж�һ���ַ��ǲ���·���ָ��
+//判断一个字符是不是路径分割符
 #define	IsPathSeparator(x)	(((x) == '\\') || ((x) == '/') )
-#define PATH_SEPAR			'/'			//Ĭ��ʹ�õķָ��		
+#define PATH_SEPAR			'/'			//默认使用的分割符		
 
-//FAT32�����һЩ����
-#define FAT_MASK		0x0FFFFFFF		//FAT32������Ч����
-#define	FAT_FREE		0x00000000		//FAT32���дر���
-#define FAT_BAD			0x0FFFFFF7		//FAT32���ر���
-#define FAT_END			0x0FFFFFF8		//FAT32�����Ľ�β��
+//FAT32表项的一些操作
+#define FAT_MASK		0x0FFFFFFF		//FAT32表项有效掩码
+#define	FAT_FREE		0x00000000		//FAT32空闲簇表项
+#define FAT_BAD			0x0FFFFFF7		//FAT32坏簇表项
+#define FAT_END			0x0FFFFFF8		//FAT32簇链的结尾了
 
-#define IsFATFree(x)	((x & FAT_MASK) == FAT_FREE)  //�Ƿ�Ϊ���б���
-#define IsFATBad(x)		((x & FAT_MASK) == FAT_BAD)	//�Ƿ�Ϊ���б���
-#define IsFATEnd(x)		((x & FAT_MASK) >= FAT_END)	//�����Ľ�β��
+#define IsFATFree(x)	((x & FAT_MASK) == FAT_FREE)  //是否为空闲表项
+#define IsFATBad(x)		((x & FAT_MASK) == FAT_BAD)	//是否为空闲表项
+#define IsFATEnd(x)		((x & FAT_MASK) >= FAT_END)	//粗炼的结尾了
 
-//���ָ��Ĵ����ƶ���������
+//获得指针的处的制定类型数据
 #define GetLONG_INT(x)	(*((LONG_INT*)((BYTE*)(x))))
 #define GetDWORD(x)		(*((DWORD*)((BYTE*)(x))))
 #define GetWORD(x)		(*((WORD*)((BYTE*)(x))))
 #define GetBYTE(x)		(*((BYTE*)(x)))
 
-//��ָ���д���ƶ���������
+//在指针出写入制定类型数据
 #define SetLONG_INT(p , v)	(*((LONG_INT*)((BYTE*)(p))) = (LONG_INT)(v))
 #define SetDWORD(p , v)		(*((DWORD*)((BYTE*)(p))) = (DWORD)(v))
 #define SetWORD(p , v)		(*((WORD*)((BYTE*)(p))) = (WORD)(v))
@@ -168,85 +168,85 @@ DECLARE_HANDLE(FINDER);
 
 
 
-//�ļ�����
-//FAT32Ŀ¼�������
-#define ATTR_READ_ONLY		0x01		//ֻ���ļ�			00000001
-#define	ATTR_HIDDEN			0x02		//�����ļ�			00000010
-#define	ATTR_SYSTEM 		0x04		//ϵͳ�ļ�			00000100
-#define	ATTR_VOLUME_ID 		0x08		//����				00001000
-#define	ATTR_DIRECTORY		0x10		//��Ŀ¼			00010000  //�Ҹ�����Щntfs�ļ�û�д�����
-#define	ATTR_ARCHIVE		0x20		//�鵵				00100000
-#define	ATTR_LONG_NAME		0x0F		//�������			00001111
+//文件属性
+//FAT32目录项的属性
+#define ATTR_READ_ONLY		0x01		//只读文件			00000001
+#define	ATTR_HIDDEN			0x02		//隐藏文件			00000010
+#define	ATTR_SYSTEM 		0x04		//系统文件			00000100
+#define	ATTR_VOLUME_ID 		0x08		//卷标				00001000
+#define	ATTR_DIRECTORY		0x10		//子目录			00010000  //我柑橘有些ntfs文件没有此属性
+#define	ATTR_ARCHIVE		0x20		//归档				00100000
+#define	ATTR_LONG_NAME		0x0F		//长命入口			00001111
 
-//һ��ֻ��ntfs�ļ��е�����
-#define ATTR_DEVICE			0x0040		//�豸�ļ�			01000000            
+//一下只有ntfs文件有的属性
+#define ATTR_DEVICE			0x0040		//设备文件			01000000            
 #define ATTR_NORMAL			0x0080		//Normal			10000000
-#define ATTR_TEMPORARY		0x0100		//��ʱ�ļ�		   100000000
-#define ATTR_SPARES			0x0200		//ϡ���ļ�		  1000000000
+#define ATTR_TEMPORARY		0x0100		//临时文件		   100000000
+#define ATTR_SPARES			0x0200		//稀疏文件		  1000000000
 #define ATTR_REPARSE_POINT	0x0400		//Reparse Point	 10000000000
-#define ATTR_COMPRESSED		0x0800		//ѹ���ļ�      100000000000  ѹ���ͼ��ܲ���ͬʱ����
+#define ATTR_COMPRESSED		0x0800		//压缩文件      100000000000  压缩和加密不能同时存在
 #define ATTR_OFFLINE		0x1000		//Offline      1000000000000 
-#define ATTR_NOT_CONTENT_IDX 0x2000//û��������index  10000000000000
-#define ATTR_ENCRYPTED		0x4000		//����	     100000000000000
-#define ATTR_DIRECTORY_INDEX 0x10000000	//ntfsĿ¼
+#define ATTR_NOT_CONTENT_IDX 0x2000//没有索引的index  10000000000000
+#define ATTR_ENCRYPTED		0x4000		//加密	     100000000000000
+#define ATTR_DIRECTORY_INDEX 0x10000000	//ntfs目录
 #define ATTR_INDEX_VIEW		 0x20000000	//Index View
 
-#define ATTR_NTFS_MASK		0x30007FE7	//NTFS�ļ���������  110000000000000111111111100111
-#define ATTR_FAT32_MASK		0x3F		//FAT32����		 0000000000111111
+#define ATTR_NTFS_MASK		0x30007FE7	//NTFS文件属性掩码  110000000000000111111111100111
+#define ATTR_FAT32_MASK		0x3F		//FAT32掩码		 0000000000111111
 
 
 //////////////////////////////////////////////////////////////////////////
-//FAT32�ĵ�0C��Ŀ¼�����ݽṹ�е�mNameCase���ֽڵĺ��壬�����Ƿ������²���
-//��֪����ֻ�����Լ��Ĳ���ȫͳ�ƵĽ����
-//��FAT32�ж��ļ�������չ�������Դ�д�ַ�����ʽչʾ�ģ�������Щ���ȷʵ��
-//Сд�����,Ҳ����˵�Ҵ������ļ�������8.3����ȷʵ����Сд�ַ�����������:
+//FAT32的第0C（目录项数据结构中的mNameCase）字节的含义，具体是否是如下不得
+//而知，这只是我自己的不完全统计的结果。
+//在FAT32中短文件名、扩展名都是以大写字符的形式展示的，但是有些情况确实有
+//小写的情况,也就是说我创建的文件（符合8.3规则）确实存在小写字符。所以如下:
 //
-//�ļ���Сд	00001000
-//��չ��Сд	00010000
-//���߿�������('|'),Ҳ����˵����ļ���ΪСд�Ļ�����0C�ֽڵĵ�3λΪ1�������
-//չ��ΪСд�Ļ�����0C�ֽڵ�4λΪ1.���ϣ�
-//�ļ���Сд����չ��Сд,��aaa.aaa	��00011000=18h
-//�ļ�����д����չ����д,��AAA.AAA	��00000000=00h
-//�ļ�����д����չ��Сд,��AAA.aaa	��00010000=10h
-//�ļ���Сд����չ����д,��aaa.AAA	��00001000=08h
+//文件名小写	00001000
+//扩展名小写	00010000
+//两者可以相与('|'),也就是说如果文件名为小写的话，则0C字节的第3位为1。如果扩
+//展名为小写的话，则0C字节第4位为1.综上：
+//文件名小写，扩展名小写,如aaa.aaa	则00011000=18h
+//文件名大写，扩展名大写,如AAA.AAA	则00000000=00h
+//文件名大写，扩展名小写,如AAA.aaa	则00010000=10h
+//文件名小写，扩展名大写,如aaa.AAA	则00001000=08h
 //
-//�����ﳤ�ļ���Ŀ¼�������֮��Ӧ�Ķ�����Ŀ¼���û�йܣ���������Ҫ��
-//�ᣩ�����ҷ·���0
+//在这里长文件名目录项（或者与之对应的短文名目录项）我没有管（根本不需要理
+//会），而且仿佛都是0
 //////////////////////////////////////////////////////////////////////////
 #define FNAME_LOWER_CASE		0x08
 #define FEXT_NAME_LOWER_CASE	0x10
 
 
 
-/*/һЩ�����Ķ���///////////////////////////////////////////////////////////////////////*/
-#define DISK_PRE_NAME	L"\\\\.\\PhysicalDrive"	//�����豸���ֵ�ǰ׺
-#define EXT_DPT_FLAG	0x705A5A5A5A			//��չ����������ʼ���
+/*/一些常量的定义///////////////////////////////////////////////////////////////////////*/
+#define DISK_PRE_NAME	L"\\\\.\\PhysicalDrive"	//磁盘设备名字的前缀
+#define EXT_DPT_FLAG	0x705A5A5A5A			//扩展分区表的起始标记
 
-//���ϰ�˵windows�����Թ���0x80����������
-//��������һ�������Դ����(dskwipe)�п���������0x40Ϊ���޵�
-#define MAX_DISK_COUNT	0x80				//ϵͳ���Թ��ص����Ĵ�������
+//车老板说windows最多可以挂载0x80个物理磁盘
+//但是我在一个国外的源程序(dskwipe)中看到他是以0x40为上限的
+#define MAX_DISK_COUNT	0x80				//系统可以挂载的最大的磁盘数量
 
-#define DEVICE_NAME_LEN 21					//�豸�����ֳ���
-#define	SECTOR_SIZE		512					//�������ֽڴ�С
-#define MAX_PATH		260					//����·������
-#define MAX_LFN			255					//���ĳ��ļ�������
-#define MAX_NTFS_VOLUME_NAME_LEN	127		//NTfs����������ַ���
+#define DEVICE_NAME_LEN 21					//设备的名字长度
+#define	SECTOR_SIZE		512					//扇区的字节大小
+#define MAX_PATH		260					//最大的路径长度
+#define MAX_LFN			255					//最大的长文件名长度
+#define MAX_NTFS_VOLUME_NAME_LEN	127		//NTfs卷名的最多字符数
 
-#define  MBR_END		0xAA55				//����������ɽ���Ľ������
+#define  MBR_END		0xAA55				//个工作数据山区的结束标记
 
-//���̵���������
+//磁盘的区域类型
 #define  PART_MBR		0x100			//MBR
 #define  PART_EBR		0x101			//EBR
-#define  PART_UN_PART	0x102			//û�����Ŀ�������
-#define  PART_UNPARTBLE 0x103			//���ܷ���������
+#define  PART_UN_PART	0x102			//没分区的空闲区域
+#define  PART_UNPARTBLE 0x103			//不能分区的区域
 #define	 PART_FAT32		0x0C			//FAT32  
 #define  PART_NTFS		0x07			//NTFS
 
-//�ж�һ�������Ƿ�Ϊһ���ļ�ϵͳ
+//判断一个区域是否为一个文件系统
 #define  IsPartFS(x) ((x) != PART_MBR && (x) != PART_EBR && (x) != PART_UN_PART && (x) != PART_UNPARTBLE)
 
 
-//AttrDef  ��ȡֵ  NTFS
+//AttrDef  的取值  NTFS
 #define	AD_STANDARD_INFORMATION		0x10
 #define AD_ATTRIBUTE_LIST			0x20
 #define AD_FILE_NAME				0x30
@@ -268,59 +268,59 @@ DECLARE_HANDLE(FINDER);
 
 
 
-//ntfs�ļ�ϵͳ���ļ��������ռ�
+//ntfs文件系统的文件名命名空间
 #define  NS_POSIX		0
 #define	 NS_WIN32		1
 #define  NS_DOS			2
 #define  NS_WIN32_DOS	3
-#define  NS__ALL		4		//���е��ļ���������
+#define  NS__ALL		4		//所有的文件名都可以
 
-//�ƶ��ļ���ʱ�� ���ȶ�λ��ѡ��
-#define FILE_POS_BEGIN		0		//�ļ�����ʼλ�� 
-#define FILE_POS_CURRENT	1		//�ļ��ĵ�ǰλ�� 
-#define FILE_POS_END		2		//�ļ��Ľ���λ��
+//移动文件的时候 的先对位置选项
+#define FILE_POS_BEGIN		0		//文件的起始位置 
+#define FILE_POS_CURRENT	1		//文件的当前位置 
+#define FILE_POS_END		2		//文件的结束位置
 
 
-//ÿ����¼����ռ�õ�������
+//每条记录的所占用的扇区数
 #define SECTOR_PER_RECODE		2
-//MFT��¼�ĵĴ�С
+//MFT记录的的大小
 #define MFT_RECODE_SIZE		(SECTOR_PER_RECODE * SECTOR_SIZE)
 
-//NTFS�е�ϵͳ�����ļ���MFT��¼��
-#define SYS_FILE_MFT		0	// $MFT   MFT�ļ��б���ÿ���ļ������� 
-#define SYS_FILE_MFTMIRR	1	// $MFTMirr   MFTǰ4����¼�ı��� 
-#define SYS_FILE_LOGFILE	2	// $LogFile   ��������־�ļ� 
-#define SYS_FILE_VOLUME		3	// $Volume   ���кţ�����ʱ�䣬��Ⱦ��� 
-#define SYS_FILE_ATTRDEF	4	// $AttrDef   ���Զ��� 
-#define SYS_FILE_ROOT		5	// . (dot)   ���̵ĸ�Ŀ¼ 
-#define SYS_FILE_BITMAP		6	// $Bitmap   �������Ĵ�ͼ�����úͿ��У� 
-#define SYS_FILE_BOOT		7	// $Boot   ����������¼ 
-#define SYS_FILE_BADCLUS	8	// $BadClus   �г��ھ��ϵĻ��� 
-//9 $Quota NT �޶���Ϣ 
-#define SYS_FILE_SECURE		9	// $Secure 2K �����õİ�ȫ������ 
-#define SYS_FILE_UPCASE		10	// $UpCase   ���ڱȽϵĴ�д��ĸ�� 
-#define SYS_FILE_EXTEND		11	// $Extend 2K һ��Ŀ¼��$ObjId, $Quota, $Reparse, $UsnJrnl 
+//NTFS中的系统保留文件的MFT记录号
+#define SYS_FILE_MFT		0	// $MFT   MFT文件列表－每个文件的索引 
+#define SYS_FILE_MFTMIRR	1	// $MFTMirr   MFT前4个记录的备份 
+#define SYS_FILE_LOGFILE	2	// $LogFile   事务型日志文件 
+#define SYS_FILE_VOLUME		3	// $Volume   序列号，开发时间，污染标记 
+#define SYS_FILE_ATTRDEF	4	// $AttrDef   属性定义 
+#define SYS_FILE_ROOT		5	// . (dot)   磁盘的根目录 
+#define SYS_FILE_BITMAP		6	// $Bitmap   包含卷的簇图（在用和空闲） 
+#define SYS_FILE_BOOT		7	// $Boot   卷的引导记录 
+#define SYS_FILE_BADCLUS	8	// $BadClus   列出在卷上的坏簇 
+//9 $Quota NT 限额信息 
+#define SYS_FILE_SECURE		9	// $Secure 2K 卷所用的安全描述符 
+#define SYS_FILE_UPCASE		10	// $UpCase   用于比较的大写字母表 
+#define SYS_FILE_EXTEND		11	// $Extend 2K 一个目录：$ObjId, $Quota, $Reparse, $UsnJrnl 
 
 
 
 //////////////////////////////////////////////////////////////////////////
-//����NTFSϵͳ��ʱ���������
-//*NTFS�ļ�ϵͳ��ʱ��洢����100ns��1s = 1,000,000,000 ns��Ϊ��λ�ģ���ʼʱ
-//*����Э������ʱ(UTC)1601��1��1��00:00:00.000��
-//*Unix Time ������Ϊ��λ�ģ�����ʼʱ����(UTC)1970��1��1��00:00:00��
-//*Unix Time Ҳ��C����time()���ص�ʱ������
+//关于NTFS系统的时间戳的问题
+//*NTFS文件系统的时间存储是以100ns（1s = 1,000,000,000 ns）为单位的，起始时
+//*间是协调世界时(UTC)1601年1月1日00:00:00.000。
+//*Unix Time 是以秒为单位的，其起始时间是(UTC)1970年1月1日00:00:00。
+//*Unix Time 也是C函数time()返回的时间类型
 //
-//*��������ʼʱ���֮�����369�꣬������89�����꣨92����ſ��Ա�4��������
-//*����3�����Ա�100������
+//*在这两起始时间的之间相隔369年，其中有89个闰年（92个年号可以被4整除，但
+//*是有3个可以被100整除）
 //
-//*��������������ʱ�������֮��
+//*下面是以上两个时间的秒数之差
 //////////////////////////////////////////////////////////////////////////
 #define NTFS_TIME_OFFSET ((LONGLONG)(369 * 365 + 89) * 24 * 60 * 60)
 
 
 
 //////////////////////////////////////////////////////////////////////////
-//�Դ��̵Ĳ����ķ�װ
+//对磁盘的操作的封装
 //////////////////////////////////////////////////////////////////////////
 class DTOOL_API Disk
 {
@@ -329,107 +329,107 @@ public:
 	~Disk(void);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//�����ﶨ����һ����������ı�ʾ��ʽ�����Ա�ʾһ��MBR��EBR���ļ�ϵͳ����.
-	//δ���������򣬻����޷�����������
+	//在这里定义了一个磁盘区域的表示方式，可以表示一个MBR。EBR。文件系统分区.
+	//未分区的区域，或者无法分区的区域
 	//////////////////////////////////////////////////////////////////////////
 	typedef struct _tagDPART{
-		LONG_INT	mOffset;        //������������ƫ����,Ҳ���Ǳ���ǰʹ���˵���������
-		DWORD		mRelativeSectors;//���������
-		USHORT		mType;          //��������
-		LONG_INT	mSecCount;		//���������������
-		BOOL		mIsMainPart;	//�Ƿ�Ϊ������,֪���ڵ�ǰ�ڵ�ֵ���Ǿ���ʱ����Ч
-		BOOL		mIsActivity;	//�Ƿ�Ϊ�����
-		INT			mVolIndex;		//���������������ǰ������һ�����Ļ���Ϊ-1������
-									//��0,1,2...����ֵ�ǰ�DPT���������Ǽ��������,��������λ�õ�����
-		CHAR		mLogicalLetter;	//�߼��������ַ�
+		LONG_INT	mOffset;        //本分区的物理偏移量,也就是本分前使用了的总扇区数
+		DWORD		mRelativeSectors;//相对扇区数
+		USHORT		mType;          //分区类型
+		LONG_INT	mSecCount;		//此区域的扇区数量
+		BOOL		mIsMainPart;	//是否为主分区,知否在当前节点值得是卷的时候有效
+		BOOL		mIsActivity;	//是否为活动分区
+		INT			mVolIndex;		//卷的索引，如果当前区域不是一个卷的话置为-1，否则
+									//从0,1,2...。此值是按DPT链表遍历是计算出来的,不是物理位置的索引
+		CHAR		mLogicalLetter;	//逻辑驱动的字符
 	}DPart , *PDPart;
 private:
-	DList* mPPartList;		//�˴��̵ķ�������  �ó�Ա����ʹ�� 
-							//malloc �� freeϵ�к���  ��Ϊ����
-							//�������Ĺ��캯�� �� ��������
-	HANDLE			mDisk;			//һ���Ѿ��򿪵Ĵ����豸���
-	LONG_INT		mPartableSecCnt;//���̵Ŀɷ���������
-	LONG_INT		mExtPos;        //��������չ��������ʵλ��(����)
-	DWORD			mUnPartSize;	//���ɷ����ֽ���
-	DWORD			mVolCnt;		//��������
-	DWORD			mMainVolCount;	//����������
-	BOOL			mIsGetUnPartSec;//�Ѿ�����˲��ɷ����˵Ŀռ��С
-	WCHAR			mDevName[DEVICE_NAME_LEN];		//�豸���� ,ͨ���������ж��豸�Ƿ��
-	DWORD			mSecPerTrack;//ÿ�ŵ�������
-	DWORD			mTracksPerCylinder;//ÿ����ŵ���
-	LONG_INT		mCylinders;		//������
+	DList* mPPartList;		//此次盘的分区链表  该成员不得使用 
+							//malloc 和 free系列函数  因为这样
+							//不会他的构造函数 和 析构函数
+	HANDLE			mDisk;			//一个已经打开的磁盘设备句柄
+	LONG_INT		mPartableSecCnt;//磁盘的可分配扇区数
+	LONG_INT		mExtPos;        //磁盘中扩展分区的其实位置(扇区)
+	DWORD			mUnPartSize;	//不可分区字节数
+	DWORD			mVolCnt;		//卷的总数
+	DWORD			mMainVolCount;	//主分区数量
+	BOOL			mIsGetUnPartSec;//已经获得了不可分配了的空间大小
+	WCHAR			mDevName[DEVICE_NAME_LEN];		//设备名字 ,通过此属性判断设备是否打开
+	DWORD			mSecPerTrack;//每磁道扇区数
+	DWORD			mTracksPerCylinder;//每柱面磁道数
+	LONG_INT		mCylinders;		//柱面数
 private:
 	//////////////////////////////////////////////////////////////////////////
-	//����ָ��DPT������   ����÷������ӵ�����������ȥ
+	//分析指定DPT的数据   将获得分区添加到分区链表中去
 	//param       
-	//		hDisk           �豸���
-	//		dpt             ��ǰҪ������DPT����
-	//		dptoff			dpt���ڵ�EBR��ƫ��
-	//		isFirstDPT      ָ����DPT�����Ƿ����ڴ��̵ĵ�һ��PDT
+	//		hDisk           设备句柄
+	//		dpt             当前要分析的DPT表项
+	//		dptoff			dpt所在的EBR的偏移
+	//		isFirstDPT      指定的DPT表项是否属于磁盘的第一个PDT
 	//return 
-	//		TRUE    �����ɹ�
-	//		FALSE   ����ʧ��,��ȡ����ʧ��
+	//		TRUE    操作成功
+	//		FALSE   操作失败,读取数据失败
 	//////////////////////////////////////////////////////////////////////////
 	BOOL ListPartion(
 /*		HANDLE        hDisk,			//*/
-		PVOID         dpt,				//��ǰҪ�оٷ�����Ϣ
+		PVOID         dpt,				//当前要列举分区信息
 		LONG_INT	  dptoff,			//
-		BOOL          isFirstDPT,		//�Ƿ��ǵ�һ��DPT
-		DWORD*		  pLogicDir);		//�߼�������
+		BOOL          isFirstDPT,		//是否是第一个DPT
+		DWORD*		  pLogicDir);		//逻辑驱动表
 	
 	//////////////////////////////////////////////////////////////////////////
-	//��ȡָ�������������
+	//读取指定的区域的数据
 	//param 
-	//		hDisk   Ҫ��ȡ���ݵ��豸���
-	//		offert  ��ȡ���ݵ�λ��(����)
-	//		buf     Ҫ��ȡ���ݵĻ���
-	//		dwReaded ��ȡ�������ݳ���
-	//		buflen  Ҫ�������ݴ�С
+	//		hDisk   要读取数据的设备句柄
+	//		offert  读取数据的位置(扇区)
+	//		buf     要读取数据的缓存
+	//		dwReaded 读取到的数据长度
+	//		buflen  要读的数据大小
 	//return       
-	//		TRUE    ��ȡ�ɹ�
-	//		FALSE   ��ȡʧ�ܡ�ʧ��ԭ�������mbr������û�з���,����hDisk ������
-	//				����,������ʼƫ�Ʋ���ȷ
+	//		TRUE    获取成功
+	//		FALSE   获取失败。失败原因可能是mbr的数据没有分配,或者hDisk 参数有
+	//				问题,或者起始偏移不正确
 	//////////////////////////////////////////////////////////////////////////
 	BOOL ReadSecter(/*HANDLE hDisk ,*/LONG_INT offert , PVOID buf  ,DWORD* dwReaded ,DWORD buflen = SECTOR_SIZE);
 
 	//////////////////////////////////////////////////////////////////////////
-	//���ش��̵ķ����б�
+	//加载磁盘的分区列表
 	//param 
-	//		hDisk   �򿪵Ĵ����豸���
+	//		hDisk   打开的磁盘设备句柄
 	//return       
-	//		TRUE    ��ȡ�ɹ�
-	//		FALSE   ��ȡʧ��
-	//				�Ѿ��������б�,����hDisk ����������,��ȡMBRʧ��,��ʼƫ�Ʋ���ȷ
+	//		TRUE    获取成功
+	//		FALSE   获取失败
+	//				已经加载了列表,或者hDisk 参数有问题,读取MBR失败,起始偏移不正确
 	//////////////////////////////////////////////////////////////////////////
 	BOOL LoadPartList(/*HANDLE hDisk*/);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//ʹ����������������̵���Ч���ɷ���Ŀռ�Ĵ�С
+	//使链表连续，计算磁盘的有效不可分配的空间的大小
 	//param
-	//		hDisk		�򿪵Ĵ��̾��
+	//		hDisk		打开的磁盘句柄
 	//return       
-	//		�����ɹ�	TRUE
+	//		连续成功	TRUE
 	//////////////////////////////////////////////////////////////////////////
 	BOOL MakeListContinue(/*HANDLE hDisk*/);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ʵ���������һ�������ڵ�  ��DFAT32 NTFS �Ľڵ�
+	//根据实际情况创建一个分区节点  如DFAT32 NTFS 的节点
 	//param
-	//		dpt			Ҫ������DPT����    �������NULL ������type����
-	//		off			������ʵ������ƫ��
-	//		type		����������       dpt��ΪNULL�������
-	//		isMainPart	�Ƿ�Ϊ����,����ֻ���ڵ�ǰ�ڵ�ָ�����������Ч
-	//		pLogicDri	��ǰ�豸���߼�������,��������ļ�ϵͳ�Ļ�����ΪNULL
+	//		dpt			要分析的DPT表项    如果此域NULL 类型有type决定
+	//		off			分区的实际物理偏移
+	//		type		分区的类型       dpt不为NULL此域忽略
+	//		isMainPart	是否为分区,此域只有在当前节点指卷的情况下有效
+	//		pLogicDri	当前设备的逻辑驱动表,如果不是文件系统的话可能为NULL
 	//return 
-	//		NULL	����ʧ��  �����ǲ�������
+	//		NULL	创建失败  可能是参数错误
 	//////////////////////////////////////////////////////////////////////////
 	PVOID NewPart(PVOID dpt, PLONG_INT off, int type , BOOL isMainPart = FALSE , DWORD* pLogicDri = NULL);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�Ƚ������ڵ����ʵλ�ô�С
+	//比较两个节点的其实位置大小
 	//param
-	//		p1    ���ȽϵĽڵ�ָ��1
-	//		p2    ���ȽϵĽڵ�ָ��2
+	//		p1    带比较的节点指针1
+	//		p2    带比较的节点指针2
 	//return 
 	//		TRUE	p1 < p2
 	//////////////////////////////////////////////////////////////////////////
@@ -437,289 +437,289 @@ private:
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ�����豸����Ӧ�߼��������̷�
-	//return	res	�߼��������ڴ��豸�ϵ�λ������
-	//			�������res==NULL�Ļ���ȡ����ʧ��
-	//			�ɹ��Ļ�res[0]�ڴ��豸�ϵ��ļ�ϵͳ����,res[1],res[2]..����LOGCDRI
-	//			ʹ�����˵Ļ���Ҫdelete[]
+	//获得当前物理设备所对应逻辑驱动器盘符
+	//return	res	逻辑驱动器在此设备上的位置序列
+	//			如果返回res==NULL的话获取数据失败
+	//			成功的话res[0]在此设备上的文件系统数量,res[1],res[2]..都是LOGCDRI
+	//			使用完了的话需要delete[]
 	//////////////////////////////////////////////////////////////////////////
 	DWORD* GetLogicalDrives();
 
 public:
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ô��̵��������������û�л�ȡ���ɷ����������ʱ�����ص��ǿɷ��������
-	//��
-	//����豸��û�д򿪵Ļ�������-1
+	//获得磁盘的扇区总数，如果没有获取不可分配的扇区数时，返回的是可分配的扇区
+	//数
+	//如果设备还没有打开的话，返回-1
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetSecCount();
 	
 	//////////////////////////////////////////////////////////////////////////
-	//��ô��̿��Է���Ŀռ�������
-	//����豸��û�д򿪵Ļ�������-1
+	//获得磁盘可以分配的空间扇区数
+	//如果设备还没有打开的话，返回-1
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetPartableSecCount();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ò��ɷ�����С�ֽ���
-	//�����û�д��豸�Ļ�������0
+	//获得不可分区大小字节数
+	//如果还没有打开设备的话，返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetUnPartableSize();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ô��̵Ĳ��ɷ���Ŀռ�������,��������ȽϺ�ʱ�����鲻Ҫ���û��߳���ʹ�á�
-	//���Ƕ�ȡ�����ķ������ж��Ǵ������Ƿ���Ч�������Ч�Ļ�ִ�л��ȽϿ죬����
-	//���������Ч�Ļ�������Ҫ��ʱ���룬�����۰���ҵķ�ʽ������һ�£�ִ������
-	//����������Ҫ1���ӣ�������Ϊ������ٷ���ҲҪ���룬����IO���⣬�����Ķ�û��
-	//�⣬ֻ���ڶ�ȡ����һ�������ڵ�������Ҫ�ȽϾõ�ʱ��
+	//获得磁盘的不可分配的空间扇区数,这个方法比较耗时，建议不要再用户线程中使用。
+	//我是读取扇区的方法来判断是次扇区是否有效，如果有效的话执行还比较快，但是
+	//如果扇区无效的话，估计要耗时几秒，我用折半查找的方式测试了一下，执行玩这
+	//个函数估计要1分钟，后来换为了了穷举法，也要几秒，这是IO问题，其他的都没问
+	//题，只是在读取到了一个不存在的扇区数要比较久的时间
 	//
 	//param
-	//		secCount	���ɷ���ռ�����������������ΪNULL�Ļ�ֻ�Ǵ�����ȡ���ɷ�
-	//					�Ĵ�С,�����ݴ洢������������᷵�����ֵ
+	//		secCount	不可分配空间的扇区数，如果此域为NULL的话只是触发获取不可分
+	//					的大小,将数据存储在链表里，而不会返回这个值
 	//return       
-	//		�����ɹ�	TRUE
-	//		����ʧ��	FALSE
+	//		操作成功	TRUE
+	//		操作失败	FALSE
 	//////////////////////////////////////////////////////////////////////////
 /*	BOOL GetUnPartSecCount(DWORD * secCount = 0);*/
 
 	
 // 	//////////////////////////////////////////////////////////////////////////
-// 	//��ò����Է���Ŀռ�ɽ����
-// 	//���û�еĲ��ɷ���Ŀռ���߻�û�в��ҵĻ�����0
+// 	//获得不可以分配的空间山区数
+// 	//如果没有的不可分配的空间或者还没有查找的话返回0
 // 	//////////////////////////////////////////////////////////////////////////
 // 	DWORD GetUnPartableSecCount();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��������洢�豸��������ע�⣬�������̵����ֲ�һ������0~n˳���ŵģ�����
-	//��0.2.4��
+	//获得物理存储设备的数量，注意，物理磁盘的名字不一定是以0~n顺序编号的，可能
+	//是0.2.4等
 	//return       
-	//		0����n  �豸������
+	//		0……n  设备的数量
 	//////////////////////////////////////////////////////////////////////////
 	static int GetDiskCount(void);
 
 	//////////////////////////////////////////////////////////////////////////
-	//ͨ�����̵����� ��һ����������
+	//通过磁盘的索引 打开一个物理磁盘
 	//param 
-	//		index   �������̵�����   (0...n)
+	//		index   物理磁盘的索引   (0...n)
 	//return       
-	//		TRUE    �򿪳ɹ�
-	//		FALSE   ��ʧ��
-	//			ʧ�ܵ�ԭ������� �Ѿ���һ��һ�����̣�����û�رգ��ּ�����
-	//			����Ҳ��������������ȷ,���ߴ��豸ʧ��
+	//		TRUE    打开成功
+	//		FALSE   打开失败
+	//			失败的原因可能是 已经打开一了一个磁盘，但还没关闭，又继续打开
+	//			或者也可能是索引不正确,或者打开设备失败
 	//////////////////////////////////////////////////////////////////////////
 	BOOL OpenDisk(int index);
 
 	//////////////////////////////////////////////////////////////////////////
-	//ͨ�����̵��������� ��һ����������  ����ֻ�����ڴ򿪴��� �����Ǿ�
+	//通过磁盘的索引名字 打开一个物理磁盘  这里只能用于打开磁盘 而不是卷
 	//param 
-	//		name   �����豸������
+	//		name   物理设备的名字
 	//return       
-	//		TRUE    �򿪳ɹ�
-	//		FALSE   ��ʧ��
-	//			ʧ�ܵ�ԭ������� �Ѿ���һ��һ�����̣�����û�رգ��ּ�����
-	//			����Ҳ���������ֲ���ȷ
+	//		TRUE    打开成功
+	//		FALSE   打开失败
+	//			失败的原因可能是 已经打开一了一个磁盘，但还没关闭，又继续打开
+	//			或者也可能是名字不正确
 	//////////////////////////////////////////////////////////////////////////
 	BOOL OpenDisk(const WCHAR* name);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//�رյ�ǰ�򿪵Ĵ���  ������ֻ���ͷŴ��̵ķ������������ݵ�һЩ���ݵ�����
+	//关闭当前打开的磁盘  在这里只是释放磁盘的分区链表的数据等一些数据的清理
 	//////////////////////////////////////////////////////////////////////////
 	void CloseDisk(void);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�жϵ�ǰ�豸�Ƿ��Ѿ���ȷ��
+	//判断当前设备是否已经正确打开
 	//////////////////////////////////////////////////////////////////////////
 	inline BOOL IsDiskOpened() { return ((wcslen(mDevName) != 0) && (mDisk != INVALID_HANDLE_VALUE) && (mDisk != NULL)); }
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ���̵ķ�������,�����߼���������������������
+	//获得当前磁盘的分区数量,不是逻辑驱动数，被划分区域数
 	//return   
-	//		��ǰ����������  (û�з���0)
+	//		当前分区的数量  (没有返回0)
 	//////////////////////////////////////////////////////////////////////////
 	int GetPartCount(void);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ���̵ľ�������
+	//获得当前磁盘的卷的总数
 	//return
-	//		��������������̻�û�д򿪵Ļ�����0
+	//		卷总数，如果磁盘还没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetVolumeCount();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�������������
+	//获得主分区数量
 	//return
-	//		��ǰ���̵�������������������̻�û�д򿪵Ļ�����0
+	//		当前磁盘的主分区数量，如果磁盘还没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetMainVolCount();
 	
 	//////////////////////////////////////////////////////////////////////////
-	//		һ���ǻ�ô����еĸ����������Ϣ
+	//		一下是获得磁盘中的各个区域的信息
 	//////////////////////////////////////////////////////////////////////////
-	//���ָ������(����MBR��EBR��)
+	//获得指定区域(卷，MBR，EBR等)
 	//param
-	//		index		ָ�������Ľڵ����,�����GetPartCount()-1
+	//		index		指定分区的节点序号,最大是GetPartCount()-1
 	//return
-	//		�������NULL�Ļ���ʾ����Խ��
+	//		如果返回NULL的话表示索引越界
 	//////////////////////////////////////////////////////////////////////////
 	const PDPart GetPart(int index);
 
 	//////////////////////////////////////////////////////////////////////////
-	//���ָ�����߼������ľ�
+	//获得指定的逻辑驱动的卷
 	//param
-	//		letter	�������̷�
+	//		letter	罗驱动盘符
 	//return
-	//		���ָ���豸�����ڵĻ����� NULL��������Ӧ���߼�����
+	//		如果指定设备不存在的话返回 NULL，否则相应的逻辑驱动
 	//////////////////////////////////////////////////////////////////////////
 	const PDPart GetPart(char letter);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//���ָ������ڵ����������,��ϸ����뿴strut_conf.h �ļ�β
+	//获得指定区域节点的区域类型,详细情况请看strut_conf.h 文件尾
 	//param
-	//		index		ָ�������Ľڵ����,�����GetPartCount()-1
+	//		index		指定分区的节点序号,最大是GetPartCount()-1
 	//return
-	//		�ֻ�����ķ�������  ��ϸ����뿴strut_conf.h��ĩβ
-	//		���index��Ч�򷵻�0xFFFF
+	//		分会区域的分区类型  详细情况请看strut_conf.h的末尾
+	//		如果index无效则返回0xFFFF
 	//////////////////////////////////////////////////////////////////////////
 	USHORT GetPartFormat(int index);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ô�ָ���������������λ�ã�������߼������Ļ�,����ָ���ǣ������չ��
-	//����ʼλ�õ���������������������Ļ�����ָ��������ڴ�����ʵλ�õ�������
+	//获得此指定分区的相对扇区位置，如果是逻辑分区的话,这里指的是，相对扩展分
+	//区起始位置的扇区数，如果是主分区的话这里指的是相对于磁盘其实位置的扇区数
 	//param
-	//		index	ָ���ķ������
+	//		index	指定的分区序号
 	//return
-	//		���ɽ����
-	//		���index���޵Ļ�����  0xFFFFFFFF
+	//		相对山区号
+	//		如果index有无的话返回  0xFFFFFFFF
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetRelativeSectors(int index);
 
 	//////////////////////////////////////////////////////////////////////////
-	//���ָ��������������
+	//获得指定分区的扇区数
 	//param
-	//		index	ָ���ķ������
+	//		index	指定的分区序号
 	//return
-	//		��������  ���index��Ч�Ļ�����-1
+	//		扇区总数  如果index无效的话返回-1
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetPartSectorCount(int index);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//���ָ��������Դ��̵�ʵ��λ��
+	//获得指定区域相对磁盘的实际位置
 	//param
-	//		index	ָ���ķ������
+	//		index	指定的分区序号
 	//return
-	//		��Դ�����ʼλ�õ�ʵ��ɽ����  ���index��Ч�Ļ�����-1
+	//		相对磁盘起始位置的实际山区号  如果index无效的话返回-1
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetPartOffset(int index);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ж�ָ���Ľڵ��Ƿ�Ϊ�����
+	//判断指定的节点是否为活动分区
 	//param
-	//		index	ָ���ķ������
+	//		index	指定的分区序号
 	//return
-	//		����ǻ�����Ļ�����TRUE������FALSE
+	//		如果是活动分区的话返回TRUE，否则FALSE
 	//////////////////////////////////////////////////////////////////////////
 	BOOL	 IsActivityPart(int index);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//����豸������
+	//获得设备的名字
 	//////////////////////////////////////////////////////////////////////////
 	inline const WCHAR* GetDevName(void) { return mDevName; }
 
 	//////////////////////////////////////////////////////////////////////////
-	//�Ӵ��̶�ȡ����
+	//从磁盘读取数据
 	//param
-	//		buf		��ȡ���ݵĻ���
-	//		off		��ȡ���ݵ�ƫ��
-	//		dwRead	��Ҫ��ȡ�����ݵĴ�С
+	//		buf		读取数据的缓存
+	//		off		读取数据的偏移
+	//		dwRead	将要读取的数据的大小
 	//return
-	//		������� ,DR_INIT_ERR�豸û�д�
-	//		��дָ������ DR_DEV_CTRL_ERR
+	//		操作结果 ,DR_INIT_ERR设备没有打开
+	//		读写指针御姐 DR_DEV_CTRL_ERR
 	//***********************************************************************************/
 	DRES ReadData(void* buf , LONG_INT off , DWORD dwRead = SECTOR_SIZE);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ���̵�ÿ�����ֽ�������Ϊ�������������ֵ����������СΪ512�ֽڵ�
-	//���̣������ﷵ�ص�ֵ����512
+	//获得当前磁盘的每扇区字节数，因为现在这这个程序值处理扇区大小为512字节的
+	//磁盘，所这里返回的值总是512
 	//////////////////////////////////////////////////////////////////////////
 	int GetBytePerSec();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ���̵�ÿ�ŵ������� 
-	//return ÿ�ŵ�������,�������û�д򿪵Ļ�����-1
+	//获得当前磁盘的每磁道扇区数 
+	//return 每磁道扇区数,如果磁盘没有打开的话返回-1
 	//////////////////////////////////////////////////////////////////////////
 	int GetSectorPerTrack();
 	
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ���̵�ÿ����ŵ���
-	//return ÿ����ŵ���,�������û�д򿪵Ļ�����0
+	//获得当前磁盘的每柱面磁道数
+	//return 每柱面磁道数,如果磁盘没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetTracksPerCylinder();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ���̵�ÿ������
-	//return ÿ������,�������û�д򿪵Ļ�����-1
+	//获得当前磁盘的每柱面数
+	//return 每柱面数,如果磁盘没有打开的话返回-1
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetCylinders();
 
 };
 
 //////////////////////////////////////////////////////////////////////////
-//FAT32�ļ�ϵͳ�Ĳ����ķ�װ
+//FAT32文件系统的操作的封装
 //////////////////////////////////////////////////////////////////////////
 
 /*********************************************************
-�����ļ��Ļص�����
+查找文件的回调函数
 param
-	name	�ҵ����ļ�����,�������NULL��ʾ�������,��
-			�����������ļ������Ǿͷ��ش�д����ʽ
+	name	找到的文件名字,如果等于NULL表示查找完毕,如
+			果是遇到短文件名，那就返回大写的形式
 return 
-	TRUE	��Ҫ�����о�
-	FALSE	����Ҫ�����о�	
+	TRUE	需要继续列举
+	FALSE	不需要继续列举	
 **********************************************************/
 typedef BOOL ( * FIND_FILE)(const WCHAR*  name);
 
 /*********************************************************
-�оٱ�ɾ���˵��ļ��Ļص�����
+列举被删除了的文件的回调函数
 param
-	file	�ҵ��ı�ɾ���˵��ļ����,�˾����ʹ�����˵�֮��
-			����رգ������ڴ�й¶���������ΪNULL���ʾ�Ѿ�
-			���ҽ���
+	file	找到的被删除了的文件句柄,此句柄在使用完了的之后
+			必须关闭，否则内存泄露，如果此域为NULL则表示已经
+			查找结束
 return 
-	TRUE	��Ҫ�����о�
-	FALSE	����Ҫ�����о�	
+	TRUE	需要继续列举
+	FALSE	不需要继续列举	
 **********************************************************/
 typedef BOOL (*FIND_DEL_FILE)(DFat32File file);
 
 
 
 class  DFat32;
-//FAT32���ļ�������
+//FAT32的文件管理类
 class DTOOL_API DFat32File
 {	
 	friend DFat32;
 private:
-	BYTE	mAttr;				//���ļ�������
-	BYTE	mStatus;			//״̬
+	BYTE	mAttr;				//此文件的属性
+	BYTE	mStatus;			//状态
 	
-	USHORT  mCrtTime;			//�ļ��Ĵ���ʱ��
-	USHORT  mCrtDate;			//�ļ��Ĵ�������
+	USHORT  mCrtTime;			//文件的创建时间
+	USHORT  mCrtDate;			//文件的创建日期
 	
-	USHORT	mLstAccDate;		//�ļ������ķ�������
+	USHORT	mLstAccDate;		//文件的最后的访问日期
 
-	USHORT  mWrtTime;			//�ļ�������д��ʱ��
-	USHORT  mWrtDate;			//�ļ�������д������
+	USHORT  mWrtTime;			//文件的最后的写的时间
+	USHORT  mWrtDate;			//文件的最后的写的日期
 	
-	DWORD	mStartClust;		//��ʼ�غ�
-	DWORD	mFileSize;			//�ļ��Ĵ�С
-	DWORD	mPointer;			//��ǰ�ļ���дָ��
-	DWORD   mIndex;				//���ļ���Ӧ�Ķ��ļ�������ڸ�Ŀ¼�е�Ŀ¼������
+	DWORD	mStartClust;		//起始簇号
+	DWORD	mFileSize;			//文件的大小
+	DWORD	mPointer;			//当前文件读写指针
+	DWORD   mIndex;				//此文件对应的段文件入口所在父目录中的目录项索引
 	
-	std::wstring mPath;			//���ļ���·��
+	std::wstring mPath;			//此文件的路径
 
-	DFat32* mFS;				//���ļ��������ļ�ϵͳ
+	DFat32* mFS;				//此文件所属的文件系统
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ʼ����ǰ�ļ��Ķ�������� 
+	//初始化当前文件的对象的属性 
 	//////////////////////////////////////////////////////////////////////////
 	DRES InitFile( PVOID entr ,const WCHAR* path ,DFat32 * fs);
 
@@ -728,87 +728,87 @@ public:
 	virtual ~DFat32File();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���ָ���ļ����ļ���,����ļ�û�г�ʼ���Ļ��ķ��ص���NULL
+	//获得指定文件的文件名,如果文件没有初始化的话的返回的是NULL
 	//////////////////////////////////////////////////////////////////////////
 	const WCHAR* GetFileName();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�жϵ�ǰ�ļ��ṹ�Ƿ���һ��Ŀ¼,������ļ���һ��Ŀ¼�Ļ�����TRUE������
-	//��FALSE��ע�������ļ�û�д򿪵Ļ����ص�Ҳ��FALSE
+	//判断当前文件结构是否是一个目录,如果此文件是一个目录的话返回TRUE，否则返
+	//回FALSE。注意若果文件没有打开的话返回的也是FALSE
 	//////////////////////////////////////////////////////////////////////////
 	BOOL IsDir();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ж�һ���ļ��Ƿ��Ѿ������ļ�β,����ļ��Ѿ������ļ�β�Ļ�����TRUE,����
-	//��FALSE��ע�������ļ�û�д򿪵Ļ����ص�Ҳ��FALSE��
+	//判断一个文件是否已经到了文件尾,如果文件已经到了文件尾的话返回TRUE,否则返
+	//回FALSE。注意若果文件没有打开的话返回的也是FALSE回
 	//////////////////////////////////////////////////////////////////////////
 	BOOL IsEOF();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�жϵ�ǰ�ļ��Ƿ���Ч
+	//判断当前文件是否有效
 	//////////////////////////////////////////////////////////////////////////
 	BOOL IsValid();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�رյ�ǰ�ļ�
+	//关闭当前文件
 	//////////////////////////////////////////////////////////////////////////
 	void Close();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ȡָ�����ļ�������
+	//读取指定的文件的数据
 	//param
-	//		file		��Ҫ��ȡ���ļ�
-	//		buf			��ȡ���ݵĻ���
-	//		dwReaded	ʵ�ʵõ������ݵĴ�С
-	//		dwToRead	��Ҫ��ȡ�����ݵĴ�С
+	//		file		将要读取的文件
+	//		buf			读取数据的缓存
+	//		dwReaded	实际得到的数据的大小
+	//		dwToRead	需要读取的数据的大小
 	//return
-	//		������� 
-	//		DR_IS_DIR	ָ�����ļ���һ��Ŀ¼������һ���ļ�
+	//		操作结果 
+	//		DR_IS_DIR	指定的文件是一个目录，不是一个文件
 	//	
 	//////////////////////////////////////////////////////////////////////////
 	DRES ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead = SECTOR_SIZE);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ļ���Ŀ¼���ݵ���ʵ������
-	//��������ķ���0
+	//获得文件、目录内容的其实扇区号
+	//如果出错的返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetStartSec();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ�ļ����ݵ���ʼ�غ�
-	//��������ķ���0
+	//获得当前文件内容的起始簇号
+	//如果出错的返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetStartClust();
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ļ����õ�������
-	//ʵ�����ݲ�һ������ô��
+	//获得文件中用的扇区数
+	//实际数据不一定有这么大
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetSecCount();
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ļ���ʵ�ʴ�С���ֽ�����
-	//����ʱ ����0
+	//获得文件的实际大小（字节数）
+	//错误时 返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetFileSize();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�����ǻ���ļ��Ĵ������޸ģ�����ʱ�䡣���з���ֻ�������ڲ��֡����е�ʱ��
-	//���ǻ���UTC��
+	//以下是获得文件的创建，修改，访问时间。其中访问只包含日期部分。所有的时间
+	//都是基于UTC的
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetCreateTime(void);
 	LONG_INT GetWriteTime(void);
 	LONG_INT GetAccessTime(void);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ļ�������,�˺������ص���һ��λ�ļ��� �����ATTR_*���Ľ��
+	//获得文件的属性,此函数返回的是一个位的集合 ，多个ATTR_*相或的结果
 	//////////////////////////////////////////////////////////////////////////
 	BYTE	 GetFileAttr();
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ڸ�Ŀ¼�е�������
+	//获得在父目录中的索引号
 	//return
-	//		����ļ�û�д򿪵Ļ�����0xFFFFFFFF
+	//		如果文件没有打开的话返回0xFFFFFFFF
 	//////////////////////////////////////////////////////////////////////////
 	DWORD	GetParentIndex();
 
@@ -820,196 +820,196 @@ class DTOOL_API DFat32
 {
 	friend DFat32File;
 private:
-	HANDLE		mDev;							//�豸
-	WCHAR		mDevName[DEVICE_NAME_LEN+1];	//�豸����
-	LONG_INT	mFSOff;							//�ļ�ϵͳ����ƫ��(����)
-	BYTE		mSecPerClus;					//ÿ��������
-	DWORD		mMaxClust;						//���Ŀɷ���غ�
-	USHORT      mResSec;						//������������(��һ��fat֮ǰ��������)
-	USHORT		mFSinfoSec;						//FSinfo�������ڵ�������(���������� ͨ��Ϊ1)
-	DWORD		mSecsPerFAT;					//ÿ��FATռ��������
-	DWORD		mSectors;						//������ɽ����	
-	DWORD		m1stDirClut;					//��һ����Ŀ¼���ڵĴصĴغ�
-	BYTE		mFATs;							//FAT����
-	BOOL		mIsViewChged;					//���ݴ����е������Ƿ��޸���
-	DWORD		mViewSec;						//���ݴ��ڵ�������
-	BYTE		mView[SECTOR_SIZE];				//���ݻ��洰��
+	HANDLE		mDev;							//设备
+	WCHAR		mDevName[DEVICE_NAME_LEN+1];	//设备名字
+	LONG_INT	mFSOff;							//文件系统化的偏移(扇区)
+	BYTE		mSecPerClus;					//每簇扇区数
+	DWORD		mMaxClust;						//最大的可分配簇号
+	USHORT      mResSec;						//保留的扇区数(第一个fat之前的扇区数)
+	USHORT		mFSinfoSec;						//FSinfo扇区所在的扇区号(保留扇区中 通常为1)
+	DWORD		mSecsPerFAT;					//每个FAT占的扇区数
+	DWORD		mSectors;						//分区总山区数	
+	DWORD		m1stDirClut;					//第一个根目录所在的簇的簇号
+	BYTE		mFATs;							//FAT表数
+	BOOL		mIsViewChged;					//数据窗口中的数据是否修改了
+	DWORD		mViewSec;						//数据窗口的扇区号
+	BYTE		mView[SECTOR_SIZE];				//数据缓存窗口
 private:
 
 	//////////////////////////////////////////////////////////////////////////
-	//������д������
+	//将数据写到磁盘
 	//param
-	//		buf			Ҫд�����ݻ���
-	//		off			д���ݵ�ƫ��(���� ,����ڱ�������ʵλ��)
-	//		dwWrite		��Ҫд�����ݵĴ�С
+	//		buf			要写的数据缓存
+	//		off			写数据的偏移(扇区 ,相对于本分区其实位置)
+	//		dwWrite		将要写的数据的大小
 	//return
-	//		�������
+	//		操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES WriteData(void* buf , DWORD off, DWORD dwWrite = SECTOR_SIZE);
 		
 	//////////////////////////////////////////////////////////////////////////
-	//�ƶ�������ͼ���ڵ�����
+	//移动数据视图所在的扇区
 	//param
-	//		sec			��Ҫ�Ƶ������ݴ��� ���������0�Ļ���ֻ�ǽ�����д����̶���
+	//		sec			将要移到的数据窗口 如果此域是0的话，只是将数据写会磁盘而已
 	//return 
-	//		�����ṹ
+	//		操作结构
 	//////////////////////////////////////////////////////////////////////////
 	DRES MoveView(DWORD sec);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//ͨ���ƶ���·���������ڽṹ
+	//通过制定的路径获得其入口结构
 	//param
-	//		path		Ҫ�������ڽṹ��Unicode�ַ���·��
-	//		entry		path��ָ�����ļ���Ŀ¼���
+	//		path		要获得其入口结构的Unicode字符串路径
+	//		entry		path所指定的文件或目录入口
 	//return 
-	//		�����ṹ
+	//		操作结构
 	//////////////////////////////////////////////////////////////////////////
 	DRES GetDirEntry(const WCHAR* path ,PVOID entry);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��λָ���Ĵغ��е��ƶ�����ڣ�Ҳ������ͨ��entry.mStartClustָ���Ĵ���Ϊ��ʼ�أ���Ŀ
-	//¼�У���index�����
+	//定位指定的簇号中的制定的入口，也就是在通过entry.mStartClust指定的簇作为起始簇，的目
+	//录中，第index个入口
 	//param
-	//		entry		Ҫ��λ��Ŀ¼�ṹ
-	//		index		�ƶ���Ŀ¼����
+	//		entry		要定位的目录结构
+	//		index		制定的目录索引
 	//return 
-	//		�����ṹ
+	//		操作结构
 	//////////////////////////////////////////////////////////////////////////
 	DRES PosEntry(PVOID entry , WORD index);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//��·��path�л�û�õ�һ�θù���entry,����ļ����ĺϷ���
+	//从路径path中获得获得第一段该构造entry,检查文件名的合法性
 	//param
-	//		path		ָ����·��,ִ�гɹ��󷵻���һ�ε���ʼλ��
-	//		entry		��Ҫ��������(�����ǰ��Ʒ)
+	//		path		指定的路径,执行成功后返回下一段的起始位置
+	//		entry		需要构造的入口(可能是半成品)
 	//return 
-	//		�����ṹ����
+	//		操作结构代码
 	//////////////////////////////////////////////////////////////////////////
 	DRES GetSegName(const WCHAR** path, PVOID entry);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��·��path�л�û�õ�һ��(��ʾ�Ѿ�ɾ�������ļ�)������entry,����ļ����ĺϷ���,��һ���ַ�����
-	//Ϊ"*"
+	//从路径path中获得获得第一段(表示已经删除来的文件)来构造entry,检查文件名的合法性,第一个字符必须
+	//为"*"
 	//param
-	//		path		ָ����·��,ִ�гɹ��󷵻���һ�ε���ʼλ��
-	//		entry		��Ҫ��������(�����ǰ��Ʒ)
+	//		path		指定的路径,执行成功后返回下一段的起始位置
+	//		entry		需要构造的入口(可能是半成品)
 	//return 
-	//		�����ṹ����
+	//		操作结构代码
 	//////////////////////////////////////////////////////////////////////////
 //	DRES GetDelSegName(const WCHAR** path, PVOID entry);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//��entry�ƶ������в���entry�ƶ���Ŀ¼(�ļ�)���(�Ӷ�λ)
+	//在entry制定扇区中查找entry制定的目录(文件)入口(从定位)
 	//param
-	//		entry		�Ӷ�λ��Ŀ¼��
+	//		entry		从定位的目录项
 	//return 
-	//		�����ṹ����
+	//		操作结构代码
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindEntry(PVOID entry);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����һ���Ѿ�ɾ���˵����,��entry�ƶ������в���entry�ƶ���Ŀ¼(�ļ�)���(�Ӷ�λ)
+	//查找一个已经删除了的入口,在entry制定扇区中查找entry制定的目录(文件)入口(从定位)
 	//param
-	//		entry		�Ӷ�λ��Ŀ¼��
+	//		entry		从定位的目录项
 	//return 
-	//		�����ṹ����
+	//		操作结构代码
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindDelEntry(PVOID entry);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�Ƚϳ������dir�е��ļ����Ƿ��path�еĶ�Ӧ�ַ��ַ����
+	//比较长名入口dir中的文件名是否和path中的对应字符字符相符
 	//param
-	//		path		ԭ·��
-	//		dir			Ҫƥ��·������ڽṹ
+	//		path		原路径
+	//		dir			要匹配路径的入口结构
 	//return 
-	//		ƥ���Ƿ�ɹ�
+	//		匹配是否成功
 	//////////////////////////////////////////////////////////////////////////
 	BOOL CompLFN(const WCHAR* path, BYTE* dir);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����һ�γ��ļ���
+	//设置一段长文件名
 	//param
-	//		path		���ֻ���
-	//		dir			��ȡ�����ֵ����
+	//		path		名字缓存
+	//		dir			待取出名字的入口
 	//return 
-	//		�����ṹ
+	//		操作结构
 	//////////////////////////////////////////////////////////////////////////
 	DRES SetLFN( WCHAR* path, BYTE* dir);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//�ڳ��ļ�������ǰ�����ָ�����ļ�������
+	//在长文件名缓存前面插入指定的文件名部分
 	//param
-	//		path		���ֻ���
-	//		dir			��ȡ�����ֵ����
+	//		path		名字缓存
+	//		dir			待取出名字的入口
 	//return 
-	//		�����ṹ
+	//		操作结构
 	//////////////////////////////////////////////////////////////////////////
 	DRES AppLFN( WCHAR* path, BYTE* dir);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ǰ������Ƶ���һ�����
+	//将当前的入口移到下一个入口
 	//param
-	//		entry		��ǰ���
+	//		entry		当前入口
 	//return 
-	//		��������״̬
+	//		操作操作状态
 	//////////////////////////////////////////////////////////////////////////
 	DRES NextEntry(PVOID entry);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����һ�����ļ�����У���
+	//计算一个短文件名的校验和
 	//param
-	//		pFcbName		��Ҫ����Ķ��ļ���
+	//		pFcbName		需要计算的短文件名
 	//return 
-	//		У���
+	//		校验和
 	//////////////////////////////////////////////////////////////////////////
 	BYTE ChkSum(BYTE* pFcbName);
 
 	//////////////////////////////////////////////////////////////////////////
-	//���ļ����ıȽ�
+	//短文件名的比较
 	//param
-	//		path1			���ȽϵĶ��ļ���1
-	//		path2			���ȽϵĶ��ļ���2
+	//		path1			待比较的段文件名1
+	//		path2			带比较的短文件名2
 	//return 
-	//		TRUE		���
-	//		FALSE		�����
+	//		TRUE		相等
+	//		FALSE		不相等
 	//////////////////////////////////////////////////////////////////////////
 	BOOL CompSFN(const char* path1, const char* path2);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ٳ����ļ�����ڵ�����
+	//抠出短文件名入口的名字
 	//param
-	//		path		���ֻ���
-	//		dir			��ȡ�����ֵ����
+	//		path		名字缓存
+	//		dir			待取出名字的入口
 	//return 
-	//		�����ṹ
+	//		操作结构
 	//////////////////////////////////////////////////////////////////////////
 	DRES SetSFN( WCHAR* path, BYTE* dir);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����һ���ļ����
+	//创建一个文件句柄
 	//param
-	//		path		�ļ�·��
-	//		entry		Ҫ�������ļ������Ӧ�Ķ��ļ�Ŀ¼���
+	//		path		文件路径
+	//		entry		要创建的文件句柄对应的段文件目录入口
 	//return 
-	//		�����õ��ļ����
+	//		创建好的文件句柄
 	//////////////////////////////////////////////////////////////////////////
 	DRES NewFileHandle(DFat32File* file, PVOID entry ,const WCHAR* path);
 
 	//////////////////////////////////////////////////////////////////////////
-	//������һ���Ѿ�ɾ���˵��ļ�
+	//查找下一个已经删除了的文件
 	//param
-	//		finder	���Ҿ��
-	//		file	�ҵ��Ľ��
-	//return	�������
+	//		finder	查找句柄
+	//		file	找到的结果
+	//return	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindNextDelFile(FINDER finder , DFat32File* file);
 
 	//////////////////////////////////////////////////////////////////////////
-	//������һ�����ڵ��ļ�
+	//超找下一个存在的文件
 	//param
-	//		finder	���Ҿ��
-	//		file	�ҵ��Ľ��
-	//return	�������
+	//		finder	查找句柄
+	//		file	找到的结果
+	//return	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindNextExistFile(FINDER finder , DFat32File* file);
 public:
@@ -1017,228 +1017,228 @@ public:
 	virtual ~DFat32(void);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ӵ�һ��FAT���л��ָ���غŵı���ֵ
+	//从第一个FAT表中获得指定簇号的表项值
 	//param
-	//		clust		ָ���Ĵغ�
+	//		clust		指定的簇号
 	//return 
-	//		����ֵ	1���غ���Ч  0xFFFFFFFF  �豸IO��������
+	//		表项值	1，簇号无效  0xFFFFFFFF  设备IO操作错误
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetFATFromFAT1(DWORD clust);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ӵڶ���FAT���л��ָ���غŵı���ֵ
+	//从第二个FAT表中获得指定簇号的表项值
 	//param
-	//		clust		ָ���Ĵغ�
+	//		clust		指定的簇号
 	//return 
-	//		����ֵ	1���غ���Ч  0xFFFFFFFF  �豸IO��������
+	//		表项值	1，簇号无效  0xFFFFFFFF  设备IO操作错误
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetFATFromFAT2(DWORD clust);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ָ���غŵ���ʼ������
+	//计算指定簇号的起始扇区号
 	//param
-	//		clust		ָ���Ĵغ�
+	//		clust		指定的簇号
 	//return 
-	//		����ֵ	0���غ���Ч
+	//		表项值	0，簇号无效
 	//////////////////////////////////////////////////////////////////////////
 	DWORD ClustToSect(DWORD clust);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ָ�������������ڵĴغ�,�����Ч�Ļ�����0
+	//计算指定的扇区号所在的簇号,如果无效的话返回0
 	//param
-	//		sector		ָ����������
+	//		sector		指定的扇区号
 	//return 
-	//		�غ�,�����Ч�Ļ�����0
+	//		簇号,如果无效的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD SectToClust(DWORD sector);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ�ļ�ϵͳ��������С
-	//����ļ�ϵͳ��ʧ�ܵĻ� ���ص���0
+	//获得当前文件系统的扇区大小
+	//如果文件系统打开失败的话 返回的是0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetSecCount();
 	
 	//////////////////////////////////////////////////////////////////////////
-	//��ʼ����DFAT32���ļ�ϵͳ��ʵ��,����������ͨ��IsDevOpened�ж��Ƿ��Ѿ���
-	//�����豸,��ȷ�򿪵��豸��Ҫ����CloseDev���ر�
+	//初始化话DFAT32的文件系统化实例,操作完后可以通过IsDevOpened判断是否已经打
+	//开了设备,正确打开的设备需要调用CloseDev来关闭
 	//param
-	//	name		�洢�豸������  ������һ��������̻�����һ����
-	//	offset		DFAT32�ļ�ϵͳ����һ���豸�ϵ�ƫ�� 
+	//	name		存储设备的名字  可以是一个屋里磁盘或者是一个卷
+	//	offset		DFAT32文件系统在这一个设备上的偏移 
 	//return
-	//	�������
-	//			DR_ALREADY_OPENDED  ��ǰ�豸�Ѿ����ˣ������´򿪵Ļ�Ҫ�ȹر�
+	//	操作结果
+	//			DR_ALREADY_OPENDED  当前设备已经打开了，样重新打开的话要先关闭
 	//////////////////////////////////////////////////////////////////////////
 	DRES OpenDev(const WCHAR* name, LONG_INT offset);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�жϵ�ǰ�豸�Ƿ��Ѿ�����
+	//判断当前设备是否已经打开了
 	//////////////////////////////////////////////////////////////////////////
 	inline BOOL IsDevOpened() { return wcslen(mDevName) > 0; }
 
 	//////////////////////////////////////////////////////////////////////////
-	//�رյ�ǰ�򿪵��豸
+	//关闭当前打开的设备
 	//////////////////////////////////////////////////////////////////////////
 	void CloseDev();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�Ӵ��̶�ȡ����
+	//从磁盘读取数据
 	//param
-	//	buf			��ȡ���ݵĻ���
-	//	off			��ȡ���ݵ�ƫ��(���� ,����ڱ�������ʵλ��)
-	//	dwRead		��Ҫ��ȡ�����ݵĴ�С
+	//	buf			读取数据的缓存
+	//	off			读取数据的偏移(扇区 ,相对于本分区其实位置)
+	//	dwRead		将要读取的数据的大小
 	//return
-	//	�������
+	//	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES ReadData(void* buf , DWORD off , DWORD dwRead = SECTOR_SIZE);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//��Unicode��·����ָ�����ļ�
+	//以Unicode的路径打开指定的文件
 	//param
-	//	path		�ļ��ľ���·��Unocode
-	//	file		�򿪵��ļ�
+	//	path		文件的绝对路径Unocode
+	//	file		打开的文件
 	//return
-	//	�������
+	//	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES OpenFileW(const WCHAR* path , DFat32File* file);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ASCII���ļ�·����һ��ָ�����ļ�
+	//以ASCII的文件路径打开一个指定的文件
 	//param
-	//	path		�ļ��ľ���·��(ascii)
-	//	file		�򿪵��ļ�
+	//	path		文件的绝对路径(ascii)
+	//	file		打开的文件
 	//return
-	//	�������
+	//	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	//DRES OpenFileA(const char* path , DFat32File* file);
 		
 	//////////////////////////////////////////////////////////////////////////
-	//�о�һ��Ŀ¼�е������ļ�����Ŀ¼
+	//列举一个目录中的所有文件或者目录
 	//param
-	//	dirc		��Ҫ�о���Ŀ¼���ļ���Ŀ¼
-	//	listFun		�о��ļ��Ļص�����,�ҵ�һ���ļ�ʱ��Ŷ���������֣�
+	//	dirc		需要列举子目录和文件的目录
+	//	listFun		列举文件的回调函数,找到一个文件时会哦返回字名字，
 	//return
-	//	�������
+	//	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES ListFile(DFat32File*  dirc, FIND_FILE listFun);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ʼһ���ļ��Ĳ��ҹ���,ÿ�ε��óɹ��󶼶���Ҫ����FindClose���ͷŲ��Ҿ��
-	//�˺�����Ҫ��FindNextFileW���������ɲ���
+	//开始一个文件的查找过程,每次调用成功后都都需要调用FindClose来释放查找句柄
+	//此函数需要和FindNextFileW组合起来完成查找
 	//param
-	//		dir		�����ҵ�Ŀ¼,�����ļ��Ļ����ش���
-	//		finder	���ڷ���һ�����ҵ��ļ����
-	//		findDel	�Ƿ��ǲ����Ѿ�ɾ���˵��ļ�
+	//		dir		被查找的目录,不是文件的话返回错误
+	//		finder	用于返回一个查找的文件句柄
+	//		findDel	是否是查找已经删除了的文件
 	//return	
-	//			DR_INVALED_PARAM  dir����finderΪ��
-	//			DR_INVALID_HANDLE dir��һ����Ч�ľ��
-	//			DR_IS_FILE		  dir��һ���ļ�����������һ��Ŀ¼
+	//			DR_INVALED_PARAM  dir或者finder为空
+	//			DR_INVALID_HANDLE dir是一个无效的句柄
+	//			DR_IS_FILE		  dir是一个文件件，而不是一个目录
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindFile(DFat32File* dir , FINDER* finder , BOOL findDel = FALSE);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ѯ���¸��ļ�
+	//查询号下个文件
 	//param
-	//			finder	���Ҿ��,�˾ٲ���FindFile����
-	//			file	���ڷ���һ���Ѿ��ҵ����ļ�
-	//return	�������
-	//				DR_FAT_EOF	 �Ѿ��������ˣ�file�����ݲ�������
+	//			finder	查找句柄,此举并由FindFile创建
+	//			file	用于返回一个已经找到的文件
+	//return	操作结果
+	//				DR_FAT_EOF	 已经查找问了，file的内容不做处理
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindNextFileW(FINDER finder , DFat32File* file );
 
 	//////////////////////////////////////////////////////////////////////////
-	//����һ�����ҹ���
-	//param	 finder  ����FindFile���ص�һ�����Ҿ��
+	//结束一个查找过程
+	//param	 finder  是有FindFile返回的一个查找句柄
 	//////////////////////////////////////////////////////////////////////////
 	void FindClose(FINDER finder);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�о�һ��Ŀ¼��һ�������Ѿ���ɾ�����˵��ļ�
+	//列举一个目录中一个所有已经被删除的了的文件
 	//param
-	//	dirc		��Ҫ�о���Ŀ¼���ļ���Ŀ¼
-	//	listFun		�ҵ�һ����ɾ���˵��ļ���Ҫ���õĻص�����
+	//	dirc		需要列举子目录和文件的目录
+	//	listFun		找到一个被删除了的文件后要调用的回调函数
 	//return
-	//	�������
+	//	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES ListDelFile(DFat32File* dirc, FIND_DEL_FILE listFun);
 
 	//////////////////////////////////////////////////////////////////////////
-	//���û�ص�������
-	//����豸û�д򿪵Ļ�����0
+	//获得没簇的扇区数
+	//如果设备没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	BYTE GetSecPerClust();
 
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ж�ָ�����豸�Ƿ���FAT32�ı�ǡ�׼ȷ�������Ⲣ�����ж�һ�����Ƿ���һ
-	//��FAT32���ı�־��Microsoft˵�жϷ�ʽ�Ǿ��Ĵ����Ĵ�С��������ֻ����FATϵ
-	//���У������NTFS�Ļ�,�����û���ж��ˡ���������һ��������̣���û����FAT32
-	//��ǣ�����WindowsҲ���Ժܺõ�ʶ������ͨ�����ַ�ʽ���жϵĻ��������
+	//判断指定的设备是否含有FAT32的标记。准确的来讲这并不是判断一个卷是否是一
+	//个FAT32卷的标志。Microsoft说判断方式是卷的簇数的大小，但是这只是在FAT系
+	//列中，如果有NTFS的话,我想就没法判断了。我做过的一个虚拟磁盘，并没有用FAT32
+	//标记，但是Windows也可以很好的识别。所以通过这种方式来判断的话会有误差
 	//param
-	//		cDevName	�豸������
-	//		offset		�ļ�ϵͳ���豸�ϵ�ƫ�ƣ�һ�����ֻ��һ�����Ļ����ֵΪ0
-	//return	DR_OK	ָ���豸������FAT32���
-	//			DR_NO	ָ���豸����û��FAT32���
-	//			DR_INVALED_PARAM	��������
-	//			��������DR_OPEN_DEV_ERR���豸����
+	//		cDevName	设备的名字
+	//		offset		文件系统在设备上的偏移，一般如果只是一个卷的话这个值为0
+	//return	DR_OK	指定设备区域含有FAT32标记
+	//			DR_NO	指定设备区域没有FAT32标记
+	//			DR_INVALED_PARAM	参数错误
+	//			其他（如DR_OPEN_DEV_ERR）设备错误
 	//////////////////////////////////////////////////////////////////////////
 	static DRES IsContainFat32Flag(const WCHAR* cDevName , LONG_INT offset);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ���ľ���
+	//获得当前卷的卷标
 	//param
-	//		cNameBuf	����Ļ���
-	//		len			����ĳ���
-	//return ������� DR_BUF_OVER���治��
+	//		cNameBuf	卷标的缓存
+	//		len			缓存的长度
+	//return 操作结果 DR_BUF_OVER缓存不够
 	//////////////////////////////////////////////////////////////////////////
 	DRES GetVolumeName(OUT WCHAR* cNameBuf, IN int len);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����豸������
-	//return	�豸������
-	//				����豸�Դ򿪵Ļ��ͷ����豸���֣�����NULL
+	//获得设备的名字
+	//return	设备的名字
+	//				如果设备以打开的话就返回设备名字，否则NULL
 	//////////////////////////////////////////////////////////////////////////
 	const WCHAR* GetDevName();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ñ���������
-	//return	����������
-	//			����豸��û�ִ򿪵Ļ�����0
+	//获得保留扇区数
+	//return	保留扇区数
+	//			如果设备还没又打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	USHORT GetReserveSector();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���ÿ��FAT����ռ�õ�������
-	//return	ÿFAT������
-	//			����豸��û�д򿪵Ļ�����0
+	//获得每个FAT表所占用的扇区数
+	//return	每FAT扇区数
+	//			如果设备还没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetSectorPerFAT();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���FSInfo����������
-	//return FSInfo��������
-	//		����豸û�д򿪷���0
+	//获得FSInfo所在扇区号
+	//return FSInfo所在扇区
+	//		如果设备没有打开返回0
 	//////////////////////////////////////////////////////////////////////////
 	USHORT GetFSInfoSec();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�һ����Ŀ¼�Ĵغ�
-	//return	��һ����Ŀ¼�غ�
-	//		����豸��û�д򿪵Ļ�����0
+	//获得第一个根目录的簇号
+	//return	第一个根目录簇号
+	//		如果设备还没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD Get1stDirClust();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ������ʣ��������
-	//return	ʣ��������
-	//		����豸��û�д򿪵Ļ�����0
+	//获得当前分区的剩余扇区数
+	//return	剩余扇区数
+	//		如果设备还没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetRemainSectorCnt();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰfat32�����غ�
-	//return	���غ�
-	//		����豸��û�д򿪵Ļ�����0
+	//获得当前fat32的最大簇号
+	//return	最大簇号
+	//		如果设备还没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetMaxClustNum();
 
@@ -1246,125 +1246,125 @@ public:
 
 
 /************************************************************************/
-/* NTFS�ļ������Բ�����ʽ                                               */
+/* NTFS文件的属性操作方式                                               */
 /************************************************************************/
 class DTOOL_API DNtfsAttr{
-private://����
-	BYTE*		mAttrBuf;			//���µ����ݻ���  ��ʵ����Ҳ������һ�����ݻ���
+private://属性
+	BYTE*		mAttrBuf;			//余下的数据缓存  其实这里也包含了一下数据缓存
 
-public:	//��������
+public:	//公开方法
 	DNtfsAttr();
 	~DNtfsAttr();
 	//////////////////////////////////////////////////////////////////////////
-	//ʹ��ָ���Ļ����ʼ����ǰ����,��������ַ�ĵ�ַ��Ч���߻����ַ��Ч�򷵻�
-	//��������������泤�ȵĵ�ַ��Ч�򻺴�ĳ��Ȳ����򷵻ز�������.Ϊ�˽�ʡ��
-	//�棬�������û�����ݻ���,���ݻ��涼��src�еģ�����Ҫ����������Ч��ǰ��src
-	//�����ƻ�
-	//param		src		������ʼ�����Ե����ݻ�����ʵ��ַ
-	//			len		���ݻ���ĳ��ȵĵ�ַ,ִ�гɹ���᷵��ʣ�µĻ���Ĵ�С
-	//return	�������,DR_FAT_EOF��ʾ���Ѿ�û�������ԣ��Ѿ����������б���ĩ
-	//			β��,DR_INVALED_PARAM��ʾ��������
+	//使用指定的缓存初始化当前属性,如果缓存地址的地址无效或者缓存地址无效则返回
+	//参数错误，如果缓存长度的地址无效或缓存的长度不够则返回参数错误.为了节省内
+	//存，里面基本没有数据缓存,数据缓存都是src中的，所以要保此属性有效的前提src
+	//不被破坏
+	//param		src		用来初始化属性的数据缓存其实地址
+	//			len		数据缓存的长度的地址,执行成功后会返回剩下的缓存的大小
+	//return	操作结果,DR_FAT_EOF表示了已经没有了属性，已经到了属性列表的末
+	//			尾了,DR_INVALED_PARAM表示参数错误
 	//////////////////////////////////////////////////////////////////////////
 	DRES InitAttr(void* src /*, DWORD* len*/);
 
 	/**************************************************************************/
-	/*һ��Ϊ�����Լ�����������֮ǰ�����Ѿ��ɹ�������InitAttr���������Ը�*/
-	/*��Ȼ�����������Ϊ�ڲ�ʹ�ã�����һ�㲻��ô������,                      */
+	/*一下为简单属性检查防范，操作之前必须已经成功调用了InitAttr，否则后果自负*/
+	/*当然此类基本是作为内部使用，所以一般不怎么检查参数,                      */
 	/**************************************************************************/
-	DWORD GetAttrType();  //������Ե�����
+	DWORD GetAttrType();  //获得属性的类型
 	//////////////////////////////////////////////////////////////////////////
-	//������Ե��ֽ���,�������Ե�ͷ��
+	//获得属性的字节数,包括属性的头部
 	DWORD GetAllLen();    
-	BOOL  IsNonResident();//�Ƿ�Ϊ��פ������
-	WORD  GetNameLen();	  //����������ֵĳ���(�ַ�����������NUL)  Ϊ0�Ǳ�ʾû������  
-	BOOL  IsCompressed(); //�Ƿ�Ϊѹ���ļ�
-	BOOL  IsEncrypted();  //�Ƿ�Ϊ�����ļ�
-	BOOL  IsSparse();     //�Ƿ�Ϊϡ���ļ�
-	WORD  GetAttrID();	  //��õ�ǰ���Ե�ID
+	BOOL  IsNonResident();//是否为非驻留属性
+	WORD  GetNameLen();	  //获得属性名字的长度(字符数，不包括NUL)  为0是表示没有名字  
+	BOOL  IsCompressed(); //是否为压缩文件
+	BOOL  IsEncrypted();  //是否为加密文件
+	BOOL  IsSparse();     //是否为稀疏文件
+	WORD  GetAttrID();	  //获得当前属性的ID
 	//////////////////////////////////////////////////////////////////////////
-	//������Ե�����
+	//获得属性的名字
 	//param
-	//		buf	���ڴ�����ֵĻ���
-	//		len	����ĳ��� ��Ҫ����һ�������ַ��Ŀռ�
-	//return	DR_OK	�����ɹ�
-	//			DR_NO	û������
-	//			DR_BUF_OVER	����ռ䲻��
+	//		buf	用于存放名字的缓存
+	//		len	缓存的长度 需要包括一个结束字符的空间
+	//return	DR_OK	操作成功
+	//			DR_NO	没有名字
+	//			DR_BUF_OVER	缓存空间不够
 	DRES  GetAttrName(WCHAR* buf , int len);
-	BYTE* GetAttrHeadPtr();//������Եĵ�ַ��ʵ���ǳ�ʼ��ʱ������src
+	BYTE* GetAttrHeadPtr();//获得属性的地址其实就是初始化时传来的src
 
 	/************************************************************************/
-	/* һ���鳣פ���Ե�һЩ��ͨ��������                                     */
+	/* 一下书常驻属性的一些普通操作方法                                     */
 	/************************************************************************/
 	//////////////////////////////////////////////////////////////////////////
-	//��ñ�׼����ͷ�ĳ���
-	WORD  R_GetStdHeadLen();//��׼�����еĳ���
-	DWORD R_GetAttrLen();//����������ݵĴ�С
-	DWORD R_GetAttrOff();//����������ݵ�ƫ��
-	BYTE* R_GetAttrBodyPtr();//�������ʵ��ĵ�ַ  //�����ļ����ĵ�ַ
+	//获得标准属性头的长度
+	WORD  R_GetStdHeadLen();//标准属性有的长度
+	DWORD R_GetAttrLen();//获得属性数据的大小
+	DWORD R_GetAttrOff();//获得属性数据的偏移
+	BYTE* R_GetAttrBodyPtr();//获得属性实体的地址  //除掉文件名的地址
 
 
 	/************************************************************************/
-	/* һ���Ƿ�פ�����������еĲ�������                                     */
+	/* 一下是非驻留属性所共有的操作方法                                     */
 	/************************************************************************/
-	LONG_INT NR_GetStartVCN();  //��ñ������������Ŀ�ʼ����غ�
-	LONG_INT NR_GetEndVCN();	//��ñ������������Ľ�������غ�
-	WORD	 NR_GetDataOff();	//����������������������ͷ��ƫ�ƣ�����Ӧ�ð�˫�ֶ���
-	WORD     NR_GetCmpSize();	//ѹ����Ԫ�ĳߴ硣ѹ����Ԫ�ĳߴ������2���������ݣ�Ϊ0��ʾδѹ��
-	LONG_INT NR_GetAllocSize(); //���Լ�¼���ݿ����Ŀռ�ĳߴ磬�óߴ簴�سߴ����
-	LONG_INT NR_GetValidSize(); //���Լ�¼���ݿ��ʵ�ʳߴ�
-	LONG_INT NR_GetInitedSize();//���Լ�¼���ݿ��Ѿ���ʼ�����ݵĳߴ磬��ĿǰΪֹ��ֵ�������Լ�¼DRES InitAttrList(BYTE* attrBuf)R_GetDataPtr();	//������ݵ���ʼ��ַ
+	LONG_INT NR_GetStartVCN();  //获得本属性数据流的开始虚拟簇号
+	LONG_INT NR_GetEndVCN();	//获得本属性数据流的结束虚拟簇号
+	WORD	 NR_GetDataOff();	//获得数据流描述相对于属性头的偏移，数据应该按双字对齐
+	WORD     NR_GetCmpSize();	//压缩单元的尺寸。压缩单元的尺寸必须是2的整数次幂，为0表示未压缩
+	LONG_INT NR_GetAllocSize(); //属性记录数据块分配的空间的尺寸，该尺寸按簇尺寸对齐
+	LONG_INT NR_GetValidSize(); //属性记录数据块的实际尺寸
+	LONG_INT NR_GetInitedSize();//属性记录数据块已经初始化数据的尺寸，到目前为止该值都与属性记录DRES InitAttrList(BYTE* attrBuf)R_GetDataPtr();	//获得数据的起始地址
 	BYTE*	 NR_GetDataPtr();
-	DWORD	 NR_GetStdHeadLen();//��õķǳ�פ���Եı�ע����ͷ�ĳ���
+	DWORD	 NR_GetStdHeadLen();//获得的非常驻属性的标注属性头的长度
 
 	/************************************************************************/
-	/* �������ļ����������õĲ�������(AD_FILE_NAME).						*/
-	/* �����Դ洢�ļ������ԣ��������ǳ�פ�ġ�������$AttrDef�ж���ģ������� */
-	/* ��С68�ֽڣ����578�ֽڡ� ����һ��255����׼�����ַ�������ļ������ȡ�*/
-	/* ��׼����ͷ(24 (0x18)�ֽ�)											*/
+	/* 以下是文件名属性所用的操作方法(AD_FILE_NAME).						*/
+	/* 此属性存储文件名属性，而且总是常驻的。就像在$AttrDef中定义的，此属性 */
+	/* 最小68字节，最大578字节。 等于一个255个标准编码字符的最大文件名长度。*/
+	/* 标准属性头(24 (0x18)字节)											*/
 	/************************************************************************/
-	DWORD FNGetFileNameLen();			//����ļ������ַ�����
-	DRES  FNGetFileName(WCHAR* buf);	//����ļ�����ľ��NUL
-	BYTE  FNGetFileNameSpase();			//����ļ��������ռ�
-	LONG_INT FNGetParentMftIndx();		//��ø�Ŀ¼��mft��¼��
-	DWORD FNGetFlags();					//���dos����
-	LONG_INT FNGetRealSize();			//����ļ���ʵ�ʴ�С
-	LONG_INT FNGetAllocateSize();		//����ļ��ķ����С
-
-
-	/************************************************************************/
-	/* һ�µĲ������������AD_INDEX_ROOT���Եģ����������ǳ�פ�ģ�          */
-	/************************************************************************/
-	DWORD IRGetAttrAttrType();		//������Ե��ڲ�������  ����֪�������
-	DWORD IRGetIndexBlockSize();	//������Ĵ�С(�ֽ�) һ����4K
-	BOOL  IRIsLargeIndex();			//���Ϊ����ڿ飬����ǵĻ�����ô��Ŀ¼����������$INDEX_ALLOCATION
-	//��$BITMAP��Ҳ����˵�������ĵط������������
-	DWORD IRGetIndexEntriesSize();	//���е������Ĵ�С�ܴ�С
-	DWORD IRGetAlloIndexEntriesSize();//�����˵�������Ĵ�С
-	BYTE* IRGetFistEntry();			//��õ�һ����ڵĵ�ַ
+	DWORD FNGetFileNameLen();			//获得文件名的字符长度
+	DRES  FNGetFileName(WCHAR* buf);	//获得文件名，木有NUL
+	BYTE  FNGetFileNameSpase();			//获得文件名的名空间
+	LONG_INT FNGetParentMftIndx();		//获得父目录的mft记录号
+	DWORD FNGetFlags();					//获得dos属性
+	LONG_INT FNGetRealSize();			//获得文件的实际大小
+	LONG_INT FNGetAllocateSize();		//获得文件的分配大小
 
 
 	/************************************************************************/
-	/* �����Ǵ�������AD_INDEX_ALLOCATION��һЩ���������������Ƿǳ�פ�ģ��Ƿ�*/
-	/* ӵ�д�����,���Ը�������AD_INDEX_ROOT��IsLargeIndex()�ж�             */
+	/* 一下的操作方法是针对AD_INDEX_ROOT属性的，此属性总是常驻的，          */
 	/************************************************************************/
-	LONG_INT IAGetLCNByVCN(LONG_INT* vcn /*����غ�*/, PLONG_INT ClustCnt/*���ڷ���ռ�ô���*/); //ͨ������غŻ���߼��غ�
+	DWORD IRGetAttrAttrType();		//获得属性的内部的属性  ，不知道干嘛的
+	DWORD IRGetIndexBlockSize();	//索引块的大小(字节) 一般是4K
+	BOOL  IRIsLargeIndex();			//书否为打入口块，如果是的话，那么此目录还包含属性$INDEX_ALLOCATION
+	//和$BITMAP，也就是说在其他的地方还包含了入口
+	DWORD IRGetIndexEntriesSize();	//所有的索引的大小总大小
+	DWORD IRGetAlloIndexEntriesSize();//分配了的索引块的大小
+	BYTE* IRGetFistEntry();			//获得第一个入口的地址
+
 
 	/************************************************************************/
-	/* ������Bitmap���ԵĲݼ���                                             */
+	/* 以下是处理属性AD_INDEX_ALLOCATION的一些方法，此属性总是非常驻的，是否*/
+	/* 拥有此属性,可以根据属性AD_INDEX_ROOT的IsLargeIndex()判断             */
+	/************************************************************************/
+	LONG_INT IAGetLCNByVCN(LONG_INT* vcn /*虚拟簇号*/, PLONG_INT ClustCnt/*用于返回占用簇数*/); //通过虚拟簇号获得逻辑簇号
+
+	/************************************************************************/
+	/* 下面数Bitmap属性的草集合                                             */
 	/************************************************************************/
 	//////////////////////////////////////////////////////////////////////////
-	//�ж�һ��ָ����Ϊ�Ƿ��趨
+	//判断一个指定的为是否设定
 	//param
-	//		bit ��Ҫ���ҵ�λ
-	//		fs	�ļ�ϵͳ
-	//return ָ��λ�Ƿ��Ѿ�����
+	//		bit 需要查找的位
+	//		fs	文件系统
+	//return 指定位是否已经设置
 	//////////////////////////////////////////////////////////////////////////
 	BOOL BMIsBitSet(LONG_INT bit , DNtfs* fs);
 
 	/************************************************************************/
-	/* AD_STANDARD_INFORMATION���ԵĲ�������                                                                     */
+	/* AD_STANDARD_INFORMATION随性的操作集合                                                                     */
 	/************************************************************************/
-	DWORD SIGetFlags();	//���dos����
+	DWORD SIGetFlags();	//获得dos属性
 
 
 
@@ -1372,14 +1372,14 @@ public:	//��������
 
 
 /************************************************************************/
-/* Run�ĸ��ֲ�������                                                    */
+/* Run的各种操作方发                                                    */
 /************************************************************************/
 class DTOOL_API DRun{
-private://�����б�
+private://运行列表
 	typedef struct _RunList{
-		LONG_INT vcn;		//�ļ�������غ�
-		LONG_INT lcn;		//�߼��غ�   ����Ϊ-1�Ǳ�ʾϡ���
-		LONG_INT clustCnt;	//�˽ڵ��Ӧ�Ĵ���
+		LONG_INT vcn;		//文件的虚拟簇号
+		LONG_INT lcn;		//逻辑簇号   此域为-1是表示稀疏簇
+		LONG_INT clustCnt;	//此节点对应的簇数
 	}RunList , *PRunList;
 
 public:
@@ -1387,51 +1387,51 @@ public:
 	~DRun();
 
 	std::vector<RunList> mRunList;
-	//PRunList mRunList;	//run��ʵ������
-	//DWORD	 mRunCnt;	//run������
+	//PRunList mRunList;	//run的实际数据
+	//DWORD	 mRunCnt;	//run的数量
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ʼ�������б������봦����
+	//初始化运行列表，必须处理的
 	//param
-	//		attr	���Զ���
-	//return �������
-	//			DR_INVALED_PARAM	������Ч
-	//			DR_INIT_ERR			ֻ�зǳ�פ���Բ���RUN
-	//			DR_OK				�����ɹ�
+	//		attr	属性对象
+	//return 操作结果
+	//			DR_INVALED_PARAM	参数无效
+	//			DR_INIT_ERR			只有非常驻属性才有RUN
+	//			DR_OK				操作成功
 	//////////////////////////////////////////////////////////////////////////
 	DRES InitRunList(DNtfsAttr* attr);
 
 	//////////////////////////////////////////////////////////////////////////
-	//ͨ���ļ���VCN����ļ���LCN���������ƶ���LCN����Ĵ���
+	//通过文件的VCN获得文件的LCN，和在在制定的LCN后面的簇数
 	//param
-	//		vcn		ָ����VCN
-	//		clustCnt ���ڷ�����vcn��Ӧ��lcn����Ĵ���,�������ΪNULL�Ļ����Ͳ�
-	//				����
-	//return	vcn����Ӧ��LCN,�����-1�Ļ����ʾ�����ˣ���-2���ʾ��ǰvcn��û
-	//			������,(ϡ���ļ�)
+	//		vcn		指定的VCN
+	//		clustCnt 用于返回在vcn对应的lcn后面的簇数,如果此域为NULL的话，就不
+	//				返回
+	//return	vcn所对应的LCN,如果是-1的话则表示出错了，而-2则表示当前vcn中没
+	//			有数据,(稀疏文件)
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetLCNByVCN(LONG_INT vcn , PLONG_INT clustCnt);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ͷ���Դ
+	//释放资源
 	//////////////////////////////////////////////////////////////////////////
 	void Close();
 };
 
 
 /************************************************************************/
-/*���ﶨ����һЩntfs�ļ��Ĳ�������						                */
+/*这里定义了一些ntfs文件的操作集合						                */
 /************************************************************************/
 class DTOOL_API DNtfsFile{
 	friend DNtfs;
 public:
 	typedef struct _AttrItem{
-		DWORD		id;			//����id
-		DWORD		attrType;	//�������� ATTR_*
-		LONG_INT	mftIndex;	//��ǰ����������MFT��¼ 
-		std::vector<BYTE> attrDataBuf;//���Ե����ݵ�ַ
-		WORD		off;		//��ǰ�����ڵ�ǰMFT�е�ƫ�� 
+		DWORD		id;			//属性id
+		DWORD		attrType;	//属性类型 ATTR_*
+		LONG_INT	mftIndex;	//当前属性所属的MFT记录 
+		std::vector<BYTE> attrDataBuf;//属性的数据地址
+		WORD		off;		//当前属性在当前MFT中的偏移 
 
 		_AttrItem()
 			: id(0)
@@ -1441,98 +1441,98 @@ public:
 	}AttrItem , *PAttrItem;
 private:
 
-	DNtfs*		mFS;			//��ǰ��¼�������ļ�ϵͳ,�������ż�¼����Ч���
-	LONG_INT	mMftIdx;		//MFT�еļ�¼��
-	LONG_INT	mFilePointer;	//�ļ��ĵ�ǰ��дָ��
+	DNtfs*		mFS;			//当前记录所属的文件系统,此域当做磁记录的有效标记
+	LONG_INT	mMftIdx;		//MFT中的记录号
+	LONG_INT	mFilePointer;	//文件的当前读写指针
 
-	LONG_INT	mLIStartFDT;	//��Ӧ��MFT��ʼ����ƫ��(�ֽ�)
-	WORD		mFDTLen;		//��Ӧ��FDT�ֽ���
+	LONG_INT	mLIStartFDT;	//对应的MFT起始物理偏移(字节)
+	WORD		mFDTLen;		//对应的FDT字节数
 
-	DWORD		mAttrCnt;		//��ǰ�ļ���¼�е���������
-	std::unique_ptr<AttrItem[]> mAttrArr; //��������
+	DWORD		mAttrCnt;		//当前文件记录中的属性总数
+	std::unique_ptr<AttrItem[]> mAttrArr; //属性数组
 
-	//�������ʱ�ļ�������������
-	//���Ŀ¼��INDEX_ALLOCATION
-	std::unique_ptr<DRun>		m_upRun;	//������
+	//这个运行时文件无名数据运行
+	//获得目录的INDEX_ALLOCATION
+	std::unique_ptr<DRun>		m_upRun;	//数据流
 
 	//BYTE*		mMftHeadPtr;	
-	std::vector<BYTE> mMftHeadBuf; //Mft��¼��ͷ��
+	std::vector<BYTE> mMftHeadBuf; //Mft记录的头部
 
 protected:
 	//////////////////////////////////////////////////////////////////////////
-	//����ָ��������
+	//查找指定的属性
 	//param
-	//		dwAttrType  �������ͣ�AD_*
-	//		attr		�ҵ������Է��ػ���
-	//		startIdx	Ҫ�������Ա�����ʼλ�ã�ȡֵ��[0 , mAttrCnt-1]����Ϊ��
-	//					ͬ���͵����� �������ļ�һ�㲻ֹһ��FAIL_NAME���ԣ�����
-	//					������ΪNULL�Ļ��ʹ�0��ʼ�ң��ҵ���һ��ƥ���,�����ָ
-	//					����λ�ÿ�ʼ�ҡ����startIdx�����ֵԽ���˵Ļ��ͷ���
+	//		dwAttrType  属性类型，AD_*
+	//		attr		找到的属性返回缓存
+	//		startIdx	要遍历属性表的起始位置，取值在[0 , mAttrCnt-1]（因为有
+	//					同类型的属性 ，比如文件一般不止一个FAIL_NAME属性）。如
+	//					果此域为NULL的话就从0开始找，找到第一个匹配的,否则从指
+	//					定的位置开始找。如果startIdx里面的值越界了的话就返回
 	//					DR_INVALID_PARAM.
-	//return	DR_OK�ɹ���DR_NOû�С����startIdx != NULL �Ļ�������򷵻ص�ǰ
-	//			��¼������
+	//return	DR_OK成功，DR_NO没有。如果startIdx != NULL 的话，则此域返回当前
+	//			记录的索引
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindAttribute(DWORD dwAttrType , VOID* attr , DWORD* startIdx = 0);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ӻ������г�ʼ�������б�
+	//从缓存区中初始化属性列表
 	//param
-	//		attrBuf	MFT���ļ���¼������
-	//return	�������
+	//		attrBuf	MFT的文件记录缓存区
+	//return	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES InitAttrList(BYTE* attrBuf);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//ʵ��������¼,�˷������ܴӷ����,�����ڴ�й¶,��Ҫ�ӷ���õĻ��ߵ���Close
-	//���򷵻�DR_ALREADY_OPENDED
+	//实例化本记录,此方法不能从夫调用,否则内存泄露,需要从夫调用的话线调用Close
+	//否则返回DR_ALREADY_OPENDED
 	//param
-	//		fs			���ļ���¼���ڵ��ļ�ϵͳ
-	//		mftIndex	��¼��mft��������
+	//		fs			此文件记录所在的文件系统
+	//		mftIndex	记录在mft的索引号
 	//////////////////////////////////////////////////////////////////////////
 	DRES InitRecode(DNtfs* fs ,LONG_INT mftIndex);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ô��ļ���¼�е�ָ���ı��������к����滻�ĵ������ԭֵ
+	//获得此文件记录中的指定的被更新序列号所替换的的区域的原值
 	//param
-	//		index		ָ����ֵ������   0~n
-	//return	�������к���ռ�õ������ԭֵ
+	//		index		指定的值得索引   0~n
+	//return	更新序列号所占用的区域的原值
 	//////////////////////////////////////////////////////////////////////////
 	WORD GetUSAItem(int index);
 public:
 	DNtfsFile();
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ļ���ʵ�����ݴ�������(����Data����)
-	//param		attr	���ڷ����ҵ�����������
-	//return	�������
-	//			DR_NO				û��ָ�������� 
-	//			DR_OK				�����ɹ�
-	//			DR_NO_OPEN			û�д��豸
-	//			DR_INVALED_PARAM	��������
+	//获得文件的实际数据存数属性(无名Data属性)
+	//param		attr	用于返回找到的数据属性
+	//return	操作结果
+	//			DR_NO				没有指定的属性 
+	//			DR_OK				操作成功
+	//			DR_NO_OPEN			没有打开设备
+	//			DR_INVALED_PARAM	参数错误
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindNoNameDataAttr(DNtfsAttr* attr);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ôż�¼��MFT�е������ţ��������ʧ�ܵĻ������ص���-1
+	//获得磁记录在MFT中的索引号，如果构造失败的话，返回的是-1
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetMftIndex();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�жϵ������ļ�����Ƿ���Ч
+	//判断当期那文件句柄是否有效
 	//////////////////////////////////////////////////////////////////////////
 	BOOL IsFileValid();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ�ʼ�����ĸ�Ŀ¼��MFT��¼��,����Ǵ�����ļ������߲���ʧ�ܵĻ���
-	//����-1,��ע�⣺��Ŀ¼�Լ������ļ�ϵͳ�����ļ��ĸ�Ŀ¼���Ǹ�Ŀ¼����0x5��
-	//Ŀ¼��,
+	//获得当前问及爱你的父目录的MFT记录号,如果是错误的文件，或者查找失败的话，
+	//返回-1,（注意：根目录以及所有文件系统管理文件的父目录都是更目录——0x5号
+	//目录）,
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetParentMftIndex();
 	
 	//////////////////////////////////////////////////////////////////////////
-	//һ���ǻ��NTFS�ļ����ĸ�ʱ�䣨����ʱ�䣬�ļ������޸�ʱ�䣬�Ľ̰�MFT��¼
-	//�޸�ʱ��,�ļ����һ�ζ�ȡʱ�䣩,�����ﶼ��ת���˵�Unixʱ�䣬����Ϊ��λ��
-	//ע�ⲻ�Ǳ���ʱ�����ʹ��time.h�е�ʱ����б���ʱ��ת��
+	//一下是获得NTFS文件的四个时间（创建时间，文件数据修改时间，文教案MFT记录
+	//修改时间,文件最后一次读取时间）,在这里都是转化了的Unix时间，以秒为单位，
+	//注意不是本地时间可以使用time.h中的时间进行本地时区转换
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetCreateTime();
 	LONG_INT GetAlteredTime();
@@ -1540,135 +1540,135 @@ public:
 	LONG_INT GetReadTime();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�жϵ�ǰ�ļ���¼�Ƿ����ļ���,������ͨ��FILE_RECODE_HEAD�еı�־�ж�
+	//判断当前文件记录是否是文件夹,这里是通过FILE_RECODE_HEAD中的标志判断
 	//////////////////////////////////////////////////////////////////////////
 	BOOL IsDir();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ�ļ����ļ���
+	//获得当前文件的文件名
 	//param
-	//		nameBuf		���ֻ�����
-	//		len			�������ĳ���(�ֽ�)
-	//		nameSpace	�ļ����������ռ�(NS_*),����Ĭ�����κ����ռ䶼���ԣ�˵
-	//					NS__ALL,�Ļ���������win32�ļ�����û�еĻ������������ģ�
-	//					Ҳ����˵win32�ļ����ռ�����
-	//return	����״̬,DR_BUF_OVER(���治��),DR_NO_FILE_NAMEû���ҵ�ָ����
-	//			�����ռ���ļ�������
+	//		nameBuf		名字缓存区
+	//		len			缓存区的长度(字节)
+	//		nameSpace	文件名的命名空间(NS_*),这里默认是任何名空间都可以，说
+	//					NS__ALL,的话是先搜索win32文件名，没有的话就再找其他的，
+	//					也就是说win32文件名空间优先
+	//return	操作状态,DR_BUF_OVER(缓存不够),DR_NO_FILE_NAME没有找到指定文
+	//			件名空间的文件名属性
 	//////////////////////////////////////////////////////////////////////////
 	DRES GetFileName(WCHAR* nameBuf , DWORD len , BYTE nameSpace = NS__ALL);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ļ�������,��������Ե�����ATTR_*��ͷ�����Լ���,�����Ƕ������ֵ����
-	//�Ľ��,�������ֵӦ��ʹ�õ�FILE_NAME�еģ�������STD_INFO�еģ�STD_INFO��
-	//ʱ�������һЩntfs���е�����
+	//获得文件的属性,这里的属性的是以ATTR_*开头的属性集合,可能是多个属性值相遇
+	//的结果,这个属性值应是使用的FILE_NAME中的，而不是STD_INFO中的，STD_INFO有
+	//时不会包含一些ntfs特有的属性
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetDOSAttr();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�����������������Ⲣ����ATTR_*������ntfs��Ϣ����
+	//获得属性域的总数，这并不是ATTR_*，而是ntfs信息属性
 	//////////////////////////////////////////////////////////////////////////
 	DWORD GetAttrCount();
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ļ�������
+	//获得文件的属性
 	//param
-	//		index	������� >=0, <  GetAttrCount()
+	//		index	属性序号 >=0, <  GetAttrCount()
 	//return
-	//		��������
-	//		NULL	������Ч�������ļ�û�д�
+	//		属性类型
+	//		NULL	索引无效，或者文件没有打开
 	//////////////////////////////////////////////////////////////////////////
 	PAttrItem GetAttr(DWORD index);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ָ��������
+	//查找指定的属性
 	//param
-	//		dwAttrType  �������ͣ�AD_*
-	//		startIdx	Ҫ�������Ա�����ʼλ�ã�ȡֵ��[0 , mAttrCnt-1]����Ϊ��
-	//					ͬ���͵����� �������ļ�һ�㲻ֹһ��FAIL_NAME���ԣ�����
-	//					������ΪNULL�Ļ��ʹ�0��ʼ�ң��ҵ���һ��ƥ���,�����ָ
-	//					����λ�ÿ�ʼ�ҡ����startIdx�����ֵԽ���˵Ļ��ͷ���
-	//					DR_INVALID_PARAM.�ں����в���ı�����ֵ
-	//return	������Դ��ڵĻ��򷵻�ָ�������Զ��󣬷���NULL
+	//		dwAttrType  属性类型，AD_*
+	//		startIdx	要遍历属性表的起始位置，取值在[0 , mAttrCnt-1]（因为有
+	//					同类型的属性 ，比如文件一般不止一个FAIL_NAME属性）。如
+	//					果此域为NULL的话就从0开始找，找到第一个匹配的,否则从指
+	//					定的位置开始找。如果startIdx里面的值越界了的话就返回
+	//					DR_INVALID_PARAM.在函数中不会改变此域的值
+	//return	如果属性存在的话则返回指定的属性对象，否则NULL
 	//////////////////////////////////////////////////////////////////////////
 	PAttrItem FindAttribute(DWORD dwAttrType , const DWORD* startIdx = 0);
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ô��ļ�ʵ�ʷ����С,�ļ���ʵ�ʴ�С�������ļ����������������У�������
-	//�ļ��������С�����ļ��Ƚ�С�Ļ����ļ��������������Ծͻ��ǳ�פ�ģ�������
-	//��ATTR_DatSz�ֶξͱ�ʾ�ļ������ֽ��������ļ������������Ե�פ��Ҳֻ�д���
-	//��ʱ��,����ļ��Ĵ�С���Ǻܴ��ʱ��ſ���,����һ���Ƿ�פ���ġ����ļ���
-	//��פ��ʱ��Ȼ�����޸��ļ������ļ��ضϵ�ֻ�м����ֽ�ʱ�ļ�Ҳ���Ƿ�פ���ģ�
-	//������Ϊ�ļ��Ľض��ʽ���פ���ļ���Ϊפ���ļ���������������ʱ��פ����ʱ��
-	//�ļ���ʵ�ʴ�С(�ֽ�)�з�פ�����Ե�ATTR_ValidSzָ��,��ʵ�ʵ�ռ�ÿռ�����
-	//ATTR_AllocSz��ȷ�������ֵҲ��һ�ֽ�Ϊ��λ�ģ����Ǵش�С��������
+	//获得此文件实际分配大小,文件的实际大小保存在文件的无名数据属性中，而不是
+	//文件名属性中。如果文件比较小的话，文件的无名数据属性就会是常驻的，而里面
+	//的ATTR_DatSz字段就表示文件数据字节数。而文件无名数据属性的驻留也只有创建
+	//的时侯,如果文件的大小不是很大的时候才可以,否则一般是非驻留的。当文件打到
+	//非驻留时，然后再修改文件，将文件截断到只有几个字节时文件也还是非驻留的，
+	//不会因为文件的截断问将非驻留文件改为驻留文件。而当无名数据时非驻留数时，
+	//文件的实际大小(字节)有非驻留属性的ATTR_ValidSz指定,而实际的占用空间则由
+	//ATTR_AllocSz来确定，这个值也是一字节为单位的，他是簇大小的整数倍
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetRealSize();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ô��ļ�������Ŀռ��С,����Ƿǳ�פ���ļ��Ļ����ص���0
+	//获得此文件所分配的空间大小,如果是非常驻的文件的话返回的是0
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetAllocSize();
 
 	//////////////////////////////////////////////////////////////////////////
-	//ͨ���ļ���VCN����ļ���LCN���������ƶ���LCN����Ĵ���
+	//通过文件的VCN获得文件的LCN，和在在制定的LCN后面的簇数
 	//param
-	//		vcn		ָ����VCN
-	//		clustCnt ���ڷ�����vcn��Ӧ��lcn����Ĵ���,�������ΪNULL�Ļ����Ͳ�
-	//				����
-	//return	vcn����Ӧ��LCN,�����-1�Ļ����ʾ�����ˣ���-2���ʾ��ǰvcn��û
-	//			������,(ϡ���ļ�)
+	//		vcn		指定的VCN
+	//		clustCnt 用于返回在vcn对应的lcn后面的簇数,如果此域为NULL的话，就不
+	//				返回
+	//return	vcn所对应的LCN,如果是-1的话则表示出错了，而-2则表示当前vcn中没
+	//			有数据,(稀疏文件)
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetLCNByVCN(LONG_INT vcn , PLONG_INT clustCnt);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ȡ�ļ���ǰָ�봦��ָ����С�����ݣ��η���ֻ����������������Ե��ļ�����
-	//���ʺ�ϵͳ�������ļ�.�����ϵͳ�����Ľ̰��Ļ����᷵��DR_OK��Ȼ��dwReaded
-	//����0.
+	//读取文件当前指针处的指定大小的数据，次方发只针对有无名数据属性的文件，不
+	//不适合系统保留的文件.如果是系统保留文教案的话，会返回DR_OK，然后dwReaded
+	//会置0.
 	//param	
-	//		buf		 ȡ���ݵĻ���
-	//		dwReaded �Ѿ���ȡ�������ݴ�С(�ֽ�)
-	//		dwToRead ��Ҫ��ȡ�����ݵ��ֽ���
-	//return	�����ɹ��Ļ���DR_IS_DIR-��ǰ�ļ���һ��Ŀ¼��
+	//		buf		 取数据的缓存
+	//		dwReaded 已经读取到的数据大小(字节)
+	//		dwToRead 将要读取的数据的字节数
+	//return	操作成功的话。DR_IS_DIR-当前文件是一个目录。
 	//////////////////////////////////////////////////////////////////////////
 	DRES ReadFile(char* buf, DWORD* dwReaded, DWORD dwToRead);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ж��Ƿ����ļ���β
+	//判断是否到了文件结尾
 	//////////////////////////////////////////////////////////////////////////
 	BOOL IsEOF();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�����ļ��ĵ�ǰ��ȡָ��,
+	//设置文件的当前读取指针,
 	//param
-	//		ptr		Ҫһ�����ֽ���
-	//		dwMoveMethod Ҫ�ƶ������λ�� FILE_POS*
-	//return ����״̬�ɹ����� DR_OK�����򷵻� DR_INVALED_PARAM
+	//		ptr		要一定的字节数
+	//		dwMoveMethod 要移动的相对位置 FILE_POS*
+	//return 操作状态成功返回 DR_OK，否则返回 DR_INVALED_PARAM
 	//////////////////////////////////////////////////////////////////////////
 	DRES SetFilePointer(LONG_INT ptr , BYTE dwMoveMethod);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ر��Ѿ��򿪵��ļ�����Ҫ���ͷŷ������Դ�����һ���Ѿ��򿪵��ļ�û���ͷ�
-	//�Ļ������ᵼ���ڴ�й¶
+	//关闭已经打开的文件，主要用释放分配的资源，如果一个已经打开的文件没有释放
+	//的话，将会导致内存泄露
 	//////////////////////////////////////////////////////////////////////////
 	void Close();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���MFT��¼����ʵ������
+	//获得MFT记录的其实扇区号
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetMftStartSec();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���FDT������ƫ��λ��
-	//return ƫ��
-	//			�������0���ʾû������λ��
+	//获得FDT的物理偏移位置
+	//return 偏移
+	//			如果返回0则表示没有设置位置
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetFDTOffset();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���FDT�ĳ��� 
-	//return ����
-	//			�������0���ʾû������FDT��λ��
+	//获得FDT的长度 
+	//return 长度
+	//			如果返回0则表示没有设置FDT的位置
 	//////////////////////////////////////////////////////////////////////////
 	WORD GetFDTLen();
 };
@@ -1678,105 +1678,105 @@ public:
 
 
 /************************************************************************/
-/* NTFS����������������                                                 */
+/* NTFS解析操作方法集合                                                 */
 /************************************************************************/
 class DTOOL_API DNtfs
 {
 	friend DNtfsFile;
 
 	/************************************************************************/
-	/* MFT��¼�飬��������Ŀ������Ϊ��Щ���MFT����һ������                 */
+	/* MFT记录块，这样做的目的是因为有些情况MFT不是一个整体                 */
 	/************************************************************************/
 	typedef struct _MFT_BLOCK{
-		LONG_INT	liStartMft;		//�˿����ʼ��¼��
-		LONG_INT	liMftCnt;		//��MFT��¼��ļ�¼����
-		LONG_INT	liStartSector;	//�˿����ʼ������
+		LONG_INT	liStartMft;		//此块的起始记录号
+		LONG_INT	liMftCnt;		//此MFT记录块的记录总数
+		LONG_INT	liStartSector;	//此块的起始扇区号
 	}MFT_BLOCK , *PMFT_BLOCK;
 
 private:
-	std::wstring mDevName;	//�豸������  ,���ߴ�ֵ�ж��ļ�ϵͳ�Ƿ��Ѿ�������
-	LONG_INT	mFSOff;		//�豸�ϵ�ntfs�ļ��ļ�ϵͳ������ƫ��  (����)
-	LONG_INT	mCluForMFT;	//$MFT���߼��غ�
-	LONG_INT	mCluForMFTMirr;	//$MFTMirr���߼��غ�
-	BYTE		mSecPerClu;	//ÿ�ص�������
-	LONG_INT	mAllSec;	//��������
-	HANDLE		mDev;		//��ǰ�򿪵��豸���
-	PMFT_BLOCK	mPMftBlock;	//Mft������
-	DWORD		mMftBlockCnt;//KFT������
+	std::wstring mDevName;	//设备的名字  ,更具此值判断文件系统是否已经开好了
+	LONG_INT	mFSOff;		//设备上的ntfs文件文件系统的物理偏移  (扇区)
+	LONG_INT	mCluForMFT;	//$MFT的逻辑簇号
+	LONG_INT	mCluForMFTMirr;	//$MFTMirr的逻辑簇号
+	BYTE		mSecPerClu;	//每簇的扇区数
+	LONG_INT	mAllSec;	//总扇区数
+	HANDLE		mDev;		//当前打开的设备句柄
+	PMFT_BLOCK	mPMftBlock;	//Mft块序列
+	DWORD		mMftBlockCnt;//KFT快数量
 protected:
 	
 	//////////////////////////////////////////////////////////////////////////
-	//��ȡһ��mft�е��ļ���¼
+	//读取一条mft中的文件记录
 	//param
-	//		buf			��ȡ�������ݴ�Ż���
-	//		index		MFT������
-	//return			�������������ʱ��DR_OK��
+	//		buf			读取到的数据存放缓存
+	//		index		MFT索引号
+	//return			操作结果，正常时（DR_OK）
 	//////////////////////////////////////////////////////////////////////////	
 	DRES ReadMFT(void* buf , PLONG_INT index);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ļ�����ƥ��
+	//文件名的匹配
 	//param
-	//			src1,src2		������Ҫ�Ƚϵ��ļ��ַ���
-	//			len				Ҫ�Ƚϴ�ĳ���
-	//			caseSensitiv	 �ļ����Ƿ��Сд����
-	//return	��ȷ��� 0
+	//			src1,src2		两个需要比较的文件字符串
+	//			len				要比较大的长度
+	//			caseSensitiv	 文件名是否大小写铭感
+	//return	相等返回 0
 	//////////////////////////////////////////////////////////////////////////
 	static int FileNameCmp(const WCHAR * src1,const WCHAR * src2 , int len , BOOL caseSensitiv = false);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ָ����Ŀ¼�������ֲ����ļ�����Ŀ¼,����ͨ���ƶ��ļ��������������ҵ�����
-	//������Ŀ¼��������һ�����⣬������õĲ��ҵ�û���������ļ�����Ŀ¼�Ļ���
-	//������ҵ���һ���ַ���ƥ����ļ���֮��ľͲ����ˡ����������ͨ������ÿһ
-	//��vcn��Ӧ��lcn�е����������ң�����������������ر��Ļ���Խ����������ڴ�
-	//������ҪСһЩ
+	//在指定的目录更具名字产找文件或者目录,可以通过制定文件的属性来决定找的是文
+	//件还是目录，这里有一个问题，如果设置的查找的没有区分是文件还是目录的话，
+	//程序会找到第一个字符串匹配的文件，之后的就不管了。这个方法是通过搜索每一
+	//个vcn对应的lcn中的数据来查找，这样的如果数据量特别多的话相对较慢，但是内存
+	//的消耗要小一些
 	//param
-	//		dir		ָ��mft�����Ϊ-1 �ľ��Ǹ�Ŀ¼
-	//		name	Ҫ���ҵ�����
-	//		len		���ֵĳ���
-	//		mftIdx	����ҵ��˵Ļ����������ﷵ������mft�е�����
-	//		attr    Ҫƥ���NTFS�ļ�����  (ATTR_*),ATTR_NTFS_MASK��ʾ���е�����
-	//return �ҵ��˵Ļ�����DR_OK,��������
+	//		dir		指定mft，如果为-1 的就是更目录
+	//		name	要查找的名字
+	//		len		名字的长度
+	//		mftIdx	如果找到了的话，就在这里返回其在mft中的索引
+	//		attr    要匹配的NTFS文件属性  (ATTR_*),ATTR_NTFS_MASK表示所有的属性
+	//return 找到了的话返回DR_OK,否则其他
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_INT mftIdx , DWORD attr = ATTR_NTFS_MASK);
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ָ����Ŀ¼�����ڳ���ָ�����ļ�(����B+��),�˺����Ĺ��ܺ�FindItemByName
-	//һ�������������������b+��Ϊ���������ģ�����������ر��Ļ���������
-	//FindItemByNameҪ�죬�����ڴ�������Խ��࣬�������õݹ�ʵ�ֵ�
+	//遍历指定的目录，用于超找指定的文件(遍历B+树),此函数的功能和FindItemByName
+	//一样，但是这个方法是以b+数为基础遍历的，如果数据量特别多的话，遍历较
+	//FindItemByName要快，但是内存消耗相对交多，这里是用递归实现的
 	//param		
-	//		dir		ָ����Ŀ¼��mft��¼��,-1��ʾ��Ŀ¼
-	//		name	Ҫ���ҵ��ļ���
-	//		len		�ļ�������
-	//		mftIdx	�ҵ��˵��ļ���mft��¼��
-	//		attr	Ҫ�ҵ��ļ�������
-	//		pLIStartFDT �ҵ����ļ���FDT��ʼ����ƫ�Ƶ�ַ
-	//		fdtLen	�ҵ���FDT�ĳ���
-	//return	DR_OK�ҵ��ˣ�������ʧ����,DR_NOû���ҵ�,DR_IS_FILE-dirָ����һ
-	//		���ļ�
+	//		dir		指定的目录的mft记录号,-1表示根目录
+	//		name	要查找的文件名
+	//		len		文件名长度
+	//		mftIdx	找到了的文件的mft记录号
+	//		attr	要找的文件的属性
+	//		pLIStartFDT 找到的文件的FDT起始物理偏移地址
+	//		fdtLen	找到的FDT的长度
+	//return	DR_OK找到了，其他的失败了,DR_NO没有找到,DR_IS_FILE-dir指定的一
+	//		个文件
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_INT mftIdx , PLONG_INT pLIStartFDT , WORD* fdtLen /*, DWORD attr = ATTR_NTFS_MASK*/);
 	
 	//////////////////////////////////////////////////////////////////////////
-	//����IndexBlock,��WalkDir���� ����һ��ָ�����ļ�
+	//遍历IndexBlock,被WalkDir调用 查找一个指定的文件
 	//param
-	//			root	vcn������Ŀ¼
-	//			vcn		��Ҫ�����block����vcn
-	//			name	Ҫ���ҵ��ļ���
-	//			len		�ļ����ĳ���
-	//			mftIdx	�ҵ��˵Ļ����ڷ���mft��¼��
-	//			attr	Ҫ���ҵ��ļ�����
-	//			pLIStartFDT	�ҵ���FDT������ƫ��
-	//			fdtLen	�ҵ���FDT�ĳ���
-	//return	DR_OK��ʾ�Ѿ��ҵ�,DR_ONû���ҵ�,�����Ļ���ʾ������
+	//			root	vcn所属的目录
+	//			vcn		将要进入的block所属vcn
+	//			name	要查找的文件名
+	//			len		文件名的长度
+	//			mftIdx	找到了的话用于返回mft记录号
+	//			attr	要超找的文件属性
+	//			pLIStartFDT	找到的FDT的物理偏移
+	//			fdtLen	找到的FDT的长度
+	//return	DR_OK表示已经找到,DR_ON没有找到,其他的话表示出错了
 	//////////////////////////////////////////////////////////////////////////
 	DRES WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int len , PLONG_INT mftIdx  , PLONG_INT pLIStartFDT , WORD* fdtLen /*, DWORD attr = ATTR_NTFS_MASK*/);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ʼ��MFT��ṹ
-	//return	�������
-	//			DR_OK	�����ɹ�
+	//初始化MFT块结构
+	//return	操作结果
+	//			DR_OK	操作成功
 	//////////////////////////////////////////////////////////////////////////
 	DRES	InitMFTBlock();
 
@@ -1785,168 +1785,168 @@ public:
 	~DNtfs();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ȡ��ǰ�豸��ָ��������
+	//读取当前设备的指定的数据
 	//param	
-	//		buf		���ݻ���
-	//		off		Ҫ��ȡ������ƫ�ƣ���Ե�ǰ��������ʼλ��
-	//		dwReadCnt ���ݵ�����  �ֽ���
-	//		isOffSec  off������ƫ����ΪTRUE���ֽ�ƫ����FALSE
-	//return	�������
-	//			offԽ��Ļ� ����DR_DEV_CTRL_ERR
+	//		buf		数据缓存
+	//		off		要读取的数据偏移，相对当前分区的起始位置
+	//		dwReadCnt 数据的总数  字节数
+	//		isOffSec  off是扇区偏移则为TRUE，字节偏移则FALSE
+	//return	操作结果
+	//			off越界的话 返回DR_DEV_CTRL_ERR
 	//////////////////////////////////////////////////////////////////////////
 	DRES ReadData(void* buf , PLONG_INT off , DWORD dwReadCnt , BOOL isOffSec = TRUE);
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ָ�����豸�ϵ�ntfs�ļ�ϵͳ
+	//打开指定的设备上的ntfs文件系统
 	//param
-	//		devName		�豸����
-	//		off			���豸�ϵ�ntfs����ƫ��
-	//return			�������������ʱ��DR_OK��
+	//		devName		设备名字
+	//		off			在设备上的ntfs物理偏移
+	//return			操作结果，正常时（DR_OK）
 	//////////////////////////////////////////////////////////////////////////
 	DRES OpenDev(const WCHAR* devName, const PLONG_INT off);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�رյ�ǰ�򿪵��豸
+	//关闭当前打开的设备
 	//////////////////////////////////////////////////////////////////////////
 	void CloseDev();
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ж��豸�Ƿ��Ѿ���ȷ����
+	//判断设备是否已经正确打开了
 	//////////////////////////////////////////////////////////////////////////
 	BOOL IsDevOpened();
 	
 	//////////////////////////////////////////////////////////////////////////
-	//ͨ��mft�������Ż���ļ���¼,�˲�������ɹ��Ļ�����Ҫʹ��Close���ͷ���Դ��
-	//������ڴ�й¶
+	//通过mft的索引号获得文件记录,此操作如果成功的话，需要使用Close来释放资源，
+	//否则会内存泄露
 	//param	
-	//		file	���ڷ����ļ���¼�ļ�¼������
-	//		idx		mft������
-	//return	�����ɹ�DR_OK
+	//		file	用于返回文件记录的记录缓存区
+	//		idx		mft的索引
+	//return	操作成功DR_OK
 	//////////////////////////////////////////////////////////////////////////
 	DRES OpenFileW(DNtfsFile *file , LONG_INT idx);
 	DRES OpenFileW(DNtfsFile *file , int idx);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ָ����·�������ļ�,����Ŀ¼,����ͨ���ƶ��ļ��������������ҵ�����
-	//������Ŀ¼��������һ�����⣬������õĲ��ҵ�û���������ļ�����Ŀ¼�Ļ���
-	//������ҵ���һ���ַ���ƥ����ļ���֮��ľͲ����ˡ��˲�������ɹ�����ô
-	//�õ����ļ�������ҪClose���ͷſռ�
+	//更具指定的路径名打开文件,或者目录,可以通过制定文件的属性来决定找的是文
+	//件还是目录，这里有一个问题，如果设置的查找的没有区分是文件还是目录的话，
+	//程序会找到第一个字符串匹配的文件，之后的就不管了。此操作如果成功，那么
+	//得到的文件对象需要Close来释放空间
 	//param		
-	//		path	�ļ�·��,NUL��β
-	//		file	���ڷ��ص����ļ���������,��Ҫ�ȷ���û���
-	//		attr	Ҫ�򿪵�NTFS�ļ�����  (ATTR_*),ATTR_NTFS_MASK��ʾ���е�����
-	//				���ֻ�ǲ���Ŀ¼�Ļ������� ʹ��ATTR_DIRECTORY_INDEX��ATTR_DIRECTORY
-	//				�����,��Ϊ�Ҹо�������Щindex������ļ�����ֻ��ATTR_DIRECTORY_INDEX��
-	//return	�������
+	//		path	文件路径,NUL结尾
+	//		file	用于返回的我文件操作集合,需要先分配好缓存
+	//		attr	要打开的NTFS文件属性  (ATTR_*),ATTR_NTFS_MASK表示所有的属性
+	//				如果只是查找目录的话，建议 使用ATTR_DIRECTORY_INDEX和ATTR_DIRECTORY
+	//				的组合,因为我感觉发现有些index区域的文件属性只有ATTR_DIRECTORY_INDEX，
+	//return	操作结果
 	//////////////////////////////////////////////////////////////////////////
 	DRES OpenFileW(const WCHAR* path , DNtfsFile *file /*, DWORD attr = ATTR_NTFS_MASK*/);
 	//DRES OpenFileA(const char* path , DNtfsFile *file /*, DWORD attr = ATTR_NTFS_MASK*/);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ʼ��һ�����Ҿ��,������ָ����Ŀ¼�в����ļ�,�ڵ�����������ɹ�֮����Ҫ
-	//��������FindNext����ȡÿһ�ļ����Ŀ¼,ִ�����֮����Ҫ����CloseFind����
-	//�ղ��Ҿ��,�����ڴ�й¶,
+	//初始化一个查找句柄,用于在指定的目录中查找文件,在调用这个方法成功之后需要
+	//反复调用FindNext来获取每一文件获得目录,执行完毕之后需要调用CloseFind来关
+	//闭查找句柄,否则内存泄露,
 	//param	
-	//			root	��Ҫ���ҵ�Ŀ¼·��
-	//			hFind	���ڷ��ز��Ҿ��
-	//			mftIndx	��һ���ҵ����ļ�MFT��¼
-	//return	���ز���״̬DR_INVALID_NAME��ʾ·��ʧ��
+	//			root	将要查找的目录路径
+	//			hFind	用于返回查找句柄
+	//			mftIndx	第一个找到的文件MFT记录
+	//return	返回操作状态DR_INVALID_NAME表示路径失败
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindFile(const WCHAR* root , FINDER* /*PFIND_FILE_HANDER*/ hFind /*,PLONG_INT mftIndx*/);
 	DRES FindFile(const char* root , FINDER*  hFind);
 	DRES FindFile(DNtfsFile* root , FINDER*  hFind);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ָ���Ĳ��Ҿ�����ܲ����ļ���
+	//在指定的查找句柄汇总查找文件，
 	//param	
-	//			hFind	���Ҿ��
-	//			mftIndx	�����ҵ��ļ�¼��
-	//return	DR_FAT_EOF��ʾ��������,DR_INVALID_HANDLE��Ч�Ĳ��Ҿ��
+	//			hFind	查找句柄
+	//			mftIndx	返回找到的记录号
+	//return	DR_FAT_EOF表示查找完了,DR_INVALID_HANDLE无效的查找句柄
 	//////////////////////////////////////////////////////////////////////////
 	DRES FindNext(/*PFIND_FILE_HANDER*/FINDER hFind ,PLONG_INT mftIndx);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�رղ��Ҿ��
+	//关闭查找句柄
 	//////////////////////////////////////////////////////////////////////////
 	void CloseFind(/*PFIND_FILE_HANDER*/FINDER hFind);
 
 	//////////////////////////////////////////////////////////////////////////
-	//���ÿ��������
+	//获得每簇扇区数
 	//////////////////////////////////////////////////////////////////////////
 	BYTE GetSecPerClust();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ñ�������������
+	//获得本卷的扇区总数
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetSecCount();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ�߼������ľ���
+	//获得当前逻辑驱动的卷名
 	//param
-	//		nameBuf		��������
-	//		bufLen		��������Ĵ�С(�ֽ�)
-	//return  ���ز���״̬,DR_NO_FILE_NAME��ʾû���ҵ�����
+	//		nameBuf		卷名缓存
+	//		bufLen		卷名缓存的大小(字节)
+	//return  返回操作状态,DR_NO_FILE_NAME表示没有找到卷名
 	//////////////////////////////////////////////////////////////////////////
 	DRES GetVolumeName(WCHAR * nameBuf , DWORD bufLen);
 
 	//////////////////////////////////////////////////////////////////////////
-	//�ж�ָ���豸��ָ�������Ƿ������NTFS��ر��
+	//判断指定设备的指定区域是否包含了NTFS相关标记
 	//param	
-	//		cDevName	�豸������
-	//		offset		ָ���������豸�ϵ�ƫ��
-	//return	DR_OK	����NTFS��صı��
-	//			DR_NO	û�а���NTFS���
-	//			����	������
+	//		cDevName	设备的名字
+	//		offset		指定区域在设备上的偏移
+	//return	DR_OK	包含NTFS相关的标记
+	//			DR_NO	没有包含NTFS标记
+	//			其他	出错了
 	//////////////////////////////////////////////////////////////////////////
 	static DRES IsContainNTFSFlag(const WCHAR* cDevName, LONG_INT offset);
 
 	//////////////////////////////////////////////////////////////////////////
-	//����豸������
-	//return �豸����
-	//		����豸û�д򿪵Ļ�����NULL
+	//获得设备的名字
+	//return 设备名字
+	//		如果设备没有打开的话返回NULL
 	//////////////////////////////////////////////////////////////////////////
 	const WCHAR* GetDevName();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���MFT�ĵ�һ��VCN��Ӧ��LCN
-	//return	MFT��һ���غ�
-	//			����豸��û�д򿪵Ļ�����0
+	//获得MFT的第一个VCN对应的LCN
+	//return	MFT第一个簇号
+	//			如果设备还没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetClustForMFT();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���MFTMirr�ĵ�һ��VCN��Ӧ��LCN
-	//return	MFT��һ���غ�
-	//			����豸��û�д򿪵Ļ�����0
+	//获得MFTMirr的第一个VCN对应的LCN
+	//return	MFT第一个簇号
+	//			如果设备还没有打开的话返回0
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetClustForMFTMirr();
 
 	//////////////////////////////////////////////////////////////////////////
-	//����ָ����mft��¼���ڵ���һ��������
+	//计算指定的mft记录所在的死一个扇区号
 	//param
-	//		mft	MFT��¼��
+	//		mft	MFT记录号
 	//return
-	//		���ָ����MFT��ʹ�õĻ��򷵻����һ������������
-	//		���ָ���ļ�¼�����ڵĻ��򷵻�-1
+	//		如果指定的MFT在使用的话则返回其第一扇区的扇区号
+	//		如果指定的记录不存在的话则返回-1
 	//////////////////////////////////////////////////////////////////////////
 	LONG_INT GetSectorOfMFTRecode(LONG_INT mft);
 
 };
 
 
-#ifdef _UNICODE  //Unicode�Ľӿ�
+#ifdef _UNICODE  //Unicode的接口
 
 #define  OpenFile  OpenFileW
 
-#else			//ASCII�ӿ�
+#else			//ASCII接口
 
 #define  OpenFile  OpenFileA
 
 #endif
 
 
-//���ڿ��Ի�ԭ�ڴ���뷽ʽ��
+//现在可以还原内存对齐方式了
 #pragma pack(pop)
 
 #endif

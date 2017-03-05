@@ -1,17 +1,17 @@
-// StrTool.cpp : Defines the entry point for the DLL application.
+Ôªø// StrTool.cpp : Defines the entry point for the DLL application.
 //
 
 #include "stdafx.h"
 #include "StrTool.h"
 #include "CodePage.h"
 
-//≤È±Ì ’€∞Î≤È’“
+//Êü•Ë°® ÊäòÂçäÊü•Êâæ
 WCHAR SearchTable(WCHAR src , const USHORT tbl[][2] , const UINT tbLen);
 
 W_CHAR WINAPI ChrConvert(W_CHAR src , BOOL toUnic , UINT codepage)
 {
 	W_CHAR c;
-	if (src.charw < 0x80) {			// «ASCII◊÷∑˚
+	if (src.charw < 0x80) {			//ÊòØASCIIÂ≠óÁ¨¶
 		c = src;
 	} else {
 		switch(codepage){
@@ -30,7 +30,7 @@ W_CHAR WINAPI ChrConvert(W_CHAR src , BOOL toUnic , UINT codepage)
 DWORD WINAPI UnicToMultyByte(const WCHAR* src , CHAR* buf , DWORD bufLen , UINT codepage)
 {
 	DWORD dwNeed = 0;
-	//º∆À„–Ë“™µƒø’º‰¥Û–°
+	//ËÆ°ÁÆóÈúÄË¶ÅÁöÑÁ©∫Èó¥Â§ßÂ∞è
 	int i = 0;
 	for (i = 0 ; src[i] != 0 ;	++i )
 	{
@@ -39,7 +39,7 @@ DWORD WINAPI UnicToMultyByte(const WCHAR* src , CHAR* buf , DWORD bufLen , UINT 
 		++dwNeed;
 	}
 
-	if(buf == NULL ||  bufLen < dwNeed +1)//÷ª «Œ™¡Àº∆À„◊÷∑˚◊™ªªÀ˘–Ë“™µƒø’º‰¥Û–°
+	if(buf == NULL ||  bufLen < dwNeed +1)//Âè™ÊòØ‰∏∫‰∫ÜËÆ°ÁÆóÂ≠óÁ¨¶ËΩ¨Êç¢ÊâÄÈúÄË¶ÅÁöÑÁ©∫Èó¥Â§ßÂ∞è
 		return dwNeed;
 
 	W_CHAR wc;
@@ -47,13 +47,13 @@ DWORD WINAPI UnicToMultyByte(const WCHAR* src , CHAR* buf , DWORD bufLen , UINT 
 	for (i = 0 ; src[i] != 0 ; ++i)
 	{
 		if(!IsSingleByteChar(src[i]))
-		{							//∂‡◊÷Ω⁄◊÷∑˚
+		{							//Â§öÂ≠óËäÇÂ≠óÁ¨¶
 			wc.charw = src[i];
 			wc = ChrConvert(wc ,FALSE ,codepage);
 			if(wc.char1)
 				buf[dwNeed++] = wc.char1;
 			buf[dwNeed++] = wc.char2;
-		}else{						//≤ª «∂‡◊÷Ω⁄◊÷∑˚
+		}else{						//‰∏çÊòØÂ§öÂ≠óËäÇÂ≠óÁ¨¶
 			buf[dwNeed++] = CHAR(src[i]);
 		}
 	}
@@ -75,14 +75,14 @@ WCHAR SearchTable(WCHAR src , const USHORT tbl[][2] , const UINT tbLen)
 	}
 	
 	if(tbl[high][0] != src)
-		return 0;          //√ª”–∂‘”¶µƒ±ÌœÛ
+		return 0;          //Ê≤°ÊúâÂØπÂ∫îÁöÑË°®Ë±°
 	else
-		return tbl[high][1];//’“µΩ¡À
+		return tbl[high][1];//ÊâæÂà∞‰∫Ü
 }
 DWORD WINAPI MultyByteToUnic(const CHAR* src, WCHAR* buf, size_t bufLen, UINT codepage)
 {
 	DWORD dwNeed = 0;
-	//º∆À„–Ë“™µƒø’º‰¥Û–°
+	//ËÆ°ÁÆóÈúÄË¶ÅÁöÑÁ©∫Èó¥Â§ßÂ∞è
 	int i = 0;
 	for (i = 0 ; src[i] != 0 ;	++i )
 	{
@@ -91,7 +91,7 @@ DWORD WINAPI MultyByteToUnic(const CHAR* src, WCHAR* buf, size_t bufLen, UINT co
 		++dwNeed;
 	}
 	
-	if(buf == NULL ||  bufLen < dwNeed + 1)//÷ª «Œ™¡Àº∆À„◊÷∑˚◊™ªªÀ˘–Ë“™µƒø’º‰¥Û–°
+	if(buf == NULL ||  bufLen < dwNeed + 1)//Âè™ÊòØ‰∏∫‰∫ÜËÆ°ÁÆóÂ≠óÁ¨¶ËΩ¨Êç¢ÊâÄÈúÄË¶ÅÁöÑÁ©∫Èó¥Â§ßÂ∞è
 		return dwNeed;
 	
 	W_CHAR wc;
@@ -100,12 +100,12 @@ DWORD WINAPI MultyByteToUnic(const CHAR* src, WCHAR* buf, size_t bufLen, UINT co
 	while(src[i] != 0)
 	{
 		if(IsMultyByteLead(*((UCHAR*)&src[i])))
-		{							//∂‡◊÷Ω⁄◊÷∑˚
+		{							//Â§öÂ≠óËäÇÂ≠óÁ¨¶
 			wc.char1 = src[i++];
 			wc.char2 = src[i++];
 			wc = ChrConvert(wc ,TRUE ,codepage);
 			buf[dwNeed++] = wc.charw;
-		}else{						//≤ª «∂‡◊÷Ω⁄◊÷∑˚
+		}else{						//‰∏çÊòØÂ§öÂ≠óËäÇÂ≠óÁ¨¶
 			buf[dwNeed++] = WCHAR(src[i++]);
 		}
 	}
@@ -143,7 +143,7 @@ BOOL WINAPI IsValidCode(const W_CHAR src , UINT codepage)
 {
 	if (codepage == CP_GBK)
 	{//bgk   
-		//≤È’“bgk±Ì
+		//Êü•ÊâæbgkË°®
 		return (0 != SearchTable(src.charw , gbk2Unic , gbk2UnicCount));
 	}else
 		return FALSE;

@@ -1,4 +1,4 @@
-#if !defined(AFX_INFOVIEW_H__AE0D456E_E45A_43C7_99C6_376A9C9A7FE9__INCLUDED_)
+ï»¿#if !defined(AFX_INFOVIEW_H__AE0D456E_E45A_43C7_99C6_376A9C9A7FE9__INCLUDED_)
 #define AFX_INFOVIEW_H__AE0D456E_E45A_43C7_99C6_376A9C9A7FE9__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -32,7 +32,7 @@ public:
 public:
 
 	//////////////////////////////////////////////////////////////////////////
-	//µ÷ÕûÊÓÍ¼ÖĞ¸÷¸ö¿Ø¼şµÄÎ»ÖÃ
+	//è°ƒæ•´è§†å›¾ä¸­å„ä¸ªæ§ä»¶çš„ä½ç½®
 	//////////////////////////////////////////////////////////////////////////
 	virtual int RePositionCtrl();
 
@@ -51,11 +51,11 @@ protected:
 	virtual ~CInfoView();
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÏÔÊ¾ĞÅÏ¢ĞèÒª×ÖÌå
+	//æ˜¾ç¤ºä¿¡æ¯éœ€è¦å­—ä½“
 	//////////////////////////////////////////////////////////////////////////
 	CFont m_Font;
 
-	//Ò»¸ö×Ö·ûÏÔÊ¾ĞèÒªµÄ¿Õ¼ä´óĞ¡
+	//ä¸€ä¸ªå­—ç¬¦æ˜¾ç¤ºéœ€è¦çš„ç©ºé—´å¤§å°
 	CSize m_szChar;
 
 #ifdef _DEBUG
@@ -68,7 +68,7 @@ protected:
 		// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-	// »ñµÃÓÃÓÚÏÔÊ¾ĞÅÏ¢µÄÊÓÍ¼Àà
+	// è·å¾—ç”¨äºæ˜¾ç¤ºä¿¡æ¯çš„è§†å›¾ç±»
 	//CRuntimeClass* GetInfoViewClass(void);
 public:
 	afx_msg void OnDestroy();
@@ -80,9 +80,9 @@ public:
 
 //#define  FIRST_CTRL_RECT CRect( 11 , 5 , 78 , 23)
 
-//¹ØÓÚ¿Ø¼şµÄ²Ù×÷
-//CStatic¿Ø¼şµÄ´´½¨
-#define CRT_STATIC(pST/*¿Ø¼ş*/ , id /*¿Ø¼şID*/ , title /*¿Ø¼ş±êÌâID*/) do{	\
+//å…³äºæ§ä»¶çš„æ“ä½œ
+//CStaticæ§ä»¶çš„åˆ›å»º
+#define CRT_STATIC(pST/*æ§ä»¶*/ , id /*æ§ä»¶ID*/ , title /*æ§ä»¶æ ‡é¢˜ID*/) do{	\
 		CString strTemp;													\
 		strTemp.LoadString(title);											\
 		pST.Create(strTemp  , WS_CHILD | WS_VISIBLE | SS_LEFT  ,			\
@@ -90,8 +90,8 @@ public:
 		pST.SetFont(&m_Font , FALSE);										\
 		}while(0)
 
-//´´½¨×éºÏ¿ò(ÇøÓòÏÔÊ¾¿ò)
-#define CRT_STATIC_AREA(st/*Òª°¡´´½¨µÄ¿Ø¼ş*/ ,id/*¿Ø¼şID*/ , title/*±êÌâ*/) do{	\
+//åˆ›å»ºç»„åˆæ¡†(åŒºåŸŸæ˜¾ç¤ºæ¡†)
+#define CRT_STATIC_AREA(st/*è¦å•Šåˆ›å»ºçš„æ§ä»¶*/ ,id/*æ§ä»¶ID*/ , title/*æ ‡é¢˜*/) do{	\
 			CString strTemp;													\
 			strTemp.LoadString(title);											\
 			(st).Create(strTemp , BS_CENTER | BS_GROUPBOX | WS_CHILD |			\
@@ -99,8 +99,8 @@ public:
 			(st).SetFont(&m_Font , FALSE);										\
 			}while(0)
 
-//ÓÃÓÚÏÔÊ¾µÄ±à¼­¿ò¿Ø¼şµÄ´´½¨
-#define CRT_EDIT(pST/*¿Ø¼ş*/ , id /*¿Ø¼şID*/ , title /*¿Ø¼ş±êÌâ*/) do{	\
+//ç”¨äºæ˜¾ç¤ºçš„ç¼–è¾‘æ¡†æ§ä»¶çš„åˆ›å»º
+#define CRT_EDIT(pST/*æ§ä»¶*/ , id /*æ§ä»¶ID*/ , title /*æ§ä»¶æ ‡é¢˜*/) do{	\
 		(pST).Create(WS_CHILD | WS_VISIBLE | ES_RIGHT | ES_READONLY,	\
 		CRect(85, 35, 165, 65), this , (id));							\
 		(pST).SetFont(&m_Font);											\
@@ -109,10 +109,10 @@ public:
 
 
 
-//´´½¨ä¯ÀÀ¿ØÖÆ¿Ø¼ş×é
+//åˆ›å»ºæµè§ˆæ§åˆ¶æ§ä»¶ç»„
 #define CRT_SCAN_CTRLS(st , title , stId , et , etId , pre , preid , next , nextId ,first ,firstid , last , lastid )  do{\
 		CString  strTemp;														\
-		strTemp.LoadString(title);/*±êÇ©Ãû×Ö*/									\
+		strTemp.LoadString(title);/*æ ‡ç­¾åå­—*/									\
 		st.Create(strTemp  , WS_CHILD | WS_VISIBLE | SS_CENTER ,				\
 		CRect( 1 , 1 , 1 , 1) , this , stId );									\
 		st.SetFont(&m_Font , FALSE);											\
@@ -134,8 +134,8 @@ public:
 	} while (0)
 
 
-//ÒÆ¶¯¾²Ì¬¿Ø¼ş
-#define MV_STATIC(et /*ÉÏÒ»¸öEdit*/ , st /*ÒªÒÆ¶¯µÄ¿Ø¼ş*/ , cr/*¿Ø¼şËùÊô¿Í»§Çø*/ , top /*»æÖÆ¿Ø¼şµÄ¶¥²¿Î»ÖÃ*/) do{	\
+//ç§»åŠ¨é™æ€æ§ä»¶
+#define MV_STATIC(et /*ä¸Šä¸€ä¸ªEdit*/ , st /*è¦ç§»åŠ¨çš„æ§ä»¶*/ , cr/*æ§ä»¶æ‰€å±å®¢æˆ·åŒº*/ , top /*ç»˜åˆ¶æ§ä»¶çš„é¡¶éƒ¨ä½ç½®*/) do{	\
 		CRect ctlRc1;													\
 		CString strTemp;												\
 		et.GetWindowRect(&ctlRc1);										\
@@ -146,8 +146,8 @@ public:
 		min(width + CTRL_X_GAP , cr.Width()) , m_szChar.cy , FALSE );	\
 		}while(0)
 
-//ÒÆ¶¯Ò»¸ö¾²Ì¬¿Ø¼ş Ã»ÓĞÇ°Ò»¸ö±à¼­¿Ø¼ş×÷²ÎÊı
-#define MV_STATIC_NO_PRE(st /*ÒªÒÆ¶¯µÄ¿Ø¼ş*/ ,cr/*¿Ø¼şËùÊô¿Í»§Çø*/ , top /*»æÖÆ¿Ø¼şµÄ¶¥²¿Î»ÖÃ*/)  do{	\
+//ç§»åŠ¨ä¸€ä¸ªé™æ€æ§ä»¶ æ²¡æœ‰å‰ä¸€ä¸ªç¼–è¾‘æ§ä»¶ä½œå‚æ•°
+#define MV_STATIC_NO_PRE(st /*è¦ç§»åŠ¨çš„æ§ä»¶*/ ,cr/*æ§ä»¶æ‰€å±å®¢æˆ·åŒº*/ , top /*ç»˜åˆ¶æ§ä»¶çš„é¡¶éƒ¨ä½ç½®*/)  do{	\
 		CString strTemp;													\
 		(st).GetWindowText(strTemp);										\
 		width = strTemp.GetLength() * this->m_szChar.cx;					\
@@ -155,16 +155,16 @@ public:
 		min(width + CTRL_X_GAP , cr.Width()) , m_szChar.cy , FALSE );		\
 		}while(0)
 
-//ÒÆ¶¯ÇøÓò¿ò
-#define MV_STATIC_AREA(et /*ÇøÓòÍâµÄ×îºóÒÔ¿Ø¼ş*/ , st /*ÒªÒÆ¶¯µÄ¿Ø¼ş*/ , topbak/*±¸·İµÄ¶¥²¿Î»ÖÃ*/ , top/*ÉÏÒ»¿Ø¼şµÄ¶¥²¿Î»ÖÃ*/) do{ \
+//ç§»åŠ¨åŒºåŸŸæ¡†
+#define MV_STATIC_AREA(et /*åŒºåŸŸå¤–çš„æœ€åä»¥æ§ä»¶*/ , st /*è¦ç§»åŠ¨çš„æ§ä»¶*/ , topbak/*å¤‡ä»½çš„é¡¶éƒ¨ä½ç½®*/ , top/*ä¸Šä¸€æ§ä»¶çš„é¡¶éƒ¨ä½ç½®*/) do{ \
 		CRect ctlRc1;														\
 		(et).GetWindowRect(&ctlRc1);										\
 		(st).MoveWindow( cr.left , topbak - 3*CTRL_Y_GAP , cr.Width() ,		\
 		ctlRc1.Height()*2 + top + 2 * CTRL_Y_GAP - topbak , FALSE  );		\
 	}while(0)
 
-//ÒÆ¶¯ÏÔÊ¾Êı¾İµÄ±à¼­¿ò¿Ø¼ş
-#define MV_EDITE(st/*¶ÔÓ¦µÄstatic¿Ø¼ş*/ , et/*ÒªÒÆ¶¯µÄµÄ¿Ø¼ş*/  , cr/*µ±Ç°ËùÊô¿Í»§Çø*/ , top /*¿Ø¼şµÄ¶¥²¿Î»ÖÃ*/) do{\
+//ç§»åŠ¨æ˜¾ç¤ºæ•°æ®çš„ç¼–è¾‘æ¡†æ§ä»¶
+#define MV_EDITE(st/*å¯¹åº”çš„staticæ§ä»¶*/ , et/*è¦ç§»åŠ¨çš„çš„æ§ä»¶*/  , cr/*å½“å‰æ‰€å±å®¢æˆ·åŒº*/ , top /*æ§ä»¶çš„é¡¶éƒ¨ä½ç½®*/) do{\
 		CRect ctlRc1;														\
 		CString	strTemp;													\
 		int width;															\
@@ -180,8 +180,8 @@ public:
 		}while(0)
 
 
-//ÒÆ¶¯ä¯ÀÀ¿Ø¼ş×é
-//ÒÆ¶¯¿Õ¼äµÄµÄË³Ğò  Îª st |<  >|   <   >   Edit
+//ç§»åŠ¨æµè§ˆæ§ä»¶ç»„
+//ç§»åŠ¨ç©ºé—´çš„çš„é¡ºåº  ä¸º st |<  >|   <   >   Edit
 #define MV_SCAN_CTRLS(top , cr , btnW ,btnH , st , first , last , pre , next ,et ) do {\
 	CRect ctlRc1;				 										\
 	st.MoveWindow(cr.left  , top , cr.Width() , m_szChar.cy , FALSE );	\

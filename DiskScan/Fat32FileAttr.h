@@ -1,10 +1,10 @@
-#include "Fat32Doc.h"
+ï»¿#include "Fat32Doc.h"
 
 #ifndef _CFAT32_FILE_ATTR_H_
 #define _CFAT32_FILE_ATTR_H_
 
 
-// CFat32FileAttr ¶Ô»°¿ò
+// CFat32FileAttr å¯¹è¯æ¡†
 class CFat32Doc;
 
 class CFat32FileDlg : public CDialog
@@ -12,31 +12,31 @@ class CFat32FileDlg : public CDialog
 	DECLARE_DYNAMIC(CFat32FileDlg)
 
 public:
-	CFat32FileDlg(CFat32Doc* pDoc , CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
+	CFat32FileDlg(CFat32Doc* pDoc , CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
 	virtual ~CFat32FileDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_FAT32_FILE };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
 	DECLARE_MESSAGE_MAP()
 
 public:
-	//µ±Ç°¶Ô»°¿ò¶ÔÓ¦µÄÎÄ¼şËùÔÚµÄÎÄµµ
+	//å½“å‰å¯¹è¯æ¡†å¯¹åº”çš„æ–‡ä»¶æ‰€åœ¨çš„æ–‡æ¡£
 	CFat32Doc*  m_pDoc;
-	//µ±Ç°ÎÄ¼şËù¶ÔÓ¦µÄÊµ¼ÊÎÄ¼şµÄÂ·¾¶
+	//å½“å‰æ–‡ä»¶æ‰€å¯¹åº”çš„å®é™…æ–‡ä»¶çš„è·¯å¾„
 	CString		m_strFilePath;
-	//FAT32µÄÎÄ¼ş¶ÔÏó
+	//FAT32çš„æ–‡ä»¶å¯¹è±¡
 	DFat32File*	m_pFile;
-	//Ïß³Ì
+	//çº¿ç¨‹
 	HANDLE		m_hThread;
 	volatile BOOL		m_bIsThreadRun;
 
-	//ÉèÖÃµ±Ç°ÒªÏÔÊ¾µÄÎÄ¼şµÄÂ·¾¶
+	//è®¾ç½®å½“å‰è¦æ˜¾ç¤ºçš„æ–‡ä»¶çš„è·¯å¾„
 	BOOL SetFilePath(CString file);
-	//½«Êı¾İ(ÖØĞÂ)ÏÔÊ¾³öÀ´
+	//å°†æ•°æ®(é‡æ–°)æ˜¾ç¤ºå‡ºæ¥
 	int UpdateFileData(void);
 	afx_msg void OnOK();
 	virtual BOOL OnInitDialog();

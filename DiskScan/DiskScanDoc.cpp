@@ -1,4 +1,4 @@
-// DiskScanDoc.cpp : implementation of the CDiskScanDoc class
+ï»¿// DiskScanDoc.cpp : implementation of the CDiskScanDoc class
 //
 
 #include "stdafx.h"
@@ -50,7 +50,7 @@ CDiskDoc::CDiskDoc()
 
 CDiskDoc::~CDiskDoc()
 {
-	//ÊÍ·Å»ñµÃ×ÊÔ´
+	//é‡Šæ”¾èŽ·å¾—èµ„æº
 	if (m_pDisk)
 	{
 		m_pDisk->CloseDisk();
@@ -84,31 +84,31 @@ BOOL CDiskDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	CString		strTemp;
 
 
-	//»ñµÃÐèÒªµÄÄÚÈÝÁÐ±í
+	//èŽ·å¾—éœ€è¦çš„å†…å®¹åˆ—è¡¨
 	POSITION pos = GetFirstViewPosition();
 	view = 	GetNextView(pos);
 
 	this->m_pContentList = &((CChildFrm*)(view->GetParentFrame()))->m_DisList;
-	//¶ÔÁÐ±í½øÐÐ³õÊ¼»¯
+	//å¯¹åˆ—è¡¨è¿›è¡Œåˆå§‹åŒ–
 	InitContentListHead();
 	
-	//Òª´ò¿ªµÄÉè±¸Ãû×Ö
-	//´ò¿ªÖ¸¶¨µÄÉè±¸
+	//è¦æ‰“å¼€çš„è®¾å¤‡åå­—
+	//æ‰“å¼€æŒ‡å®šçš„è®¾å¤‡
 	bRes = m_pDisk->OpenDisk(lpszPathName);
 
 	if (!bRes)
-	{//´ò¿ªÖ¸¶¨Éè±¸Ê§°Ü
+	{//æ‰“å¼€æŒ‡å®šè®¾å¤‡å¤±è´¥
 		pDevName.LoadString(IDS_OPEN_FALIED);
 		pDevName.Replace(STR_POS , lpszPathName);
 		strTemp.LoadString(IDS_ERROR);
 		::MessageBox(NULL , pDevName  , strTemp  , MB_OK|MB_ICONERROR);
 	}else{
-		//´ò¿ªÉè±¸³É¹¦
+		//æ‰“å¼€è®¾å¤‡æˆåŠŸ
 		this->m_strTitle = lpszPathName;
-		//Éè±¸´ò¿ª³É¹¦µÄ»° ¾ÍÕâÊÇÁÐ±íÖÐµÄÄÚÈÝ
+		//è®¾å¤‡æ‰“å¼€æˆåŠŸçš„è¯ å°±è¿™æ˜¯åˆ—è¡¨ä¸­çš„å†…å®¹
 		SetLIstContent();
 
-		//Éè±¸µÄÃû×Ö
+		//è®¾å¤‡çš„åå­—
 		this->m_strDevName = lpszPathName;
 
 		this->m_secList.AddSector( 0 , this->m_pDisk->GetSecCount());
@@ -124,58 +124,58 @@ void CDiskDoc::SetLIstContent()
 	USHORT		format = 0;
 	CString		strTemp;
 
-	//³õÊ¼»¯ ÁÐ±íÖÐµÄÄÚÈÝ
+	//åˆå§‹åŒ– åˆ—è¡¨ä¸­çš„å†…å®¹
 	nCnt = this->m_pDisk->GetPartCount();
 	
-	//  ID  ÎÄ¼þÃû  ÀàÐÍ	ÆðÊ¼ÉÈÇøºÅ  ×ÜÉÈÇøÊý  ´óÐ¡ Ö÷·ÖÇø  »î¶¯·ÖÇø
+	//  ID  æ–‡ä»¶å  ç±»åž‹	èµ·å§‹æ‰‡åŒºå·  æ€»æ‰‡åŒºæ•°  å¤§å° ä¸»åˆ†åŒº  æ´»åŠ¨åˆ†åŒº
 	for (i = 0 ; i <  nCnt ; ++i)
 	{
 		Disk::PDPart pDPart = m_pDisk->GetPart(i);
-		//¸ñÊ½
+		//æ ¼å¼
 		format = pDPart->mType;
 		
 		strTemp.Format(_T("%d") , i);//ID
 		m_pContentList->InsertItem( i  , strTemp ,1 );
 		
-		//Éè±¸ÇøÓòµÄÃû×Ö
+		//è®¾å¤‡åŒºåŸŸçš„åå­—
 		m_pContentList->SetItemText(i , 1  ,
-			GetPartName(format ,m_pDisk->GetDevName() , pDPart->mOffset) );//Ãû×Ö
+			GetPartName(format ,m_pDisk->GetDevName() , pDPart->mOffset) );//åå­—
 		
-		//Éè±¸ÇøÓòµÄÀàÐÍ
-		m_pContentList->SetItemText(i , 2  , GetPartFormatName(format));//ÀàÐÍ
+		//è®¾å¤‡åŒºåŸŸçš„ç±»åž‹
+		m_pContentList->SetItemText(i , 2  , GetPartFormatName(format));//ç±»åž‹
 		
 		li = pDPart->mOffset;
 		li.HighPart ? strTemp.Format(_T("%X%8X") , li.HighPart , li.LowPart) :
 		strTemp.Format(_T("%X") , li.LowPart);
-		m_pContentList->SetItemText(i , 3  , strTemp);//ÆðÊ¼É½Çø
+		m_pContentList->SetItemText(i , 3  , strTemp);//èµ·å§‹å±±åŒº
 		
 		li = pDPart->mSecCount;
 		li.HighPart ? strTemp.Format(_T("%X%8X") , li.HighPart , li.LowPart) :
 		strTemp.Format(_T("%X") , li.LowPart);
-		m_pContentList->SetItemText(i , 4  , strTemp);//×ÜÉÈÇøÊý
+		m_pContentList->SetItemText(i , 4  , strTemp);//æ€»æ‰‡åŒºæ•°
 		
 		li.QuadPart = pDPart->mSecCount.QuadPart * SECTOR_SIZE;
 		strTemp = GetSizeToString(li);
-		m_pContentList->SetItemText(i , 5  , strTemp);//´óÐ¡
+		m_pContentList->SetItemText(i , 5  , strTemp);//å¤§å°
 		
 		if ( -1 != pDPart->mVolIndex )
-		{//ÊÇ·ñÎªÒ»¸öÎÄ¼þÏµÍ³
-			if (pDPart->mIsMainPart) //Ö÷·ÖÇø?
+		{//æ˜¯å¦ä¸ºä¸€ä¸ªæ–‡ä»¶ç³»ç»Ÿ
+			if (pDPart->mIsMainPart) //ä¸»åˆ†åŒº?
 				strTemp.LoadString(IDS_YES);	
 			else
 				strTemp.LoadString(IDS_NO);
-			m_pContentList->SetItemText(i , 6  , strTemp);//´óÐ¡
+			m_pContentList->SetItemText(i , 6  , strTemp);//å¤§å°
 			
-			if (pDPart->mIsActivity) //»î¶¯·ÖÇø?
+			if (pDPart->mIsActivity) //æ´»åŠ¨åˆ†åŒº?
 				strTemp.LoadString(IDS_YES);	
 			else
 				strTemp.LoadString(IDS_NO);
-			m_pContentList->SetItemText(i , 7  , strTemp);//´óÐ¡
+			m_pContentList->SetItemText(i , 7  , strTemp);//å¤§å°
 			
 			if (pDPart->mLogicalLetter)
 			{
 				strTemp = pDPart->mLogicalLetter;
-				m_pContentList->SetItemText(i , 8  , strTemp);//´óÐ¡
+				m_pContentList->SetItemText(i , 8  , strTemp);//å¤§å°
 			}
 		}
 		}
@@ -194,13 +194,13 @@ void CDiskDoc::OnCloseDocument()
 void CDiskDoc::InitContentListHead()
 {
 	CString  strHead;
-// 	//ÉèÖÃÍ¼Æ¬ÁÐ±í
+// 	//è®¾ç½®å›¾ç‰‡åˆ—è¡¨
 // 	m_pContentList->SetImageList(&(((CMainFrame*)::AfxGetMainWnd())->m_wndImageList)
 // 		,TVSIL_NORMAL);
 	
-	//  ID  ÎÄ¼þÃû  ÀàÐÍ	ÆäÊµÉÈÇøºÅ  ×ÜÉÈÇøÊý  ´óÐ¡ Ö÷·ÖÇø£¿ »î¶¯·ÖÇø? Âß¼­Çý¶¯
+	//  ID  æ–‡ä»¶å  ç±»åž‹	å…¶å®žæ‰‡åŒºå·  æ€»æ‰‡åŒºæ•°  å¤§å° ä¸»åˆ†åŒºï¼Ÿ æ´»åŠ¨åˆ†åŒº? é€»è¾‘é©±åŠ¨
 	strHead.LoadString(IDS_ID);
-	m_pContentList->InsertColumn( 0, strHead , LVCFMT_LEFT, 30 );//²åÈëÁÐ
+	m_pContentList->InsertColumn( 0, strHead , LVCFMT_LEFT, 30 );//æ’å…¥åˆ—
 	
 	strHead.LoadString(IDS_FILE_NAME);
 	m_pContentList->InsertColumn( 1, strHead , LVCFMT_LEFT, 90 );
@@ -235,10 +235,10 @@ void CDiskDoc::OnClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 	CString strStartSec = _T("");
 	LONG_INT liStart = {0};
 
-	//ÏàÓ¦ÁÐ±íµÄµã»÷ÊÂ¼þ
+	//ç›¸åº”åˆ—è¡¨çš„ç‚¹å‡»äº‹ä»¶
 	if (this->m_pContentList)
 	{
-		//»ñµÃÑ¡ÖÐµÄÏî	
+		//èŽ·å¾—é€‰ä¸­çš„é¡¹	
 		nItem = m_pContentList->GetSelectionMark();
 		strStartSec = m_pContentList->GetItemText(nItem , 3 );
 		this->m_liCurSec = HexStrToLONG_INT(strStartSec);
@@ -246,11 +246,11 @@ void CDiskDoc::OnClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 		LONG_INT secCnt;
 		strStartSec = m_pContentList->GetItemText(nItem , 4 );
 		secCnt = HexStrToLONG_INT(strStartSec);
-		//ÉèÖÃÏÔÊ¾ÁÐ±í
+		//è®¾ç½®æ˜¾ç¤ºåˆ—è¡¨
 		SectorList secList;
 		secList.AddSector(this->m_liCurSec  , secCnt);
 
-		//»ñÈ¡ÉÈÇøÐòÁÐÃû×Ö 
+		//èŽ·å–æ‰‡åŒºåºåˆ—åå­— 
 		CString strTemp;
 		strTemp = this->m_strTitle;
 		strTemp +=(_T("->") + m_pContentList->GetItemText(nItem , 0 ));
@@ -277,39 +277,39 @@ void CDiskDoc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 	LONG_INT	liStart		= {0};
 	DWORD		dwType		= 0;
 
-	//±ØÐëÒÑ¾­»ñµÃÁÐ±í¿Ø¼þµÄÖ¸Õë
+	//å¿…é¡»å·²ç»èŽ·å¾—åˆ—è¡¨æŽ§ä»¶çš„æŒ‡é’ˆ
 	ASSERT(NULL != m_pContentList);
 
 	*pResult = 0;
 	
-	//ÏàÓ¦ÁÐ±íµÄµã»÷ÊÂ¼þ
+	//ç›¸åº”åˆ—è¡¨çš„ç‚¹å‡»äº‹ä»¶
 	pos = m_pContentList->GetFirstSelectedItemPosition();
-	if (pos == NULL){//Ã»ÓÐÑ¡ÔñÈÎºÎÊý¾Ý
+	if (pos == NULL){//æ²¡æœ‰é€‰æ‹©ä»»ä½•æ•°æ®
 		TRACE0("No items were selected!\n");
 		return ;
 	}
 	
-	//»ñµÃÑ¡ÖÐµÄÏî	
+	//èŽ·å¾—é€‰ä¸­çš„é¡¹	
 	nItem = m_pContentList->GetNextSelectedItem(pos);
 
-	//»ñµÃÑ¡ÖÐÏîµÄÀàÐÍ
+	//èŽ·å¾—é€‰ä¸­é¡¹çš„ç±»åž‹
 	strType = m_pContentList->GetItemText(nItem , 2);
 
-	//ÊÇ·ñÎªFAT32
+	//æ˜¯å¦ä¸ºFAT32
 	if (sTemp.LoadString(IDS_FAT32_PART) , 
 		0 == sTemp.CompareNoCase(strType))
-	{//Ñ¡ÔñµÄÊÇFAT32ÀàÐÍ
+	{//é€‰æ‹©çš„æ˜¯FAT32ç±»åž‹
 
 		dwType = PART_FAT32;
 	
 	}else if (sTemp.LoadString(IDS_NTFS_PART) , 
 		0 == sTemp.CompareNoCase(strType))
-	{//Ñ¡ÔñµÄÊÇNTFSÀàÐÍ
+	{//é€‰æ‹©çš„æ˜¯NTFSç±»åž‹
 		
 		dwType = PART_NTFS;
 
 	}else{
-		//ÆäËûÀàÐÍµÄ»°Ö»ÊÇ¼òµ¥µÄÏÔÊ¾Ò»ÏÂ
+		//å…¶ä»–ç±»åž‹çš„è¯åªæ˜¯ç®€å•çš„æ˜¾ç¤ºä¸€ä¸‹
 
 		strStartSec = m_pContentList->GetItemText(nItem , 3 );
 		this->m_liCurSec = HexStrToLONG_INT(strStartSec);
@@ -318,37 +318,37 @@ void CDiskDoc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 		return ;
 	}
 
-// 	//»ñµÃµ±Ç°Ñ¡ÔñµÄ½Úµã
+// 	//èŽ·å¾—å½“å‰é€‰æ‹©çš„èŠ‚ç‚¹
 // 	Disk::PDPart pPart = this->m_pDisk->GetPart(nItem);
 
-	//´ò¿ªÉè±¸µÄÏûÏ¢²ÎÊý
-	sTemp = this->m_pDisk->GetDevName() ;  //Éè±¸µÄÃû×Ö
+	//æ‰“å¼€è®¾å¤‡çš„æ¶ˆæ¯å‚æ•°
+	sTemp = this->m_pDisk->GetDevName() ;  //è®¾å¤‡çš„åå­—
 
-	//ÐòºÅ
+	//åºå·
 	strStartSec.Format(_T(" %d ") , nItem );
 	sTemp += _T(" ");
-	sTemp += PN_INDEX;		//½ÓÏÂÀ´ÊÇ ËõÓ°²ÎÊý
-	sTemp += strStartSec;	//Ìí¼ÓÁËË÷Òý
+	sTemp += PN_INDEX;		//æŽ¥ä¸‹æ¥æ˜¯ ç¼©å½±å‚æ•°
+	sTemp += strStartSec;	//æ·»åŠ äº†ç´¢å¼•
 	
-	//Æ«ÒÆ
+	//åç§»
 	sTemp += PN_OFFSET;
 	sTemp += _T(" ");		
-	strStartSec = m_pContentList->GetItemText(nItem , 3 );  //ÆäÊµÉÈÇøºÅ
+	strStartSec = m_pContentList->GetItemText(nItem , 3 );  //å…¶å®žæ‰‡åŒºå·
 	sTemp += strStartSec;
 
-	//ÅÌ·û
+	//ç›˜ç¬¦
 	strStartSec = m_pContentList->GetItemText(nItem , 8 );
 	strStartSec.TrimLeft();
 	strStartSec.TrimRight();
 	if (0 != strStartSec.GetLength())
-	{//ÓÐÅÌ·û
+	{//æœ‰ç›˜ç¬¦
 		sTemp += _T(" ");	
 		sTemp += PN_LETTER;
 		sTemp += _T(" ");	
 		sTemp += strStartSec;
 	}
 	
-	//ÏòÖ÷¿ò¼Ü·¢ËÍÏûÏ¢ ÐèÒª´ò¿ªÒ»¸öÐÂµÄÎÄµµ
+	//å‘ä¸»æ¡†æž¶å‘é€æ¶ˆæ¯ éœ€è¦æ‰“å¼€ä¸€ä¸ªæ–°çš„æ–‡æ¡£
 	AfxGetMainWnd()->SendMessage( DMSG_OPEN_NEW_DOC , WPARAM(&sTemp)  , dwType);
 }
 
@@ -357,7 +357,7 @@ void CDiskDoc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 
 // void CDiskDoc::GotUnpartableSecCont()
 // {
-// 	//³õÊ¼»¯ ÁÐ±íÖÐµÄÄÚÈÝ
+// 	//åˆå§‹åŒ– åˆ—è¡¨ä¸­çš„å†…å®¹
 // 	CString strTemp;
 // 	USHORT format;
 // 	LONG_INT li;
@@ -368,39 +368,39 @@ void CDiskDoc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 // 
 // 	int nCnt = this->m_pDisk->GetPartCount();
 // 	
-// 	//  ID  ÎÄ¼þÃû  ÀàÐÍ	ÆðÊ¼ÉÈÇøºÅ  ×ÜÉÈÇøÊý  ´óÐ¡ 
+// 	//  ID  æ–‡ä»¶å  ç±»åž‹	èµ·å§‹æ‰‡åŒºå·  æ€»æ‰‡åŒºæ•°  å¤§å° 
 // 	for (i = 0 ; i <  nCnt ; ++i)
 // 		if((format = m_pDisk->GetPartFormat(i)) == PART_UNPARTBLE)
 // 			break;
 // 
-// 	if (i == nCnt) 	return ;  //Ã»ÓÐÕÒµ½²»¿É·ÖÅäµÄ¿Õ¼ä½Úµã
+// 	if (i == nCnt) 	return ;  //æ²¡æœ‰æ‰¾åˆ°ä¸å¯åˆ†é…çš„ç©ºé—´èŠ‚ç‚¹
 // 
 // 	
 // 	strTemp.Format(_T("%d") , i);//ID
 // 	m_pContentList->InsertItem( i  , strTemp ,1 );
 // 	
 // 	m_pContentList->SetItemText(i , 1  ,
-// 			GetPartName(format ,m_pDisk->GetDevName() , m_pDisk->GetPartOffset(i)) );//Ãû×Ö
-// 	//m_pContentList->SetItemText(i , 1  , GetPartFormatName(format));//Ãû×Ö
+// 			GetPartName(format ,m_pDisk->GetDevName() , m_pDisk->GetPartOffset(i)) );//åå­—
+// 	//m_pContentList->SetItemText(i , 1  , GetPartFormatName(format));//åå­—
 // 	
-// 	m_pContentList->SetItemText(i , 2  , GetPartFormatName(format));//ÀàÐÍ
+// 	m_pContentList->SetItemText(i , 2  , GetPartFormatName(format));//ç±»åž‹
 // 	
 // 	li = m_pDisk->GetPartOffset(i);
 // 	li.HighPart ? strTemp.Format(_T("%X%8X") , li.HighPart , li.LowPart) :
 // 	strTemp.Format(_T("%X") , li.LowPart);
-// 	m_pContentList->SetItemText(i , 3  , strTemp);//ÆðÊ¼É½Çø
+// 	m_pContentList->SetItemText(i , 3  , strTemp);//èµ·å§‹å±±åŒº
 // 	
 // 	li = m_pDisk->GetPartSectorCount(i);
 // 	li.HighPart ? strTemp.Format(_T("%X%8X") , li.HighPart , li.LowPart) :
 // 	strTemp.Format(_T("%X") , li.LowPart);
-// 	m_pContentList->SetItemText(i , 4  , strTemp);//×ÜÉÈÇøÊý
+// 	m_pContentList->SetItemText(i , 4  , strTemp);//æ€»æ‰‡åŒºæ•°
 // 	
 // 	li.QuadPart = m_pDisk->GetPartSectorCount(i).QuadPart * SECTOR_SIZE;
 // 	strTemp = GetSizeToString(li);
-// 	m_pContentList->SetItemText(i , 5  , strTemp);//´óÐ¡
+// 	m_pContentList->SetItemText(i , 5  , strTemp);//å¤§å°
 // 
 // 
-// 	//¸Ä±äÊÓÍ¼µÄ¿ÉÒÔÏÔÊ¾µÄ×î´óµÄÉÈÇøºÅ
+// 	//æ”¹å˜è§†å›¾çš„å¯ä»¥æ˜¾ç¤ºçš„æœ€å¤§çš„æ‰‡åŒºå·
 // 	pos = this->GetFirstViewPosition();
 // 	while(pos != NULL)
 // 	{
@@ -437,10 +437,10 @@ CRuntimeClass* CDiskDoc::GetInofViewClass()
 
 void CDiskDoc::OnBnClickedPreSector()
 {
-	/*AfxMessageBox(_T("ÉÏÒ»ÉÈÇø"));*/
+	/*AfxMessageBox(_T("ä¸Šä¸€æ‰‡åŒº"));*/
 	ReSetSectorList();
 	if (0 != this->m_liCurSec.QuadPart )
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		--this->m_liCurSec.QuadPart;
 		UpdateAllViews(NULL);
 	}
@@ -448,12 +448,12 @@ void CDiskDoc::OnBnClickedPreSector()
 
 void CDiskDoc::OnBnClickedNextSector()
 {
-/*	AfxMessageBox(_T("ÏÂÒ»ÉÈÇø"));*/
-	//×ÜÉÈÇøÊý
+/*	AfxMessageBox(_T("ä¸‹ä¸€æ‰‡åŒº"));*/
+	//æ€»æ‰‡åŒºæ•°
 	LONG_INT liSecCnt = this->m_pDisk->GetSecCount();
 	ReSetSectorList();
 	if (this->m_liCurSec.QuadPart != liSecCnt.QuadPart - 1)
-	{//µ±Ç°²»ÊÇ×îºóÒ»¸öÉÈÇø
+	{//å½“å‰ä¸æ˜¯æœ€åŽä¸€ä¸ªæ‰‡åŒº
 		++this->m_liCurSec.QuadPart;
 		UpdateAllViews(NULL);
 	}
@@ -462,9 +462,9 @@ void CDiskDoc::OnBnClickedNextSector()
 void CDiskDoc::OnBnClickedFirstSector()
 {
 	ReSetSectorList();
-	/*AfxMessageBox(_T("µÚÒ»¸öÉÈÇø"));*/
+	/*AfxMessageBox(_T("ç¬¬ä¸€ä¸ªæ‰‡åŒº"));*/
 	if (0 != this->m_liCurSec.QuadPart )
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		this->m_liCurSec.QuadPart = 0;
 		UpdateAllViews(NULL);
 	}
@@ -472,19 +472,19 @@ void CDiskDoc::OnBnClickedFirstSector()
 
 void CDiskDoc::OnBnClickedLastSector()
 {
-/*	AfxMessageBox(_T("×îºóÒ»¸öÉÈÇø"));*/
-	//×ÜÉÈÇøÊý
+/*	AfxMessageBox(_T("æœ€åŽä¸€ä¸ªæ‰‡åŒº"));*/
+	//æ€»æ‰‡åŒºæ•°
 	ReSetSectorList();
 	LONG_INT liSecCnt = this->m_pDisk->GetSecCount();
 
 	if (this->m_liCurSec.QuadPart != liSecCnt.QuadPart - 1)
-	{//µ±Ç°²»ÊÇ×îºóÒ»¸öÉÈÇø
+	{//å½“å‰ä¸æ˜¯æœ€åŽä¸€ä¸ªæ‰‡åŒº
 		this->m_liCurSec.QuadPart = liSecCnt.QuadPart - 1;
 		UpdateAllViews(NULL);
 	}
 }
 
 void CDiskDoc::SetCurFile( CString strPath )
-{//Õâ¸öº¯ÊýÊ½¾ø¶Ô²»ÔÊÐí½øÀ´µÄ
+{//è¿™ä¸ªå‡½æ•°å¼ç»å¯¹ä¸å…è®¸è¿›æ¥çš„
 	ASSERT(FALSE);
 }

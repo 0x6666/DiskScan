@@ -1,4 +1,4 @@
-// MainFrm.cpp : implementation of the CMainFrame class
+ï»¿// MainFrm.cpp : implementation of the CMainFrame class
 //
 
 #include "stdafx.h"
@@ -40,7 +40,7 @@ END_MESSAGE_MAP()
 static UINT indicators[] =
 {
 	ID_SEPARATOR,           // status line indicator
-	ID_INDICATOR_CUR_VIEW,	//µ±Ç°¿ÉÒÔÏÔÊ¾µÄÊı¾İÇøÃû×Ö
+	ID_INDICATOR_CUR_VIEW,	//å½“å‰å¯ä»¥æ˜¾ç¤ºçš„æ•°æ®åŒºåå­—
 	ID_INDICATOR_CAPS,
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
@@ -64,7 +64,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	//ÏÖ»õµÄListBarÏÔÊ¾µÄ³õÊ¼´óĞ¡
+	//ç°è´§çš„ListBaræ˜¾ç¤ºçš„åˆå§‹å¤§å°
 	CSize size(400 , 400);
 
 
@@ -76,14 +76,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // fail to create
 	}
 
-	//Ìí¼ÓÏÔÊ¾Êı¾İÇøµÄĞÅÏ¢×´Ì¬À¸¸ñ×Ó
-	m_wndStatusBar.SetPaneInfo( 1 , ID_INDICATOR_CUR_VIEW ,SBPS_NOBORDERS , 400);//Ìí¼ÓÒ»¸öĞÂµÄindicator 
+	//æ·»åŠ æ˜¾ç¤ºæ•°æ®åŒºçš„ä¿¡æ¯çŠ¶æ€æ æ ¼å­
+	m_wndStatusBar.SetPaneInfo( 1 , ID_INDICATOR_CUR_VIEW ,SBPS_NOBORDERS , 400);//æ·»åŠ ä¸€ä¸ªæ–°çš„indicator 
 	CString strTemp;
 	strTemp.LoadString(ID_INDICATOR_CUR_VIEW);
 	m_wndStatusBar.SetPaneText(1 ,  strTemp , TRUE); 
 
 
-	//½«´°¿ÚÏÔÊ¾ÔÚÏÔÊ¾Æ÷ÖĞ¼ä
+	//å°†çª—å£æ˜¾ç¤ºåœ¨æ˜¾ç¤ºå™¨ä¸­é—´
 	CenterWindow();
 
 	return 0;
@@ -96,9 +96,9 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
 
-	//Ö÷¿ò¼Ü²»ÏÔÊ¾ÎÄ¼şµÄ±êÌâ
+	//ä¸»æ¡†æ¶ä¸æ˜¾ç¤ºæ–‡ä»¶çš„æ ‡é¢˜
 /*	cs.style&= ~FWS_ADDTOTITLE;*/
-	//Ö÷¿ò¼ÜµÄ³õÊ¼´óĞ¡
+	//ä¸»æ¡†æ¶çš„åˆå§‹å¤§å°
 	cs.cx = 900;
 	cs.cy = 700;
 
@@ -128,14 +128,14 @@ void CMainFrame::Dump(CDumpContext& dc) const
 void CMainFrame::OnFileOpen()
 {
 	CDevVolumeDlg dlg;
-	if(IDOK != dlg.DoModal()) //Ñ¡ÔñÁËÒ»¸öÕıÈ·Éè±¸Ãû×Ö
+	if(IDOK != dlg.DoModal()) //é€‰æ‹©äº†ä¸€ä¸ªæ­£ç¡®è®¾å¤‡åå­—
 		return;
 
-	//»ñµÃÑ¡ÔñÁËµÄÉè±¸
+	//è·å¾—é€‰æ‹©äº†çš„è®¾å¤‡
 	CString strDevName = dlg.GetSelDevName();
 	CMultiDocTemplate*	pTemp = NULL;
 
-	//ÅĞ¶Ï´ò¿ªµÄÊÇÎïÀí´ÅÅÌ»¹ÊÇ¾í
+	//åˆ¤æ–­æ‰“å¼€çš„æ˜¯ç‰©ç†ç£ç›˜è¿˜æ˜¯å·
 	if (SEL_DISK == dlg.m_bSelDisk)
 	{
 		pTemp =  ((CDiskScanApp*)AfxGetApp())->m_pDiskDocTemplate;//->OpenDocumentFile(
@@ -143,7 +143,7 @@ void CMainFrame::OnFileOpen()
 	}
 	else if (SEL_VOLUME == dlg.m_bSelDisk)
 	{
-		LONG_INT off = { 0 };//Éè±¸µÄÆ«ÒÆ
+		LONG_INT off = { 0 };//è®¾å¤‡çš„åç§»
 		DRES res = DR_OK;
 		if ((res = DFat32::IsContainFat32Flag(strDevName, off)) == DR_OK)
 		{
@@ -166,7 +166,7 @@ void CMainFrame::OnFileOpen()
 		}
 		else
 		{
-			//ÕâÀïÊÇ²»Ö§³ÖÖ±½Ó´ò¿ªµÄÀàĞÍ
+			//è¿™é‡Œæ˜¯ä¸æ”¯æŒç›´æ¥æ‰“å¼€çš„ç±»å‹
 			return;
 		}
 	}
@@ -175,15 +175,15 @@ void CMainFrame::OnFileOpen()
 		return;
 	}
 
-	//Éè±¸Ãû×Ö
+	//è®¾å¤‡åå­—
 	//strDevName
 
-	//¼ì²éÊÇ·ñÊÇÒÑ¾­´ò¿ªÁË
+	//æ£€æŸ¥æ˜¯å¦æ˜¯å·²ç»æ‰“å¼€äº†
 	POSITION pos = pTemp->GetFirstDocPosition();
 
 	while( NULL != pos)
 	{
-		//»ñµÃÎÄµµÖ¸Õë
+		//è·å¾—æ–‡æ¡£æŒ‡é’ˆ
 		CDocument* pDoc = pTemp->GetNextDoc(pos);
 		CString sTitle = pDoc->GetTitle();
 		int index = sTitle.Find(_T(" "));
@@ -191,16 +191,16 @@ void CMainFrame::OnFileOpen()
 			sTitle = sTitle.Mid(0 , index);
 
 		if (0 == strDevName.CompareNoCase(sTitle))
-		{//ÕÒµ½ÁË
+		{//æ‰¾åˆ°äº†
 			//	pDoc->se
-			//¼¤»îÕÒµ½µÄ´°¿Ú
+			//æ¿€æ´»æ‰¾åˆ°çš„çª—å£
 			pos = pDoc->GetFirstViewPosition();
 			this->MDIActivate(pDoc->GetNextView(pos)->GetParentFrame());
 			return ;
 		}
 	}
 
-	//Ã»ÓĞµÄ»°¾Í´ò¿ªÒ»¸öĞÂµÄ
+	//æ²¡æœ‰çš„è¯å°±æ‰“å¼€ä¸€ä¸ªæ–°çš„
 	pTemp->OpenDocumentFile( strDevName ,TRUE);
 
 	return ;
@@ -209,49 +209,49 @@ void CMainFrame::OnFileOpen()
 
 LRESULT CMainFrame::OnOpenNewDoc(WPARAM wParam, LPARAM lParam)
 {
-	//Òª´ò¿ªµÄÉè±¸µÄÂ·¾¶
+	//è¦æ‰“å¼€çš„è®¾å¤‡çš„è·¯å¾„
 	CString*			pPath = (CString*)wParam;
 	CMultiDocTemplate*	pTemp = NULL;
 	CDocument*			pDoc  = NULL;
 	POSITION			pos   = NULL;
-	CString				sDevName;		//Éè±¸Ãû×Ö	
-	CString				sIndex;			//ĞòºÅ
-	CString				sTitle;			//ÒÑ¾­´æÔÚµÄÉè±¸Ãû×Ö
+	CString				sDevName;		//è®¾å¤‡åå­—	
+	CString				sIndex;			//åºå·
+	CString				sTitle;			//å·²ç»å­˜åœ¨çš„è®¾å¤‡åå­—
 	int					index = 0;
 	
 	if (wParam == 0) return 0;
 
-	//ĞèÒª¼ì²éÊÇ·ñÖØ¸´´ò¿ª
+	//éœ€è¦æ£€æŸ¥æ˜¯å¦é‡å¤æ‰“å¼€
 
 	if (lParam == PART_FAT32)
-	{//ÒªµÄ´ò¿ªµÄÊÇÒ»¸öfat32¾í
+	{//è¦çš„æ‰“å¼€çš„æ˜¯ä¸€ä¸ªfat32å·
 		pTemp = ((CDiskScanApp*)AfxGetApp())->m_pFat32DocTemplate;
 	}else if(lParam == PART_NTFS){
-		//Ò»¸öntfs¾í
+		//ä¸€ä¸ªntfså·
 		pTemp = ((CDiskScanApp*)AfxGetApp())->m_pNtfsDocTemplate;//->OpenDocumentFile(
 			//*pPath ,TRUE);
 	}else{
-		//²»Ö§³ÖµÄÉè±¸
+		//ä¸æ”¯æŒçš„è®¾å¤‡
 		return 0;
 	}
 
-	//Éè±¸Ãû×Ö
+	//è®¾å¤‡åå­—
 	sDevName = GetPathParam(*pPath , PT_DEVNAME);
-	//»ñµÃĞòºÅ
+	//è·å¾—åºå·
 	sIndex = GetPathParam(*pPath , PT_INDEX);
 	if (0 != sIndex.GetLength())
-	{//×éºÏÃû×Ö
+	{//ç»„åˆåå­—
 		sDevName += _T("->");
 		sDevName += sIndex;
 	}
 
 
-	//¼ì²éÊÇ·ñÊÇÒÑ¾­´ò¿ªÁË
+	//æ£€æŸ¥æ˜¯å¦æ˜¯å·²ç»æ‰“å¼€äº†
 	pos = pTemp->GetFirstDocPosition();
 
 	while( NULL != pos)
 	{
-		//»ñµÃÎÄµµÖ¸Õë
+		//è·å¾—æ–‡æ¡£æŒ‡é’ˆ
 		pDoc = pTemp->GetNextDoc(pos);
 		sTitle = pDoc->GetTitle();
 		index = sTitle.Find(_T(" "));
@@ -259,8 +259,8 @@ LRESULT CMainFrame::OnOpenNewDoc(WPARAM wParam, LPARAM lParam)
 			sTitle = sTitle.Mid(0 , index);
 
 		if (0 == sDevName.CompareNoCase(sTitle))
-		{//ÕÒµ½ÁË
-			//¼¤»îÕÒµ½µÄ´°¿Ú
+		{//æ‰¾åˆ°äº†
+			//æ¿€æ´»æ‰¾åˆ°çš„çª—å£
 			pos = pDoc->GetFirstViewPosition();
 			this->MDIActivate(pDoc->GetNextView(pos)->GetParentFrame());
 			
@@ -268,7 +268,7 @@ LRESULT CMainFrame::OnOpenNewDoc(WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	//Ã»ÓĞµÄ»°¾Í´ò¿ªÒ»¸öĞÂµÄ
+	//æ²¡æœ‰çš„è¯å°±æ‰“å¼€ä¸€ä¸ªæ–°çš„
 	return (LRESULT)pTemp->OpenDocumentFile( *pPath ,TRUE);
 }
 
@@ -284,28 +284,28 @@ void CMainFrame::OnOpenFileDir()
 	bi.lpszTitle = strTemp;
 	bi.ulFlags = BIF_NONEWFOLDERBUTTON | BIF_NEWDIALOGSTYLE | BIF_BROWSEFORCOMPUTER | BIF_BROWSEINCLUDEFILES; 
 	CString str;
-	CString strDir;  //Ñ¡ÔñµÄÄ¿Â¼
+	CString strDir;  //é€‰æ‹©çš„ç›®å½•
 	LPITEMIDLIST idl = SHBrowseForFolder(&bi);
 	if(idl == NULL)
-	{//Ã»ÓĞÑ¡ÔñÎÄ¼ş»òÄ¿Â¼
+	{//æ²¡æœ‰é€‰æ‹©æ–‡ä»¶æˆ–ç›®å½•
 		return;
 	}
-	//»ñÈ¡Ñ¡ÔñµÄÎÄ¼ş»òÕßÄ¿Â¼Â·¾¶
+	//è·å–é€‰æ‹©çš„æ–‡ä»¶æˆ–è€…ç›®å½•è·¯å¾„
 	SHGetPathFromIDList(idl, str.GetBuffer(MAX_PATH * 2));
 	str.ReleaseBuffer();
 	IMalloc * imalloc = 0;
 	if (SUCCEEDED(SHGetMalloc(&imalloc)))
-	{//Ïà¹Ø×ÊÔ´µÄÊÍ·Å
+	{//ç›¸å…³èµ„æºçš„é‡Šæ”¾
 		imalloc->Free (idl);
 		imalloc->Release();
 	}
-	//ÅĞ¶ÏÊÇ·ñÊÇÒ»¸öÓĞĞ§µÄÂ·¾¶
+	//åˆ¤æ–­æ˜¯å¦æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„è·¯å¾„
 	if (str.GetLength() < 3 )
 		return ;
 	if (isLetter(str.GetAt(0)) && str.GetAt(1) == _T(':') && IsPathSeparator(str.GetAt(2)))
 	{
 		PosFileDir(str);
-	}else{//ÎŞĞ§Â·¾¶
+	}else{//æ— æ•ˆè·¯å¾„
 		strTemp.LoadString(IDS_PROMPT);
 		strDir.LoadString(IDS_INVALID_PATH);
 		strDir.Replace(STR_POS , str);
@@ -318,18 +318,18 @@ void CMainFrame::PosFileDir( CString path )
 	CString strTemp;
 	HANDLE hVol;
 	CString strVol  = _T("\\\\?\\");
-	//»ñµÃÅÌ·û
+	//è·å¾—ç›˜ç¬¦
 	strVol += path.GetAt(0);
 	strVol += _T(":");
 	CString strPath = path.Mid(2);	
 	BOOL res;
 	
-	//²éÑ¯Ö¸¶¨µÄÅÌ·ûÔÚÄÄÒ»¸öÉè±¸ÉÏ
+	//æŸ¥è¯¢æŒ‡å®šçš„ç›˜ç¬¦åœ¨å“ªä¸€ä¸ªè®¾å¤‡ä¸Š
 	hVol = CreateFile(strVol , GENERIC_READ | GENERIC_WRITE,  
 		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL ,  
 		OPEN_EXISTING,  0 , NULL);        
 	if (hVol == INVALID_HANDLE_VALUE)
-	{//´ò¿ªÉè±¸Ê§°Ü
+	{//æ‰“å¼€è®¾å¤‡å¤±è´¥
 		strPath.LoadString(IDS_OPEN_FALIED);
 		strPath.Replace(STR_POS , strVol);
 		strTemp.LoadString(IDS_ERROR);
@@ -342,26 +342,26 @@ void CMainFrame::PosFileDir( CString path )
 	res = DeviceIoControl( hVol , 
 		IOCTL_STORAGE_GET_DEVICE_NUMBER , NULL , 0 ,
 		&numb ,	sizeof(numb) , &readed , NULL );
-	CloseHandle(hVol);  //ÄãµÄÊ¹ÃüÒÑ¾­Íê³ÉÁË
+	CloseHandle(hVol);  //ä½ çš„ä½¿å‘½å·²ç»å®Œæˆäº†
 	if (FALSE == res)
-	{////»ñÈ¡ĞÅÏ¢Ê§°Ü 
+	{////è·å–ä¿¡æ¯å¤±è´¥ 
 		strPath.LoadString(IDS_GET_DEV_INTO_ERR);
 		strTemp.LoadString(IDS_ERROR);
 		::MessageBox(NULL , strPath  , strTemp  , MB_OK|MB_ICONERROR);
 		return ;
 	}
 	
-	//ÕıÈ·»ñÈ¡ÁËÎïÀíÉè±¸ºÅ
+	//æ­£ç¡®è·å–äº†ç‰©ç†è®¾å¤‡å·
 	Disk disk;
 	if(FALSE == disk.OpenDisk(numb.DeviceNumber))
-	{//´ò¿ª´ÅÅÌÊ§°Ü
+	{//æ‰“å¼€ç£ç›˜å¤±è´¥
 		strPath.LoadString(IDS_OPEN_FALIED);
 		strPath.Replace(STR_POS , strVol);
 		strTemp.LoadString(IDS_ERROR);
 		::MessageBox(NULL , strPath  , strTemp  , MB_OK|MB_ICONERROR);
 	}
 
-	//»ñµÃÖ¸¶¨µÄ¾í
+	//è·å¾—æŒ‡å®šçš„å·
 	Disk::PDPart pPart = NULL;
 	int  i = 0;
 	char letter = path.GetAt(0);
@@ -374,7 +374,7 @@ void CMainFrame::PosFileDir( CString path )
 	}
 	
 	if (i == cnt)
-	{//»ñÈ¡Êı¾İÊ§°Ü
+	{//è·å–æ•°æ®å¤±è´¥
 		strPath.LoadString(IDS_OPEN_FALIED);
 		strPath.Replace(STR_POS , strVol);
 		strTemp.LoadString(IDS_ERROR);
@@ -382,23 +382,23 @@ void CMainFrame::PosFileDir( CString path )
 	}
 
 	CString strParam;
-	//´ò¿ªÉè±¸µÄÏûÏ¢²ÎÊı
-	strParam = disk.GetDevName() ;  //Éè±¸µÄÃû×Ö
+	//æ‰“å¼€è®¾å¤‡çš„æ¶ˆæ¯å‚æ•°
+	strParam = disk.GetDevName() ;  //è®¾å¤‡çš„åå­—
 
-	//ĞòºÅ
+	//åºå·
 	strTemp.Format(_T(" %d ") , i );
 	strParam += _T(" ");
-	strParam += PN_INDEX;		//½ÓÏÂÀ´ÊÇ ËõÓ°²ÎÊı
-	strParam += strTemp;	//Ìí¼ÓÁËË÷Òı
+	strParam += PN_INDEX;		//æ¥ä¸‹æ¥æ˜¯ ç¼©å½±å‚æ•°
+	strParam += strTemp;	//æ·»åŠ äº†ç´¢å¼•
 
-	//Æ«ÒÆ
+	//åç§»
 	strParam += PN_OFFSET;
 	strParam += _T(" ");	
 	pPart->mOffset.HighPart?(strTemp.Format(_T("%X%X") , 
 		pPart->mOffset.HighPart , pPart->mOffset.LowPart)):(strTemp.Format(_T("%X") , pPart->mOffset.LowPart));
 	strParam += strTemp;
 
-	//ÅÌ·û
+	//ç›˜ç¬¦
 	strTemp.Format(_T("%c") , path.GetAt(0));
 	strParam += _T(" ");	
 	strParam += PN_LETTER;
@@ -413,10 +413,10 @@ void CMainFrame::PosFileDir( CString path )
 	{
 		type = PART_NTFS;
 	}
-	//´ò¿ªÖ¸¶¨µÄÉè±¸
+	//æ‰“å¼€æŒ‡å®šçš„è®¾å¤‡
 	CDataDoc* pDoc = (CDataDoc*)OnOpenNewDoc(DWORD(&strParam) , type);
 
-	//ÉèÖÃµ±Ç°Â·¾¶
+	//è®¾ç½®å½“å‰è·¯å¾„
 	if (NULL != pDoc) pDoc->SetCurFile(strPath);
 
 	disk.CloseDisk();

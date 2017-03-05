@@ -1,4 +1,4 @@
-// CopyProcessDlg.cpp : ÊµÏÖÎÄ¼þ
+ï»¿// CopyProcessDlg.cpp : å®žçŽ°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -9,7 +9,7 @@
 #include "NtfsDoc.h"
 
 
-// CCopyProcessDlg ¶Ô»°¿ò
+// CCopyProcessDlg å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(CCopyProcessDlg, CDialog)
 
@@ -42,15 +42,15 @@ BEGIN_MESSAGE_MAP(CCopyProcessDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CCopyProcessDlg ÏûÏ¢´¦Àí³ÌÐò
+// CCopyProcessDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 BOOL CCopyProcessDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	//³õÊ¼»¯¸÷¸ö¿Ø¼þ
+	//åˆå§‹åŒ–å„ä¸ªæŽ§ä»¶
 	CProgressCtrl* pProg = (CProgressCtrl*)this->GetDlgItem(IDC_COPY_PROGRESS);
-	pProg->SetRange(0 , 100); //ÉèÖÃ½ø¶ÈÌõµÄ¿Õ¼ä´óÐ¡
+	pProg->SetRange(0 , 100); //è®¾ç½®è¿›åº¦æ¡çš„ç©ºé—´å¤§å°
 	pProg->SetStep(1);
 
 	CWnd* pBtn = this->GetDlgItem(IDOK);
@@ -58,20 +58,20 @@ BOOL CCopyProcessDlg::OnInitDialog()
 	pBtn = this->GetDlgItem(IDCANCEL);
 	pBtn->EnableWindow(TRUE);
 
-	//ÔÚÕâÀïÅÐ¶ÏÊÇÊ²Ã´ÎÄ¼þ
-	if(this->m_pDoc->IsKindOf(RUNTIME_CLASS(CFat32Doc))){//ÊÇFAT32ÎÄ¼þ
+	//åœ¨è¿™é‡Œåˆ¤æ–­æ˜¯ä»€ä¹ˆæ–‡ä»¶
+	if(this->m_pDoc->IsKindOf(RUNTIME_CLASS(CFat32Doc))){//æ˜¯FAT32æ–‡ä»¶
 		m_hCopyThread = CreateThread(NULL , 0 , CopyFat32File , this , 0 , NULL);
 	}else if (this->m_pDoc->IsKindOf(RUNTIME_CLASS(CNtfsDoc)))
-	{//ÊÇNTFSÎÄ¼þ
+	{//æ˜¯NTFSæ–‡ä»¶
 		m_hCopyThread = CreateThread(NULL , 0 , CopyNtfsFile , this , 0 , NULL);
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// Òì³£: OCX ÊôÐÔÒ³Ó¦·µ»Ø FALSE
+	// å¼‚å¸¸: OCX å±žæ€§é¡µåº”è¿”å›ž FALSE
 }
 
 LRESULT CCopyProcessDlg::OnOpenFileFaild( WPARAM wParam , LPARAM lParam )
-{//ÎÄ¼þ¿½±´Ê§°Ü
+{//æ–‡ä»¶æ‹·è´å¤±è´¥
 	EndDialog(IDCANCEL);
 
 	CString strTitle;
@@ -106,7 +106,7 @@ LRESULT CCopyProcessDlg::OnCopySuccess( WPARAM wParam , LPARAM lParam )
 	pBtn->EnableWindow(TRUE);
 
 
-	//½«È¡Ïû°´Å¥¸ÄÎªä¯ÀÀ 
+	//å°†å–æ¶ˆæŒ‰é’®æ”¹ä¸ºæµè§ˆ 
 	pBtn = this->GetDlgItem(IDCANCEL);
 	pBtn->EnableWindow(TRUE);
 
@@ -128,8 +128,8 @@ void CCopyProcessDlg::OnBnClickedCancel()
 
 
 	if (FALSE == m_bIsCopying )
-	{//ÒÑ¾­¿½±´ÍêÁË
-		//´ò¿ª×ÊÔ´¹ÜÀíÆ÷£¬¶¨Î»ÎÄ¼þ£¬½«Õâ¸ö¹¤×÷·Åµ½Ïß³ÌÖÐÈ¥ÊÇÎªÁË±ÜÃâ×èÈûµ±Ç°GUIÏß³Ì
+	{//å·²ç»æ‹·è´å®Œäº†
+		//æ‰“å¼€èµ„æºç®¡ç†å™¨ï¼Œå®šä½æ–‡ä»¶ï¼Œå°†è¿™ä¸ªå·¥ä½œæ”¾åˆ°çº¿ç¨‹ä¸­åŽ»æ˜¯ä¸ºäº†é¿å…é˜»å¡žå½“å‰GUIçº¿ç¨‹
 		CloseHandle(CreateThread(NULL , 0 , PosFileInExplore , &(this->m_strFileToWrite) , 0 , NULL));
 		OnOK();
 		return;
@@ -138,13 +138,13 @@ void CCopyProcessDlg::OnBnClickedCancel()
 	if ( NULL != m_hCopyThread || INVALID_HANDLE_VALUE != m_hCopyThread)
 	{
 		if(WAIT_TIMEOUT == WaitForSingleObject(m_hCopyThread , 1000))
-		{//µÈ´ý³¬Ê±,Ò²Ö»ÓÐÃ»°ì·¨µÄÊ±ºò²ÅÄÜÇ¿ÐÐ¹Ø±ÕÏß³Ì,
+		{//ç­‰å¾…è¶…æ—¶,ä¹Ÿåªæœ‰æ²¡åŠžæ³•çš„æ—¶å€™æ‰èƒ½å¼ºè¡Œå…³é—­çº¿ç¨‹,
 			 if(FALSE != GetExitCodeThread(m_hCopyThread , &dwExitCode))
 				TerminateThread(m_hCopyThread , dwExitCode);
 		}
 	}
 
-	//Èç¹û´æÔÚµÄ»°¾ÍÉ¾³ý£¬ÏÖÔÚ¿ÉÒÔÉ¾³ýÁËÃ»ÓÐÓÃÁËµÄÎÄ¼þ
+	//å¦‚æžœå­˜åœ¨çš„è¯å°±åˆ é™¤ï¼ŒçŽ°åœ¨å¯ä»¥åˆ é™¤äº†æ²¡æœ‰ç”¨äº†çš„æ–‡ä»¶
 	::DeleteFile(this->m_strFileToWrite);
 
 	OnCancel();

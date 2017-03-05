@@ -1,4 +1,4 @@
-// NtfsFileDlg.cpp : ÊµÏÖÎÄ¼þ
+ï»¿// NtfsFileDlg.cpp : å®žçŽ°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -6,7 +6,7 @@
 #include "NtfsFileDlg.h"
 
 
-// CNtfsFileDlg ¶Ô»°¿ò
+// CNtfsFileDlg å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(CNtfsFileDlg, CDialog)
 
@@ -58,17 +58,17 @@ BOOL CNtfsFileDlg::SetFilePath( CString strSelPath )
 	
 	pNtfs = m_pDoc->m_pNtfs.get();
 
-	//ÏÈ²»¹ÜÓÐÃ»ÓÐ´ò¿ª£¬¹Ø±ÕÒ»ÏÂ£¬±ÜÃâ×ÊÔ´Ð¹Â¶
+	//å…ˆä¸ç®¡æœ‰æ²¡æœ‰æ‰“å¼€ï¼Œå…³é—­ä¸€ä¸‹ï¼Œé¿å…èµ„æºæ³„éœ²
 	m_upFile->Close();
-	//´ò¿ªÖ¸¶¨µÄÎÄ¼þ
+	//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶
 	res = pNtfs->OpenFile(strSelPath, m_upFile.get());
 	if (DR_OK != res)
-	{//´ò¿ªÖ¸¶¨µÄÎÄ¼þÊ§°Ü
+	{//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶å¤±è´¥
 		return FALSE;
 	}
 
 	m_strFilePath = strSelPath;
-	//½«Êý¾ÝÖØÐÂÏÔÊ¾³öÀ´
+	//å°†æ•°æ®é‡æ–°æ˜¾ç¤ºå‡ºæ¥
 	UpdateFileData();
 
 	return TRUE;
@@ -81,75 +81,75 @@ void CNtfsFileDlg::UpdateFileData()
 	int			nCunt = 0;
 	int			i = 0;
 	CListCtrl*	pList;
-	DNtfsFile::PAttrItem pAttrItem = NULL;  //ÎÄ¼þÊôÐÔ½Úµã
+	DNtfsFile::PAttrItem pAttrItem = NULL;  //æ–‡ä»¶å±žæ€§èŠ‚ç‚¹
 	CString		strTemp;
 	int			nTemp;
 	DNtfsAttr	ntfsAttr;
 	WCHAR		wBuf[100] = {0};
 	LONG_INT	mft = {0};
 
-	//ÏÔÊ¾Â·¾¶
+	//æ˜¾ç¤ºè·¯å¾„
 	pWnd = this->GetDlgItem(IDC_FILE_PATH);
 	::SetWindowText(pWnd->GetSafeHwnd() , this->m_strFilePath);
 
-	//»ñµÃÎÄ¼þÃû
+	//èŽ·å¾—æ–‡ä»¶å
 	nCunt = m_strFilePath.GetLength();
 	for ( i = nCunt - 1 ; ( i > 0 ) && !IsPathSeparator(m_strFilePath.GetAt(i)); --i );
 	this->SetWindowText(m_strFilePath.Mid(1 + i));
 
 
-	//»ñµÃÎÄ¼þÊôÐÔÊýÁ¿
+	//èŽ·å¾—æ–‡ä»¶å±žæ€§æ•°é‡
 	nCunt = m_upFile->GetAttrCount();
-	//¼ÓÔØÊôÐÔÁÐ±í
+	//åŠ è½½å±žæ€§åˆ—è¡¨
 	pList = (CListCtrl*)this->GetDlgItem(IDC_NTFS_FILE_ATTR_LIST);
 	pList->DeleteAllItems();
 	for (i = 0 ; i < nCunt; ++i)
 	{
-		//»ñµÃÊôÐÔ¶ÔÏó
+		//èŽ·å¾—å±žæ€§å¯¹è±¡
 		pAttrItem = m_upFile->GetAttr((DWORD)i);
 		if (NULL == pAttrItem) ASSERT(FALSE);
 		ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 		
-		//ÊôÐÔID
+		//å±žæ€§ID
 		strTemp.Format(_T("%d") , pAttrItem->id);
 		pList->InsertItem(i , strTemp);
 
-		//ÊôÐÔÀàÐÍ 
+		//å±žæ€§ç±»åž‹ 
 		strTemp = GetNtfsAttrTypeName(pAttrItem->attrType);
 		pList->SetItemText(i , 1 , strTemp );
 
-		//ÊôÐÔÃû
+		//å±žæ€§å
 		ntfsAttr.GetAttrName(wBuf , 100);
 		strTemp = wBuf;
 		pList->SetItemText(i , 2 , strTemp );
 
-		//×Ö½ÚÊý
+		//å­—èŠ‚æ•°
 		nTemp = ntfsAttr.GetAllLen();
 		strTemp.Format(_T("%X") , nTemp);
 		pList->SetItemText(i , 3 , strTemp );
 
-		//ÊÇ·ñ³£×¤
+		//æ˜¯å¦å¸¸é©»
 		if(FALSE == ntfsAttr.IsNonResident())
 		{
 			strTemp.LoadString(IDS_YES_HOOK);
 			pList->SetItemText(i , 4 , strTemp );
 		}
 
-		//Ñ¹Ëõ
+		//åŽ‹ç¼©
 		if(ntfsAttr.IsCompressed())
 		{
 			strTemp.LoadString(IDS_YES_HOOK);
 			pList->SetItemText(i , 5 , strTemp );
 		}
 
-		//Ï¡Êè
+		//ç¨€ç–
 		if(ntfsAttr.IsSparse())
 		{
 			strTemp.LoadString(IDS_YES_HOOK);
 			pList->SetItemText(i , 6 , strTemp );
 		}
 
-		//¼ÓÃÜ
+		//åŠ å¯†
 		if(ntfsAttr.IsEncrypted())
 		{
 			strTemp.LoadString(IDS_YES_HOOK);
@@ -157,16 +157,16 @@ void CNtfsFileDlg::UpdateFileData()
 		}
 	}
 
-	//¸üÐÂdosÊôÐÔ
+	//æ›´æ–°doså±žæ€§
 	UpdateDosAttr();
 
-	//¸üÐÂMFT¼ÇÂ¼ºÅ
+	//æ›´æ–°MFTè®°å½•å·
 	pWnd = this->GetDlgItem(IDC_MFT_NUM);
 	mft = m_upFile->GetMftIndex();
 	mft.HighPart?strTemp.Format(_T("%X%08X") , mft.HighPart , mft.LowPart):strTemp.Format(_T("%X") , mft.LowPart);
 	pWnd->SetWindowText(strTemp);
 
-	//¸üÐÂ¸¸Ä¿Â¼¼ÇÂ¼ºÅ
+	//æ›´æ–°çˆ¶ç›®å½•è®°å½•å·
 	pWnd = this->GetDlgItem(IDC_PARENT_MFT);
 	mft = m_upFile->GetParentMftIndex();
 	mft.HighPart?strTemp.Format(_T("%X%08X") , mft.HighPart , mft.LowPart):strTemp.Format(_T("%X") , mft.LowPart);
@@ -183,45 +183,45 @@ BOOL CNtfsFileDlg::OnInitDialog()
 
 	CListCtrl* pList = (CListCtrl*)this->GetDlgItem(IDC_NTFS_FILE_ATTR_LIST);
 	
-	//ÊôÐÔID
+	//å±žæ€§ID
 	strTemp.LoadString(IDS_ATTR_ID);
 	pList->InsertColumn(0 , strTemp , LVCFMT_LEFT , 50);
 
-	//ÊôÐÔÀàÐÍ 
+	//å±žæ€§ç±»åž‹ 
 	strTemp.LoadString(IDS_ATTR_TYPE);
 	pList->InsertColumn(1 , strTemp , LVCFMT_LEFT , 150);
 	
-	//ÊôÐÔÃû
+	//å±žæ€§å
 	strTemp.LoadString(IDS_ATTR_NAME);
 	pList->InsertColumn(2 , strTemp , LVCFMT_LEFT , 70);
 
-	//×Ö½ÚÊý
+	//å­—èŠ‚æ•°
 	strTemp.LoadString(IDS_ATTR_SIZE);
 	pList->InsertColumn(3 , strTemp , LVCFMT_LEFT , 90);
 
-	//ÊÇ·ñ³£×¤
+	//æ˜¯å¦å¸¸é©»
 	strTemp.LoadString(IDS_ATTR_RESIDENT);
 	pList->InsertColumn(4 , strTemp , LVCFMT_LEFT , 40);
 
-	//Ñ¹Ëõ
+	//åŽ‹ç¼©
 	strTemp.LoadString(IDS_ATTR_COMPRESSED);
 	pList->InsertColumn(5 , strTemp , LVCFMT_LEFT , 40);
 	
-	//Ï¡Êè
+	//ç¨€ç–
 	strTemp.LoadString(IDS_ATTR_SPARSE);
 	pList->InsertColumn(6 , strTemp , LVCFMT_LEFT , 40);
 	
-	//¼ÓÃÜ
+	//åŠ å¯†
 	strTemp.LoadString(IDS_ATTR_ENCRYPTED);
 	pList->InsertColumn(7 , strTemp , LVCFMT_LEFT , 40);
 
 	dwStyle = pList->GetExtendedStyle();
-	dwStyle |= LVS_EX_FULLROWSELECT;//Ñ¡ÖÐÄ³ÐÐÊ¹ÕûÐÐ¸ßÁÁ
-	dwStyle |= LVS_EX_GRIDLINES;	//Íø¸ñÏß
-	pList->SetExtendedStyle(dwStyle); //ÉèÖÃÀ©Õ¹·ç¸ñ
+	dwStyle |= LVS_EX_FULLROWSELECT;//é€‰ä¸­æŸè¡Œä½¿æ•´è¡Œé«˜äº®
+	dwStyle |= LVS_EX_GRIDLINES;	//ç½‘æ ¼çº¿
+	pList->SetExtendedStyle(dwStyle); //è®¾ç½®æ‰©å±•é£Žæ ¼
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// Òì³£: OCX ÊôÐÔÒ³Ó¦·µ»Ø FALSE
+	// å¼‚å¸¸: OCX å±žæ€§é¡µåº”è¿”å›ž FALSE
 }
 
 void CNtfsFileDlg::OnNMClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -229,24 +229,24 @@ void CNtfsFileDlg::OnNMClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 
-	//´¦ÀíÁÐ±íµÄµÄµã»÷ÊÂ¼þ 
+	//å¤„ç†åˆ—è¡¨çš„çš„ç‚¹å‡»äº‹ä»¶ 
 	CString strTemp;
 	LONG_INT liEnd = {0};
 	DWORD	nAttrID = 0;
 	int		nAttrCnt = 0;
 	int		i;
 	LONG_INT liSector = {0};
-	DNtfsFile::PAttrItem pAttrItem = NULL;  //ÎÄ¼þÊôÐÔ½Úµã
+	DNtfsFile::PAttrItem pAttrItem = NULL;  //æ–‡ä»¶å±žæ€§èŠ‚ç‚¹
 	DNtfsAttr	ntfsAttr;
 	CListCtrl* pList = (CListCtrl*)this->GetDlgItem(IDC_NTFS_FILE_ATTR_LIST);
 	int nItem = pList->GetSelectionMark();
 	if (-1 == nItem) return ;
 
-	//»ñµÃÊôÐÔID
+	//èŽ·å¾—å±žæ€§ID
 	strTemp = pList->GetItemText(nItem , 0);
 	nAttrID = atoi((LPCSTR)(LPCTSTR)strTemp);
 
-	//»ñµÃ¾ßÌåµÄÊôÐÔ
+	//èŽ·å¾—å…·ä½“çš„å±žæ€§
 	nAttrCnt = m_upFile->GetAttrCount();
 	for (i = 0 ; i < nAttrCnt ; ++i )
 	{
@@ -255,21 +255,21 @@ void CNtfsFileDlg::OnNMClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult)
 		if (pAttrItem->id == nAttrID)
 			break;
 	}
-	if (i == nAttrCnt) ASSERT(FALSE);   //ÕâÊÇ²»ÔÊÐí³öÏÖµÄÇé¿ö
+	if (i == nAttrCnt) ASSERT(FALSE);   //è¿™æ˜¯ä¸å…è®¸å‡ºçŽ°çš„æƒ…å†µ
 
-	//»ñµÃÊµ¼ÊµÄÉÈÇøºÅ
+	//èŽ·å¾—å®žé™…çš„æ‰‡åŒºå·
 	liSector.QuadPart = this->m_pDoc->m_pNtfs->GetSectorOfMFTRecode(
 		pAttrItem->mftIndex).QuadPart +  pAttrItem->off / SECTOR_SIZE;
 	
-	//ÉèÖÃµ±Ç°ÉÈÇøºÅ
+	//è®¾ç½®å½“å‰æ‰‡åŒºå·
 	this->m_pDoc->SetCurSector(liSector);
 
-	//Ñ¡Ôñ
+	//é€‰æ‹©
 	ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 	liSector.QuadPart *= SECTOR_SIZE;
 	liSector.QuadPart += (pAttrItem->off % SECTOR_SIZE);
 	liEnd.QuadPart = liSector.QuadPart + ntfsAttr.GetAllLen();
-	//ÉèÖÃÑ¡ÔñÇøÓò
+	//è®¾ç½®é€‰æ‹©åŒºåŸŸ
 	this->m_pDoc->SetSel(liSector , liEnd);
 }
 
@@ -279,16 +279,16 @@ void CNtfsFileDlg::UpdateDosAttr()
 	DRES		res		= DR_OK;
 	DWORD		dwFlags = 0;
 	CWnd*		pWnd	= NULL;
-	DNtfsFile::PAttrItem pAttrItem = NULL;  //ÎÄ¼þÊôÐÔ½Úµã
+	DNtfsFile::PAttrItem pAttrItem = NULL;  //æ–‡ä»¶å±žæ€§èŠ‚ç‚¹
 
-	//±ê×¼ÊôÐÔÖÐµÄdosÊôÐÔ
+	//æ ‡å‡†å±žæ€§ä¸­çš„doså±žæ€§
 	pAttrItem = m_upFile->FindAttribute(AD_STANDARD_INFORMATION);
 	if ( NULL != pAttrItem)
 	{
 		ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 		dwFlags = ntfsAttr.SIGetFlags();
 	}
-	//ÎÄ¼þÃûµÄDOSÊôÐÔ
+	//æ–‡ä»¶åçš„DOSå±žæ€§
 	pAttrItem = m_upFile->FindAttribute(AD_FILE_NAME);
 	if ( NULL != pAttrItem)
 	{
@@ -296,7 +296,7 @@ void CNtfsFileDlg::UpdateDosAttr()
 		dwFlags |= ntfsAttr.FNGetFlags();
 	}
 	
-	//Ö»¶Á
+	//åªè¯»
 	pWnd = this->GetDlgItem(IDC_CK_READ_ONLY);
 	if (dwFlags & ATTR_READ_ONLY)
 	{
@@ -304,7 +304,7 @@ void CNtfsFileDlg::UpdateDosAttr()
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//Òþ²Ø
+	//éšè—
 	pWnd = this->GetDlgItem(IDC_CK_HIDDEN);
 	if (dwFlags & ATTR_HIDDEN)
 	{
@@ -312,7 +312,7 @@ void CNtfsFileDlg::UpdateDosAttr()
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//¹éµµ
+	//å½’æ¡£
 	pWnd = this->GetDlgItem(IDC_CK_ARCHIVE);
 	if (dwFlags & ATTR_ARCHIVE)
 	{
@@ -320,7 +320,7 @@ void CNtfsFileDlg::UpdateDosAttr()
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//ÏµÍ³
+	//ç³»ç»Ÿ
 	pWnd = this->GetDlgItem(IDC_CK_SYSTEM);
 	if (dwFlags & ATTR_SYSTEM)
 	{
@@ -328,56 +328,56 @@ void CNtfsFileDlg::UpdateDosAttr()
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//Ï¡Êè
+	//ç¨€ç–
 	pWnd = this->GetDlgItem(IDC_CK_SPARSE);
 	if (dwFlags & ATTR_SPARES)
 		((CButton*)pWnd)->SetCheck(TRUE);
 	else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//Ñ¹Ëõ
+	//åŽ‹ç¼©
 	pWnd = this->GetDlgItem(IDC_CK_COMPRESSED);
 	if (dwFlags & ATTR_COMPRESSED)
 		((CButton*)pWnd)->SetCheck(TRUE);
 	else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//¼ÓÃÜ
+	//åŠ å¯†
 	pWnd = this->GetDlgItem(IDC_CK_ENCRYPTED);
 	if (dwFlags & ATTR_ENCRYPTED)
 		((CButton*)pWnd)->SetCheck(TRUE);
 	else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//Ä¿Â¼
+	//ç›®å½•
 	pWnd = this->GetDlgItem(IDC_CK_DIR);
 	if (dwFlags & ATTR_DIRECTORY_INDEX)
 		((CButton*)pWnd)->SetCheck(TRUE);
 	else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//ÁÙÊ±
+	//ä¸´æ—¶
 	pWnd = this->GetDlgItem(IDC_CK_TEMP);
 	if (dwFlags & ATTR_TEMPORARY)
 		((CButton*)pWnd)->SetCheck(TRUE);
 	else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//Éè±¸
+	//è®¾å¤‡
 	pWnd = this->GetDlgItem(IDC_CK_DEVICE);
 	if (dwFlags & ATTR_DEVICE)
 		((CButton*)pWnd)->SetCheck(TRUE);
 	else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//³£¹æ
+	//å¸¸è§„
 	pWnd = this->GetDlgItem(IDC_CK_NORMAL);
 	if (dwFlags & ATTR_NORMAL)
 		((CButton*)pWnd)->SetCheck(TRUE);
 	else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//¶à·Öµã
+	//å¤šåˆ†ç‚¹
 	pWnd = this->GetDlgItem(IDC_CK_REPARSE_POINT);
 	if (dwFlags & ATTR_REPARSE_POINT)
 		((CButton*)pWnd)->SetCheck(TRUE);
@@ -385,7 +385,7 @@ void CNtfsFileDlg::UpdateDosAttr()
 		((CButton*)pWnd)->SetCheck(FALSE);
 
 // #define ATTR_OFFLINE		0x1000		//Offline      1000000000000 
-// #define ATTR_NOT_CONTENT_IDX 0x2000//Ã»ÓÐË÷ÒýµÄindex  10000000000000
+// #define ATTR_NOT_CONTENT_IDX 0x2000//æ²¡æœ‰ç´¢å¼•çš„index  10000000000000
 // #define ATTR_INDEX_VIEW		 0x20000000	//Index View
 
 }
@@ -398,10 +398,10 @@ void CNtfsFileDlg::OnBnClickedCkReadOnly()
 void CNtfsFileDlg::OnCheckBox( DWORD id )
 {
 	if(BST_CHECKED == ::IsDlgButtonChecked(this->m_hWnd , id))
-	{///Ñ¡ÖÐ
+	{///é€‰ä¸­
 		::CheckDlgButton(this->m_hWnd , id , BST_UNCHECKED);
 	}else{
-		///Ã»Ñ¡ÖÐ
+		///æ²¡é€‰ä¸­
 		::CheckDlgButton(this->m_hWnd , id , BST_CHECKED);
 	}
 }
@@ -463,27 +463,27 @@ void CNtfsFileDlg::OnBnClickedCkReparsePoint()
 
 void CNtfsFileDlg::OnPosStdAttrHead()
 {
-	//´¦ÀíÁÐ±íµÄµÄµã»÷ÊÂ¼þ
+	//å¤„ç†åˆ—è¡¨çš„çš„ç‚¹å‡»äº‹ä»¶
 	CString		strTemp;
 	DWORD		nAttrID = 0;
-	DNtfsFile::PAttrItem pAttrItem = NULL;  //ÎÄ¼þÊôÐÔ½Úµã
+	DNtfsFile::PAttrItem pAttrItem = NULL;  //æ–‡ä»¶å±žæ€§èŠ‚ç‚¹
 	DNtfsAttr	ntfsAttr;
 	DWORD		nAttrCnt;
 	DWORD		i = 0; 
 	LONG_INT	liSector = {0};
 	LONG_INT	liEnd = {0};
 
-	//µ±Ç°ÁÐ±í¿Ø¼þ
+	//å½“å‰åˆ—è¡¨æŽ§ä»¶
 	CListCtrl*	pList = (CListCtrl*)this->GetDlgItem(IDC_NTFS_FILE_ATTR_LIST);
-	//µ±Ç°Ñ¡ÖÐµÄÁÐºÅ
+	//å½“å‰é€‰ä¸­çš„åˆ—å·
 	int nItem = pList->GetSelectionMark();
 	if (-1 == nItem) return ;
 
-	//»ñµÃÊôÐÔID
+	//èŽ·å¾—å±žæ€§ID
 	strTemp = pList->GetItemText(nItem , 0);
 	nAttrID = atoi((LPCSTR)(LPCTSTR)strTemp);
 	
-	//»ñµÃ¾ßÌåµÄÊôÐÔ
+	//èŽ·å¾—å…·ä½“çš„å±žæ€§
 	nAttrCnt = m_upFile->GetAttrCount();
 	for (i = 0 ; i < nAttrCnt ; ++i )
 	{
@@ -492,29 +492,29 @@ void CNtfsFileDlg::OnPosStdAttrHead()
 		if (pAttrItem->id == nAttrID)
 			break;
 	}
-	if (i == nAttrCnt) ASSERT(FALSE);   //ÕâÊÇ²»ÔÊÐí³öÏÖµÄÇé¿ö
+	if (i == nAttrCnt) ASSERT(FALSE);   //è¿™æ˜¯ä¸å…è®¸å‡ºçŽ°çš„æƒ…å†µ
 
-	//»ñµÃÊµ¼ÊµÄÉÈÇøºÅ
+	//èŽ·å¾—å®žé™…çš„æ‰‡åŒºå·
 	liSector.QuadPart = this->m_pDoc->m_pNtfs->GetSectorOfMFTRecode(
 		pAttrItem->mftIndex).QuadPart +  pAttrItem->off / SECTOR_SIZE;
 
-	//ÉèÖÃµ±Ç°ÉÈÇøºÅ
+	//è®¾ç½®å½“å‰æ‰‡åŒºå·
 	this->m_pDoc->SetCurSector(liSector);
 
-	//Ñ¡Ôñ
+	//é€‰æ‹©
 	ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 	liSector.QuadPart *= SECTOR_SIZE;
 	liSector.QuadPart += (pAttrItem->off % SECTOR_SIZE);
 
 	if (ntfsAttr.IsNonResident())
-	{//·Ç³£×¤ÊôÐÔ
+	{//éžå¸¸é©»å±žæ€§
 		liEnd.QuadPart = liSector.QuadPart + ntfsAttr.NR_GetStdHeadLen();
 	}else{
-		//³£×¤ÊôÐÔ
+		//å¸¸é©»å±žæ€§
 		liEnd.QuadPart = liSector.QuadPart + ntfsAttr.R_GetStdHeadLen();
 	}
 
-	//ÉèÖÃÑ¡ÔñÇøÓò
+	//è®¾ç½®é€‰æ‹©åŒºåŸŸ
 	this->m_pDoc->SetSel(liSector , liEnd);
 }
 
@@ -522,7 +522,7 @@ void CNtfsFileDlg::OnSeverAttr()
 {
 	DWORD		i = 0;
 	int			len = 0;
-	//»ñµÃµ±Ç°Ñ¡ÖÐµÄÎÄ¼þ
+	//èŽ·å¾—å½“å‰é€‰ä¸­çš„æ–‡ä»¶
 	CString		strFilePath = this->m_strFilePath;
 	CString		strFileName;
 	CString		strWrite;
@@ -530,7 +530,7 @@ void CNtfsFileDlg::OnSeverAttr()
 	CString		strTemp;
 	DWORD		nAttrID;
 	HANDLE		hFile;
-	DNtfsFile::PAttrItem pAttrItem = NULL;  //ÎÄ¼þÊôÐÔ½Úµã
+	DNtfsFile::PAttrItem pAttrItem = NULL;  //æ–‡ä»¶å±žæ€§èŠ‚ç‚¹
 	DNtfsAttr	ntfsAttr;
 	DWORD		nAttrCnt;
 	DWORD		dwWriten;
@@ -539,22 +539,22 @@ void CNtfsFileDlg::OnSeverAttr()
 	for (i = len - 1 ; i > 0 && !IsPathSeparator(strFilePath.GetAt(i)); --i);
 	strFileName = strFilePath.Mid( i + 1 );
 	if (strFileName.GetLength() == 1 && (IsPathSeparator(strFileName.GetAt(0))))
-	{//ÊÇ¸ùÄ¿Â¼
+	{//æ˜¯æ ¹ç›®å½•
 		strFileName = _T("root");
 	}
-	//µ±Ç°ÁÐ±í¿Ø¼þ
+	//å½“å‰åˆ—è¡¨æŽ§ä»¶
 	pList = (CListCtrl*)this->GetDlgItem(IDC_NTFS_FILE_ATTR_LIST);
-	//µ±Ç°Ñ¡ÖÐµÄÁÐºÅ
+	//å½“å‰é€‰ä¸­çš„åˆ—å·
 	int nItem = pList->GetSelectionMark();
 	if (-1 == nItem) return ;
 
-	//»ñµÃÊôÐÔID
+	//èŽ·å¾—å±žæ€§ID
 	strTemp = pList->GetItemText(nItem , 0);
 	nAttrID = atoi((LPCSTR)(LPCTSTR)strTemp);
-	//ÊôÐÔÀàÐÍ
+	//å±žæ€§ç±»åž‹
 	strTemp = pList->GetItemText(nItem , 1);
 	strFileName += (_T("_") + strTemp);
-	//ÊôÐÔÃû
+	//å±žæ€§å
 	strTemp = pList->GetItemText(nItem , 2);
 	if (strTemp.GetLength())
 	{
@@ -563,18 +563,18 @@ void CNtfsFileDlg::OnSeverAttr()
 	
 
 
-	//ÎÄ¼þÑ¡Ôñ¶Ô»°¿ò
+	//æ–‡ä»¶é€‰æ‹©å¯¹è¯æ¡†
 	CFileDialog fDlg(FALSE , NULL , strFileName , OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT );
 	if(IDCANCEL == fDlg.DoModal())
-	{//È¡ÏûÁË 
+	{//å–æ¶ˆäº† 
 		return;
 	}
 
-	//»ñµÃÒªÐ´µÄÂ·¾¶Ãû
+	//èŽ·å¾—è¦å†™çš„è·¯å¾„å
 	strWrite = fDlg.GetPathName();
 
-	//»ñÈ¡Ö¸¶¨µÄÊôÐÔ
-	//»ñµÃ¾ßÌåµÄÊôÐÔ
+	//èŽ·å–æŒ‡å®šçš„å±žæ€§
+	//èŽ·å¾—å…·ä½“çš„å±žæ€§
 	nAttrCnt = m_upFile->GetAttrCount();
 	for (i = 0 ; i < nAttrCnt ; ++i )
 	{
@@ -583,14 +583,14 @@ void CNtfsFileDlg::OnSeverAttr()
 		if (pAttrItem->id == nAttrID)
 			break;
 	}
-	if (i == nAttrCnt) ASSERT(FALSE);   //ÕâÊÇ²»ÔÊÐí³öÏÖµÄÇé¿ö
+	if (i == nAttrCnt) ASSERT(FALSE);   //è¿™æ˜¯ä¸å…è®¸å‡ºçŽ°çš„æƒ…å†µ
 	ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 
 
-	//´ò¿ªÒªÐ´µÄÎÄ¼þ
+	//æ‰“å¼€è¦å†™çš„æ–‡ä»¶
 	hFile = ::CreateFile(strWrite , GENERIC_WRITE , FILE_SHARE_READ , NULL , CREATE_ALWAYS ,FILE_ATTRIBUTE_NORMAL , NULL);
 	if (INVALID_HANDLE_VALUE == hFile)
-	{//´ò¿ª½«ÒªÐ´µÄÎÄ¼þÊ§°Ü 
+	{//æ‰“å¼€å°†è¦å†™çš„æ–‡ä»¶å¤±è´¥ 
 		CString strTitle;
 		CString	strMsg;
 		strTitle.LoadString(IDS_PROMPT);
@@ -600,10 +600,10 @@ void CNtfsFileDlg::OnSeverAttr()
 		return ;
 	}
 
-	//½«Êý¾ÝÐ´µ½ÎÄ¼þ
+	//å°†æ•°æ®å†™åˆ°æ–‡ä»¶
 	if (FALSE == ::WriteFile(hFile, pAttrItem->attrDataBuf.data(),
 		ntfsAttr.GetAllLen() , &dwWriten , NULL ))
-	{//¶ÁÈ¡ÊôÐÔÊ§°Ü
+	{//è¯»å–å±žæ€§å¤±è´¥
 		CString strTitle;
 		CString	strMsg;
 		strTitle.LoadString(IDS_PROMPT);
@@ -613,7 +613,7 @@ void CNtfsFileDlg::OnSeverAttr()
 		return ;
 	}
 	
-	//¸´ÖÆ³É¹¦
+	//å¤åˆ¶æˆåŠŸ
 	CString strTitle;
 	CString	strMsg;
 	strTitle.LoadString(IDS_PROMPT);
@@ -625,27 +625,27 @@ void CNtfsFileDlg::OnSeverAttr()
 
 void CNtfsFileDlg::OnPosStdAttrData()
 {
-	//´¦ÀíÁÐ±íµÄµÄµã»÷ÊÂ¼þ
+	//å¤„ç†åˆ—è¡¨çš„çš„ç‚¹å‡»äº‹ä»¶
 	CString		strTemp;
 	DWORD		nAttrID = 0;
-	DNtfsFile::PAttrItem pAttrItem = NULL;  //ÎÄ¼þÊôÐÔ½Úµã
+	DNtfsFile::PAttrItem pAttrItem = NULL;  //æ–‡ä»¶å±žæ€§èŠ‚ç‚¹
 	DNtfsAttr	ntfsAttr;
 	DWORD		nAttrCnt;
 	DWORD		i = 0; 
 	LONG_INT	liSector = {0};
 	LONG_INT	liEnd = {0};
 
-	//µ±Ç°ÁÐ±í¿Ø¼þ
+	//å½“å‰åˆ—è¡¨æŽ§ä»¶
 	CListCtrl*	pList = (CListCtrl*)this->GetDlgItem(IDC_NTFS_FILE_ATTR_LIST);
-	//µ±Ç°Ñ¡ÖÐµÄÁÐºÅ
+	//å½“å‰é€‰ä¸­çš„åˆ—å·
 	int nItem = pList->GetSelectionMark();
 	if (-1 == nItem) return ;
 
-	//»ñµÃÊôÐÔID
+	//èŽ·å¾—å±žæ€§ID
 	strTemp = pList->GetItemText(nItem , 0);
 	nAttrID = atoi((LPCSTR)(LPCTSTR)strTemp);
 
-	//»ñµÃ¾ßÌåµÄÊôÐÔ
+	//èŽ·å¾—å…·ä½“çš„å±žæ€§
 	nAttrCnt = m_upFile->GetAttrCount();
 	for (i = 0 ; i < nAttrCnt ; ++i )
 	{
@@ -654,29 +654,29 @@ void CNtfsFileDlg::OnPosStdAttrData()
 		if (pAttrItem->id == nAttrID)
 			break;
 	}
-	if (i == nAttrCnt) ASSERT(FALSE);   //ÕâÊÇ²»ÔÊÐí³öÏÖµÄÇé¿ö
+	if (i == nAttrCnt) ASSERT(FALSE);   //è¿™æ˜¯ä¸å…è®¸å‡ºçŽ°çš„æƒ…å†µ
 
-	//»ñµÃÊµ¼ÊµÄÉÈÇøºÅ
+	//èŽ·å¾—å®žé™…çš„æ‰‡åŒºå·
 	liSector.QuadPart = this->m_pDoc->m_pNtfs->GetSectorOfMFTRecode(
 		pAttrItem->mftIndex).QuadPart +  pAttrItem->off / SECTOR_SIZE;
 
-	//ÉèÖÃµ±Ç°ÉÈÇøºÅ
+	//è®¾ç½®å½“å‰æ‰‡åŒºå·
 	this->m_pDoc->SetCurSector(liSector);
 
-	//Ñ¡Ôñ
+	//é€‰æ‹©
 	ntfsAttr.InitAttr(pAttrItem->attrDataBuf.data());
 	liSector.QuadPart *= SECTOR_SIZE;
 	liSector.QuadPart += (pAttrItem->off % SECTOR_SIZE);
 	liEnd.QuadPart = liSector.QuadPart + ntfsAttr.GetAllLen();
 	if (ntfsAttr.IsNonResident())
-	{//·Ç³£×¤ÊôÐÔ
+	{//éžå¸¸é©»å±žæ€§
 		liSector.QuadPart += ntfsAttr.NR_GetStdHeadLen();
 	}else{
-		//³£×¤ÊôÐÔ
+		//å¸¸é©»å±žæ€§
 		liSector.QuadPart += ntfsAttr.R_GetStdHeadLen();
 	}
 
-	//ÉèÖÃÑ¡ÔñÇøÓò
+	//è®¾ç½®é€‰æ‹©åŒºåŸŸ
 	this->m_pDoc->SetSel( liSector , liEnd );
 }
 
@@ -685,17 +685,17 @@ void CNtfsFileDlg::OnNMRClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 
-	CRect	cRect;//¿Í»§Çø
-	CPoint	p;	//Êó±êµ±Ç°Î»ÖÃ
+	CRect	cRect;//å®¢æˆ·åŒº
+	CPoint	p;	//é¼ æ ‡å½“å‰ä½ç½®
 	CMenu	menu;
 	CMenu*	pMenu;
 
 	::GetWindowRect(this->GetSafeHwnd()/*AfxGetMainWnd()->GetSafeHwnd()*/ , &cRect);
 	::GetCursorPos(&p);
 	if(!cRect.PtInRect(p)) 
-		return ;//Ö»ÔÚÁÐ±í¿ÕÖÐÏÔÊ¾¿ì½Ý²Ëµ¥
+		return ;//åªåœ¨åˆ—è¡¨ç©ºä¸­æ˜¾ç¤ºå¿«æ·èœå•
 
-	//¿ì½Ý²Ëµ¥
+	//å¿«æ·èœå•
 	menu.LoadMenu(IDR_NTFS_FILE_ATTR_LIST_MENU);
 	pMenu = menu.GetSubMenu(0);
 	pMenu->TrackPopupMenu(TPM_LEFTALIGN|TPM_TOPALIGN , p.x , p.y , this/*AfxGetMainWnd()*/ , NULL);

@@ -1,4 +1,4 @@
-// DiskScan.cpp : Defines the class behaviors for the application.
+ï»¿// DiskScan.cpp : Defines the class behaviors for the application.
 //
 
 #include "stdafx.h"
@@ -73,7 +73,7 @@ BOOL CDiskScanApp::InitInstance()
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views.
 
-	//ÓÃÓÚ¹ÜÀí´ÅÅÌµÄÎÄµµ¹ÜÀíÆ÷
+	//ç”¨äºç®¡ç†ç£ç›˜çš„æ–‡æ¡£ç®¡ç†å™¨
 	m_pDiskDocTemplate = new CMultiDocTemplate(
 		IDR_DISKSCTYPE,
 		RUNTIME_CLASS(CDiskDoc),
@@ -81,7 +81,7 @@ BOOL CDiskScanApp::InitInstance()
 		RUNTIME_CLASS(CHexDataView));
 	AddDocTemplate(m_pDiskDocTemplate);
 
-	//ÓÃÓÚ¹ÜÀíFat32¾íµÄÎÄµµÄ£°å
+	//ç”¨äºç®¡ç†Fat32å·çš„æ–‡æ¡£æ¨¡æ¿
 	m_pFat32DocTemplate = new CMultiDocTemplate(
 		IDR_FAT32TYPE,
 		RUNTIME_CLASS(CFat32Doc),
@@ -89,7 +89,7 @@ BOOL CDiskScanApp::InitInstance()
 		RUNTIME_CLASS(CHexDataView));
 	AddDocTemplate(m_pFat32DocTemplate);
 
-	//ÓÃÓÚ¹ÜÀíNtfs¾íµÄÎÄµµÄ£°å
+	//ç”¨äºç®¡ç†Ntfså·çš„æ–‡æ¡£æ¨¡æ¿
 	m_pNtfsDocTemplate = new CMultiDocTemplate(
 		IDR_NTFSTYPE,
 		RUNTIME_CLASS(CNtfsDoc),
@@ -116,7 +116,7 @@ BOOL CDiskScanApp::InitInstance()
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
 
-	//´ò¿ªÊ±²»´´½¨ÎÄµµ
+	//æ‰“å¼€æ—¶ä¸åˆ›å»ºæ–‡æ¡£
 	if(cmdInfo.m_nShellCommand == CCommandLineInfo::FileNew){
 		cmdInfo.m_nShellCommand = CCommandLineInfo::FileNothing;
 	}

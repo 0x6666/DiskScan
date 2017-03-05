@@ -1,4 +1,4 @@
-// Fat32FileAttr.cpp : ÊµÏÖÎÄ¼þ
+ï»¿// Fat32FileAttr.cpp : å®žçŽ°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -6,7 +6,7 @@
 #include "Fat32FileAttr.h"
 
 
-// CFat32FileAttr ¶Ô»°¿ò
+// CFat32FileAttr å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(CFat32FileDlg, CDialog)
 
@@ -54,7 +54,7 @@ END_MESSAGE_MAP()
 
 
 
-// //ÉèÖÃµ±Ç°ÒªÏÔÊ¾µÄÎÄ¼þµÄÂ·¾¶
+// //è®¾ç½®å½“å‰è¦æ˜¾ç¤ºçš„æ–‡ä»¶çš„è·¯å¾„
 
 BOOL CFat32FileDlg::SetFilePath( CString file )
 {
@@ -63,21 +63,21 @@ BOOL CFat32FileDlg::SetFilePath( CString file )
 	pDFat32 = this->m_pDoc->m_pFat32;
 
 	this->m_pFile->Close();
-	//´ò¿ªÖ¸¶¨µÄÎÄ¼þ
+	//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶
 	res = pDFat32->OpenFile(file , this->m_pFile);
 	if (DR_OK != res)
-	{//´ò¿ªÖ¸¶¨µÄÎÄ¼þÊ§°Ü
+	{//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶å¤±è´¥
 		return FALSE;
 	}
 
 	m_strFilePath = file;
-	//½«Êý¾ÝÖØÐÂÏÔÊ¾³öÀ´
+	//å°†æ•°æ®é‡æ–°æ˜¾ç¤ºå‡ºæ¥
 	UpdateFileData();
 
 	return TRUE;
 }
 
-// Ë¢ÐÂÊý¾Ý
+// åˆ·æ–°æ•°æ®
 int CFat32FileDlg::UpdateFileData(void)
 {
 	CString		strTitle;
@@ -85,67 +85,67 @@ int CFat32FileDlg::UpdateFileData(void)
 	BYTE		attr;
 	int			nCunt = 0;
 	int			i = 0;
-	//ÏÔÊ¾Â·¾¶
+	//æ˜¾ç¤ºè·¯å¾„
 	pWnd = this->GetDlgItem(IDC_FILE_PATH);
 	::SetWindowText(pWnd->GetSafeHwnd() , this->m_strFilePath);
 
-	//»ñµÃÎÄ¼þÃû
+	//èŽ·å¾—æ–‡ä»¶å
 	nCunt = m_strFilePath.GetLength();
 	for ( i = nCunt - 1 ; i > 0 && !IsPathSeparator(m_strFilePath.GetAt(i)); --i );
 	this->SetWindowText(m_strFilePath.Mid(1 + i));
 
-	//»ñµÃ´ËÎÄ¼þµÄÊôÐÔ
+	//èŽ·å¾—æ­¤æ–‡ä»¶çš„å±žæ€§
 	attr = this->m_pFile->GetFileAttr();
 
 
 	pWnd = this->GetDlgItem(IDC_CK_READ_ONLY);
 	if (attr & ATTR_READ_ONLY)
-	{//ÊÇÖ»¶ÁÎÄ¼þ/Ä¿Â¼
+	{//æ˜¯åªè¯»æ–‡ä»¶/ç›®å½•
 		((CButton*)pWnd)->SetCheck(TRUE);
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
 	pWnd = this->GetDlgItem(IDC_CK_HIDDEN);
 	if (attr & ATTR_HIDDEN)
-	{//ÊÇÖ»¶ÁÎÄ¼þ/Ä¿Â¼
+	{//æ˜¯åªè¯»æ–‡ä»¶/ç›®å½•
 		((CButton*)pWnd)->SetCheck(TRUE);
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
 	pWnd = this->GetDlgItem(IDC_CK_SYSTEM);
 	if (attr & ATTR_SYSTEM)
-	{//ÊÇÖ»¶ÁÎÄ¼þ/Ä¿Â¼
+	{//æ˜¯åªè¯»æ–‡ä»¶/ç›®å½•
 		((CButton*)pWnd)->SetCheck(TRUE);
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
 	pWnd = this->GetDlgItem(IDC_CK_VOL_ID);
 	if (attr & ATTR_VOLUME_ID)
-	{//ÊÇÖ»¶ÁÎÄ¼þ/Ä¿Â¼
+	{//æ˜¯åªè¯»æ–‡ä»¶/ç›®å½•
 		((CButton*)pWnd)->SetCheck(TRUE);
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
 	pWnd = this->GetDlgItem(IDC_CK_DIR);
 	if (attr & ATTR_DIRECTORY)
-	{//ÊÇÖ»¶ÁÎÄ¼þ/Ä¿Â¼
+	{//æ˜¯åªè¯»æ–‡ä»¶/ç›®å½•
 		((CButton*)pWnd)->SetCheck(TRUE);
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
 	pWnd = this->GetDlgItem(IDC_CK_ARTRIVE);
 	if (attr & ATTR_ARCHIVE)
-	{//ÊÇÖ»¶ÁÎÄ¼þ/Ä¿Â¼
+	{//æ˜¯åªè¯»æ–‡ä»¶/ç›®å½•
 		((CButton*)pWnd)->SetCheck(TRUE);
 	}else
 		((CButton*)pWnd)->SetCheck(FALSE);
 
-	//¿ªÆôÏß³Ì¼ÓÔØ´ØÁ´
-	this->m_bIsThreadRun = FALSE;  //Í¨ÖªÍ£Ö¹Ïß³Ì
+	//å¼€å¯çº¿ç¨‹åŠ è½½ç°‡é“¾
+	this->m_bIsThreadRun = FALSE;  //é€šçŸ¥åœæ­¢çº¿ç¨‹
 	//Sleep(200);	
-	//µÈ´ýÓ¦´æÔÚµÄÏß³Ì½áÊø
+	//ç­‰å¾…åº”å­˜åœ¨çš„çº¿ç¨‹ç»“æŸ
 	if(WAIT_TIMEOUT == WaitForSingleObject(m_hThread , 800))
-	{//ÊÖ¶¯¹Ø±ÕÏß³ÌÎÞÐ§ ÔòÔòÇ¿ÐÐ¹Ø±Õ
+	{//æ‰‹åŠ¨å…³é—­çº¿ç¨‹æ— æ•ˆ åˆ™åˆ™å¼ºè¡Œå…³é—­
 		DWORD dwExitCode = 0;
 		if(GetExitCodeThread(m_hThread , &dwExitCode ))
 			TerminateThread(m_hThread , dwExitCode);
@@ -173,9 +173,9 @@ BOOL CFat32FileDlg::OnInitDialog()
 	strTemp.LoadString(IDS_CLUST_NUM);
 	pList->InsertColumn(1 , strTemp , LVCFMT_LEFT , 90);
 	dwStyle = pList->GetExtendedStyle();
-	dwStyle |= LVS_EX_FULLROWSELECT;//Ñ¡ÖÐÄ³ÐÐÊ¹ÕûÐÐ¸ßÁÁ
-	dwStyle |= LVS_EX_GRIDLINES;	//Íø¸ñÏß
-	pList->SetExtendedStyle(dwStyle); //ÉèÖÃÀ©Õ¹·ç¸ñ
+	dwStyle |= LVS_EX_FULLROWSELECT;//é€‰ä¸­æŸè¡Œä½¿æ•´è¡Œé«˜äº®
+	dwStyle |= LVS_EX_GRIDLINES;	//ç½‘æ ¼çº¿
+	pList->SetExtendedStyle(dwStyle); //è®¾ç½®æ‰©å±•é£Žæ ¼
 
 	pList = (CListCtrl*)this->GetDlgItem(IDC_FAT2_LIST);
 	strTemp.LoadString(IDS_ID);
@@ -183,13 +183,13 @@ BOOL CFat32FileDlg::OnInitDialog()
 	strTemp.LoadString(IDS_CLUST_NUM);
 	pList->InsertColumn(1 , strTemp , LVCFMT_LEFT , 90);
 	dwStyle = pList->GetExtendedStyle();
-	dwStyle |= LVS_EX_FULLROWSELECT;//Ñ¡ÖÐÄ³ÐÐÊ¹ÕûÐÐ¸ßÁÁ
-	dwStyle |= LVS_EX_GRIDLINES;	//Íø¸ñÏß
-	pList->SetExtendedStyle(dwStyle); //ÉèÖÃÀ©Õ¹·ç¸ñ
+	dwStyle |= LVS_EX_FULLROWSELECT;//é€‰ä¸­æŸè¡Œä½¿æ•´è¡Œé«˜äº®
+	dwStyle |= LVS_EX_GRIDLINES;	//ç½‘æ ¼çº¿
+	pList->SetExtendedStyle(dwStyle); //è®¾ç½®æ‰©å±•é£Žæ ¼
 
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// Òì³£: OCX ÊôÐÔÒ³Ó¦·µ»Ø FALSE
+	// å¼‚å¸¸: OCX å±žæ€§é¡µåº”è¿”å›ž FALSE
 }
 
 void CFat32FileDlg::OnNMClickFat1List(NMHDR *pNMHDR, LRESULT *pResult)
@@ -197,7 +197,7 @@ void CFat32FileDlg::OnNMClickFat1List(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 
-	//ÁÐ±í¿Ø¼þ
+	//åˆ—è¡¨æŽ§ä»¶
 	CListCtrl*	pList = (CListCtrl*)this->GetDlgItem(IDC_FAT1_LIST);
 	DFat32*		pFat32 = this->m_pDoc->m_pFat32;
 	int			nItem = 0;
@@ -207,31 +207,31 @@ void CFat32FileDlg::OnNMClickFat1List(NMHDR *pNMHDR, LRESULT *pResult)
 	LONG_INT	liTemp = {0};
 	LONG_INT	liEnd = {0};
 
-	//»ñµÃÑ¡ÔñµÄ´ØºÅ
-	//Ñ¡ÔñÁËµÄÊý¾Ý
+	//èŽ·å¾—é€‰æ‹©çš„ç°‡å·
+	//é€‰æ‹©äº†çš„æ•°æ®
 	nItem = pList->GetSelectionMark();
-	if (-1 == nItem) return ;	//Ã»ÓÐÑ¡ÔñÈÎºÎÊý¾Ý
+	if (-1 == nItem) return ;	//æ²¡æœ‰é€‰æ‹©ä»»ä½•æ•°æ®
 	strTemp = pList->GetItemText(nItem , 1);
 	if (0 == strTemp.GetLength()) return ;
 	dwClust = DWORD(HexStrToLONG_INT(strTemp).QuadPart);
 
-	//¼ÆËã´ØºÅËùÔÚµÄÉÈÇø
+	//è®¡ç®—ç°‡å·æ‰€åœ¨çš„æ‰‡åŒº
 	liTemp.QuadPart = (dwClust / (SECTOR_SIZE / 4)) + pFat32->GetReserveSector();
 
-	//ÉÈÇøÁÐ±í 
+	//æ‰‡åŒºåˆ—è¡¨ 
 	SectorList secList;
 	secList.AddSector(pFat32->GetReserveSector() , pFat32->GetSectorPerFAT());
 	secList.m_strName.LoadString(IDS_FAT1);
 	this->m_pDoc->SetSectorList(&secList);
 
-	//ÒÆ¶¯µ½Ö¸¶¨µÄÉÈÇø
+	//ç§»åŠ¨åˆ°æŒ‡å®šçš„æ‰‡åŒº
 	this->m_pDoc->SetCurSector(liTemp);
 
-	//¼ÆËã´ØºÅËùÔÚÉÈÇøÄÚÆ«ÒÆ 
+	//è®¡ç®—ç°‡å·æ‰€åœ¨æ‰‡åŒºå†…åç§» 
 	liTemp.QuadPart *= SECTOR_SIZE;
 	liTemp.QuadPart += (dwClust % (SECTOR_SIZE / 4) * 4);
 
-	//Ñ¡ÔñÖ¸¶¨µÄÊý¾Ý
+	//é€‰æ‹©æŒ‡å®šçš„æ•°æ®
 	liEnd.QuadPart = liTemp.QuadPart + 4;
 	this->m_pDoc->SetSel(liTemp ,liEnd );
 }
@@ -241,7 +241,7 @@ void CFat32FileDlg::OnNMClickFat2List(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 
-	//ÁÐ±í¿Ø¼þ
+	//åˆ—è¡¨æŽ§ä»¶
 	CListCtrl*	pList = (CListCtrl*)this->GetDlgItem(IDC_FAT2_LIST);
 	DFat32*		pFat32 = this->m_pDoc->m_pFat32;
 	int			nItem = 0;
@@ -251,33 +251,33 @@ void CFat32FileDlg::OnNMClickFat2List(NMHDR *pNMHDR, LRESULT *pResult)
 	LONG_INT	liTemp = {0};
 	LONG_INT	liEnd = {0};
 
-	//»ñµÃÑ¡ÔñµÄ´ØºÅ
-	//Ñ¡ÔñÁËµÄÊý¾Ý
+	//èŽ·å¾—é€‰æ‹©çš„ç°‡å·
+	//é€‰æ‹©äº†çš„æ•°æ®
 	nItem = pList->GetSelectionMark();
-	if (-1 == nItem) return ;	//Ã»ÓÐÑ¡ÔñÈÎºÎÊý¾Ý
+	if (-1 == nItem) return ;	//æ²¡æœ‰é€‰æ‹©ä»»ä½•æ•°æ®
 	strTemp = pList->GetItemText(nItem , 1);
 	if (0 == strTemp.GetLength()) return ;
 	dwClust = DWORD(HexStrToLONG_INT(strTemp).QuadPart);
 
-	//¼ÆËã´ØºÅËùÔÚµÄÉÈÇø
+	//è®¡ç®—ç°‡å·æ‰€åœ¨çš„æ‰‡åŒº
 	liTemp.QuadPart = (dwClust / (SECTOR_SIZE / 4)) + pFat32->GetReserveSector() + pFat32->GetSectorPerFAT();
 
 
-	//ÉÈÇøÁÐ±í 
+	//æ‰‡åŒºåˆ—è¡¨ 
 	SectorList secList;
 	secList.AddSector(pFat32->GetReserveSector() + pFat32->GetSectorPerFAT() , pFat32->GetSectorPerFAT());
 	secList.m_strName.LoadString(IDS_FAT2);
 	this->m_pDoc->SetSectorList(&secList);
 
 
-	//ÒÆ¶¯µ½Ö¸¶¨µÄÉÈÇø
+	//ç§»åŠ¨åˆ°æŒ‡å®šçš„æ‰‡åŒº
 	this->m_pDoc->SetCurSector(liTemp);
 
-	//¼ÆËã´ØºÅËùÔÚÉÈÇøÄÚÆ«ÒÆ 
+	//è®¡ç®—ç°‡å·æ‰€åœ¨æ‰‡åŒºå†…åç§» 
 	liTemp.QuadPart *= SECTOR_SIZE;
 	liTemp.QuadPart += (dwClust % (SECTOR_SIZE / 4) * 4);
 
-	//Ñ¡ÔñÖ¸¶¨µÄÊý¾Ý
+	//é€‰æ‹©æŒ‡å®šçš„æ•°æ®
 	liEnd.QuadPart = liTemp.QuadPart + 4;
 	this->m_pDoc->SetSel(liTemp ,liEnd );
 }
@@ -291,10 +291,10 @@ BOOL CFat32FileDlg::PreTranslateMessage(MSG* pMsg)
 void CFat32FileDlg::OnCheckBox( DWORD id )
 {
 	if(BST_CHECKED == ::IsDlgButtonChecked(this->m_hWnd , id))
-	{///Ñ¡ÖÐ
+	{///é€‰ä¸­
 		::CheckDlgButton(this->m_hWnd , id , BST_UNCHECKED);
 	}else{
-		///Ã»Ñ¡ÖÐ
+		///æ²¡é€‰ä¸­
 		::CheckDlgButton(this->m_hWnd , id , BST_CHECKED);
 	}
 }
@@ -333,7 +333,7 @@ void CFat32FileDlg::OnNMDblclkFat1List(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 
-	//ÁÐ±í¿Ø¼þ
+	//åˆ—è¡¨æŽ§ä»¶
 	CListCtrl*	pList = (CListCtrl*)this->GetDlgItem(IDC_FAT1_LIST);
 	DFat32*		pFat32 = this->m_pDoc->m_pFat32;
 	int			nItem = 0;
@@ -342,10 +342,10 @@ void CFat32FileDlg::OnNMDblclkFat1List(NMHDR *pNMHDR, LRESULT *pResult)
 	CString		strTemp;
 	LONG_INT	curSec = {0};
 
-	//»ñµÃÑ¡ÔñµÄ´ØºÅ
-	//Ñ¡ÔñÁËµÄÊý¾Ý
+	//èŽ·å¾—é€‰æ‹©çš„ç°‡å·
+	//é€‰æ‹©äº†çš„æ•°æ®
 	nItem = pList->GetSelectionMark();
-	if (-1 == nItem) return ;	//Ã»ÓÐÑ¡ÔñÈÎºÎÊý¾Ý
+	if (-1 == nItem) return ;	//æ²¡æœ‰é€‰æ‹©ä»»ä½•æ•°æ®
 	strTemp = pList->GetItemText(nItem , 1);
 	if (0 == strTemp.GetLength()) return ;
 	dwClust = DWORD(HexStrToLONG_INT(strTemp).QuadPart);
@@ -357,7 +357,7 @@ void CFat32FileDlg::OnNMDblclkFat1List(NMHDR *pNMHDR, LRESULT *pResult)
 	secList.m_strName += (_T("  ") + strTemp);
 	this->m_pDoc->SetSectorList(&secList);
 
-	//ÒÆ¶¯µ½Ö¸¶¨µÄÉÈÇø
+	//ç§»åŠ¨åˆ°æŒ‡å®šçš„æ‰‡åŒº
 	curSec.QuadPart = dwSector;
 	this->m_pDoc->SetCurSector(curSec);
 
@@ -368,7 +368,7 @@ void CFat32FileDlg::OnNMDblclkFat2List(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 
-	//ÁÐ±í¿Ø¼þ
+	//åˆ—è¡¨æŽ§ä»¶
 	CListCtrl*	pList = (CListCtrl*)this->GetDlgItem(IDC_FAT2_LIST);
 	DFat32*		pFat32 = this->m_pDoc->m_pFat32;
 	int			nItem = 0;
@@ -377,10 +377,10 @@ void CFat32FileDlg::OnNMDblclkFat2List(NMHDR *pNMHDR, LRESULT *pResult)
 	CString		strTemp;
 	LONG_INT	curSec = {0};
 
-	//»ñµÃÑ¡ÔñµÄ´ØºÅ
-	//Ñ¡ÔñÁËµÄÊý¾Ý
+	//èŽ·å¾—é€‰æ‹©çš„ç°‡å·
+	//é€‰æ‹©äº†çš„æ•°æ®
 	nItem = pList->GetSelectionMark();
-	if (-1 == nItem) return ;	//Ã»ÓÐÑ¡ÔñÈÎºÎÊý¾Ý
+	if (-1 == nItem) return ;	//æ²¡æœ‰é€‰æ‹©ä»»ä½•æ•°æ®
 	strTemp = pList->GetItemText(nItem , 1);
 	if (0 == strTemp.GetLength()) return ;
 	dwClust = DWORD(HexStrToLONG_INT(strTemp).QuadPart);
@@ -392,7 +392,7 @@ void CFat32FileDlg::OnNMDblclkFat2List(NMHDR *pNMHDR, LRESULT *pResult)
 	secList.m_strName += (_T("  ") + strTemp);
 	this->m_pDoc->SetSectorList(&secList);
 
-	//ÒÆ¶¯µ½Ö¸¶¨µÄÉÈÇø
+	//ç§»åŠ¨åˆ°æŒ‡å®šçš„æ‰‡åŒº
 	curSec.QuadPart = dwSector;
 	this->m_pDoc->SetCurSector(curSec);
 }

@@ -1,35 +1,35 @@
 /***********************************************************************
  * FileName:	DNtfs.cpp
- * Author:		ÑîËÉ
- * Created:		2012Äê4ÔÂ20ÈÕ ĞÇÆÚÎå
- * Purpose:		ÕâÊÇDNtfsµÄ¾ßÌåÊµÏÖ
- * Comment:		Õâ¸öÀàÊÇ¶ÔÒ»¸öNtfs¾íµÄ³éÏó£¬Ìá¹©¶ÔNtfs²Ù×÷µÄ¸÷ÖÖ·½·¨
+ * Author:		æ¨æ¾
+ * Created:		2012å¹´4æœˆ20æ—¥ æ˜ŸæœŸäº”
+ * Purpose:		è¿™æ˜¯DNtfsçš„å…·ä½“å®ç°
+ * Comment:		è¿™ä¸ªç±»æ˜¯å¯¹ä¸€ä¸ªNtfså·çš„æŠ½è±¡ï¼Œæä¾›å¯¹Ntfsæ“ä½œçš„å„ç§æ–¹æ³•
  *
- * Modify:		ÔÚ³ÌĞòµÄÔËĞĞÆÚ¼ä·¢ÏÖÓĞĞ©Ä¿Â¼µÄIndexBlockÖĞµÄÎÄ¼şÃûÇøÓòÖĞ
- *				µÄDOSÊôĞÔÎªÁã,Ò²¾ÍÊÇËµÔÚ²éÕÒµÄ¹ı³ÌÖĞÈç¹ûÉèÖÃÒª²éÕÒµÄÎÄ¼ş
- *				ÊôĞÔµÄ»°£¬¿ÉÄÜ»á³ö´íÎó£¬Ò²¾ÍÊÇËµÕÒ²»µ½£¬Õâ´ÎÎÒ½«ËùÓĞµÄ´ø
- *				ÊôĞÔ²Ù×÷ĞĞÊı¶¼¸ÄÎªÁË²»´øÊôĞÔµÄº¯Êı£¬±ÜÃâ³öÏÖÎÄ¼ş´æÔÚ¶øÕÒ
- *				²»µ½µÄÇé¿ö.2012-05-21 16:34
+ * Modify:		åœ¨ç¨‹åºçš„è¿è¡ŒæœŸé—´å‘ç°æœ‰äº›ç›®å½•çš„IndexBlockä¸­çš„æ–‡ä»¶ååŒºåŸŸä¸­
+ *				çš„DOSå±æ€§ä¸ºé›¶,ä¹Ÿå°±æ˜¯è¯´åœ¨æŸ¥æ‰¾çš„è¿‡ç¨‹ä¸­å¦‚æœè®¾ç½®è¦æŸ¥æ‰¾çš„æ–‡ä»¶
+ *				å±æ€§çš„è¯ï¼Œå¯èƒ½ä¼šå‡ºé”™è¯¯ï¼Œä¹Ÿå°±æ˜¯è¯´æ‰¾ä¸åˆ°ï¼Œè¿™æ¬¡æˆ‘å°†æ‰€æœ‰çš„å¸¦
+ *				å±æ€§æ“ä½œè¡Œæ•°éƒ½æ”¹ä¸ºäº†ä¸å¸¦å±æ€§çš„å‡½æ•°ï¼Œé¿å…å‡ºç°æ–‡ä»¶å­˜åœ¨è€Œæ‰¾
+ *				ä¸åˆ°çš„æƒ…å†µ.2012-05-21 16:34
  *
- *				ÔÚÖ®Ç°runµÄ²Ù×÷ÊÇÖ±½ÓĞ´ÔÚNTFSÎÄ¼şÀàÖĞ£¬ÄÇÑùµÄ»°Ê¹ÓÃÆğÀ´
- *				ºÜÊÜÏŞ,Ö»ÔÚ·ÃÎÊµÄÊ±ºòÍ¨¹ıÅĞ¶ÏÊÇ·ñÊÇÎÄ¼şÀ´¾ö¶¨³õÊ¼»¯ÎŞÃû
- *				DATAÊôĞÔÖĞµÄRUN»¹ÊÇINDEX_ALLOCATIONÖĞµÄRUN£¬Ò²¾ÍÊÇËµÖ®´¦
- *				ÀíÁËÁ½ÖÖÇé¿öµÄRUN£¬¶øÊµ¼ÊµÄRUNÊÇ¿ÉÒÔ±»ºÜ¶àÊôĞÔÊ¹ÓÃµÄ£¬Ëù
- *				ÒÔÏÖÔÚ½«RUN¶ÀÁ¢³öÀ´ÁË£¬½«Æä¶¨ÒåÎªDRun¡£2012-07-01 11:21¡£
+ *				åœ¨ä¹‹å‰runçš„æ“ä½œæ˜¯ç›´æ¥å†™åœ¨NTFSæ–‡ä»¶ç±»ä¸­ï¼Œé‚£æ ·çš„è¯ä½¿ç”¨èµ·æ¥
+ *				å¾ˆå—é™,åªåœ¨è®¿é—®çš„æ—¶å€™é€šè¿‡åˆ¤æ–­æ˜¯å¦æ˜¯æ–‡ä»¶æ¥å†³å®šåˆå§‹åŒ–æ— å
+ *				DATAå±æ€§ä¸­çš„RUNè¿˜æ˜¯INDEX_ALLOCATIONä¸­çš„RUNï¼Œä¹Ÿå°±æ˜¯è¯´ä¹‹å¤„
+ *				ç†äº†ä¸¤ç§æƒ…å†µçš„RUNï¼Œè€Œå®é™…çš„RUNæ˜¯å¯ä»¥è¢«å¾ˆå¤šå±æ€§ä½¿ç”¨çš„ï¼Œæ‰€
+ *				ä»¥ç°åœ¨å°†RUNç‹¬ç«‹å‡ºæ¥äº†ï¼Œå°†å…¶å®šä¹‰ä¸ºDRunã€‚2012-07-01 11:21ã€‚
  *
- *				ÔÚ»ñÈ¡MFT¼ÇÂ¼µÄµÚÒ»¸öÉÈÇøÊ±£¬ÒÔÇ°ÊÇÖ±½ÓÍ¨¹ı¼ÇÂ¼ºÅ²éÕÒDBR
- *				ÖĞµÄÖ¸¶¨µÄMFT£¬µ«ÊÇ¾İËµÓĞĞ©Çé¿ö»á³öÏÖMFT²»»áÔÙÒ»ÆğµÄÇé¿ö£¬
- *				ËùÔÚÔÚÕâÀïĞŞ¸ÄÁË²éÕÒMFTµÄËã·¨¡£ÒòÎªÎÄ¼ş·ÖÅä±íÆäÊµÒ²ÊÇÒ»¸ö
- *				ÎÄ¼ş,ËùÒÔ²éÕÒµÄ»°¿ÉÒÔÍ¨¹ı²éÕÒÎŞÃûDATAÊôĞÔµÄÖĞRUN»ñµÃÊµ¼Ê
- *				MFT¼ÇÂ¼ËùÔÚµÄ¾ßÌåÎ»ÖÃ,ÕâÑùÒ²¾Í±ÜÃâÁËMFTÒ»·ÖÎª¶şµÄÇé¿ö.µ±
- *				È»£¬ÕâÖÖÇé¿öÎÒÃ»ÓĞ¼û¹ı£¬²é¹ıµÄ×ÊÁÏÒ²¶¼ËµÎÄ¼ş·ÖÅä±íÊ¾Ò»¸ö
- *				Á¬ĞøµÄ¿Õ¼ä,ÊÇÔ¤ÁôµÄ¡£2012-07-01 13:54¡£
+ *				åœ¨è·å–MFTè®°å½•çš„ç¬¬ä¸€ä¸ªæ‰‡åŒºæ—¶ï¼Œä»¥å‰æ˜¯ç›´æ¥é€šè¿‡è®°å½•å·æŸ¥æ‰¾DBR
+ *				ä¸­çš„æŒ‡å®šçš„MFTï¼Œä½†æ˜¯æ®è¯´æœ‰äº›æƒ…å†µä¼šå‡ºç°MFTä¸ä¼šå†ä¸€èµ·çš„æƒ…å†µï¼Œ
+ *				æ‰€åœ¨åœ¨è¿™é‡Œä¿®æ”¹äº†æŸ¥æ‰¾MFTçš„ç®—æ³•ã€‚å› ä¸ºæ–‡ä»¶åˆ†é…è¡¨å…¶å®ä¹Ÿæ˜¯ä¸€ä¸ª
+ *				æ–‡ä»¶,æ‰€ä»¥æŸ¥æ‰¾çš„è¯å¯ä»¥é€šè¿‡æŸ¥æ‰¾æ— åDATAå±æ€§çš„ä¸­RUNè·å¾—å®é™…
+ *				MFTè®°å½•æ‰€åœ¨çš„å…·ä½“ä½ç½®,è¿™æ ·ä¹Ÿå°±é¿å…äº†MFTä¸€åˆ†ä¸ºäºŒçš„æƒ…å†µ.å½“
+ *				ç„¶ï¼Œè¿™ç§æƒ…å†µæˆ‘æ²¡æœ‰è§è¿‡ï¼ŒæŸ¥è¿‡çš„èµ„æ–™ä¹Ÿéƒ½è¯´æ–‡ä»¶åˆ†é…è¡¨ç¤ºä¸€ä¸ª
+ *				è¿ç»­çš„ç©ºé—´,æ˜¯é¢„ç•™çš„ã€‚2012-07-01 13:54ã€‚
  *
- *				ÓÅ»¯MFT²éÕÒËã·¨¡£ÔÚÖ®Ç°Ã¿Ò»¶¨Î»MFT¼ÇÂ¼ÊÇ¶¼Òª»ñÈ¡²éÕÒ$MFT
- *				ÎÄ¼şµÄÎŞÃûDATAÊôĞÔ£¬ÕâÑùµÄ»°Ğ§ÂÊ»áµÍÁËÒ»µã£¬ÏÖÔÚÊÇÔÚ´ò¿ª
- *				Éè±¸ÊÇ¾Í½«ÄÇ¸öRun×ª»»µ½MFT_BLOCKĞòÁĞÖĞÈ¥ÁË£¬±ãÓÚÒÔºóÃ¿Ò»
- *				´Î²éÕÒÊ±¼ÆËã£¬ÕâÑùµÄ»°Ö»Ğè»ñÈ¡Ò»´Î$MFTÎŞÃûÊôĞÔRunÁË£¬ÇÒ¼Æ
- *				ËãÁ¿¼õÉÙÁËÒ»Ğ©¡£2012-07-18 1:07.
+ *				ä¼˜åŒ–MFTæŸ¥æ‰¾ç®—æ³•ã€‚åœ¨ä¹‹å‰æ¯ä¸€å®šä½MFTè®°å½•æ˜¯éƒ½è¦è·å–æŸ¥æ‰¾$MFT
+ *				æ–‡ä»¶çš„æ— åDATAå±æ€§ï¼Œè¿™æ ·çš„è¯æ•ˆç‡ä¼šä½äº†ä¸€ç‚¹ï¼Œç°åœ¨æ˜¯åœ¨æ‰“å¼€
+ *				è®¾å¤‡æ˜¯å°±å°†é‚£ä¸ªRunè½¬æ¢åˆ°MFT_BLOCKåºåˆ—ä¸­å»äº†ï¼Œä¾¿äºä»¥åæ¯ä¸€
+ *				æ¬¡æŸ¥æ‰¾æ—¶è®¡ç®—ï¼Œè¿™æ ·çš„è¯åªéœ€è·å–ä¸€æ¬¡$MFTæ— åå±æ€§Runäº†ï¼Œä¸”è®¡
+ *				ç®—é‡å‡å°‘äº†ä¸€äº›ã€‚2012-07-18 1:07.
  *
  ***********************************************************************/
 
@@ -38,20 +38,20 @@
 #include "stut_connf.h"
 #include "windows.h"
 
-//È¡ÏûÒâË¼°´windows¹ØÓÚ±ê×¢¿âµÄ¾¯¸æ¿ª¹Ø
+//å–æ¶ˆæ„æ€æŒ‰windowså…³äºæ ‡æ³¨åº“çš„è­¦å‘Šå¼€å…³
 #pragma warning(disable:4996)
 
 //////////////////////////////////////////////////////////////////////
-//ÓÃÓÚ²éÕÒÎÄ¼ş¾ä±ú
+//ç”¨äºæŸ¥æ‰¾æ–‡ä»¶å¥æŸ„
 
 //////////////////////////////////////////////////////////////////////
 // typedef struct _FileFindHander{
-// 	LONG_INT vcn;		//ĞéÄâ´ØºÅ  -1 ±íÊ¾indexRootÖĞµÄ
-// 	int index;			//ÔÚÖÆ¶¨vcnÈë¿ÚË÷Òı
+// 	LONG_INT vcn;		//è™šæ‹Ÿç°‡å·  -1 è¡¨ç¤ºindexRootä¸­çš„
+// 	int index;			//åœ¨åˆ¶å®švcnå…¥å£ç´¢å¼•
 // }FIND_FILE_HANDER , *PFIND_FILE_HANDER;
 
 
-//±éÀúÀàĞÍ  1  B+Êı±éÀú   2  Index_Allocation ±éÀú
+//éå†ç±»å‹  1  B+æ•°éå†   2  Index_Allocation éå†
 #define  SEARCH_TYPE  2 
 
 
@@ -84,10 +84,10 @@ DRES DNtfs::OpenDev(const WCHAR* devName, const PLONG_INT off)
 	LONG_INT	temp = {0};
 
 	mDevName = devName;
-	//Éè±¸µÄÆ«ÒÆ
+	//è®¾å¤‡çš„åç§»
 	mFSOff = *off;
 
-	//´ò¿ªÉè±¸
+	//æ‰“å¼€è®¾å¤‡
 	mDev = ::CreateFile(mDevName.c_str(),
 						GENERIC_READ | GENERIC_WRITE,
 						FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -96,33 +96,33 @@ DRES DNtfs::OpenDev(const WCHAR* devName, const PLONG_INT off)
 						0,
 						NULL);
 	if (mDev == INVALID_HANDLE_VALUE)
-	{//´ò¿ªÉè±¸Ê§°Ü
+	{//æ‰“å¼€è®¾å¤‡å¤±è´¥
 		mDevName.clear();
 		mFSOff.QuadPart = 0;
 		return DR_OPEN_DEV_ERR;
 	}
 
-	//¶ÁÈ¡dbrµÄÊı¾İ
+	//è¯»å–dbrçš„æ•°æ®
 	temp.QuadPart = 0;
 	mAllSec.QuadPart = 1;
-	res = ReadData(buf , &temp , SECTOR_SIZE );	//¶ÁÈ¡·ÖÇøµÄµÚÒ»¸öÉÈÇøµÄÊı¾İ
+	res = ReadData(buf , &temp , SECTOR_SIZE );	//è¯»å–åˆ†åŒºçš„ç¬¬ä¸€ä¸ªæ‰‡åŒºçš„æ•°æ®
 	mAllSec.QuadPart = 0;
-	if(DR_OK != res)	return res;				//¶ÁÈ¡Êı¾İÊ§°Ü?
-	if(pDBR->dbrEnd != MBR_END)//Êı¾İÎŞĞ§
+	if(DR_OK != res)	return res;				//è¯»å–æ•°æ®å¤±è´¥?
+	if(pDBR->dbrEnd != MBR_END)//æ•°æ®æ— æ•ˆ
 		return DR_INIT_ERR;
 
-	//¶ÁÈ¡MFTµÄÆğÊ¼Âß¼­´ØºÅ
-	mSecPerClu		= pDBR->bpbSecPerClu;	//Ã¿´ØµÄÉ½ÇøÊı
-//	mResSec			= pDBR->bpbResSec;		//±£ÁôÉÈÇøÊı
-	mAllSec			= pDBR->bpbAllSec;		//×ÜµÄÉÈÇøÊı
+	//è¯»å–MFTçš„èµ·å§‹é€»è¾‘ç°‡å·
+	mSecPerClu		= pDBR->bpbSecPerClu;	//æ¯ç°‡çš„å±±åŒºæ•°
+//	mResSec			= pDBR->bpbResSec;		//ä¿ç•™æ‰‡åŒºæ•°
+	mAllSec			= pDBR->bpbAllSec;		//æ€»çš„æ‰‡åŒºæ•°
 	mCluForMFT		= pDBR->bpbCluForMFT;	//MFT
 	mCluForMFTMirr	= pDBR->bpbCluForMFTMirr;//MFTMirr
 	
-	//³õÊ¼»¯MFT¿é½á¹¹
+	//åˆå§‹åŒ–MFTå—ç»“æ„
 	res = InitMFTBlock();
 
 	if (res != DR_OK)
-	{//²Ù×÷Ê§°Ü
+	{//æ“ä½œå¤±è´¥
 		mDevName.clear();
 		mFSOff.QuadPart = 0;
 		CloseHandle(mDev);
@@ -138,47 +138,47 @@ DRES DNtfs::OpenDev(const WCHAR* devName, const PLONG_INT off)
 
 DRES DNtfs::InitMFTBlock()
 {
-	DNtfsFile	mftFile;//µ±Ç°¾íµÄMFTÎÄ¼ş
+	DNtfsFile	mftFile;//å½“å‰å·çš„MFTæ–‡ä»¶
 	DRES		res = DR_OK;
 	DNtfsFile::PAttrItem pAttrItem = NULL;
 	DNtfsAttr	ntfsAttr;
 	DRun		run;
 	DWORD		i;
-	LONG_INT	liStartMft;	//ÆğÊ¼MFT¼ÇÂ¼ºÅ
+	LONG_INT	liStartMft;	//èµ·å§‹MFTè®°å½•å·
 
-	//´ò¿ª$MFTÎÄ¼ş
+	//æ‰“å¼€$MFTæ–‡ä»¶
 	res = OpenFileW(&mftFile , SYS_FILE_MFT);
-	if (res != DR_OK) return res;  //ÎÄ¼ş´ò¿ªÊ§°Ü
+	if (res != DR_OK) return res;  //æ–‡ä»¶æ‰“å¼€å¤±è´¥
 
-	//»ñµÃÎŞÃûÊı¾İÊôĞÔ 
+	//è·å¾—æ— åæ•°æ®å±æ€§ 
 	if(DR_OK != mftFile.FindNoNameDataAttr(&ntfsAttr))
-	{//»ñÈ¡ÎŞÃûÊı¾İÊôĞÔÊ§°Ü
+	{//è·å–æ— åæ•°æ®å±æ€§å¤±è´¥
 		return DR_INNER_ERR;
 	}
 
-	//»ñµÃÊı¾İÔËĞĞ
+	//è·å¾—æ•°æ®è¿è¡Œ
 	if(DR_OK != run.InitRunList(&ntfsAttr))
 		return DR_INNER_ERR;
 
-	mMftBlockCnt = DWORD(run.mRunList.size());  //¿ìÊıÁ¿
-	mPMftBlock = (PMFT_BLOCK)malloc(sizeof(MFT_BLOCK) * mMftBlockCnt);  //¿Õ¼ä·ÖÅä
+	mMftBlockCnt = DWORD(run.mRunList.size());  //å¿«æ•°é‡
+	mPMftBlock = (PMFT_BLOCK)malloc(sizeof(MFT_BLOCK) * mMftBlockCnt);  //ç©ºé—´åˆ†é…
 	memset(mPMftBlock , 0 , sizeof(MFT_BLOCK) * mMftBlockCnt);
 
 	for( i = 0 , liStartMft.QuadPart = 0 ;
 		i < mMftBlockCnt ; ++i )
 	{
-		//ÆğÊ¼¼ÇÂ¼ºÅ
+		//èµ·å§‹è®°å½•å·
 		mPMftBlock[i].liStartMft = liStartMft;
 
-		//ÆğÊ¼ÉÈÇøºÅ
+		//èµ·å§‹æ‰‡åŒºå·
 		mPMftBlock[i].liStartSector.QuadPart 
 			= run.mRunList[i].lcn.QuadPart * mSecPerClu;
 		
-		//¼ÇÂ¼Êı
+		//è®°å½•æ•°
 		mPMftBlock[i].liMftCnt.QuadPart
 			= (run.mRunList[i].clustCnt.QuadPart * mSecPerClu) / SECTOR_PER_RECODE;
 
-		//Ğ´Ò»¸öMFT¼ÇÂ¼¿éµÄÆğÊ¼¼ÇÂ¼ºÅ
+		//å†™ä¸€ä¸ªMFTè®°å½•å—çš„èµ·å§‹è®°å½•å·
 		liStartMft.QuadPart += mPMftBlock[i].liMftCnt.QuadPart;
 	}
 
@@ -192,7 +192,7 @@ BOOL DNtfs::IsDevOpened()
 
 void DNtfs::CloseDev()
 {
-	//ÊÍ·ÅÃû×Ö¿Õ¼ä
+	//é‡Šæ”¾åå­—ç©ºé—´
 	if (!mDevName.empty())
 	{
 		mDevName.clear();
@@ -215,56 +215,56 @@ DRES DNtfs::ReadData(void* buf , PLONG_INT off , DWORD dwReadCnt , BOOL isOffSec
 	DWORD	 dwReaded = 0;
 	LONG_INT offset;
 
-	//Éè±¸¸ù±¾¾ÍÃ»ÓĞ´ò¿ª
+	//è®¾å¤‡æ ¹æœ¬å°±æ²¡æœ‰æ‰“å¼€
 	if (mDevName.empty())
 		return DR_NO_OPEN;
 
-	if (isOffSec) //ÉÈÇøÆ«ÒÆ
+	if (isOffSec) //æ‰‡åŒºåç§»
 	{
 		if (off->QuadPart >= mAllSec.QuadPart)
-			return DR_DEV_CTRL_ERR; //Ô½½çÁË
+			return DR_DEV_CTRL_ERR; //è¶Šç•Œäº†
 
-		offset.QuadPart = mFSOff.QuadPart + off->QuadPart;	//¶ÁÈ¡Êı¾İµÄÊµ¼ÊÆ«ÒÆ
-		offset.QuadPart *= SECTOR_SIZE;		//×Ö½ÚÆ«ÒÆ
+		offset.QuadPart = mFSOff.QuadPart + off->QuadPart;	//è¯»å–æ•°æ®çš„å®é™…åç§»
+		offset.QuadPart *= SECTOR_SIZE;		//å­—èŠ‚åç§»
 	}
-	else //×Ö½ÚÆ«ÒÆ
+	else //å­—èŠ‚åç§»
 	{
 		if (off->QuadPart / SECTOR_SIZE >= mAllSec.QuadPart)
-			return DR_DEV_CTRL_ERR; //Ô½½çÁË
+			return DR_DEV_CTRL_ERR; //è¶Šç•Œäº†
 
 		offset.QuadPart = mFSOff.QuadPart * SECTOR_SIZE;
 		offset.QuadPart += off->QuadPart;
 	}
 
-	//ÉèÖÃÎÄ¼şÖ¸Õë
+	//è®¾ç½®æ–‡ä»¶æŒ‡é’ˆ
 	offset.LowPart = SetFilePointer(mDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 	if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 		res = DR_DEV_CTRL_ERR;
 
-	//¶ÁÈ¡Êı¾İ
+	//è¯»å–æ•°æ®
 	if(!res && !::ReadFile(mDev , buf , dwReadCnt ,&dwReaded ,NULL) && dwReaded != dwReadCnt)	
 		res =  DR_DEV_IO_ERR;
 
-/*	CloseHandle(hDev);								//¹Ø±ÕÒÑ¾­´ò¿ªµÄÉè±¸*/
+/*	CloseHandle(hDev);								//å…³é—­å·²ç»æ‰“å¼€çš„è®¾å¤‡*/
 	return res;
 }
 
 DRES DNtfs::ReadMFT(void* buf , PLONG_INT index)
 {
-	//ÏÈ¼ÆËãÒ»ÏÂÆ«ÒÆ°É
+	//å…ˆè®¡ç®—ä¸€ä¸‹åç§»å§
  	LONG_INT off;
 
 	if (index->QuadPart != 0)
-	{//Ö»ÓĞµÚÒ»¸öÎÄ¼şĞèÒª²éÕÒ£¬·ñÔò²»ĞèÒª²éÕÒ
+	{//åªæœ‰ç¬¬ä¸€ä¸ªæ–‡ä»¶éœ€è¦æŸ¥æ‰¾ï¼Œå¦åˆ™ä¸éœ€è¦æŸ¥æ‰¾
 		off =GetSectorOfMFTRecode(*index);
 	}else
 	{
 		off = mCluForMFT;
-		off.QuadPart *= mSecPerClu;	//MFTÆäÊµÉÈÇøºÅ
+		off.QuadPart *= mSecPerClu;	//MFTå…¶å®æ‰‡åŒºå·
 /*		off.QuadPart += index->QuadPart * RECODE_PER_SEC;*/
 	}
 	
-	//¶ÁÈ¡Ö¸¶¨µÄÊı¾İ
+	//è¯»å–æŒ‡å®šçš„æ•°æ®
 	return ReadData(buf , &off , MFT_RECODE_SIZE , TRUE);
 }
 
@@ -275,16 +275,16 @@ int DNtfs::FileNameCmp(const WCHAR * src1,const WCHAR * src2 , int len , BOOL ca
 	if (caseSensitiv)
 	{
 		for (i = 0 ;  i < len ; ++i)
-			if (src1[i] == src2[i]) continue;  //µ±Ç°×Ö·ûÏàµÈ
-			else return  src1[i] - src2[i];       //µ±Ç°×Ö·û²»ÏàµÈ
+			if (src1[i] == src2[i]) continue;  //å½“å‰å­—ç¬¦ç›¸ç­‰
+			else return  src1[i] - src2[i];       //å½“å‰å­—ç¬¦ä¸ç›¸ç­‰
 	}else{
 		WCHAR w1 ,w2;
 
 		for (i = 0 ;  i < len ; ++i){
 			w1 = WchrToUpper(src1[i]);
 			w2 = WchrToUpper(src2[i]);
-			if (w1 == w2) continue;  //µ±Ç°×Ö·ûÏàµÈ
-			else return  w1 - w2;       //µ±Ç°×Ö·û²»ÏàµÈ
+			if (w1 == w2) continue;  //å½“å‰å­—ç¬¦ç›¸ç­‰
+			else return  w1 - w2;       //å½“å‰å­—ç¬¦ä¸ç›¸ç­‰
 		}
 	}
 
@@ -296,7 +296,7 @@ DRES DNtfs::OpenFileW(DNtfsFile *file , LONG_INT idx)
 	if (!file)
 		return DR_INVALED_PARAM;
 
-	//Éè±¸¸ù±¾¾ÍÃ»ÓĞ´ò¿ª
+	//è®¾å¤‡æ ¹æœ¬å°±æ²¡æœ‰æ‰“å¼€
 	if (mDevName.empty())
 		return DR_NO_OPEN;
 
@@ -316,68 +316,68 @@ DRES DNtfs::OpenFileA(const char* path , DNtfsFile *file/ * , DWORD attr* / / *=
 	WCHAR wPath[MAX_PATH + 1] = {0};
 	if (path == NULL)return DR_INVALED_PARAM;
 
-	//±àÂë×ª»»
+	//ç¼–ç è½¬æ¢
 	MultyByteToUnic(path , wPath , MAX_PATH + 1);
 
-	//µ÷ÓÃUnicode½Ó¿Ú
+	//è°ƒç”¨Unicodeæ¥å£
 	return OpenFileW(wPath , file / *, attr* /);
 }
 */
 
 DRES DNtfs::OpenFileW(const WCHAR* path , DNtfsFile *file /*,DWORD attr*/)
 {
-	size_t		nameLen		= 0;	//ÎÄ¼şÃûµÄ×Ü³¤¶È
-	DWORD		nameSegLen	= 0;	//ÎÄ¼şÃûµÄÒ»²¿·ÖµÄ³¤¶È
-	const WCHAR*  name		= path; //µ±Ç°ÎÄ¼şÃû
+	size_t		nameLen		= 0;	//æ–‡ä»¶åçš„æ€»é•¿åº¦
+	DWORD		nameSegLen	= 0;	//æ–‡ä»¶åçš„ä¸€éƒ¨åˆ†çš„é•¿åº¦
+	const WCHAR*  name		= path; //å½“å‰æ–‡ä»¶å
 	DWORD		i			= 0;
-/*	DWORD		attrT		= attr;	//ÁÙÊ±µÄÊôĞÔÖµ*/
+/*	DWORD		attrT		= attr;	//ä¸´æ—¶çš„å±æ€§å€¼*/
 	LONG_INT	mftIdx		= {0};
-	DRES		res			= DR_OK;//¸÷¸ö²Ù×÷½á¹û
+	DRES		res			= DR_OK;//å„ä¸ªæ“ä½œç»“æœ
 
 	LONG_INT	liFDTOff	= {0};
 	WORD		fdtLen		= 0;
 
-	//ÎÄ¼şÏµÍ³ÊÇ·ñÒÑ¾­´ò¿ªÁË?
+	//æ–‡ä»¶ç³»ç»Ÿæ˜¯å¦å·²ç»æ‰“å¼€äº†?
 	if (mDevName.empty())
 		return DR_NO_OPEN;
 
-	//°²¼ì
+	//å®‰æ£€
 	if (!path || ! file /*|| !attr*/)
 		return DR_INVALED_PARAM;
 	
-	nameLen = wcslen(path);//ÎÄ¼şÃûµÄ×Ü³¤¶È
-	name    = path; //µ±Ç°ÎÄ¼şÃû
-/*	attrT   = attr;			//ÁÙÊ±µÄÊôĞÔÖµ*/
+	nameLen = wcslen(path);//æ–‡ä»¶åçš„æ€»é•¿åº¦
+	name    = path; //å½“å‰æ–‡ä»¶å
+/*	attrT   = attr;			//ä¸´æ—¶çš„å±æ€§å€¼*/
 
-// 	//ÊÇÄ¿Â¼µÄ»°
+// 	//æ˜¯ç›®å½•çš„è¯
 // 	if (attr & ATTR_DIRECTORY)
 // 		attrT |= ATTR_DIRECTORY_INDEX;
 	
-	//¸ùÄ¿Â¼
+	//æ ¹ç›®å½•
 	mftIdx.QuadPart = SYS_FILE_ROOT;
 
 	while(name[0]){
-		//±éÀúÎÄ¼şÂ·¾¶µÄÃ¿Ò»¶Î
+		//éå†æ–‡ä»¶è·¯å¾„çš„æ¯ä¸€æ®µ
 		for(i = 0 ; name[0] ;++i ){
-			if(IsPathSeparator(name[i]))  ++name;//È¥µôÎÄ¼şÃûÇ°ÃæµÄ·Ö¸ô·û¶î
+			if(IsPathSeparator(name[i]))  ++name;//å»æ‰æ–‡ä»¶åå‰é¢çš„åˆ†éš”ç¬¦é¢
 			else  break;		
 		}
-		//²éÕÒÍê±Ï
+		//æŸ¥æ‰¾å®Œæ¯•
 		if (!name[0] )  break;
 
-		//¼ÆËãµ±Ç°Â·¾¶¶ÎµÄ³¤¶È
+		//è®¡ç®—å½“å‰è·¯å¾„æ®µçš„é•¿åº¦
 		for (nameSegLen = 0 ; 
 			!IsPathSeparator(name[nameSegLen]) && name[nameSegLen] ;
 			++nameSegLen);
 
-/*		if (name[nameSegLen]) attrT = attr | ATTR_DIRECTORY |ATTR_DIRECTORY_INDEX;//ÊÇÎÊ¼ÙÃû*/
+/*		if (name[nameSegLen]) attrT = attr | ATTR_DIRECTORY |ATTR_DIRECTORY_INDEX;//æ˜¯é—®å‡å*/
 
-		//ÔÚÄ¿Â¼²éÕÒÎÄ¼ş
-		//±éÀúËùÓĞµÄvcn¶ÔÓ¦µÄblock
+		//åœ¨ç›®å½•æŸ¥æ‰¾æ–‡ä»¶
+		//éå†æ‰€æœ‰çš„vcnå¯¹åº”çš„block
 		//res = FindItemByName(mftIdx , name ,nameSegLen , &mftIdx ,  attrT);
-		//ÊÕË÷b+Ê÷
+		//æ”¶ç´¢b+æ ‘
 		res = FindItemByName2(mftIdx , name ,nameSegLen , &mftIdx  , &liFDTOff , &fdtLen);
-		//³ö´íÁË
+		//å‡ºé”™äº†
 		if (res != DR_OK) return res;
 		name += nameSegLen;
 	}
@@ -394,105 +394,105 @@ DRES DNtfs::OpenFileW(const WCHAR* path , DNtfsFile *file /*,DWORD attr*/)
 DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_INT mftIdx , DWORD attr)
 {
  	DRES			res			= DR_OK;
-	LONG_INT		parentMft	= {0};	//±»²éÕÒµÄÄ¿Â¼µÄmft¼ÇÂ¼ºÅ
+	LONG_INT		parentMft	= {0};	//è¢«æŸ¥æ‰¾çš„ç›®å½•çš„mftè®°å½•å·
  	DWORD			blockSize	= 0;
  	BYTE*			blockEnd	= 0;
 	INDEX_ENTRY*	indexEntry	= NULL;
-	LONG_INT		vcn			= {0};	//ĞéÄâ´ØºÅ
-	LONG_INT		lcn			= {0};	//Âß¼­´ØºÅ
-	std::vector<BYTE> indexBlockBuf;//Ë÷Òı»º´æÇøµÄÆäÊµµØÖ·
- 	PFILE_NAME		fn			= NULL; //ÎÄ¼şÊôĞÔÖ¸Õë
+	LONG_INT		vcn			= {0};	//è™šæ‹Ÿç°‡å·
+	LONG_INT		lcn			= {0};	//é€»è¾‘ç°‡å·
+	std::vector<BYTE> indexBlockBuf;//ç´¢å¼•ç¼“å­˜åŒºçš„å…¶å®åœ°å€
+ 	PFILE_NAME		fn			= NULL; //æ–‡ä»¶å±æ€§æŒ‡é’ˆ
 	DNtfsFile		root;
  	DNtfsAttr		attrRoot;
  	DNtfsAttr		attrAllocation;
-	DNtfsAttr		attrBitMp;		//ÎªÍÁÊôĞÔ
+	DNtfsAttr		attrBitMp;		//ä¸ºåœŸå±æ€§
 
 
-	//°²¼ì
+	//å®‰æ£€
 	if (!name || len <= 0 || len > 255 || !mftIdx) return DR_INVALED_PARAM; 
 
-	if (dir.QuadPart == -1)  //ÔÚÖ¸¶¨µÄÄ¿Â¼ÖĞ²éÕÒ
+	if (dir.QuadPart == -1)  //åœ¨æŒ‡å®šçš„ç›®å½•ä¸­æŸ¥æ‰¾
 		parentMft.QuadPart = SYS_FILE_ROOT;
 	else
 		parentMft = dir;
 
 
-	//»ñµÃÖ¸¶¨µÄ¸½ÎÄ¼ş¼ÇÂ¼
+	//è·å¾—æŒ‡å®šçš„é™„æ–‡ä»¶è®°å½•
 	res = OpenFileW(&root , parentMft);
 	
-	//»ñµÃ¸úÊôĞÔ
+	//è·å¾—è·Ÿå±æ€§
 	res = root.FindAttribute(AD_INDEX_ROOT , &attrRoot);
-	//³öÎÊÌâ
+	//å‡ºé—®é¢˜
 	if (res != DR_OK)	return DR_INIT_ERR;
-	//Ë÷Òı¿éµÄ´óĞ¡
+	//ç´¢å¼•å—çš„å¤§å°
 	blockSize = attrRoot.IRGetIndexBlockSize();
-	//Ë÷Òı±íµÄµÚÒ»¸öÈë¿ÚµÄµØÖ·
+	//ç´¢å¼•è¡¨çš„ç¬¬ä¸€ä¸ªå…¥å£çš„åœ°å€
 	indexEntry = PINDEX_ENTRY(attrRoot.IRGetFistEntry());
-	//Ë÷Òı±íµÄ½áÊøÎ»ÖÃ
+	//ç´¢å¼•è¡¨çš„ç»“æŸä½ç½®
 	blockEnd = (BYTE*)indexEntry + attrRoot.IRGetAlloIndexEntriesSize();
 
-	//±éÀúÕû¸öË÷Òı±í
+	//éå†æ•´ä¸ªç´¢å¼•è¡¨
 	for (;(BYTE*)indexEntry != blockEnd 
 		;indexEntry = PINDEX_ENTRY((BYTE*)indexEntry + indexEntry->IE_Size))
 	{
-		if ((BYTE*)indexEntry + 0x10 > blockEnd)//³ö´íÁË 0x10ÊÇINDEX_RNTRYÍ·²¿µÄ´óĞ¡
+		if ((BYTE*)indexEntry + 0x10 > blockEnd)//å‡ºé”™äº† 0x10æ˜¯INDEX_RNTRYå¤´éƒ¨çš„å¤§å°
 		{
 			root.Close();
 			return  DR_INIT_ERR;
 		}
-		//±ê¼ÇÁË×îºóÈë¿ÚµÄEntry²»»áº¬ÓĞÃû×Ö.Ò²²»»áÓĞº¢×Ó½ÚµãµÄÖ¸Õë
-		if (indexEntry->IE_Flags & INDEX_ENTRY_END)  //µ½ÁË½áÎ²ÁË
-			break;  //Ìø³öºó¿ªÊ¼¼ì²évcn
+		//æ ‡è®°äº†æœ€åå…¥å£çš„Entryä¸ä¼šå«æœ‰åå­—.ä¹Ÿä¸ä¼šæœ‰å­©å­èŠ‚ç‚¹çš„æŒ‡é’ˆ
+		if (indexEntry->IE_Flags & INDEX_ENTRY_END)  //åˆ°äº†ç»“å°¾äº†
+			break;  //è·³å‡ºåå¼€å§‹æ£€æŸ¥vcn
 
-		fn = PFILE_NAME(indexEntry->IE_Stream);  //»ñÈ¡ÎÄ¼şÃûÊôĞÔ
-		if(fn->FN_NameSize != len || !(fn->FN_DOSAttr & attr)) 		continue;			//ÎÄ¼şÃûµÄ³¤¶È²»Æ¥Åä
+		fn = PFILE_NAME(indexEntry->IE_Stream);  //è·å–æ–‡ä»¶åå±æ€§
+		if(fn->FN_NameSize != len || !(fn->FN_DOSAttr & attr)) 		continue;			//æ–‡ä»¶åçš„é•¿åº¦ä¸åŒ¹é…
 		if (!FileNameCmp(fn->FN_FileName ,  name , len , FALSE ))
-		{//ÕÒµ½ÁË
-			mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16)>>16; //È¥µô¸ßÁ½¸ö×Ö½ÚµÄmftĞòÁĞºÅ
+		{//æ‰¾åˆ°äº†
+			mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16)>>16; //å»æ‰é«˜ä¸¤ä¸ªå­—èŠ‚çš„mftåºåˆ—å·
 			root.Close();
-			return DR_OK;   //ÕÒµ½ÁË¾ÍÖ±½Ó·µ»Ø
+			return DR_OK;   //æ‰¾åˆ°äº†å°±ç›´æ¥è¿”å›
 		}else
 			continue;
 	}
 
-	//»ñµÃÏàÓ¦µÄÊôĞÔ
+	//è·å¾—ç›¸åº”çš„å±æ€§
 	res = root.FindAttribute(AD_BITMAP , &attrBitMp);
-	if (res == DR_NO) return DR_NO_FILE;  //Ã»ÓĞÎ»Í¼ÊôĞÔ   	
+	if (res == DR_NO) return DR_NO_FILE;  //æ²¡æœ‰ä½å›¾å±æ€§   	
 	res = root.FindAttribute(AD_INDEX_ALLOCATION , &attrAllocation);
-	if (res == DR_NO) return DR_NO_FILE;  //Ã»ÓĞvcn->lcnÓ³Éä±íÊôĞÔ
+	if (res == DR_NO) return DR_NO_FILE;  //æ²¡æœ‰vcn->lcnæ˜ å°„è¡¨å±æ€§
 	
-	root.Close();		//²»ĞèÒªÓÃÁË
+	root.Close();		//ä¸éœ€è¦ç”¨äº†
 
 
-	//ÏÈÉêÇëÒ»¿éË÷Òı»º´æÇøµÄ»º´æ
+	//å…ˆç”³è¯·ä¸€å—ç´¢å¼•ç¼“å­˜åŒºçš„ç¼“å­˜
 	indexBlockBuf.resize(blockSize, 0);
 
-	int bitCnt = attrBitMp.R_GetAttrLen() * 8;  //bitmapÖĞµÄbitÊı
-	vcn.QuadPart = 0;//ÆäÊµvcn
+	int bitCnt = attrBitMp.R_GetAttrLen() * 8;  //bitmapä¸­çš„bitæ•°
+	vcn.QuadPart = 0;//å…¶å®vcn
 
-	//±éÀúÕû¸öB+Ê÷
+	//éå†æ•´ä¸ªB+æ ‘
 	while (1)
 	{
-		//»ñµÃÏÂÒ»¸övcn
+		//è·å¾—ä¸‹ä¸€ä¸ªvcn
 		for( ; vcn.QuadPart < bitCnt ; ++vcn.QuadPart) {
 			if (attrBitMp.BMIsBitSet(vcn , this))
 				break;
 		}
 		if (vcn.QuadPart == bitCnt){
-			res = DR_NO_FILE;//Ã»ÓĞÕÒµ½ÎÄ¼ş		
+			res = DR_NO_FILE;//æ²¡æœ‰æ‰¾åˆ°æ–‡ä»¶		
 			break;
 		}
 
-		//»ñµÃÂß¼­´ØºÅ
+		//è·å¾—é€»è¾‘ç°‡å·
 		lcn = root.GetLCNByVCN(vcn , NULL);
 		//lcn = attrAllocation.IAGetLCNByVCN(&vcn , NULL);
 		lcn.QuadPart *= mSecPerClu; 
-		ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//¶ÁÈ¡Ö¸¶¨µÄÊı¾İ
+		ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//è¯»å–æŒ‡å®šçš„æ•°æ®
 
-		//Ïß»Ö¸´usa
+		//çº¿æ¢å¤usa
 		PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlockBuf.data());
 
-		//»ñµÃusaµÄÊıÁ¿  
+		//è·å¾—usaçš„æ•°é‡  
 		int		usaCnt = ibh->IB_USNSz ;
 		WORD	us	   = 0;
 		DWORD	offUsa = ibh->IB_USOff;
@@ -504,44 +504,44 @@ DRES DNtfs::FindItemByName(LONG_INT dir , const  WCHAR* name, int len , PLONG_IN
 			SetWORD(indexBlockBuf.data() + 512 * i - 2, us);
 		}
 
-		//¶ÔÓ¦ĞéÄâ´ØºÅ
+		//å¯¹åº”è™šæ‹Ÿç°‡å·
 		if (vcn.QuadPart != ibh->IB_VCN.QuadPart)
-		{//ĞéÄâ´ØºÅ²»Æ¥Åä
+		{//è™šæ‹Ÿç°‡å·ä¸åŒ¹é…
 			res = DR_INIT_ERR;
 			break;
 		}
 
-		//Ë÷Òı±íµÄµÚÒ»¸öÈë¿ÚµÄµØÖ·
+		//ç´¢å¼•è¡¨çš„ç¬¬ä¸€ä¸ªå…¥å£çš„åœ°å€
 		indexEntry = PINDEX_ENTRY((BYTE*)&ibh->IB_indexHead + ibh->IB_indexHead.IH_EntryOff);
-		//Ë÷Òı±íµÄ½áÊøÎ»ÖÃ
+		//ç´¢å¼•è¡¨çš„ç»“æŸä½ç½®
 		blockEnd = (BYTE*)&ibh->IB_indexHead + ibh->IB_indexHead.IH_AllocSize;
 
-		//±éÀúÕû¸öË÷Òı±í
+		//éå†æ•´ä¸ªç´¢å¼•è¡¨
 		for (;(BYTE*)indexEntry != blockEnd ; 
 			indexEntry = PINDEX_ENTRY((BYTE*)indexEntry + indexEntry->IE_Size))
 		{
 			if ((BYTE*)indexEntry + 0x10 > blockEnd)
-			{//³ö´íÁË 0x10ÊÇINDEX_RNTRYÍ·²¿µÄ´óĞ¡
+			{//å‡ºé”™äº† 0x10æ˜¯INDEX_RNTRYå¤´éƒ¨çš„å¤§å°
 				res =  DR_INIT_ERR;
 				break;
 			}
 
-			//±ê¼ÇÁË×îºóÈë¿ÚµÄEntry²»»áº¬ÓĞÃû×Ö.Ò²²»»áÓĞº¢×Ó½ÚµãµÄÖ¸Õë
-			if (indexEntry->IE_Flags & INDEX_ENTRY_END)  //µ½ÁË½áÎ²ÁË
-				break;  //Ìø³öºó¿ªÊ¼¼ì²évcn
+			//æ ‡è®°äº†æœ€åå…¥å£çš„Entryä¸ä¼šå«æœ‰åå­—.ä¹Ÿä¸ä¼šæœ‰å­©å­èŠ‚ç‚¹çš„æŒ‡é’ˆ
+			if (indexEntry->IE_Flags & INDEX_ENTRY_END)  //åˆ°äº†ç»“å°¾äº†
+				break;  //è·³å‡ºåå¼€å§‹æ£€æŸ¥vcn
 
 			fn = PFILE_NAME(indexEntry->IE_Stream);
 			//if(fn->FN_NameSize != len || !(fn->FN_DOSAttr & attr)) 		continue;	
 			if (!FileNameCmp(fn->FN_FileName ,  name , len , FALSE ))
-			{//ÕÒµ½ÁË
-				if(!(fn->FN_DOSAttr & attr)) 		continue;	//ÊôĞÔ²»·ş
-				mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16)>>16; //È¥µô¸ßÁ½¸ö×Ö½ÚµÄmftĞòÁĞºÅ
-				return DR_OK;   //ÕÒµ½ÁË¾ÍÖ±½Ó·µ»Ø
+			{//æ‰¾åˆ°äº†
+				if(!(fn->FN_DOSAttr & attr)) 		continue;	//å±æ€§ä¸æœ
+				mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16)>>16; //å»æ‰é«˜ä¸¤ä¸ªå­—èŠ‚çš„mftåºåˆ—å·
+				return DR_OK;   //æ‰¾åˆ°äº†å°±ç›´æ¥è¿”å›
 			}else
 				continue;
 		}
 
-		//ÏÂÒ»¸ö´ØºÅ
+		//ä¸‹ä¸€ä¸ªç°‡å·
 		++vcn.QuadPart;
 	}
 
@@ -560,22 +560,22 @@ LONG_INT DNtfs::GetSecCount()
 
 DRES DNtfs::GetVolumeName(WCHAR * nameBuf , DWORD bufLen)
 {
-	//°²¼ì
+	//å®‰æ£€
 	if (!nameBuf)
 		return DR_INVALED_PARAM;
 
-	//ÎÄ¼şÏµÍ³ÊÇ·ñÒÑ¾­´ò¿ªÁË?
+	//æ–‡ä»¶ç³»ç»Ÿæ˜¯å¦å·²ç»æ‰“å¼€äº†?
 	if (mDevName.empty())
 		return DR_NO_OPEN;
 
 	DNtfsFile file;
-	//´ò¿ª¾íÎÄ¼ş
+	//æ‰“å¼€å·æ–‡ä»¶
 	DRES res = OpenFileW(&file, SYS_FILE_VOLUME);
 	if (res != DR_OK)
 		return res;
 
 	DNtfsAttr attr;
-	//²éÕÒÎÄ¼şÃûÊôĞÔ
+	//æŸ¥æ‰¾æ–‡ä»¶åå±æ€§
 	res = file.FindAttribute(AD_VOLUME_NAME , &attr);
 	if (res != DR_OK)
 	{
@@ -583,157 +583,157 @@ DRES DNtfs::GetVolumeName(WCHAR * nameBuf , DWORD bufLen)
 		return DR_NO_FILE_NAME;
 	}
 
-	//»ñµÃÃû×ÖµÄ×Ö·ûÊı
+	//è·å¾—åå­—çš„å­—ç¬¦æ•°
 	DWORD len = attr.R_GetAttrLen();
-	if (bufLen <= len) //»º´æ²»¹»
+	if (bufLen <= len) //ç¼“å­˜ä¸å¤Ÿ
 	{
 		file.Close();
 		return DR_BUF_OVER;
 	}
 
-	//¿½±´ÎÄ¼şÃû
+	//æ‹·è´æ–‡ä»¶å
 	memcpy(nameBuf , attr.R_GetAttrBodyPtr() , len);
 	nameBuf[len/2] = 0;
 
-	//ÊÕÎ²µÄÊ±ºò¼ÇµÃÒª¹Ø±ÕÒÑ¾­´ò¿ªµÄÎÄ¼ş
+	//æ”¶å°¾çš„æ—¶å€™è®°å¾—è¦å…³é—­å·²ç»æ‰“å¼€çš„æ–‡ä»¶
 	file.Close();
 	return res;
 }
 
 DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_INT mftIdx , PLONG_INT pLIStartFDT , WORD* fdtLen/* , DWORD attr*/)
 {
-	//°²¼ì
+	//å®‰æ£€
 	if (!name || len <= 0 || len > 255 || !mftIdx)
 		return DR_INVALED_PARAM;
 
 	DRES		res = DR_OK;
-	LONG_INT	parentMft;	//±»²éÕÒµÄÄ¿Â¼µÄmft¼ÇÂ¼ºÅ
+	LONG_INT	parentMft;	//è¢«æŸ¥æ‰¾çš„ç›®å½•çš„mftè®°å½•å·
 	DNtfsFile	root;
 	DNtfsAttr	attrRoot;
 	LONG_INT	vcn;
 	WCHAR		nameBuf[255] = {0};
 	BYTE*		blockEnd = 0;
 	INDEX_ENTRY* indexEntry;
-	PFILE_NAME	fn = NULL;			//ÎÄ¼şÊôĞÔÖ¸Õë
-	DNtfsFile::PAttrItem pAttrItem;	//ÎÄ¼şÊôĞÔ
+	PFILE_NAME	fn = NULL;			//æ–‡ä»¶å±æ€§æŒ‡é’ˆ
+	DNtfsFile::PAttrItem pAttrItem;	//æ–‡ä»¶å±æ€§
 
-	if (dir.QuadPart == -1)  //ÔÚÖ¸¶¨µÄÄ¿Â¼ÖĞ²éÕÒ
+	if (dir.QuadPart == -1)  //åœ¨æŒ‡å®šçš„ç›®å½•ä¸­æŸ¥æ‰¾
 		parentMft.QuadPart = SYS_FILE_ROOT;
 	else
 		parentMft = dir;
 
-	//»ñµÃ±»²éÕÒµÄÄ¿Â¼
+	//è·å¾—è¢«æŸ¥æ‰¾çš„ç›®å½•
 	res = OpenFileW(&root , parentMft);
-	if (res != DR_OK) return res;  //²éÕÒÎÄ¼şÊ§°ÜÁË
-	if (!root.IsDir()){//Õâ²»ÊÇÒ»¸öÄ¿Â¼
+	if (res != DR_OK) return res;  //æŸ¥æ‰¾æ–‡ä»¶å¤±è´¥äº†
+	if (!root.IsDir()){//è¿™ä¸æ˜¯ä¸€ä¸ªç›®å½•
 		root.Close();
 		return DR_IS_FILE;
 	}
-	//»ñµÃ¸úÊôĞÔ
+	//è·å¾—è·Ÿå±æ€§
 	pAttrItem = root.FindAttribute(AD_INDEX_ROOT);
 	//res = root.FindAttribute(AD_INDEX_ROOT , &attrRoot);
-	if (NULL == pAttrItem){//²éÕÒÊôĞÔÊ§°Ü
+	if (NULL == pAttrItem){//æŸ¥æ‰¾å±æ€§å¤±è´¥
 		root.Close();
 		return DR_INIT_ERR;
 	}
 	attrRoot.InitAttr(pAttrItem->attrDataBuf.data());
 	
 
-	//Ë÷Òı±íµÄµÚÒ»¸öÈë¿ÚµÄµØÖ·
+	//ç´¢å¼•è¡¨çš„ç¬¬ä¸€ä¸ªå…¥å£çš„åœ°å€
 	indexEntry = PINDEX_ENTRY(attrRoot.IRGetFistEntry());
-	//Ë÷Òı±íµÄ½áÊøÎ»ÖÃ
+	//ç´¢å¼•è¡¨çš„ç»“æŸä½ç½®
 	blockEnd = (BYTE*)indexEntry + attrRoot.IRGetAlloIndexEntriesSize();
 
-	//±éÀúÕû¸öË÷Òı±í
+	//éå†æ•´ä¸ªç´¢å¼•è¡¨
 	for (;(BYTE*)indexEntry < blockEnd 
 		;indexEntry = PINDEX_ENTRY((BYTE*)indexEntry + indexEntry->IE_Size) )
 	{
-		if (indexEntry->IE_Flags & INDEX_ENTRY_NODE) {//ÊÇÒ»¸ö×Ó½Úµã
+		if (indexEntry->IE_Flags & INDEX_ENTRY_NODE) {//æ˜¯ä¸€ä¸ªå­èŠ‚ç‚¹
 			
 			if (!(indexEntry->IE_Flags & INDEX_ENTRY_END))
-			{//µ±Ç°Ë÷ÒıÇøÃ»ÓĞ½áÊø  ĞèÒªºÍµ±Ç°µÄ½Úµã±È½Ï
-				fn = PFILE_NAME(indexEntry->IE_Stream);  //»ñÈ¡ÎÄ¼şÃûÊôĞÔ
+			{//å½“å‰ç´¢å¼•åŒºæ²¡æœ‰ç»“æŸ  éœ€è¦å’Œå½“å‰çš„èŠ‚ç‚¹æ¯”è¾ƒ
+				fn = PFILE_NAME(indexEntry->IE_Stream);  //è·å–æ–‡ä»¶åå±æ€§
 				memcpy(nameBuf , fn->FN_FileName , fn->FN_NameSize*2);
 				nameBuf[fn->FN_NameSize] = 0;
 
-				//ºÍÎÄ¼şÃû½øĞĞ±È½Ï
+				//å’Œæ–‡ä»¶åè¿›è¡Œæ¯”è¾ƒ
 				//if(fn->FN_NameSize != len || !(fn->FN_DOSAttr & attr)) 		continue;	
 				int flag = FileNameCmp(nameBuf , name , len  , FALSE);
 				if (flag == 0)
-				{ //¾ÍÊÇµ±Ç°µÄ½Úµã
-/*					if(!(fn->FN_DOSAttr & attr)) 		continue;	//ÊôĞÔ²»·ş*/
+				{ //å°±æ˜¯å½“å‰çš„èŠ‚ç‚¹
+/*					if(!(fn->FN_DOSAttr & attr)) 		continue;	//å±æ€§ä¸æœ*/
 					mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16 )>> 16;
 					
 					if (NULL != pLIStartFDT)
-					{//¼ÆËãFDTµÄÆğÊ¼Î»ÖÃ
+					{//è®¡ç®—FDTçš„èµ·å§‹ä½ç½®
 
-						//¼ÆËãµ±Ç°MFTµÄÆ«ÒÆ
+						//è®¡ç®—å½“å‰MFTçš„åç§»
 						pLIStartFDT->QuadPart = GetSectorOfMFTRecode(parentMft).QuadPart * SECTOR_SIZE;
-						//µ±Ç°MFTµÄINDEX_ROOTÊôĞÔ
+						//å½“å‰MFTçš„INDEX_ROOTå±æ€§
 						pLIStartFDT->QuadPart += pAttrItem->off;
-						//INDEX_ROOTÖĞµÄµ±Ç°Èë¿ÚµÄÆ«ÒÆ
+						//INDEX_ROOTä¸­çš„å½“å‰å…¥å£çš„åç§»
 						pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - pAttrItem->attrDataBuf.data());
 						
-						//µ±Ç°FDTµÄ³¤¶È
+						//å½“å‰FDTçš„é•¿åº¦
 						if (NULL != fdtLen) *fdtLen = indexEntry->IE_Size;
 					}
 
 					root.Close();
 					return DR_OK;
 				}else if (flag > 0)
-				{//ÔÚÕâÀï½øÈëvcn
-					//»ñµÃË÷Òı±íÖĞµÄ¿Õ±íÏîËùÉè¶¨µÄĞéÄâ´ØºÅ
+				{//åœ¨è¿™é‡Œè¿›å…¥vcn
+					//è·å¾—ç´¢å¼•è¡¨ä¸­çš„ç©ºè¡¨é¡¹æ‰€è®¾å®šçš„è™šæ‹Ÿç°‡å·
 					vcn = *PLONG_INT((BYTE*)indexEntry + indexEntry->IE_Size - 8);
 					res = WalkNode(&root  , vcn , name , len , mftIdx , pLIStartFDT , fdtLen);
-					if (res == DR_OK){ //²éÕÒ³É¹¦ 
+					if (res == DR_OK){ //æŸ¥æ‰¾æˆåŠŸ 
 						root.Close();					
 						return DR_OK;   
 					}    
-					else if (res == DR_NO) //µ±Ç°blockÃ»ÓĞÕÒµ½
+					else if (res == DR_NO) //å½“å‰blockæ²¡æœ‰æ‰¾åˆ°
 						continue;
-					else					//³ö´íÁË
+					else					//å‡ºé”™äº†
 						break;
 
 				}else  //flag < 0 
-				{//ÕâÀï²»¿É½øÈë  ÏÂÒ»¸ö¿É½øÈë
+				{//è¿™é‡Œä¸å¯è¿›å…¥  ä¸‹ä¸€ä¸ªå¯è¿›å…¥
 					continue;
 				}
 			}else
-			{//ÒÑÊÇ×îºóÒ»¸öindexEntry £¬µ«ÊÇÓĞvcn
-				//»ñµÃË÷Òı±íÖĞµÄ¿Õ±íÏîËùÉè¶¨µÄĞéÄâ´ØºÅ
+			{//å·²æ˜¯æœ€åä¸€ä¸ªindexEntry ï¼Œä½†æ˜¯æœ‰vcn
+				//è·å¾—ç´¢å¼•è¡¨ä¸­çš„ç©ºè¡¨é¡¹æ‰€è®¾å®šçš„è™šæ‹Ÿç°‡å·
 				vcn = *PLONG_INT((BYTE*)indexEntry + indexEntry->IE_Size - 8);
 				res = WalkNode(&root  , vcn , name , len , mftIdx , pLIStartFDT , fdtLen);
 				root.Close();
-				return res;//×îºóÒ»¸ö²»¹ÜÊÇ°×Óë·ñÖ±½ÓÌø³ö
+				return res;//æœ€åä¸€ä¸ªä¸ç®¡æ˜¯ç™½ä¸å¦ç›´æ¥è·³å‡º
 			}
 		}
 
-		if (indexEntry->IE_Flags & INDEX_ENTRY_END) { //µ½ÁË½áÎ²ÁË	
+		if (indexEntry->IE_Flags & INDEX_ENTRY_END) { //åˆ°äº†ç»“å°¾äº†	
 			res = DR_NO;
-			break;  //Ìø³öºó¿ªÊ¼¼ì²évcn
+			break;  //è·³å‡ºåå¼€å§‹æ£€æŸ¥vcn
 		}
 		
-		//Èç¹ûÖ´ĞĞµ½ÕâÀïÁËµÄ»°¾Í±íÊ¾ÕâÀïÊÇÒ»¸öÆÕÍ¨µÄ½Úµã
-		fn = PFILE_NAME(indexEntry->IE_Stream);  //»ñÈ¡ÎÄ¼şÃûÊôĞÔ
+		//å¦‚æœæ‰§è¡Œåˆ°è¿™é‡Œäº†çš„è¯å°±è¡¨ç¤ºè¿™é‡Œæ˜¯ä¸€ä¸ªæ™®é€šçš„èŠ‚ç‚¹
+		fn = PFILE_NAME(indexEntry->IE_Stream);  //è·å–æ–‡ä»¶åå±æ€§
 		memcpy(nameBuf , fn->FN_FileName , fn->FN_NameSize*2);
 		nameBuf[fn->FN_NameSize] = 0;
 		//if(fn->FN_NameSize != len || !(fn->FN_DOSAttr & attr)) 		continue;	
 		if (!FileNameCmp(nameBuf , name  , len , FALSE))
-		{//ÕÒµ½ÁË
-/*			if(!(fn->FN_DOSAttr & attr)) 		continue;	//ÊôĞÔ²»·ş*/
+		{//æ‰¾åˆ°äº†
+/*			if(!(fn->FN_DOSAttr & attr)) 		continue;	//å±æ€§ä¸æœ*/
 			mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16 )>> 16;
 
 			if (NULL != pLIStartFDT)
-			{//¼ÆËãFDTµÄÆğÊ¼Î»ÖÃ
+			{//è®¡ç®—FDTçš„èµ·å§‹ä½ç½®
 
-				//¼ÆËãµ±Ç°MFTµÄÆ«ÒÆ
+				//è®¡ç®—å½“å‰MFTçš„åç§»
 				pLIStartFDT->QuadPart = GetSectorOfMFTRecode(parentMft).QuadPart * SECTOR_SIZE;
-				//µ±Ç°MFTµÄINDEX_ROOTÊôĞÔ
+				//å½“å‰MFTçš„INDEX_ROOTå±æ€§
 				pLIStartFDT->QuadPart += pAttrItem->off;
-				//INDEX_ROOTÖĞµÄµ±Ç°Èë¿ÚµÄÆ«ÒÆ
+				//INDEX_ROOTä¸­çš„å½“å‰å…¥å£çš„åç§»
 				pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - pAttrItem->attrDataBuf.data());
 
-				//µ±Ç°FDTµÄ³¤¶È
+				//å½“å‰FDTçš„é•¿åº¦
 				if (NULL != fdtLen) *fdtLen = indexEntry->IE_Size;
 			}
 
@@ -747,45 +747,45 @@ DRES DNtfs::FindItemByName2(LONG_INT dir , const  WCHAR* name, int len , PLONG_I
 
 DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int len , PLONG_INT mftIdx  , PLONG_INT pLIStartFDT , WORD* fdtLen/* , DWORD attr*/)
 {
-	LONG_INT	lcn			= {0};//Âß¼­´ØºÅ
+	LONG_INT	lcn			= {0};//é€»è¾‘ç°‡å·
 	DRES		res			= DR_NO;
 	DNtfsAttr	attrAllocation;
 	DNtfsAttr	attrRoot;
 	INDEX_ENTRY* indexEntry	= NULL;
 	BYTE*		blockEnd	= 0;
-	PFILE_NAME	fn			= NULL;        //ÎÄ¼şÊôĞÔÖ¸Õë
+	PFILE_NAME	fn			= NULL;        //æ–‡ä»¶å±æ€§æŒ‡é’ˆ
 	WCHAR		nameBuf[255] = {0};
 
-	//»ñµÃ¸úÊôĞÔ
+	//è·å¾—è·Ÿå±æ€§
 	res = root->FindAttribute(AD_INDEX_ROOT , &attrRoot);
-	//³öÎÊÌâ
+	//å‡ºé—®é¢˜
 	if (res != DR_OK)	return DR_INIT_ERR;
 
-	//»ñµÃINDEX_ALLOCATIONÊôĞÔ
+	//è·å¾—INDEX_ALLOCATIONå±æ€§
 	res = root->FindAttribute( AD_INDEX_ALLOCATION, &attrAllocation);
-	//´íÎÊÌâÁË
-	if (res != DR_OK)	return DR_INIT_ERR;  //ÄÚ²¿´íÎó
+	//é”™é—®é¢˜äº†
+	if (res != DR_OK)	return DR_INIT_ERR;  //å†…éƒ¨é”™è¯¯
 
-	//Ë÷Òı¿éµÄ´óĞ¡
+	//ç´¢å¼•å—çš„å¤§å°
 	DWORD blockSize = attrRoot.IRGetIndexBlockSize();
 
-	//ÏÈÉêÇëÒ»¿éË÷Òı»º´æÇøµÄ»º´æ
+	//å…ˆç”³è¯·ä¸€å—ç´¢å¼•ç¼“å­˜åŒºçš„ç¼“å­˜
 	std::vector<BYTE> indexBlockBuf(blockSize, 0);
 
-	//»ñµÃÂß¼­´ØºÅ
+	//è·å¾—é€»è¾‘ç°‡å·
 	lcn = root->GetLCNByVCN(vcn , NULL);
 	//lcn = attrAllocation.IAGetLCNByVCN(&vcn , NULL);
 	lcn.QuadPart *= mSecPerClu; 
 	ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);
 	
-	//ÏÈ±£´æÒ»ÏÂindex_blockµÄÎïÀíÎ»ÖÃ
+	//å…ˆä¿å­˜ä¸€ä¸‹index_blockçš„ç‰©ç†ä½ç½®
 	if (NULL != pLIStartFDT)
 		pLIStartFDT->QuadPart = lcn.QuadPart * SECTOR_SIZE;
 
-	//Ïß»Ö¸´usa
+	//çº¿æ¢å¤usa
 	PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlockBuf.data());
 
-	//»ñµÃusaµÄÊıÁ¿  
+	//è·å¾—usaçš„æ•°é‡  
 	int		usaCnt	= ibh->IB_USNSz ;
 	WORD	us		= 0;
 	DWORD	offUsa	=  ibh->IB_USOff;
@@ -800,62 +800,62 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 
 	if (vcn.QuadPart != ibh->IB_VCN.QuadPart)
 	{
-		//ĞéÄâ´ØºÅ²»Æ¥Åä
+		//è™šæ‹Ÿç°‡å·ä¸åŒ¹é…
 		return DR_INIT_ERR;
 	}
 
-	//Ë÷Òı±íµÄµÚÒ»¸öÈë¿ÚµÄµØÖ·
+	//ç´¢å¼•è¡¨çš„ç¬¬ä¸€ä¸ªå…¥å£çš„åœ°å€
 	indexEntry = PINDEX_ENTRY((BYTE*)&ibh->IB_indexHead + ibh->IB_indexHead.IH_EntryOff);
-	//Ë÷Òı±íµÄ½áÊøÎ»ÖÃ
+	//ç´¢å¼•è¡¨çš„ç»“æŸä½ç½®
 	blockEnd = (BYTE*)&ibh->IB_indexHead + ibh->IB_indexHead.IH_AllocSize;
 
-	//±éÀúÕû¸öË÷Òı±í
+	//éå†æ•´ä¸ªç´¢å¼•è¡¨
 	for (;(BYTE*)indexEntry < blockEnd ; 
 		indexEntry = PINDEX_ENTRY((BYTE*)indexEntry + indexEntry->IE_Size) )
 	{
-		//±ê¼ÇÁË×îºóÈë¿ÚµÄEntry²»»áº¬ÓĞÃû×Ö.Ò²²»»áÓĞº¢×Ó½ÚµãµÄÖ¸Õë
-		if (indexEntry->IE_Flags & INDEX_ENTRY_NODE) {//ÊÇÒ»¸ö×Ó½Úµã
+		//æ ‡è®°äº†æœ€åå…¥å£çš„Entryä¸ä¼šå«æœ‰åå­—.ä¹Ÿä¸ä¼šæœ‰å­©å­èŠ‚ç‚¹çš„æŒ‡é’ˆ
+		if (indexEntry->IE_Flags & INDEX_ENTRY_NODE) {//æ˜¯ä¸€ä¸ªå­èŠ‚ç‚¹
 
 			if (!(indexEntry->IE_Flags & INDEX_ENTRY_END))
-			{//µ±Ç°Ë÷ÒıÇøÃ»ÓĞ½áÊø  ĞèÒªºÍµ±Ç°µÄ½Úµã±È½Ï
-				fn = PFILE_NAME(indexEntry->IE_Stream);  //»ñÈ¡ÎÄ¼şÃûÊôĞÔ
+			{//å½“å‰ç´¢å¼•åŒºæ²¡æœ‰ç»“æŸ  éœ€è¦å’Œå½“å‰çš„èŠ‚ç‚¹æ¯”è¾ƒ
+				fn = PFILE_NAME(indexEntry->IE_Stream);  //è·å–æ–‡ä»¶åå±æ€§
 				memcpy(nameBuf , fn->FN_FileName , fn->FN_NameSize*2);
 				nameBuf[fn->FN_NameSize] = 0;
 
-				//ºÍÎÄ¼şÃû½øĞĞ±È½Ï
+				//å’Œæ–‡ä»¶åè¿›è¡Œæ¯”è¾ƒ
 				//if(fn->FN_NameSize != len || !(fn->FN_DOSAttr & attr)) 		continue;	
 				int flag = FileNameCmp(nameBuf , name  ,len , FALSE);
 				if (flag == 0)
-				{ //¾ÍÊÇµ±Ç°µÄ½Úµã
-/*					if(!(fn->FN_DOSAttr & attr)) 		continue;	//ÊôĞÔ²»·ş*/
+				{ //å°±æ˜¯å½“å‰çš„èŠ‚ç‚¹
+/*					if(!(fn->FN_DOSAttr & attr)) 		continue;	//å±æ€§ä¸æœ*/
 					mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16 )>> 16;
 
 					if (NULL != pLIStartFDT)
-					{//¼ÆËãFDTµÄÆğÊ¼Î»ÖÃ
+					{//è®¡ç®—FDTçš„èµ·å§‹ä½ç½®
 
-						//INDEX_ROOTÖĞµÄµ±Ç°Èë¿ÚµÄÆ«ÒÆ
+						//INDEX_ROOTä¸­çš„å½“å‰å…¥å£çš„åç§»
 						pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - indexBlockBuf.data());
 
-						//µ±Ç°FDTµÄ³¤¶È
+						//å½“å‰FDTçš„é•¿åº¦
 						if (NULL != fdtLen) *fdtLen = indexEntry->IE_Size;
 					}
 
 					res = DR_OK;
 					break;
 				}else if (flag > 0)
-				{//ÔÚÕâÀï½øÈëvcn
-					//»ñµÃË÷Òı±íÖĞµÄ¿Õ±íÏîËùÉè¶¨µÄĞéÄâ´ØºÅ
+				{//åœ¨è¿™é‡Œè¿›å…¥vcn
+					//è·å¾—ç´¢å¼•è¡¨ä¸­çš„ç©ºè¡¨é¡¹æ‰€è®¾å®šçš„è™šæ‹Ÿç°‡å·
 					vcn = *PLONG_INT((BYTE*)indexEntry + indexEntry->IE_Size - 8);
 					res = WalkNode(root  , vcn , name , len , mftIdx , pLIStartFDT , fdtLen);
 					if (res /*!=*/== DR_NO)
 						continue;
-					else //ÕÒµ½»òÕß³ö´íÁË
+					else //æ‰¾åˆ°æˆ–è€…å‡ºé”™äº†
 						break;
 				}else  //flag < 0 
-				{//ÕâÀï²»¿É½øÈë  ĞèÒª²éÏÂÒ»¸ö
+				{//è¿™é‡Œä¸å¯è¿›å…¥  éœ€è¦æŸ¥ä¸‹ä¸€ä¸ª
 					continue;
 				}
-			}else//×îºóµÄÒ»¸ö½Úµã  ĞèÒªÌø³öÈ¥
+			}else//æœ€åçš„ä¸€ä¸ªèŠ‚ç‚¹  éœ€è¦è·³å‡ºå»
 			{
 				vcn = *PLONG_INT((BYTE*)indexEntry + indexEntry->IE_Size - 8);
 				res = WalkNode(root  , vcn , name , len , mftIdx , pLIStartFDT , fdtLen);
@@ -863,27 +863,27 @@ DRES DNtfs::WalkNode(DNtfsFile* root , LONG_INT vcn , const  WCHAR* name, int le
 			}
 		}
 
-		if (indexEntry->IE_Flags & INDEX_ENTRY_END) { //µ½ÁË½áÎ²ÁË	
+		if (indexEntry->IE_Flags & INDEX_ENTRY_END) { //åˆ°äº†ç»“å°¾äº†	
 			res = DR_NO;
-			break;  //Ìø³öºó¿ªÊ¼¼ì²évcn
+			break;  //è·³å‡ºåå¼€å§‹æ£€æŸ¥vcn
 		}
 
-		//Èç¹ûÖ´ĞĞµ½ÕâÀïÁËµÄ»°¾Í±íÊ¾ÕâÀïÊÇÒ»¸öÆÕÍ¨µÄ½Úµã
-		fn = PFILE_NAME(indexEntry->IE_Stream);  //»ñÈ¡ÎÄ¼şÃûÊôĞÔ
+		//å¦‚æœæ‰§è¡Œåˆ°è¿™é‡Œäº†çš„è¯å°±è¡¨ç¤ºè¿™é‡Œæ˜¯ä¸€ä¸ªæ™®é€šçš„èŠ‚ç‚¹
+		fn = PFILE_NAME(indexEntry->IE_Stream);  //è·å–æ–‡ä»¶åå±æ€§
 		memcpy(nameBuf , fn->FN_FileName , fn->FN_NameSize*2);
 		nameBuf[fn->FN_NameSize] = 0;
 		if(fn->FN_NameSize != len /*|| !(fn->FN_DOSAttr & attr)*/) 		continue;	
 		if (!FileNameCmp(nameBuf , name , len  , FALSE))
-		{//ÕÒµ½ÁË
+		{//æ‰¾åˆ°äº†
 			mftIdx->QuadPart = (indexEntry->IE_FR.QuadPart << 16 )>> 16;
 
 			if (NULL != pLIStartFDT)
-			{//¼ÆËãFDTµÄÆğÊ¼Î»ÖÃ
+			{//è®¡ç®—FDTçš„èµ·å§‹ä½ç½®
 
-				//INDEX_ROOTÖĞµÄµ±Ç°Èë¿ÚµÄÆ«ÒÆ
+				//INDEX_ROOTä¸­çš„å½“å‰å…¥å£çš„åç§»
 				pLIStartFDT->QuadPart += (((BYTE*)indexEntry) - indexBlockBuf.data());
 
-				//µ±Ç°FDTµÄ³¤¶È
+				//å½“å‰FDTçš„é•¿åº¦
 				if (NULL != fdtLen) *fdtLen = indexEntry->IE_Size;
 			}
 
@@ -899,30 +899,30 @@ DRES DNtfs::FindFile(DNtfsFile* root, FINDER* hFin)
 {
 	*hFin = NULL;
 
-	//Éè±¸¸ù±¾¾ÍÃ»ÓĞ´ò¿ª
+	//è®¾å¤‡æ ¹æœ¬å°±æ²¡æœ‰æ‰“å¼€
 	if (mDevName.empty())
 		return DR_NO_OPEN;
 
-	//°²¼ì
+	//å®‰æ£€
 	if (root == NULL || hFin == NULL)
 		return DR_INVALED_PARAM;
 	if (!root->IsDir())
-		return DR_IS_FILE;	//ĞèÒªµÄÊÇÄ¿Â¼
+		return DR_IS_FILE;	//éœ€è¦çš„æ˜¯ç›®å½•
 
-	//ÄÚ´æ·ÖÅä
+	//å†…å­˜åˆ†é…
 	std::unique_ptr<FIND_FILE_HANDER> hFind(new FIND_FILE_HANDER());
 	hFind->vcn.QuadPart = -1;
 	hFind->index = 0;
 
-	//´ò¿ªÖ¸¶¨µÄÎÄ¼şÄ¿Â¼
+	//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶ç›®å½•
 	DRES res = OpenFileW(&hFind->dir, root->GetMftIndex());
-	//ÎŞĞ§µÄÂ·¾¶
+	//æ— æ•ˆçš„è·¯å¾„
 	if (res == DR_NO)
 		return DR_INVALID_NAME;
 	if (res != DR_OK)
-		return DR_INIT_ERR;		//ÆäËûµÄ³õÊ¼»¯´íÎó»òÕßÄÚ²¿´í´Ö
+		return DR_INIT_ERR;		//å…¶ä»–çš„åˆå§‹åŒ–é”™è¯¯æˆ–è€…å†…éƒ¨é”™ç²—
 
-	//Òª·µ»ØµÄ¾ä±ú
+	//è¦è¿”å›çš„å¥æŸ„
 	*hFin = FINDER(hFind.release());
 	
 	return DR_OK;
@@ -931,7 +931,7 @@ DRES DNtfs::FindFile(DNtfsFile* root, FINDER* hFin)
 DRES DNtfs::FindFile(const char* root, FINDER* hFind)
 {
 	WCHAR wPath[MAX_PATH + 1] = {0};
-	//°²¼ì
+	//å®‰æ£€
 	if (root == NULL || hFind == NULL) return DR_INVALED_PARAM;
 
 	MultyByteToUnic(root, wPath, MAX_PATH + 1);
@@ -943,27 +943,27 @@ DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 {
 	*hFin = NULL;
 
-	//°²¼ì
+	//å®‰æ£€
 	if (!path || !hFin /*|| !mftIndx */)
 		return DR_INVALED_PARAM;
 
 	if (mDevName.empty())
-		return DR_NO_OPEN;		//ÏµÍ³º£Ã¼Í·³õÊ¼»¯
+		return DR_NO_OPEN;		//ç³»ç»Ÿæµ·çœ‰å¤´åˆå§‹åŒ–
 
-	//ÇåÁã²éÕÒ¾ä±ú
+	//æ¸…é›¶æŸ¥æ‰¾å¥æŸ„
 	std::unique_ptr<FIND_FILE_HANDER> hFind(new FIND_FILE_HANDER());
 	hFind->vcn.QuadPart = -1;
 	hFind->index = 0;
 
-	//´ò¿ªÖ¸¶¨µÄÎÄ¼şÄ¿Â¼
+	//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶ç›®å½•
 	DRES res = OpenFileW(path, &hFind->dir /*, ATTR_DIRECTORY|ATTR_DIRECTORY_INDEX*/);
-	//ÎŞĞ§µÄÂ·¾¶
+	//æ— æ•ˆçš„è·¯å¾„
 	if (res == DR_NO)
 		return DR_INVALID_NAME;
 	if (res != DR_OK)
-		return DR_INIT_ERR;		//ÆäËûµÄ³õÊ¼»¯´íÎó»òÕßÄÚ²¿´í´Ö
+		return DR_INIT_ERR;		//å…¶ä»–çš„åˆå§‹åŒ–é”™è¯¯æˆ–è€…å†…éƒ¨é”™ç²—
 
-	//Òª·µ»ØµÄ¾ä±ú
+	//è¦è¿”å›çš„å¥æŸ„
 	*hFin = FINDER(hFind.release());
 
 	return res;
@@ -971,7 +971,7 @@ DRES DNtfs::FindFile(const WCHAR* path , FINDER* hFin /*,PLONG_INT mftIndx*/)
 
 DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 {
-	//Ò»¸öÈë¿ÚµÄÆäÆğÊ¼Î»ÖÃ
+	//ä¸€ä¸ªå…¥å£çš„å…¶èµ·å§‹ä½ç½®
 	PINDEX_ENTRY	indexEntry;
 	BYTE*			blockEnd;
 	PFILE_NAME      fn;
@@ -986,33 +986,33 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 	LONG_INT		lcn;
 	PFIND_FILE_HANDER hFind = (PFIND_FILE_HANDER)hFin;
 
-	//¼ì²éÊÇ·ñÒÑ¾­³õÊ¼»¯ÁËÎÄ¼şÏ´ÏµÍ³
+	//æ£€æŸ¥æ˜¯å¦å·²ç»åˆå§‹åŒ–äº†æ–‡ä»¶æ´—ç³»ç»Ÿ
 	if (mDevName.empty())
 		return DR_NO_OPEN;
 	if (!hFind || !mftIndx)
 		return DR_INVALED_PARAM;
 	if (!hFind->dir.IsFileValid())
-		return DR_INVALID_HANDLE;//ÎŞĞ§µÄ²éÕÒ¾ä±ú
+		return DR_INVALID_HANDLE;//æ— æ•ˆçš„æŸ¥æ‰¾å¥æŸ„
 
 	if (!hFind || !mftIndx)
 		return DR_INVALED_PARAM;
 
 	if (!hFind->dir.IsFileValid())
-		return DR_INVALID_HANDLE;//ÎŞĞ§µÄ²éÕÒ¾ä±ú
+		return DR_INVALID_HANDLE;//æ— æ•ˆçš„æŸ¥æ‰¾å¥æŸ„
 
-	//»ñµÃ¸úÊôĞÔ
+	//è·å¾—è·Ÿå±æ€§
 	res = hFind->dir.FindAttribute(AD_INDEX_ROOT , &attrRoot);
-	//³öÎÊÌâ
+	//å‡ºé—®é¢˜
 	if (res != DR_OK)
 		return DR_INIT_ERR;
 
-	//Ë÷Òı±íµÄµÚÒ»¸öÈë¿ÚµÄµØÖ·
+	//ç´¢å¼•è¡¨çš„ç¬¬ä¸€ä¸ªå…¥å£çš„åœ°å€
 	indexEntry = PINDEX_ENTRY(attrRoot.IRGetFistEntry());
-	//Ë÷Òı±íµÄ½áÊøÎ»ÖÃ
+	//ç´¢å¼•è¡¨çš„ç»“æŸä½ç½®
 	blockEnd = (BYTE*)indexEntry + attrRoot.IRGetAlloIndexEntriesSize();
 
-	//±éÀúÕû¸öË÷Òı±í
-	if (hFind->vcn.QuadPart == -1)//mft¼ÇÂ¼ÖĞ²éÕÒ
+	//éå†æ•´ä¸ªç´¢å¼•è¡¨
+	if (hFind->vcn.QuadPart == -1)//mftè®°å½•ä¸­æŸ¥æ‰¾
 	{
 		for (index = 0;(BYTE*)indexEntry < blockEnd
 			;indexEntry = PINDEX_ENTRY((BYTE*)indexEntry + indexEntry->IE_Size) 
@@ -1020,37 +1020,37 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 		{
 			if ((BYTE*)indexEntry + 0x10 > blockEnd || 
 				(BYTE*)indexEntry + indexEntry->IE_DataSize > blockEnd)
-			{//³¬³öÁË»º´æÇø
+			{//è¶…å‡ºäº†ç¼“å­˜åŒº
 				return DR_INIT_ERR;
 			}
-			//±ê¼ÇÁË×îºóÈë¿ÚµÄEntry²»»áº¬ÓĞÃû×Ö.Ò²²»»áÓĞº¢×Ó½ÚµãµÄÖ¸Õë
-			if (indexEntry->IE_Flags & INDEX_ENTRY_END)  //µ½ÁË½áÎ²ÁË
-				break;  //Ìø³öºó¿ªÊ¼¼ì²évcn
+			//æ ‡è®°äº†æœ€åå…¥å£çš„Entryä¸ä¼šå«æœ‰åå­—.ä¹Ÿä¸ä¼šæœ‰å­©å­èŠ‚ç‚¹çš„æŒ‡é’ˆ
+			if (indexEntry->IE_Flags & INDEX_ENTRY_END)  //åˆ°äº†ç»“å°¾äº†
+				break;  //è·³å‡ºåå¼€å§‹æ£€æŸ¥vcn
 
-			//»¹Ã»µ½Ö¸¶¨µÄÎ»ÖÃ
+			//è¿˜æ²¡åˆ°æŒ‡å®šçš„ä½ç½®
 			if (index < hFind->index) continue;
 
-			fn = PFILE_NAME(indexEntry->IE_Stream);  //»ñÈ¡ÎÄ¼şÃûÊôĞÔ
-			if (fn->FN_NamSpace == NS_DOS)//²»ÒªDOSµÄÃû×Ö
-			{//Ö¸¶¨µÄÎ»ÖÃµÄÈë¿ÚÊ±Ò»¸ödosÈë¿Ú
+			fn = PFILE_NAME(indexEntry->IE_Stream);  //è·å–æ–‡ä»¶åå±æ€§
+			if (fn->FN_NamSpace == NS_DOS)//ä¸è¦DOSçš„åå­—
+			{//æŒ‡å®šçš„ä½ç½®çš„å…¥å£æ—¶ä¸€ä¸ªdoså…¥å£
 				++hFind->index;
 				continue;
 			}
-			//ÕÒµ½ÁË
+			//æ‰¾åˆ°äº†
 			mftIndx->QuadPart = indexEntry->IE_FR.QuadPart << 16 >> 16;
-			++hFind->index;//ÏÂÒ»¸ö²éÕÒµÄÄ¿Â¼
+			++hFind->index;//ä¸‹ä¸€ä¸ªæŸ¥æ‰¾çš„ç›®å½•
 			return DR_OK;
 		}
 		
-		//mft¼ÇÂ¼ÖĞÃ»ÓĞÊı¾İ
+		//mftè®°å½•ä¸­æ²¡æœ‰æ•°æ®
 		res = hFind->dir.FindAttribute(AD_BITMAP , &attrBitMp);
 		if (res == DR_NO)
-		{//Ã»ÓĞBitmapÊôĞÔ ,Ò²¾ÍÊÇ²éÕÒÍêÁË
+		{//æ²¡æœ‰Bitmapå±æ€§ ,ä¹Ÿå°±æ˜¯æŸ¥æ‰¾å®Œäº†
 			return DR_FAT_EOF;
 		}
 
-		//»ñµÃµÚÒ»¸övcn
-		bitCnt = attrBitMp.R_GetAttrLen() * 8;  //bitmapÖĞµÄbitÊı
+		//è·å¾—ç¬¬ä¸€ä¸ªvcn
+		bitCnt = attrBitMp.R_GetAttrLen() * 8;  //bitmapä¸­çš„bitæ•°
 		hFind->vcn.QuadPart = 0;
 		for(; hFind->vcn.QuadPart < bitCnt ; ++hFind->vcn.QuadPart)
 		{
@@ -1058,39 +1058,39 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 				break;
 		}
 		if (hFind->vcn.QuadPart == bitCnt)
-			return DR_FAT_EOF;//Ã»ÓĞÕÒµ½ÓĞĞ§µÄvcn
+			return DR_FAT_EOF;//æ²¡æœ‰æ‰¾åˆ°æœ‰æ•ˆçš„vcn
 		else
-			hFind->index = 0;//ÕÒµ½ÁËµÚÒ»¸övcn
+			hFind->index = 0;//æ‰¾åˆ°äº†ç¬¬ä¸€ä¸ªvcn
 	}
 	
-	//rootIndexÖĞÒÑ¾­ÕÒ¹ıÁË,½ÓÏÂÀ´ÕÒindexBlockÇøÓò
+	//rootIndexä¸­å·²ç»æ‰¾è¿‡äº†,æ¥ä¸‹æ¥æ‰¾indexBlockåŒºåŸŸ
 
-	//»ñµÃ»º´æÇøµÄ´óĞ¡
+	//è·å¾—ç¼“å­˜åŒºçš„å¤§å°
 	blockSize = attrRoot.IRGetIndexBlockSize();
-	//ÏÈÉêÇëÒ»¿éË÷Òı»º´æÇøµÄ»º´æ
+	//å…ˆç”³è¯·ä¸€å—ç´¢å¼•ç¼“å­˜åŒºçš„ç¼“å­˜
 	indexBlockBuf.resize(blockSize, 0);
 
-	//»ñµÃÎ»Í¼ÊôĞÔ
+	//è·å¾—ä½å›¾å±æ€§
 	res = hFind->dir.FindAttribute(AD_BITMAP , &attrBitMp);
-	if (res == DR_NO) return DR_INIT_ERR;  //Ã»ÓĞÎ»Í¼ÊôĞÔ   
-	//»ñµÃvcn=¡·lvn ¶ÔÕÕ±íÊôĞÔ
+	if (res == DR_NO) return DR_INIT_ERR;  //æ²¡æœ‰ä½å›¾å±æ€§   
+	//è·å¾—vcn=ã€‹lvn å¯¹ç…§è¡¨å±æ€§
 // 	res = hFind->dir.FindAttribute(AD_INDEX_ALLOCATION , &attrAllocation);
-// 	if (res == DR_NO) return DR_INIT_ERR;  //Ã»ÓĞvcn->lcnÓ³Éä±íÊôĞÔ
+// 	if (res == DR_NO) return DR_INIT_ERR;  //æ²¡æœ‰vcn->lcnæ˜ å°„è¡¨å±æ€§
 
 
-	//±éÀúÕû¸öB+Ê÷
+	//éå†æ•´ä¸ªB+æ ‘
 	while (1)
 	{
-		//»ñµÃÂß¼­´ØºÅ
+		//è·å¾—é€»è¾‘ç°‡å·
 		lcn = hFind->dir.GetLCNByVCN(hFind->vcn , NULL);
 		//lcn = attrAllocation.IAGetLCNByVCN(&hFind->vcn , NULL);
 		lcn.QuadPart *= mSecPerClu; 
-		ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//¶ÁÈ¡Ö¸¶¨µÄÊı¾İ
+		ReadData(indexBlockBuf.data(), &lcn, blockSize, TRUE);//è¯»å–æŒ‡å®šçš„æ•°æ®
 
-		//Ïß»Ö¸´usa
+		//çº¿æ¢å¤usa
 		PINDEX_BLOCK_HEAD ibh = PINDEX_BLOCK_HEAD(indexBlockBuf.data());
 
-		//»ñµÃusaµÄÊıÁ¿  
+		//è·å¾—usaçš„æ•°é‡  
 		int		usaCnt = ibh->IB_USNSz ;
 		WORD	us = 0;
 		DWORD	offUsa =  ibh->IB_USOff;
@@ -1101,64 +1101,64 @@ DRES DNtfs::FindNext(/*PFIND_FILE_HANDER*/FINDER hFin ,PLONG_INT mftIndx)
 			SetWORD(indexBlockBuf.data() + 512 * i - 2, us);
 		}
 
-		//¶ÔÓ¦ĞéÄâ´ØºÅ
+		//å¯¹åº”è™šæ‹Ÿç°‡å·
 		if (hFind->vcn.QuadPart != ibh->IB_VCN.QuadPart)
-		{//ĞéÄâ´ØºÅ²»Æ¥Åä
+		{//è™šæ‹Ÿç°‡å·ä¸åŒ¹é…
 			res = DR_INIT_ERR;
 			break;
 		}
 
-		//Ë÷Òı±íµÄµÚÒ»¸öÈë¿ÚµÄµØÖ·
+		//ç´¢å¼•è¡¨çš„ç¬¬ä¸€ä¸ªå…¥å£çš„åœ°å€
 		indexEntry = PINDEX_ENTRY((BYTE*)&ibh->IB_indexHead + ibh->IB_indexHead.IH_EntryOff);
-		//Ë÷Òı±íµÄ½áÊøÎ»ÖÃ
+		//ç´¢å¼•è¡¨çš„ç»“æŸä½ç½®
 		blockEnd = (BYTE*)&ibh->IB_indexHead + ibh->IB_indexHead.IH_AllocSize;
 
-		index = 0;///»º´æÇøÖĞµÄË÷Òı
-		//±éÀúÕû¸öË÷Òı±í
+		index = 0;///ç¼“å­˜åŒºä¸­çš„ç´¢å¼•
+		//éå†æ•´ä¸ªç´¢å¼•è¡¨
 		for (;(BYTE*)indexEntry != blockEnd ; 
 			indexEntry = PINDEX_ENTRY((BYTE*)indexEntry + indexEntry->IE_Size)
 			,++index)
 		{
 			if ((BYTE*)indexEntry + 0x10 > blockEnd || 
 				(BYTE*)indexEntry + indexEntry->IE_DataSize > blockEnd)
-			{//³ö´íÁË 0x10ÊÇINDEX_RNTRYÍ·²¿µÄ´óĞ¡
+			{//å‡ºé”™äº† 0x10æ˜¯INDEX_RNTRYå¤´éƒ¨çš„å¤§å°
 				res =  DR_INIT_ERR;
 				break;
 			}
 
-			//±ê¼ÇÁË×îºóÈë¿ÚµÄEntry²»»áº¬ÓĞÃû×Ö.Ò²²»»áÓĞº¢×Ó½ÚµãµÄÖ¸Õë
-			if (indexEntry->IE_Flags & INDEX_ENTRY_END)  //µ½ÁË½áÎ²ÁË,ĞèÒª¼ì²éÏÂÒ»¸övcn
-				break;  //Ìø³öºó¿ªÊ¼¼ì²évcn
+			//æ ‡è®°äº†æœ€åå…¥å£çš„Entryä¸ä¼šå«æœ‰åå­—.ä¹Ÿä¸ä¼šæœ‰å­©å­èŠ‚ç‚¹çš„æŒ‡é’ˆ
+			if (indexEntry->IE_Flags & INDEX_ENTRY_END)  //åˆ°äº†ç»“å°¾äº†,éœ€è¦æ£€æŸ¥ä¸‹ä¸€ä¸ªvcn
+				break;  //è·³å‡ºåå¼€å§‹æ£€æŸ¥vcn
 
-			//»¹Ã»µ½Ö¸¶¨µÄÎ»ÖÃ
+			//è¿˜æ²¡åˆ°æŒ‡å®šçš„ä½ç½®
 			if (index < hFind->index) continue;
 
-			fn = PFILE_NAME(indexEntry->IE_Stream);  //»ñÈ¡ÎÄ¼şÃûÊôĞÔ
-			if (fn->FN_NamSpace == NS_DOS)//²»Òª´¿DOSµÄÃû×Ö
-			{//Ö¸¶¨µÄÎ»ÖÃµÄÈë¿ÚÊ±Ò»¸ödosÈë¿Ú
+			fn = PFILE_NAME(indexEntry->IE_Stream);  //è·å–æ–‡ä»¶åå±æ€§
+			if (fn->FN_NamSpace == NS_DOS)//ä¸è¦çº¯DOSçš„åå­—
+			{//æŒ‡å®šçš„ä½ç½®çš„å…¥å£æ—¶ä¸€ä¸ªdoså…¥å£
 				++hFind->index;
 				continue;
 			}
-			//ÕÒµ½ÁË
+			//æ‰¾åˆ°äº†
 			mftIndx->QuadPart = indexEntry->IE_FR.QuadPart << 16 >> 16;
-			++hFind->index;//ÏÂÒ»¸ö²éÕÒµÄÄ¿Â¼
+			++hFind->index;//ä¸‹ä¸€ä¸ªæŸ¥æ‰¾çš„ç›®å½•
 			res = DR_OK;
 			break;
 		}
 
-		if(indexEntry->IE_Flags & INDEX_ENTRY_END)//ÊÇÓ¦ÎªÅöµ½ÁËindexEntryµÄ½áÊø²ÅÌø³öÀ´µÄ
+		if(indexEntry->IE_Flags & INDEX_ENTRY_END)//æ˜¯åº”ä¸ºç¢°åˆ°äº†indexEntryçš„ç»“æŸæ‰è·³å‡ºæ¥çš„
 		{
-			//ÏÂÒ»¸ö´ØºÅ
+			//ä¸‹ä¸€ä¸ªç°‡å·
 			++hFind->vcn.QuadPart;
 			hFind->index = index =0;
 
-			bitCnt = attrBitMp.R_GetAttrLen() * 8;  //bitmapÖĞµÄbitÊı
+			bitCnt = attrBitMp.R_GetAttrLen() * 8;  //bitmapä¸­çš„bitæ•°
 			for(; hFind->vcn.QuadPart < bitCnt ; ++hFind->vcn.QuadPart) {
 				if (attrBitMp.BMIsBitSet(hFind->vcn , this))
 					break;
 			}
 			if (hFind->vcn.QuadPart == bitCnt)
-			{//Ã»ÓĞÁËÓĞĞ§µÄvcn
+			{//æ²¡æœ‰äº†æœ‰æ•ˆçš„vcn
 				res = DR_FAT_EOF;
 				break;
 			}
@@ -1181,11 +1181,11 @@ void DNtfs::CloseFind(/*PFIND_FILE_HANDER*/FINDER hFin)
 
 DRES DNtfs::IsContainNTFSFlag(const WCHAR* cDevName, LONG_INT offset)
 {
-	//²ÎÊı´íÎó
+	//å‚æ•°é”™è¯¯
 	if (cDevName == NULL)
 		return DR_INVALED_PARAM;
 
-	//´ò¿ªÉè±¸
+	//æ‰“å¼€è®¾å¤‡
 	HANDLE hDev = ::CreateFile(cDevName,
 								GENERIC_READ | GENERIC_WRITE,
 								FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1193,48 +1193,48 @@ DRES DNtfs::IsContainNTFSFlag(const WCHAR* cDevName, LONG_INT offset)
 								OPEN_EXISTING,
 								0,
 								NULL);
-	if (hDev == INVALID_HANDLE_VALUE) //´ò¿ªÉè±¸Ê§°Ü
+	if (hDev == INVALID_HANDLE_VALUE) //æ‰“å¼€è®¾å¤‡å¤±è´¥
 		return DR_OPEN_DEV_ERR;
 
 	DRES		res = DR_OK;
 	if (offset.QuadPart > 0)
-	{//Æ«ÒÆ
-		//ÉèÖÃÎÄ¼şÖ¸Õë
+	{//åç§»
+		//è®¾ç½®æ–‡ä»¶æŒ‡é’ˆ
 		offset.LowPart = ::SetFilePointer(hDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 		if (offset.LowPart == -1 && ::GetLastError() != NO_ERROR )
 			res = DR_DEV_CTRL_ERR;
 	}
 
-	//¶ÁÈ¡Êı¾İ
+	//è¯»å–æ•°æ®
 	NTFS_DBR	nDbr = { 0 };
 	DWORD		dwReaded = 0;
 	if(DR_OK == res && !::ReadFile(hDev , &nDbr , sizeof(NTFS_DBR) 
 		,&dwReaded ,NULL) && dwReaded != sizeof(NTFS_DBR))	
 		res =  DR_DEV_IO_ERR;
 	
-	//²»ĞèÒªÁË
+	//ä¸éœ€è¦äº†
 	CloseHandle(hDev);
-	//Éè±¸Ïà¹Ø²Ù×÷Ê§°Ü
+	//è®¾å¤‡ç›¸å…³æ“ä½œå¤±è´¥
 	if (res != DR_OK) return res;
 
-	//ÓĞNTFSµÄ¼¼ÊõÊÇÃ»ÓĞ¹«¿ªµÄ£¬ËùÒÔºÜ¶àµÄ¶«Î÷»ù±¾ÊÇ´óÅ£ÃÇ²Â+²âµÄ
-	if ( ( nDbr.dbrEnd != MBR_END)				//DBRµÄ½áÊø±ê¼Ç
-		||(nDbr.bpbBytePerSec != SECTOR_SIZE))	//ÉÈÇø´óĞ¡ÎÒÖ®´¦Àï512µÄ
+	//æœ‰NTFSçš„æŠ€æœ¯æ˜¯æ²¡æœ‰å…¬å¼€çš„ï¼Œæ‰€ä»¥å¾ˆå¤šçš„ä¸œè¥¿åŸºæœ¬æ˜¯å¤§ç‰›ä»¬çŒœ+æµ‹çš„
+	if ( ( nDbr.dbrEnd != MBR_END)				//DBRçš„ç»“æŸæ ‡è®°
+		||(nDbr.bpbBytePerSec != SECTOR_SIZE))	//æ‰‡åŒºå¤§å°æˆ‘ä¹‹å¤„é‡Œ512çš„
 		return DR_NO;
 
-	//NTFS±ê¼Ç
+	//NTFSæ ‡è®°
 	//4E 54 46 53 20  20 20 20
 	if ( ( nDbr.dbrOemName[0] != 0x4E)	//N
 		||(nDbr.dbrOemName[1] != 0x54)	//T
 		||(nDbr.dbrOemName[2] != 0x46)	//F
 		||(nDbr.dbrOemName[3] != 0x53)	//S
-		||(nDbr.dbrOemName[4] != 0x20)	//¿Õ¸ñ
-		||(nDbr.dbrOemName[5] != 0x20)	//¿Õ¸ñ
-		||(nDbr.dbrOemName[6] != 0x20)	//¿Õ¸ñ
-		||(nDbr.dbrOemName[7] != 0x20))	//¿Õ¸ñ
+		||(nDbr.dbrOemName[4] != 0x20)	//ç©ºæ ¼
+		||(nDbr.dbrOemName[5] != 0x20)	//ç©ºæ ¼
+		||(nDbr.dbrOemName[6] != 0x20)	//ç©ºæ ¼
+		||(nDbr.dbrOemName[7] != 0x20))	//ç©ºæ ¼
 		return DR_NO;
 
-	//¿ÉÒÔÅÜµ½ÕâÀïµÄ»°Ó¦¸ÃÊÇÃ»ÎÊÌâµÄ
+	//å¯ä»¥è·‘åˆ°è¿™é‡Œçš„è¯åº”è¯¥æ˜¯æ²¡é—®é¢˜çš„
 	return DR_OK;
 }
 
@@ -1266,87 +1266,87 @@ LONG_INT DNtfs::GetSectorOfMFTRecode( LONG_INT mft )
 {
 #define _USE_MFT_BLOCK_ 1 
 
-#if _USE_MFT_BLOCK_ == 0 //²»Ê¹ÓÃMFT_BLOCK À´´¦ÀíMFT¼ÇÂ¼
+#if _USE_MFT_BLOCK_ == 0 //ä¸ä½¿ç”¨MFT_BLOCK æ¥å¤„ç†MFTè®°å½•
 	LONG_INT	liSector = {-1};
-	DNtfsFile	mftFile;//µ±Ç°¾íµÄMFTÎÄ¼ş
+	DNtfsFile	mftFile;//å½“å‰å·çš„MFTæ–‡ä»¶
 	DRES		res = DR_OK;
 	DNtfsFile::PAttrItem pAttrItem = NULL;
 	DNtfsAttr	ntfsAttr;
 	LONG_INT	vcn = {-1};
 	DRun		run;
 
-	//Éè±¸»¹Ã»ÓĞ´ò¿ªµÄ£¿
+	//è®¾å¤‡è¿˜æ²¡æœ‰æ‰“å¼€çš„ï¼Ÿ
 	if (NULL == mDevName) return liSector;
 	res = OpenFileW(&mftFile , SYS_FILE_MFT);
-	if (res != DR_OK) liSector;  //ÎÄ¼ş´ò¿ªÊ§°Ü
+	if (res != DR_OK) liSector;  //æ–‡ä»¶æ‰“å¼€å¤±è´¥
 
-	//²éÕÒÎ»Í¼ÊôĞÔ
+	//æŸ¥æ‰¾ä½å›¾å±æ€§
 	pAttrItem = mftFile.FindAttribute(AD_BITMAP);
-	if (NULL == pAttrItem) return liSector;//ÕâÖÖÇé¿öÊÇ²»ÔÊĞíµÄ
+	if (NULL == pAttrItem) return liSector;//è¿™ç§æƒ…å†µæ˜¯ä¸å…è®¸çš„
 
-	//³õÊ¼»¯ÊôĞÔ
+	//åˆå§‹åŒ–å±æ€§
 	ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
-	//ÅĞ¶ÏÖ¸¶¨µÄMFTÊÇ·ñÔÚÊ¹ÓÃ
+	//åˆ¤æ–­æŒ‡å®šçš„MFTæ˜¯å¦åœ¨ä½¿ç”¨
 	if(FALSE == ntfsAttr.BMIsBitSet(mft , this ))
-		return liSector;//Ö¸¶¨µÄÎÄ¼ş¼ÇÂ¼²»´æÔÚ
+		return liSector;//æŒ‡å®šçš„æ–‡ä»¶è®°å½•ä¸å­˜åœ¨
 	
 
-	//»ñµÃÎŞÃûÊı¾İÊôĞÔ 
+	//è·å¾—æ— åæ•°æ®å±æ€§ 
 	if(DR_OK != mftFile.FindNoNameDataAttr(&ntfsAttr))
-	{//»ñÈ¡ÊôĞÔÊ§°Ü
+	{//è·å–å±æ€§å¤±è´¥
 		return liSector;
 	}
 
-	//»ñµÃÊı¾İÔËĞĞ
+	//è·å¾—æ•°æ®è¿è¡Œ
 	if(DR_OK != run.InitRunList(&ntfsAttr))
 		return liSector;
 
-	//¼ÆËãÎÄ¼şËùÔÚvcn
+	//è®¡ç®—æ–‡ä»¶æ‰€åœ¨vcn
 	vcn.QuadPart = (mft.QuadPart * SECTOR_PER_RECODE) / GetSecPerClust();
 
-	//²éÑ¯LCN
+	//æŸ¥è¯¢LCN
 	vcn = run.GetLCNByVCN(vcn , NULL);
 	run.Close();
 	if (-1 == vcn.QuadPart)
 		return liSector;
 
-	//¼ÆËã´ØÄÚÉÈÇøÆ«ÒÆ
+	//è®¡ç®—ç°‡å†…æ‰‡åŒºåç§»
 	liSector.QuadPart = (vcn.QuadPart * mSecPerClu) + ((mft.QuadPart * SECTOR_PER_RECODE) % mSecPerClu);
 
-	//×ÊÔ´»¹ÊÇĞèÒªÊÍ·ÅµÄ
+	//èµ„æºè¿˜æ˜¯éœ€è¦é‡Šæ”¾çš„
 	mftFile.Close();
 	return liSector;
-#elif _USE_MFT_BLOCK_ == 1   //Ê¹ÓÃMFT_BLOCK À´´¦ÀíMFT¼ÇÂ¼  2012-07-18 1:07
+#elif _USE_MFT_BLOCK_ == 1   //ä½¿ç”¨MFT_BLOCK æ¥å¤„ç†MFTè®°å½•  2012-07-18 1:07
 	LONG_INT	liSector = {-1};
 	DRES		res = DR_OK;
 	DNtfsAttr	ntfsAttr;
 	DWORD		i;
-	LONG_INT	curMft;	//ÔÚµ±Ç°¿éµÄÏà¶ÔMFT¼ÇÂ¼ºÅ
+	LONG_INT	curMft;	//åœ¨å½“å‰å—çš„ç›¸å¯¹MFTè®°å½•å·
 
-	//Éè±¸»¹Ã»ÓĞ´ò¿ªµÄ£¿
+	//è®¾å¤‡è¿˜æ²¡æœ‰æ‰“å¼€çš„ï¼Ÿ
 	if (mDevName.empty())
 		return liSector;
 // 	res = OpenFileW(&mftFile , SYS_FILE_MFT);
-// 	if (res != DR_OK) liSector;  //ÎÄ¼ş´ò¿ªÊ§°Ü
+// 	if (res != DR_OK) liSector;  //æ–‡ä»¶æ‰“å¼€å¤±è´¥
 //
-// 	//²éÕÒÎ»Í¼ÊôĞÔ
+// 	//æŸ¥æ‰¾ä½å›¾å±æ€§
 // 	pAttrItem = mftFile.FindAttribute(AD_BITMAP);
-// 	if (NULL == pAttrItem) return liSector;//ÕâÖÖÇé¿öÊÇ²»ÔÊĞíµÄ
+// 	if (NULL == pAttrItem) return liSector;//è¿™ç§æƒ…å†µæ˜¯ä¸å…è®¸çš„
 // 
-// 	//³õÊ¼»¯ÊôĞÔ
+// 	//åˆå§‹åŒ–å±æ€§
 // 	ntfsAttr.InitAttr(pAttrItem->attrDataPtr);
-// 	//ÅĞ¶ÏÖ¸¶¨µÄMFTÊÇ·ñÔÚÊ¹ÓÃ
+// 	//åˆ¤æ–­æŒ‡å®šçš„MFTæ˜¯å¦åœ¨ä½¿ç”¨
 // 	if(FALSE == ntfsAttr.BMIsBitSet(mft , this ))
-// 		return liSector;//Ö¸¶¨µÄÎÄ¼ş¼ÇÂ¼²»´æÔÚ
+// 		return liSector;//æŒ‡å®šçš„æ–‡ä»¶è®°å½•ä¸å­˜åœ¨
 
 
-	//±éÀúÃ¿Ò»¸öMFT_BLOCK
+	//éå†æ¯ä¸€ä¸ªMFT_BLOCK
 	for(i = 0 ; i < mMftBlockCnt; ++i)
 	{
 		if (( mPMftBlock[i].liStartMft.QuadPart <= mft.QuadPart ) &&
 			( mPMftBlock[i].liStartMft.QuadPart + 
 			  mPMftBlock[i].liMftCnt.QuadPart > mft.QuadPart ) )
-		{//Òª²éÕÒµÄMFTÀ©ÔÚÕâÒ»¿éÁË
+		{//è¦æŸ¥æ‰¾çš„MFTæ‰©åœ¨è¿™ä¸€å—äº†
 			curMft.QuadPart = mft.QuadPart - mPMftBlock[i].liStartMft.QuadPart;
 			liSector.QuadPart = mPMftBlock[i].liStartSector.QuadPart 
 				+ curMft.QuadPart * SECTOR_PER_RECODE;

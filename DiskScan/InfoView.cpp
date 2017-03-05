@@ -1,4 +1,4 @@
-// InfoView.cpp : implementation file
+ï»¿// InfoView.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -29,7 +29,7 @@ CInfoView::CInfoView()
 CInfoView::CInfoView( UINT nIDTemplate )
 	:CFormView(nIDTemplate)
 {
-	//µ÷ÓÃ»ùÀà¹¹Ôì·½·¨
+	//è°ƒç”¨åŸºç±»æž„é€ æ–¹æ³•
 }
 
 CInfoView::~CInfoView()
@@ -82,7 +82,7 @@ void CInfoView::OnDestroy()
 {
 	CFormView::OnDestroy();
 
-	// TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌÐò´úÂë
+	// TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
 	this->m_Font.DeleteObject();
 }
 
@@ -91,22 +91,22 @@ void CInfoView::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
 
-	//ÓÃÓÚÏÔÊ¾ÐÅÏ¢µÄ×ÖÌå
+	//ç”¨äºŽæ˜¾ç¤ºä¿¡æ¯çš„å­—ä½“
 	LOGFONT lf;
-	GetFont()->GetLogFont(&lf);  //ÏÖ»õµÄµ±Ç°ÊÓÍ¼µÄÄ¬ÈÏ×ÖÌå ×÷ÎªÄ¡±¾
-	_tcscpy(lf.lfFaceName , _T("ËÎÌå"));
+	GetFont()->GetLogFont(&lf);  //çŽ°è´§çš„å½“å‰è§†å›¾çš„é»˜è®¤å­—ä½“ ä½œä¸ºæ‘¹æœ¬
+	_tcscpy(lf.lfFaceName , _T("å®‹ä½“"));
 	lf.lfHeight = 16;
 	this->m_Font.DeleteObject();
 	this->m_Font.CreateFontIndirect(&lf);
 	this->SetFont(&m_Font , FALSE);
 
-	//»ñµÃµ±Ç°×ÖÌåµÄ×Ö·ûÏÔÊ¾´óÐ¡
+	//èŽ·å¾—å½“å‰å­—ä½“çš„å­—ç¬¦æ˜¾ç¤ºå¤§å°
 	GetTextExtentPoint32(this->GetDC()->GetSafeHdc() ,_T("A") , 1 , &m_szChar);
 }
 
 BOOL CInfoView::PreTranslateMessage(MSG* pMsg)
 {
-	//ÎªÁËÈÃµ±Ç°Àà»òÕß×ÓÀàÖÐµÄ¿Ø¼þ¿ÉÒÔÊ¹ÓÃ ctrl+CµÈÔòÐèÒªÌí¼ÓÈçÏÂÏûÏ¢´¦Àí
+	//ä¸ºäº†è®©å½“å‰ç±»æˆ–è€…å­ç±»ä¸­çš„æŽ§ä»¶å¯ä»¥ä½¿ç”¨ ctrl+Cç­‰åˆ™éœ€è¦æ·»åŠ å¦‚ä¸‹æ¶ˆæ¯å¤„ç†
 	UINT  nCode = pMsg->wParam;
 	if (pMsg->message == WM_KEYDOWN)
 	{   

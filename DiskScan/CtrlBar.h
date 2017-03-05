@@ -1,4 +1,4 @@
-#if !defined(AFX_CtrlBar_H__B56B072B_8088_439A_B4B2_D7DEAAC4C116__INCLUDED_)
+ï»¿#if !defined(AFX_CtrlBar_H__B56B072B_8088_439A_B4B2_D7DEAAC4C116__INCLUDED_)
 #define AFX_CtrlBar_H__B56B072B_8088_439A_B4B2_D7DEAAC4C116__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -10,21 +10,21 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CCtrlBar dialog
-//ÎªÁË±ãÓÚ²Ù×÷ ¸øCCtrlBar¶¨ÒåÁËÒ»ÏÂ¶îÍâµÄÊôĞÔ
-#define CTRL_EDGELEFT       0x00000001		//×ó±ß
-#define CTRL_EDGERIGHT      0x00000002		//ÓÒ±ß
-#define CTRL_EDGETOP        0x00000004		//¶¥²¿
-#define CTRL_EDGEBOTTOM     0x00000008		//µ×²¿
-#define CTRL_EDGEALL        0x0000000F		//ÒÔÉÏËÄÖÖÎ»ÖÃµÄ¼¯ºÏ
-#define CTRL_SHOWEDGES      0x00000010		//ĞèÒªÏÔÊ¾±ßÏß
-#define CTRL_SIZECHILD      0x00000020		//ÊÇ×Ó¿Ø¼ş
+//ä¸ºäº†ä¾¿äºæ“ä½œ ç»™CCtrlBarå®šä¹‰äº†ä¸€ä¸‹é¢å¤–çš„å±æ€§
+#define CTRL_EDGELEFT       0x00000001		//å·¦è¾¹
+#define CTRL_EDGERIGHT      0x00000002		//å³è¾¹
+#define CTRL_EDGETOP        0x00000004		//é¡¶éƒ¨
+#define CTRL_EDGEBOTTOM     0x00000008		//åº•éƒ¨
+#define CTRL_EDGEALL        0x0000000F		//ä»¥ä¸Šå››ç§ä½ç½®çš„é›†åˆ
+#define CTRL_SHOWEDGES      0x00000010		//éœ€è¦æ˜¾ç¤ºè¾¹çº¿
+#define CTRL_SIZECHILD      0x00000020		//æ˜¯å­æ§ä»¶
 
 
 
 class CCtrlBar : public CDialogBar
 {
-	//¶¨ÒåÕâ¸öÀàµÄÄ¿µÄÖ»ÊÇÎªÁËÊ¹CCtrlBar¿ÉÒÔ
-	//·ÃÎÊCDockBarµÄ±£»¤³ÉÔ±
+	//å®šä¹‰è¿™ä¸ªç±»çš„ç›®çš„åªæ˜¯ä¸ºäº†ä½¿CCtrlBarå¯ä»¥
+	//è®¿é—®CDockBarçš„ä¿æŠ¤æˆå‘˜
 	class CCtrlDockBar : public CDockBar{friend class CCtrlBar;};
 
 	DECLARE_DYNAMIC(CCtrlBar);
@@ -32,25 +32,25 @@ class CCtrlBar : public CDialogBar
 public:
 	CCtrlBar(CWnd* pParent = NULL);   // standard constructor
 	~CCtrlBar();
-	CSize	m_szFloat;		//´°¿Ú¸¡¶¯ÊÇµÄ´óĞ¡
-	CSize   m_szMinFloat;	//×îĞ¡µÄ¸¡¶¯´óĞ¡
-	CSize	m_szVDocked;	//×İÏòÍ£¿¿
-	CSize	m_szHDocked;	//ºáÏòÍ£¿¿µÄ´óĞ¡
-	CSize	m_szMinHorz;	//×îĞ¡µÄºáÏòÍ£¿¿
-	CSize	m_szMinVert;	//×İÏòµÄ×îĞ¡´óĞ¡
+	CSize	m_szFloat;		//çª—å£æµ®åŠ¨æ˜¯çš„å¤§å°
+	CSize   m_szMinFloat;	//æœ€å°çš„æµ®åŠ¨å¤§å°
+	CSize	m_szVDocked;	//çºµå‘åœé 
+	CSize	m_szHDocked;	//æ¨ªå‘åœé çš„å¤§å°
+	CSize	m_szMinHorz;	//æœ€å°çš„æ¨ªå‘åœé 
+	CSize	m_szMinVert;	//çºµå‘çš„æœ€å°å¤§å°
 
-	BOOL	m_bChgDockedSize;//ÊÇ·ñÒª±£³ÖÄ¬ÈÏµÄ´óĞ¡
+	BOOL	m_bChgDockedSize;//æ˜¯å¦è¦ä¿æŒé»˜è®¤çš„å¤§å°
 	
-	int		m_nDockBarID;	//µ±Ç°¿ØÖÆÌõµÄID   ÅĞ¶ÏÍ£¿¿µÄµØ·½
-	DWORD	m_dwCtrlStyle;	//¿Ø¼şµÄÊôĞÔ
-	//UINT	m_cxEdge;		//±ß¿òµÄ¿í¶È
+	int		m_nDockBarID;	//å½“å‰æ§åˆ¶æ¡çš„ID   åˆ¤æ–­åœé çš„åœ°æ–¹
+	DWORD	m_dwCtrlStyle;	//æ§ä»¶çš„å±æ€§
+	//UINT	m_cxEdge;		//è¾¹æ¡†çš„å®½åº¦
 
-	BOOL	m_bTracking;	//ÊÇ·ñÔÚÍÏ¶¯´°¿ÚµÄ´óĞ¡
-	UINT	m_htEdge;		//ÍÏ¶¯´°¿Ú´óĞ¡Ê±µÄÊó±êËùÔÚµÄ´°¿Ú·Ç¿Í»§È¥µÄÎ»ÖÃ
-	LONG	m_nTrackPosOld;	//ÍÏ¶¯´°¿Ú´óĞ¡Ê±µÄ´°¿ÚÔ­ÓĞÎ»ÖÃ´óĞ¡
-	LONG	m_nTrackEdgeOfs;//ÍÏ¶¯Î»ÖÃµ½´°¿ÚÖĞĞÄµÄÆ«ÒÆ
-	LONG	m_nTrackPosMin;	//ÍÏ¶¯µÄ×îÏÂ´óĞ¡
-	LONG	m_nTrackPosMax;	//ÍÏ¶¯µÄ×î´ó´óĞ¡
+	BOOL	m_bTracking;	//æ˜¯å¦åœ¨æ‹–åŠ¨çª—å£çš„å¤§å°
+	UINT	m_htEdge;		//æ‹–åŠ¨çª—å£å¤§å°æ—¶çš„é¼ æ ‡æ‰€åœ¨çš„çª—å£éå®¢æˆ·å»çš„ä½ç½®
+	LONG	m_nTrackPosOld;	//æ‹–åŠ¨çª—å£å¤§å°æ—¶çš„çª—å£åŸæœ‰ä½ç½®å¤§å°
+	LONG	m_nTrackEdgeOfs;//æ‹–åŠ¨ä½ç½®åˆ°çª—å£ä¸­å¿ƒçš„åç§»
+	LONG	m_nTrackPosMin;	//æ‹–åŠ¨çš„æœ€ä¸‹å¤§å°
+	LONG	m_nTrackPosMax;	//æ‹–åŠ¨çš„æœ€å¤§å¤§å°
 
 
 	// Dialog Data
@@ -69,13 +69,13 @@ virtual BOOL Create(CWnd* pParentWnd,UINT nIDTemplate,UINT nStyle,UINT nID ,CSiz
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual CSize CalcDynamicLayout( int nLength, DWORD dwMode );
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz);
-	//¼ÆËã¿Í»§ÇøµÄ´óĞ¡
+	//è®¡ç®—å®¢æˆ·åŒºçš„å¤§å°
 	//virtual void NcCalcClient(LPRECT pRc, UINT nDockBarID);
-	//¿ªÊ¼ÍÏ¶¯´°¿ÚµÄ´óĞ¡
+	//å¼€å§‹æ‹–åŠ¨çª—å£çš„å¤§å°
 	virtual void StartTracking( UINT nHitTest, CPoint point );
-	//Í£Ö¹ÍÏ¶¯´°¿ÚµÄ´óĞ¡
+	//åœæ­¢æ‹–åŠ¨çª—å£çš„å¤§å°
 	virtual void StopTracking();
-	//ÍÏ¶¯´°¿ÚµÄ´óĞ¡(ÔÚ·Ç¿Í»§È¥°´×¡Êó±ê×ó¼üÒÆ¶¯Êó±ê)
+	//æ‹–åŠ¨çª—å£çš„å¤§å°(åœ¨éå®¢æˆ·å»æŒ‰ä½é¼ æ ‡å·¦é”®ç§»åŠ¨é¼ æ ‡)
 	virtual void OnTrackUpdateSize(CPoint& point);
 	//}}AFX_VIRTUAL
 
@@ -87,35 +87,35 @@ protected:
 	afx_msg LRESULT OnInitDialog(WPARAM wParam, LPARAM lParam);
     afx_msg void OnWindowPosChanging(WINDOWPOS FAR* lpwndpos);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg LRESULT OnNcHitTest(CPoint point);  //Êó±ê¹â±êµÄÎ»ÖÃ
-	//¼ÆËã¿Í»§ÇøµÄ´óĞ¡
+	afx_msg LRESULT OnNcHitTest(CPoint point);  //é¼ æ ‡å…‰æ ‡çš„ä½ç½®
+	//è®¡ç®—å®¢æˆ·åŒºçš„å¤§å°
 	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp);
-	//»æÖÆ·Ç¿Í»§Çø
+	//ç»˜åˆ¶éå®¢æˆ·åŒº
 	afx_msg void OnNcPaint();
 	afx_msg void OnPaint();
-	//·ÑºÍ¿Í»§È¥Êó±ê°´ÏÂ
+	//è´¹å’Œå®¢æˆ·å»é¼ æ ‡æŒ‰ä¸‹
 	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
-	//Êó±êÒÆ¶¯ÏûÏ¢
+	//é¼ æ ‡ç§»åŠ¨æ¶ˆæ¯
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	
-	//Êó±ê×ó¼üµ¯Æğ
+	//é¼ æ ‡å·¦é”®å¼¹èµ·
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	//Êó±êÓÒ¼ü°´ÏÂ
+	//é¼ æ ‡å³é”®æŒ‰ä¸‹
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
-	//µ±Ç°´°¿ÚÊ§È¥ÁËÊó±êÊäÈë½¹µã,ÓĞ¿ÉÄÜÊÇµ÷ÓÃÁËReleaseCapture
+	//å½“å‰çª—å£å¤±å»äº†é¼ æ ‡è¾“å…¥ç„¦ç‚¹,æœ‰å¯èƒ½æ˜¯è°ƒç”¨äº†ReleaseCapture
 	afx_msg void OnCaptureChanged(CWnd *pWnd);
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
 public:
-	BOOL IsHDocking();//ÅĞ¶Ïµ±´°¿ÚÊÇ·ñÊÇºÜĞĞÍ£¿¿´°¿Ú
-	BOOL IsVDocking();//ÊÇ×İÏòÍ£¿¿´°¿Ú
+	BOOL IsHDocking();//åˆ¤æ–­å½“çª—å£æ˜¯å¦æ˜¯å¾ˆè¡Œåœé çª—å£
+	BOOL IsVDocking();//æ˜¯çºµå‘åœé çª—å£
 
 
-	UINT GetEdgeHTCode( int i );	//Êó±êÎ»ÖÃ¶ÔÓ¦µÄĞòºÅ 	0-HTLEFT; 1-HTTOP; 2-HTRIGHT; 3-HTBOTTOM;
-	BOOL GetEdgeRect( CRect rcWnd/*´°¿Ú¾ØĞÎ*/,
-					  UINT nHitTest/*ÖÆ¶¨ÄÇ¸ö·½ÏòµÄ±ß¿ò*/,
-					  CRect& rcEdge/*»ñµÃµÄÖÆ¶¨±ß¿ò*/ );//Èç¹û²»ÔÚÈÎºÎ±ß¿òµÄ»°·µ»ØFALSE
+	UINT GetEdgeHTCode( int i );	//é¼ æ ‡ä½ç½®å¯¹åº”çš„åºå· 	0-HTLEFT; 1-HTTOP; 2-HTRIGHT; 3-HTBOTTOM;
+	BOOL GetEdgeRect( CRect rcWnd/*çª—å£çŸ©å½¢*/,
+					  UINT nHitTest/*åˆ¶å®šé‚£ä¸ªæ–¹å‘çš„è¾¹æ¡†*/,
+					  CRect& rcEdge/*è·å¾—çš„åˆ¶å®šè¾¹æ¡†*/ );//å¦‚æœä¸åœ¨ä»»ä½•è¾¹æ¡†çš„è¯è¿”å›FALSE
 
 };
 

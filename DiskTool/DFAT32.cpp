@@ -1,17 +1,17 @@
 /***********************************************************************
  * FileName:	DFAT32.cpp
- * Author:		ÑîËÉ
- * Created:		2012Äê3ÔÂ20ÈÕ ĞÇÆÚ¶ş
- * Purpose:		DFat32µÄÊµÏÖ
- * Comment:		Õâ¸öÀàÖ÷ÒªÊÇ°üº¬ÁËÒ»Ğ©FAT32µÄ²Ù·½·¨½â£¬ÓÃÓÚ³éÏóÒ»¸öFAT32µÄ¾í
+ * Author:		æ¨æ¾
+ * Created:		2012å¹´3æœˆ20æ—¥ æ˜ŸæœŸäºŒ
+ * Purpose:		DFat32çš„å®ç°
+ * Comment:		è¿™ä¸ªç±»ä¸»è¦æ˜¯åŒ…å«äº†ä¸€äº›FAT32çš„æ“æ–¹æ³•è§£ï¼Œç”¨äºæŠ½è±¡ä¸€ä¸ªFAT32çš„å·
  * 
- * Modified:	2012Äê5ÔÂ13ÈÕ ĞÇÆÚÈÕ		ĞŞ¸´Ò»¸öBUG¡£
- *				1.½â¾öÅöµ½¶ÌÎÄ¼şÃû¸ÕºÃÊÇ8.3¸ñÊ½Ê±¶øÎŞ·¨Ê¶±ğµÄÎÊÌâ¡£GetSegName
- *				ÖĞ£¬ÎÄ¼şÃûÓëÀ©Õ¹Ãû·Ö¸ô·û"."µÄË÷Òı×î´ó¿ÉÒÔÊ¹8¡£
+ * Modified:	2012å¹´5æœˆ13æ—¥ æ˜ŸæœŸæ—¥		ä¿®å¤ä¸€ä¸ªBUGã€‚
+ *				1.è§£å†³ç¢°åˆ°çŸ­æ–‡ä»¶ååˆšå¥½æ˜¯8.3æ ¼å¼æ—¶è€Œæ— æ³•è¯†åˆ«çš„é—®é¢˜ã€‚GetSegName
+ *				ä¸­ï¼Œæ–‡ä»¶åä¸æ‰©å±•ååˆ†éš”ç¬¦"."çš„ç´¢å¼•æœ€å¤§å¯ä»¥ä½¿8ã€‚
  *
- *				2.windows×ÊÔ´¹ÜÀíÆ÷²»Ö§³Ö´´½¨ÒÔ"."¿ªÍ·µÄÎÄ¼ş£¬µ«ÊÇÊµ¼ÊÉÏ
- *				ÔÚwindowsÖĞÊÇ´æÔÚÕâÑùµÄÎÄ¼şµÄ,ËùÒÔÏÖÔÚ½«Ô­ÏÈ²»Ö§³ÖÒÔµã¿ª
- *				Í·µÄÎÄ¼ş£¬¸ÄÎªÁËÖ§³Ö"."¿ªÍ·µÄÎÄ¼ş
+ *				2.windowsèµ„æºç®¡ç†å™¨ä¸æ”¯æŒåˆ›å»ºä»¥"."å¼€å¤´çš„æ–‡ä»¶ï¼Œä½†æ˜¯å®é™…ä¸Š
+ *				åœ¨windowsä¸­æ˜¯å­˜åœ¨è¿™æ ·çš„æ–‡ä»¶çš„,æ‰€ä»¥ç°åœ¨å°†åŸå…ˆä¸æ”¯æŒä»¥ç‚¹å¼€
+ *				å¤´çš„æ–‡ä»¶ï¼Œæ”¹ä¸ºäº†æ”¯æŒ"."å¼€å¤´çš„æ–‡ä»¶
  ***********************************************************************/
 
 #include "disktool.h"
@@ -52,7 +52,7 @@ DRES DFat32::OpenDev(const WCHAR* name, LONG_INT offset)
 	wcscpy(mDevName, name);
 	mFSOff = offset;
 
-	//´ò¿ªÉè±¸
+	//æ‰“å¼€è®¾å¤‡
 	mDev = ::CreateFile(mDevName,
 						GENERIC_READ | GENERIC_WRITE,
 						FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -62,33 +62,33 @@ DRES DFat32::OpenDev(const WCHAR* name, LONG_INT offset)
 						NULL);
 
 	if (mDev == INVALID_HANDLE_VALUE)
-	{//´ò¿ªÉè±¸Ê§°Ü
+	{//æ‰“å¼€è®¾å¤‡å¤±è´¥
 		wcscpy(mDevName, L"");
 		return DR_OPEN_DEV_ERR;
 	}
 
-	char		buf[SECTOR_SIZE] = { 0 };			//Êı¾İ»º´æ
+	char		buf[SECTOR_SIZE] = { 0 };			//æ•°æ®ç¼“å­˜
 	PFAT32_DBR	pDBR = PFAT32_DBR(buf);
 
-	mSectors = 1;  //ÎªÁË¶ÁÈ¡µÚÒ»¸öÉÈÇøÔİÊ±ÉèÖÃÎª1
-	DRES res = ReadData(buf, 0, SECTOR_SIZE);	//¶ÁÈ¡·ÖÇøµÄµÚÒ»¸öÉÈÇøµÄÊı¾İ
-	mSectors = 0;  //»¹Ô­Êı¾İ
+	mSectors = 1;  //ä¸ºäº†è¯»å–ç¬¬ä¸€ä¸ªæ‰‡åŒºæš‚æ—¶è®¾ç½®ä¸º1
+	DRES res = ReadData(buf, 0, SECTOR_SIZE);	//è¯»å–åˆ†åŒºçš„ç¬¬ä¸€ä¸ªæ‰‡åŒºçš„æ•°æ®
+	mSectors = 0;  //è¿˜åŸæ•°æ®
 	if(res)
 		return res;
 
-	if (MBR_END != pDBR->bsEndSig)//Êı¾İÎŞĞ§
+	if (MBR_END != pDBR->bsEndSig)//æ•°æ®æ— æ•ˆ
 		return DR_INIT_ERR;
 
-	mSecPerClus = pDBR->bsSecPerClus;	//Ã¿´ØÉÈÇøÊı
-	m1stDirClut = pDBR->bsFirstDirEntry32;//µÚÒ»¸ö¸úÄ¿Â¼ËùÔÚµÄ´ØºÅ
-	mFATs = pDBR->bsFATs;		//fat±íÊı
-	mFSinfoSec = pDBR->bsFsInfo32;	//FSinfoËùÔÚµÄÉÈÇø
-	mResSec = pDBR->bsResSectors; //±£ÁôÉÈÇøÊı	
-	mSecsPerFAT = pDBR->bsFATsecs32;	//Ã¿¸öFAT±íËùÕ¼µÄÉÈÇøÊı
-	mSectors = pDBR->bsHugeSectors;//±¾·ÖÇøµÄÉÈÊı
+	mSecPerClus = pDBR->bsSecPerClus;	//æ¯ç°‡æ‰‡åŒºæ•°
+	m1stDirClut = pDBR->bsFirstDirEntry32;//ç¬¬ä¸€ä¸ªè·Ÿç›®å½•æ‰€åœ¨çš„ç°‡å·
+	mFATs = pDBR->bsFATs;		//fatè¡¨æ•°
+	mFSinfoSec = pDBR->bsFsInfo32;	//FSinfoæ‰€åœ¨çš„æ‰‡åŒº
+	mResSec = pDBR->bsResSectors; //ä¿ç•™æ‰‡åŒºæ•°	
+	mSecsPerFAT = pDBR->bsFATsecs32;	//æ¯ä¸ªFATè¡¨æ‰€å çš„æ‰‡åŒºæ•°
+	mSectors = pDBR->bsHugeSectors;//æœ¬åˆ†åŒºçš„æ‰‡æ•°
 	mMaxClust = (mSectors - (mResSec + (mFATs * mSecsPerFAT))) / mSecPerClus + 2 - 1;
 
-	//Éè±¸´ò¿ªÊ§°Ü
+	//è®¾å¤‡æ‰“å¼€å¤±è´¥
 	if(res)
 		wcscpy(mDevName, L"");
 
@@ -119,23 +119,23 @@ DRES DFat32::ReadData(void* buf , DWORD off , DWORD dwReadCnt)
 	if (IsDevOpened())
 		return DR_NO_OPEN;
 
-	//ĞèÒªÅĞ¶Ï¶ÁÈ¡Êı¾İÊ±ÊÇ·ñÔ½½ç
+	//éœ€è¦åˆ¤æ–­è¯»å–æ•°æ®æ—¶æ˜¯å¦è¶Šç•Œ
 	if (off  >= mSectors )
-	{//¶ÁÈ¡Êı¾İÔ½½çÁË
+	{//è¯»å–æ•°æ®è¶Šç•Œäº†
 		return DR_DEV_CTRL_ERR;
 	}
 
 	LONG_INT offset;
-	offset.QuadPart = mFSOff.QuadPart + off;						//¶ÁÈ¡Êı¾İµÄÊµ¼ÊÆ«ÒÆ
-	offset.QuadPart *= SECTOR_SIZE;					//×Ö½ÚÆ«ÒÆ
+	offset.QuadPart = mFSOff.QuadPart + off;						//è¯»å–æ•°æ®çš„å®é™…åç§»
+	offset.QuadPart *= SECTOR_SIZE;					//å­—èŠ‚åç§»
 
 	DRES res = DR_OK;
-	//ÉèÖÃÎÄ¼şÖ¸Õë
+	//è®¾ç½®æ–‡ä»¶æŒ‡é’ˆ
 	offset.LowPart = SetFilePointer(mDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 	if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 		res = DR_DEV_CTRL_ERR;
 
-	//¶ÁÈ¡Êı¾İ
+	//è¯»å–æ•°æ®
 	DWORD dwReaded = 0;
 	if(!res && !::ReadFile(mDev , buf , dwReadCnt ,&dwReaded ,NULL) && dwReaded != dwReadCnt)	
 		res =  DR_DEV_IO_ERR;
@@ -146,16 +146,16 @@ DRES DFat32::ReadData(void* buf , DWORD off , DWORD dwReadCnt)
 DRES DFat32::WriteData(void* buf , DWORD off , DWORD dwWrite)
 {
 	LONG_INT offset = {0};
-	offset.QuadPart = mFSOff.QuadPart + off; //¶ÁÈ¡Êı¾İµÄÊµ¼ÊÆ«ÒÆ
-	offset.QuadPart *= SECTOR_SIZE; //×Ö½ÚÆ«ÒÆ
+	offset.QuadPart = mFSOff.QuadPart + off; //è¯»å–æ•°æ®çš„å®é™…åç§»
+	offset.QuadPart *= SECTOR_SIZE; //å­—èŠ‚åç§»
 
-	//ÉèÖÃÎÄ¼şÖ¸Õë
+	//è®¾ç½®æ–‡ä»¶æŒ‡é’ˆ
 	DRES res = DR_OK;
 	offset.LowPart = SetFilePointer(mDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 	if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 		res = DR_DEV_CTRL_ERR;
 
-	//¶ÁÈ¡Êı¾İ
+	//è¯»å–æ•°æ®
 	DWORD dwWrited = 0;
 	if(!res && !WriteFile(mDev , buf , dwWrite , &dwWrited ,NULL) && dwWrited != dwWrite)	
 		res =  DR_DEV_IO_ERR;
@@ -166,22 +166,22 @@ DWORD DFat32::GetFATFromFAT1(DWORD clust)
 {
 	DWORD fsect;
 
-	if (clust < 2 || clust > mMaxClust)	//´ØºÅ¼ì²é
+	if (clust < 2 || clust > mMaxClust)	//ç°‡å·æ£€æŸ¥
 		return 1;
 
 	fsect = mResSec;
-	if (MoveView(fsect + (clust / (SECTOR_SIZE / 4))))//ÒÆ¶¯´°¿Úµ½clustËùÔÚµÄÉÈÇø
+	if (MoveView(fsect + (clust / (SECTOR_SIZE / 4))))//ç§»åŠ¨çª—å£åˆ°clustæ‰€åœ¨çš„æ‰‡åŒº
 		return 0xFFFFFFFF;
 
 	return GetDWORD(mView + (clust % (SECTOR_SIZE / 4) *4)) & FAT_MASK;
 }
 DWORD DFat32::GetFATFromFAT2(DWORD clust)
 {
-	if (clust < 2 || clust > mMaxClust)	//´ØºÅ¼ì²é
+	if (clust < 2 || clust > mMaxClust)	//ç°‡å·æ£€æŸ¥
 		return 1;
 
 	DWORD fsect = mResSec + mSecsPerFAT;
-	if (MoveView(fsect + (clust / (SECTOR_SIZE / 4))))//ÒÆ¶¯´°¿Úµ½clustËùÔÚµÄÉÈÇø
+	if (MoveView(fsect + (clust / (SECTOR_SIZE / 4))))//ç§»åŠ¨çª—å£åˆ°clustæ‰€åœ¨çš„æ‰‡åŒº
 		return 0xFFFFFFFF;
 
 	return GetDWORD(mView + (clust % (SECTOR_SIZE / 4) *4)) & FAT_MASK;
@@ -192,7 +192,7 @@ DWORD DFat32::ClustToSect(DWORD clust)
 	if (!IsDevOpened())
 		return 0;
 
-	//ÎŞĞ§µÄ´ØºÅ?
+	//æ— æ•ˆçš„ç°‡å·?
 	if (clust < 2 || clust > mMaxClust) 
 		return 0;
 
@@ -204,16 +204,16 @@ DWORD DFat32::SectToClust(DWORD sector)
 	if (!IsDevOpened())
 		return 0;
 
-	//ÎŞĞ§ÉÈÇøºÅ
+	//æ— æ•ˆæ‰‡åŒºå·
 	if (sector < (mResSec + (mFATs * mSecsPerFAT)))
 	{
 		return 0;
 	}
 
-	//Ïà¶Ô¸ùÄ¿Â¼µÄµÚÒ»´Ø
+	//ç›¸å¯¹æ ¹ç›®å½•çš„ç¬¬ä¸€ç°‡
 	sector -= (mResSec + (mFATs * mSecsPerFAT));
 
-	//»ñµÃÊµ¼ÊµÄ´ØºÅ
+	//è·å¾—å®é™…çš„ç°‡å·
 	return (sector/ mSecPerClus) + 2;
 }
 
@@ -222,18 +222,18 @@ DRES DFat32::MoveView(DWORD sec)
 	DWORD	vSect = mViewSec;
 	DRES	res = DR_OK;
 
-	if (vSect != sec) //Òª¸Ä±äµ±Ç°µÄÊı¾İ´°¿Ú
+	if (vSect != sec) //è¦æ”¹å˜å½“å‰çš„æ•°æ®çª—å£
 	{
-		if (mIsViewChged) //Êı¾İÊÓÍ¼ÖĞµÄÊı¾İĞèÒªĞ´»á´ÅÅÌ
+		if (mIsViewChged) //æ•°æ®è§†å›¾ä¸­çš„æ•°æ®éœ€è¦å†™ä¼šç£ç›˜
 		{
 			if ((res = WriteData(mView, vSect ,SECTOR_SIZE)) != DR_OK)
 				return res;
 
 			mIsViewChged = FALSE;
-			if (vSect < (mResSec + mSecsPerFAT)) //ÔÚFAT±íÇøÓò
+			if (vSect < (mResSec + mSecsPerFAT)) //åœ¨FATè¡¨åŒºåŸŸ
 			{
 				int nf;
-				for (nf = mFATs; nf > 1; nf--) //½«Êı¾İĞ´µ½Ã¿Ò»¸öFAT±íÖĞÈ¥
+				for (nf = mFATs; nf > 1; nf--) //å°†æ•°æ®å†™åˆ°æ¯ä¸€ä¸ªFATè¡¨ä¸­å»
 				{
 					vSect += mSecsPerFAT;
 					WriteData(mView, vSect  ,SECTOR_SIZE);
@@ -256,28 +256,28 @@ DRES DFat32::MoveView(DWORD sec)
 DRES DFat32::PosEntry(PVOID entr , WORD index)
 {
 	PDirEntry entry = PDirEntry(entr);
-	entry->mIndex = index;						//Òª¶¨Î»µÄÄ¿Â¼ºÅ
-	DWORD clst = entry->mStartClust;					//ÆğÊ¼´ØºÅ
-	if (clst == 1 || clst > mMaxClust)	//¼ì²éÆğÊ¼´ØºÅÊÇ·ñ¹şºÏ·¨
+	entry->mIndex = index;						//è¦å®šä½çš„ç›®å½•å·
+	DWORD clst = entry->mStartClust;					//èµ·å§‹ç°‡å·
+	if (clst == 1 || clst > mMaxClust)	//æ£€æŸ¥èµ·å§‹ç°‡å·æ˜¯å¦å“ˆåˆæ³•
 		return DR_INIT_ERR;
 
-	USHORT ic = SECTOR_SIZE / 32 * mSecPerClus;	//Ã¿´ØµÄÈë¿ÚÊı
-	while (index >= ic) //¸ú½øµ½´ØÁ´
+	USHORT ic = SECTOR_SIZE / 32 * mSecPerClus;	//æ¯ç°‡çš„å…¥å£æ•°
+	while (index >= ic) //è·Ÿè¿›åˆ°ç°‡é“¾
 	{
-		clst = GetFATFromFAT1( clst	); //»ñµÃÏÂÒ»´ØµÄ´ØºÅ
+		clst = GetFATFromFAT1( clst	); //è·å¾—ä¸‹ä¸€ç°‡çš„ç°‡å·
 		if (clst == 0xFFFFFFFF)
-			return DR_DEV_IO_ERR; //Éè±¸IO³ö´í
+			return DR_DEV_IO_ERR; //è®¾å¤‡IOå‡ºé”™
 
-		if (clst < 2 || clst > mMaxClust)//³¬³öÁË·¶Î§
+		if (clst < 2 || clst > mMaxClust)//è¶…å‡ºäº†èŒƒå›´
 			return DR_INIT_ERR;
 
 		index -= ic;
 	}
 
-	entry->mCurClust = clst; //µ±Ç°´ØºÅ
-	entry->mCurSect = ClustToSect( clst) + index / (SECTOR_SIZE / 32);	//ÉÈÇøºÅ
-	entry->mDir = mView + (index % (SECTOR_SIZE / 32)) * 32;//¶¨Î»indexËùÖ¸¶¨µÄÈë¿Ú
-	return DR_OK; //¶¨Î»³É¹¦  Ö»ĞèÔÚÓÃµÄÊ±ºòÒÆ¶¯Êı¾İ´°¿ÚÁË
+	entry->mCurClust = clst; //å½“å‰ç°‡å·
+	entry->mCurSect = ClustToSect( clst) + index / (SECTOR_SIZE / 32);	//æ‰‡åŒºå·
+	entry->mDir = mView + (index % (SECTOR_SIZE / 32)) * 32;//å®šä½indexæ‰€æŒ‡å®šçš„å…¥å£
+	return DR_OK; //å®šä½æˆåŠŸ  åªéœ€åœ¨ç”¨çš„æ—¶å€™ç§»åŠ¨æ•°æ®çª—å£äº†
 }
 
 DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
@@ -287,15 +287,15 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 	char*		sfn		= (char*)entry->mSFN;
 /*	const WCHAR* p		= *path;*/
 	const WCHAR* p		= NULL;
-	WCHAR		w		= 0;	//Unicode×Ö·û»º´æ
-	int			i		= 0;	//¸¨Öú±äÁ¿
-	int			lfni	= 0;	//lfn³¬Î²
-	int			sfni	= 0;	//sfn³¬Î²
-	int			doti	= 0;	//×îºóÒ»¸öµãµÄÎ»ÖÃ
-	W_CHAR		w_w		= {0};		//ÓÃÓÚ×Ö·û×ª»»µÄ×Ö·û
+	WCHAR		w		= 0;	//Unicodeå­—ç¬¦ç¼“å­˜
+	int			i		= 0;	//è¾…åŠ©å˜é‡
+	int			lfni	= 0;	//lfnè¶…å°¾
+	int			sfni	= 0;	//sfnè¶…å°¾
+	int			doti	= 0;	//æœ€åä¸€ä¸ªç‚¹çš„ä½ç½®
+	W_CHAR		w_w		= {0};		//ç”¨äºå­—ç¬¦è½¬æ¢çš„å­—ç¬¦
 	
 	if (path[0][0] == '*')
-	{//ÒÑ¾­É¾³ıÁËµÄÎÄ¼ş
+	{//å·²ç»åˆ é™¤äº†çš„æ–‡ä»¶
 		p = *path + 1;
 		entry->mIsDelFile =  TRUE;
 	}
@@ -305,49 +305,49 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 		p = *path;
 	}
 
-	entry->mStatus = 0;				//ÏÈÇåÀíÒ»ÏÂ×´Ì¬
+	entry->mStatus = 0;				//å…ˆæ¸…ç†ä¸€ä¸‹çŠ¶æ€
 	::memset(entry->mLFN , 0 ,sizeof(WCHAR)*MAX_LFN);
 	::memset(entry->mSFN , 0 ,11);
 
 	for (i = 0; !IsPathSeparator(w = p[i]) && w  ; ++i)
 	{
-		//³¤ÎÄ¼şÃûÖĞ¿Õ¸ñºÍµã¿ÉÒÔÔÚÖĞ¼ä¡£µ«²»¿ÉÒÔÔÚ¿ªÊ¼ºÍÄ©Î²
-		//ÎÄ¼şÃûÇ°Ãæ²»¿ÉÒÔÓĞ¿Õ¸ñ»òÕßµã
-		if(!lfni && (w <= 0x20 /*|| w == '.'*/ ))	//windows×ÊÔ´¹ÜÀíÆ÷ËäÈ»²»¿É´´½¨ÒÔµã¿ªÍ·µÄÎÄ¼ş£¬µ«ÊÇËûÈ´ÊÇÊÇÈ´ÊÇ´æÔÚµÄ  2012-5-13
+		//é•¿æ–‡ä»¶åä¸­ç©ºæ ¼å’Œç‚¹å¯ä»¥åœ¨ä¸­é—´ã€‚ä½†ä¸å¯ä»¥åœ¨å¼€å§‹å’Œæœ«å°¾
+		//æ–‡ä»¶åå‰é¢ä¸å¯ä»¥æœ‰ç©ºæ ¼æˆ–è€…ç‚¹
+		if(!lfni && (w <= 0x20 /*|| w == '.'*/ ))	//windowsèµ„æºç®¡ç†å™¨è™½ç„¶ä¸å¯åˆ›å»ºä»¥ç‚¹å¼€å¤´çš„æ–‡ä»¶ï¼Œä½†æ˜¯ä»–å´æ˜¯æ˜¯å´æ˜¯å­˜åœ¨çš„  2012-5-13
 			continue;
-		if(lfni > MAX_LFN) return DR_INVALID_NAME;	//ÎÄ¼şÃû³¬¹ıÁË255¸ö×Ö·û
-		if(IsSingleByteChar(w) && strchr("\"*:<>\?|", w))	return DR_INVALID_NAME;					//ÓĞ·Ç·¨×Ö·û
+		if(lfni > MAX_LFN) return DR_INVALID_NAME;	//æ–‡ä»¶åè¶…è¿‡äº†255ä¸ªå­—ç¬¦
+		if(IsSingleByteChar(w) && strchr("\"*:<>\?|", w))	return DR_INVALID_NAME;					//æœ‰éæ³•å­—ç¬¦
 
 		lfn[lfni++] = w;
 	}
 
-	if(!w)	//µ½ÁË×îºóÒ»¶Î
+	if(!w)	//åˆ°äº†æœ€åä¸€æ®µ
 		entry->mStatus |= ST_LAST;
-	*path = p + i +1;//·µ»ØÊ£ÏÂµÄÂ·¾¶
+	*path = p + i +1;//è¿”å›å‰©ä¸‹çš„è·¯å¾„
 
 	lfn[lfni] = 0;	
-	//È¥µôºóÃæµÄ¿Õ¸ñºÍµã
+	//å»æ‰åé¢çš„ç©ºæ ¼å’Œç‚¹
 	for (; lfni > 0 &&(lfn[lfni-1]== 0x20 || lfn[lfni-1]== '.');--lfni)
 		lfn[lfni-1] = 0;
 
-	if(!lfni)//Ã»ÓĞÃû×Ö
+	if(!lfni)//æ²¡æœ‰åå­—
 		return DR_INVALID_NAME;
 
-	//Í¬Ê±ÓĞ´óĞ´ºÍĞ´µÄÊ±ºòÒ²Ö»ÄÜÓÃ³¤ÎÄ¼şÃû
+	//åŒæ—¶æœ‰å¤§å†™å’Œå†™çš„æ—¶å€™ä¹Ÿåªèƒ½ç”¨é•¿æ–‡ä»¶å
 	if(entry->mStatus & ST_UPPER && entry->mStatus & ST_LOWER)
 		entry->mStatus |= ST_LFN;
 	
-	//³¤ÎÄ¼şÃû´´½¨Íê±Ï
-	//¿ªÊ¼¶àÎÄ¼şÃû
+	//é•¿æ–‡ä»¶ååˆ›å»ºå®Œæ¯•
+	//å¼€å§‹å¤šæ–‡ä»¶å
 
-	//²éÕÒÀ©Õ¹ÃûµÄÎ»ÖÃ  //µÚÒ»¸ö×Ö·û²»¿ÉÄÜÊÇµã
-	for (doti = lfni-1; doti >= 0 && lfn[doti] != '.';--doti);  //windows ÆäÊµÊÇ¿ÉÒÔ´æÔÚÒ»µã¿ªÍ·µÄÎÄ¼şµÄ     
-	//doti==-1  Ã»À©Õ¹Ãû
+	//æŸ¥æ‰¾æ‰©å±•åçš„ä½ç½®  //ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸å¯èƒ½æ˜¯ç‚¹
+	for (doti = lfni-1; doti >= 0 && lfn[doti] != '.';--doti);  //windows å…¶å®æ˜¯å¯ä»¥å­˜åœ¨ä¸€ç‚¹å¼€å¤´çš„æ–‡ä»¶çš„     
+	//doti==-1  æ²¡æ‰©å±•å
 	if (doti == -1)
 	{
 		doti = 0;
 	}
-	else if (entry->mIsDelFile == FALSE && doti >/*=*/ 8)	//³¬³öÁË8.3ÃüÃû·¨   //´Ë´¦²»µÃÓĞµÈÓÚ "."µÄ×î´óÎ»ÖÃÊÇ¿ÉÒÔµÈÓÚ8µÄ  2012-5-13
+	else if (entry->mIsDelFile == FALSE && doti >/*=*/ 8)	//è¶…å‡ºäº†8.3å‘½åæ³•   //æ­¤å¤„ä¸å¾—æœ‰ç­‰äº "."çš„æœ€å¤§ä½ç½®æ˜¯å¯ä»¥ç­‰äº8çš„  2012-5-13
 	{
 		entry->mStatus |= ST_LFN;
 	}
@@ -356,37 +356,37 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 		entry->mStatus |= ST_LFN;
 	}
 
-	//¿ªÊ¼´´½¨¶ÌÎÄ¼şÃû
-	//²»µÃĞ¡ÓÚ0x20 ÒÔ¼°"\"*+,./:;<=>\?[\\]|"
-	//ÏÈÀ´ÎÄ¼şµÄÃû×Ö
+	//å¼€å§‹åˆ›å»ºçŸ­æ–‡ä»¶å
+	//ä¸å¾—å°äº0x20 ä»¥åŠ"\"*+,./:;<=>\?[\\]|"
+	//å…ˆæ¥æ–‡ä»¶çš„åå­—
 
 	sfni = 0;
-	if (entry->mIsDelFile && !(entry->mStatus & ST_LFN)) //ÒÑ¾­É¾³ıÁËµÄÎÄ¼şµÄ¶ÌÎÄ¼şÃûµÚÒ»¸ö×Ö½ÚÌæ»»³É '*'
+	if (entry->mIsDelFile && !(entry->mStatus & ST_LFN)) //å·²ç»åˆ é™¤äº†çš„æ–‡ä»¶çš„çŸ­æ–‡ä»¶åç¬¬ä¸€ä¸ªå­—èŠ‚æ›¿æ¢æˆ '*'
 	{
 		sfn[sfni++] = '*';
 	}
 
 	for (i = 0 ; i < lfni; ++i )
 	{
-		if(i == doti && doti) //¸ÃÀ©Õ¹ÃûÁË
+		if(i == doti && doti) //è¯¥æ‰©å±•åäº†
 			break;
 
 		w = lfn[i];
-		if (IsSingleByteChar(w) && strchr(" .+,/;=[\\]", w))  //³ıµô³¤ÎÄ¼şÃûÖĞ²»¿ÉÒÔµÄ ¾ÍÊÇ" +,/;=[\\]"  ÓĞÒ»¸ö¿Õ¸ñ
-		{//³öÏÖÁË·Ç·¨×Ö·û  Ö»ÄÜÓÃ³¤ÎÄ¼şÃû
+		if (IsSingleByteChar(w) && strchr(" .+,/;=[\\]", w))  //é™¤æ‰é•¿æ–‡ä»¶åä¸­ä¸å¯ä»¥çš„ å°±æ˜¯" +,/;=[\\]"  æœ‰ä¸€ä¸ªç©ºæ ¼
+		{//å‡ºç°äº†éæ³•å­—ç¬¦  åªèƒ½ç”¨é•¿æ–‡ä»¶å
 			entry->mStatus |= ST_LFN;
 			continue;
 		}
 		
-		//¶ÌÎÄ¼şÃûÈç¹û¼ÈÓĞ´óĞ´ÓÖÓĞĞ¡Ğ´¾ÍÖ»ÄÜÓÃ³¤ÎÄ¼şÃû
+		//çŸ­æ–‡ä»¶åå¦‚æœæ—¢æœ‰å¤§å†™åˆæœ‰å°å†™å°±åªèƒ½ç”¨é•¿æ–‡ä»¶å
 		if(!(entry->mStatus & ST_LFN))
 		{
 			if (IsCharUpper((char)w))  entry->mStatus |= ST_UPPER;
 			if (IsCharLower((char)w))  entry->mStatus |= ST_LOWER;
 		}
 
-		w_w.charw = WchrToUpper(w);		//ĞèÒªµÄ»°ÏÈ½«×Ö·û×ª»»³É´óĞ¡µÄĞÎÊ½
-		w_w = ChrConvert(w_w , FALSE);	//ÔÚ½«×Ö·û×ª»»³É¶à×Ö½Ú×Ö·û
+		w_w.charw = WchrToUpper(w);		//éœ€è¦çš„è¯å…ˆå°†å­—ç¬¦è½¬æ¢æˆå¤§å°çš„å½¢å¼
+		w_w = ChrConvert(w_w , FALSE);	//åœ¨å°†å­—ç¬¦è½¬æ¢æˆå¤šå­—èŠ‚å­—ç¬¦
 		if(w_w.char1){
 			sfn[sfni++] = w_w.char1;
 			if(sfni == 8) break;
@@ -395,21 +395,21 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 		if(sfni == 8) break;
 	}
 
-	//Ìî³äÃûÖĞµÄ¿Õ¸ñ
+	//å¡«å……åä¸­çš„ç©ºæ ¼
 	for (;sfni < 8;++sfni)	sfn[sfni] = 0x20;
 
-	//¸ÃÀ©Õ¹ÃûÁË
-	if(doti){   //ÓĞÀ©Õ¹Ãû
+	//è¯¥æ‰©å±•åäº†
+	if(doti){   //æœ‰æ‰©å±•å
 		for (i = doti +1 ; i < lfni ; ++i)
 		{
 			w = lfn[i];
-			if (IsSingleByteChar(w) && strchr(" +,/;=[\\]", w))  //³ıµô³¤ÎÄ¼şÃûÖĞ²»¿ÉÒÔµÄ ¾ÍÊÇ" +,/;=[\\]"  ÓĞÒ»¸ö¿Õ¸ñ
-			{//³öÏÖÁË·Ç·¨×Ö·û  Ö»ÄÜÓÃ³¤ÎÄ¼şÃû
+			if (IsSingleByteChar(w) && strchr(" +,/;=[\\]", w))  //é™¤æ‰é•¿æ–‡ä»¶åä¸­ä¸å¯ä»¥çš„ å°±æ˜¯" +,/;=[\\]"  æœ‰ä¸€ä¸ªç©ºæ ¼
+			{//å‡ºç°äº†éæ³•å­—ç¬¦  åªèƒ½ç”¨é•¿æ–‡ä»¶å
 				entry->mStatus |= ST_LFN;
 				continue;
 			}
-			w_w.charw = WchrToUpper(w);		//ĞèÒªµÄ»°ÏÈ½«×Ö·û×ª»»³É´óĞ¡µÄĞÎÊ½
-			w_w = ChrConvert(w_w , FALSE);	//ÔÚ½«×Ö·û×ª»»³É¶à×Ö½Ú×Ö·û
+			w_w.charw = WchrToUpper(w);		//éœ€è¦çš„è¯å…ˆå°†å­—ç¬¦è½¬æ¢æˆå¤§å°çš„å½¢å¼
+			w_w = ChrConvert(w_w , FALSE);	//åœ¨å°†å­—ç¬¦è½¬æ¢æˆå¤šå­—èŠ‚å­—ç¬¦
 			if(w_w.char1){
 				sfn[sfni++] = w_w.char1;
 				if(sfni == 11) break;
@@ -418,7 +418,7 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 			if(sfni == 11) break;
 		}
 	}
-	//À©Õ¹Ãû²»¹»µÄ»°Ìî¿Õ¸ñ
+	//æ‰©å±•åä¸å¤Ÿçš„è¯å¡«ç©ºæ ¼
 	for (;sfni < 11;++sfni)	sfn[sfni] = 0x20;
 
 	return DR_OK;
@@ -429,76 +429,76 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 // 	PDirEntry	entry	= PDirEntry(entr);
 // 	WCHAR*		lfn		= entry->mLFN;
 // 	char*		sfn		= (char*)entry->mSFN;
-// 	const WCHAR* p		= (*path) + 1;   //Ìø¹ıµÚÒ»¸ö×Ö½Ú  "*"
-// 	WCHAR		w		= 0;	//Unicode×Ö·û»º´æ
-// 	int			i		= 0;	//¸¨Öú±äÁ¿
-// 	int			lfni	= 0;	//lfn³¬Î²
-// 	int			sfni	= 0;	//sfn³¬Î²
-// 	int			doti	= 0;	//×îºóÒ»¸öµãµÄÎ»ÖÃ
-// 	W_CHAR		w_w		= {0};	//ÓÃÓÚ×Ö·û×ª»»µÄ×Ö·û
+// 	const WCHAR* p		= (*path) + 1;   //è·³è¿‡ç¬¬ä¸€ä¸ªå­—èŠ‚  "*"
+// 	WCHAR		w		= 0;	//Unicodeå­—ç¬¦ç¼“å­˜
+// 	int			i		= 0;	//è¾…åŠ©å˜é‡
+// 	int			lfni	= 0;	//lfnè¶…å°¾
+// 	int			sfni	= 0;	//sfnè¶…å°¾
+// 	int			doti	= 0;	//æœ€åä¸€ä¸ªç‚¹çš„ä½ç½®
+// 	W_CHAR		w_w		= {0};	//ç”¨äºå­—ç¬¦è½¬æ¢çš„å­—ç¬¦
 // 
-// 	entry->mStatus = 0;			//ÏÈÇåÀíÒ»ÏÂ×´Ì¬
+// 	entry->mStatus = 0;			//å…ˆæ¸…ç†ä¸€ä¸‹çŠ¶æ€
 // 	::memset(entry->mLFN , 0 ,sizeof(WCHAR)*MAX_LFN);
 // 	::memset(entry->mSFN , 0 ,11);
 // 
 // 	for (i = 0; !IsPathSeparator(w = p[i]) && w  ; ++i)
 // 	{
-// 		//³¤ÎÄ¼şÃûÖĞ¿Õ¸ñºÍµã¿ÉÒÔÔÚÖĞ¼ä¡£µ«²»¿ÉÒÔÔÚ¿ªÊ¼ºÍÄ©Î²
-// 		//ÎÄ¼şÃûÇ°Ãæ²»¿ÉÒÔÓĞ¿Õ¸ñ»òÕßµã
-// 		if(!lfni && (w <= 0x20 /*|| w == '.'*/ ))	//windows×ÊÔ´¹ÜÀíÆ÷ËäÈ»²»¿É´´½¨ÒÔµã¿ªÍ·µÄÎÄ¼ş£¬µ«ÊÇËûÈ´ÊÇÊÇÈ´ÊÇ´æÔÚµÄ  2012-5-13
+// 		//é•¿æ–‡ä»¶åä¸­ç©ºæ ¼å’Œç‚¹å¯ä»¥åœ¨ä¸­é—´ã€‚ä½†ä¸å¯ä»¥åœ¨å¼€å§‹å’Œæœ«å°¾
+// 		//æ–‡ä»¶åå‰é¢ä¸å¯ä»¥æœ‰ç©ºæ ¼æˆ–è€…ç‚¹
+// 		if(!lfni && (w <= 0x20 /*|| w == '.'*/ ))	//windowsèµ„æºç®¡ç†å™¨è™½ç„¶ä¸å¯åˆ›å»ºä»¥ç‚¹å¼€å¤´çš„æ–‡ä»¶ï¼Œä½†æ˜¯ä»–å´æ˜¯æ˜¯å´æ˜¯å­˜åœ¨çš„  2012-5-13
 // 			continue;
-// 		if(lfni > MAX_LFN) return DR_INVALID_NAME;	//ÎÄ¼şÃû³¬¹ıÁË255¸ö×Ö·û
-// 		if(IsSingleByteChar(w) && strchr("\"*:<>\?|", w))	return DR_INVALID_NAME;					//ÓĞ·Ç·¨×Ö·û
+// 		if(lfni > MAX_LFN) return DR_INVALID_NAME;	//æ–‡ä»¶åè¶…è¿‡äº†255ä¸ªå­—ç¬¦
+// 		if(IsSingleByteChar(w) && strchr("\"*:<>\?|", w))	return DR_INVALID_NAME;					//æœ‰éæ³•å­—ç¬¦
 // 
 // 		lfn[lfni++] = w;
 // 	}
-// 	if(!w)	//µ½ÁË×îºóÒ»¶Î
+// 	if(!w)	//åˆ°äº†æœ€åä¸€æ®µ
 // 		entry->mStatus |= ST_LAST;
-// 	*path = p + i +1;//·µ»ØÊ£ÏÂµÄÂ·¾¶
+// 	*path = p + i +1;//è¿”å›å‰©ä¸‹çš„è·¯å¾„
 // 
 // 	lfn[lfni] = 0;	
-// 	//È¥µôºóÃæµÄ¿Õ¸ñºÍµã
+// 	//å»æ‰åé¢çš„ç©ºæ ¼å’Œç‚¹
 // 	for (; lfni > 0 &&(lfn[lfni-1]== 0x20 || lfn[lfni-1]== '.');--lfni)
 // 		lfn[lfni-1] = 0;
-// 	if(!lfni)  return DR_INVALID_NAME;//Ã»ÓĞÃû×Ö
+// 	if(!lfni)  return DR_INVALID_NAME;//æ²¡æœ‰åå­—
 // 
-// 	//Í¬Ê±ÓĞ´óĞ´ºÍĞ´µÄÊ±ºòÒ²Ö»ÄÜÓÃ³¤ÎÄ¼şÃû
+// 	//åŒæ—¶æœ‰å¤§å†™å’Œå†™çš„æ—¶å€™ä¹Ÿåªèƒ½ç”¨é•¿æ–‡ä»¶å
 // 	if(entry->mStatus & ST_UPPER && entry->mStatus & ST_LOWER)
 // 		entry->mStatus |= ST_LFN;
 // 
-// 	//³¤ÎÄ¼şÃû´´½¨Íê±Ï
-// 	//¿ªÊ¼¶àÎÄ¼şÃû
+// 	//é•¿æ–‡ä»¶ååˆ›å»ºå®Œæ¯•
+// 	//å¼€å§‹å¤šæ–‡ä»¶å
 // 
-// 	//²éÕÒÀ©Õ¹ÃûµÄÎ»ÖÃ  //µÚÒ»¸ö×Ö·û²»¿ÉÄÜÊÇµã
-// 	for (doti = lfni-1; doti >= 0 && lfn[doti] != '.';--doti);  //windows ÆäÊµÊÇ¿ÉÒÔ´æÔÚÒ»µã¿ªÍ·µÄÎÄ¼şµÄ     
-// 	//doti==-1  Ã»À©Õ¹Ãû
+// 	//æŸ¥æ‰¾æ‰©å±•åçš„ä½ç½®  //ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸å¯èƒ½æ˜¯ç‚¹
+// 	for (doti = lfni-1; doti >= 0 && lfn[doti] != '.';--doti);  //windows å…¶å®æ˜¯å¯ä»¥å­˜åœ¨ä¸€ç‚¹å¼€å¤´çš„æ–‡ä»¶çš„     
+// 	//doti==-1  æ²¡æ‰©å±•å
 // 	if(doti == -1) 
 // 		doti = 0;
-// 	else if(doti >/*=*/ 8)	//³¬³öÁË8.3ÃüÃû·¨   //´Ë´¦²»µÃÓĞµÈÓÚ "."µÄ×î´óÎ»ÖÃÊÇ¿ÉÒÔµÈÓÚ8µÄ  2012-5-13
+// 	else if(doti >/*=*/ 8)	//è¶…å‡ºäº†8.3å‘½åæ³•   //æ­¤å¤„ä¸å¾—æœ‰ç­‰äº "."çš„æœ€å¤§ä½ç½®æ˜¯å¯ä»¥ç­‰äº8çš„  2012-5-13
 // 		entry->mStatus |= ST_LFN;
 // 
-// 	//¿ªÊ¼´´½¨¶ÌÎÄ¼şÃû
-// 	//²»µÃĞ¡ÓÚ0x20 ÒÔ¼°"\"*+,./:;<=>\?[\\]|"
-// 	//ÏÈÀ´ÎÄ¼şµÄÃû×Ö
+// 	//å¼€å§‹åˆ›å»ºçŸ­æ–‡ä»¶å
+// 	//ä¸å¾—å°äº0x20 ä»¥åŠ"\"*+,./:;<=>\?[\\]|"
+// 	//å…ˆæ¥æ–‡ä»¶çš„åå­—
 // 	for (sfni = 0 ,i = 0 ; i < lfni; ++i )
 // 	{
-// 		if(i == doti && doti)  break;  //¸ÃÀ©Õ¹ÃûÁË
+// 		if(i == doti && doti)  break;  //è¯¥æ‰©å±•åäº†
 // 		w = lfn[i];
-// 		if (IsSingleByteChar(w) && strchr(" .+,/;=[\\]", w))  //³ıµô³¤ÎÄ¼şÃûÖĞ²»¿ÉÒÔµÄ ¾ÍÊÇ" +,/;=[\\]"  ÓĞÒ»¸ö¿Õ¸ñ
-// 		{//³öÏÖÁË·Ç·¨×Ö·û  Ö»ÄÜÓÃ³¤ÎÄ¼şÃû
+// 		if (IsSingleByteChar(w) && strchr(" .+,/;=[\\]", w))  //é™¤æ‰é•¿æ–‡ä»¶åä¸­ä¸å¯ä»¥çš„ å°±æ˜¯" +,/;=[\\]"  æœ‰ä¸€ä¸ªç©ºæ ¼
+// 		{//å‡ºç°äº†éæ³•å­—ç¬¦  åªèƒ½ç”¨é•¿æ–‡ä»¶å
 // 			entry->mStatus |= ST_LFN;
 // 			continue;
 // 		}
 // 
-// 		//¶ÌÎÄ¼şÃûÈç¹û¼ÈÓĞ´óĞ´ÓÖÓĞĞ¡Ğ´¾ÍÖ»ÄÜÓÃ³¤ÎÄ¼şÃû
+// 		//çŸ­æ–‡ä»¶åå¦‚æœæ—¢æœ‰å¤§å†™åˆæœ‰å°å†™å°±åªèƒ½ç”¨é•¿æ–‡ä»¶å
 // 		if(!(entry->mStatus & ST_LFN))
 // 		{
 // 			if (IsCharUpper((char)w))  entry->mStatus |= ST_UPPER;
 // 			if (IsCharLower((char)w))  entry->mStatus |= ST_LOWER;
 // 		}
 // 
-// 		w_w.charw = WchrToUpper(w);		//ĞèÒªµÄ»°ÏÈ½«×Ö·û×ª»»³É´óĞ¡µÄĞÎÊ½
-// 		w_w = ChrConvert(w_w , FALSE);	//ÔÚ½«×Ö·û×ª»»³É¶à×Ö½Ú×Ö·û
+// 		w_w.charw = WchrToUpper(w);		//éœ€è¦çš„è¯å…ˆå°†å­—ç¬¦è½¬æ¢æˆå¤§å°çš„å½¢å¼
+// 		w_w = ChrConvert(w_w , FALSE);	//åœ¨å°†å­—ç¬¦è½¬æ¢æˆå¤šå­—èŠ‚å­—ç¬¦
 // 		if(w_w.char1){
 // 			sfn[sfni++] = w_w.char1;
 // 			if(sfni == 8) break;
@@ -507,21 +507,21 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 // 		if(sfni == 8) break;
 // 	}
 // 
-// 	//Ìî³äÃûÖĞµÄ¿Õ¸ñ
+// 	//å¡«å……åä¸­çš„ç©ºæ ¼
 // 	for (;sfni < 8;++sfni)	sfn[sfni] = 0x20;
 // 
-// 	//¸ÃÀ©Õ¹ÃûÁË
-// 	if(doti){   //ÓĞÀ©Õ¹Ãû
+// 	//è¯¥æ‰©å±•åäº†
+// 	if(doti){   //æœ‰æ‰©å±•å
 // 		for (i = doti +1 ; i < lfni ; ++i)
 // 		{
 // 			w = lfn[i];
-// 			if (IsSingleByteChar(w) && strchr(" +,/;=[\\]", w))  //³ıµô³¤ÎÄ¼şÃûÖĞ²»¿ÉÒÔµÄ ¾ÍÊÇ" +,/;=[\\]"  ÓĞÒ»¸ö¿Õ¸ñ
-// 			{//³öÏÖÁË·Ç·¨×Ö·û  Ö»ÄÜÓÃ³¤ÎÄ¼şÃû
+// 			if (IsSingleByteChar(w) && strchr(" +,/;=[\\]", w))  //é™¤æ‰é•¿æ–‡ä»¶åä¸­ä¸å¯ä»¥çš„ å°±æ˜¯" +,/;=[\\]"  æœ‰ä¸€ä¸ªç©ºæ ¼
+// 			{//å‡ºç°äº†éæ³•å­—ç¬¦  åªèƒ½ç”¨é•¿æ–‡ä»¶å
 // 				entry->mStatus |= ST_LFN;
 // 				continue;
 // 			}
-// 			w_w.charw = WchrToUpper(w);		//ĞèÒªµÄ»°ÏÈ½«×Ö·û×ª»»³É´óĞ¡µÄĞÎÊ½
-// 			w_w = ChrConvert(w_w , FALSE);	//ÔÚ½«×Ö·û×ª»»³É¶à×Ö½Ú×Ö·û
+// 			w_w.charw = WchrToUpper(w);		//éœ€è¦çš„è¯å…ˆå°†å­—ç¬¦è½¬æ¢æˆå¤§å°çš„å½¢å¼
+// 			w_w = ChrConvert(w_w , FALSE);	//åœ¨å°†å­—ç¬¦è½¬æ¢æˆå¤šå­—èŠ‚å­—ç¬¦
 // 			if(w_w.char1){
 // 				sfn[sfni++] = w_w.char1;
 // 				if(sfni == 11) break;
@@ -530,7 +530,7 @@ DRES DFat32::GetSegName(const WCHAR** path, PVOID entr)
 // 			if(sfni == 11) break;
 // 		}
 // 	}
-// 	//À©Õ¹Ãû²»¹»µÄ»°Ìî¿Õ¸ñ
+// 	//æ‰©å±•åä¸å¤Ÿçš„è¯å¡«ç©ºæ ¼
 // 	for (;sfni < 11;++sfni)	sfn[sfni] = 0x20;
 // 
 // 	return DR_OK;
@@ -543,40 +543,40 @@ DRES DFat32::GetDirEntry( const WCHAR* path ,PVOID entr)
 	BYTE		attr = 0;
 	PDirEntry	entry= PDirEntry(entr);
 
-	if (IsPathSeparator(path[0]))	++path;	//Ìø¹ıÇ°ÃæµÄ·Ö¸ô·û
-	entry->mStartClust = m1stDirClut;	//´Ó¸ùÄ¿Â¼¿ªÊ¼
-	if(path[0] == 0){						//¿ÕÂ·¾¶Ò²¾ÍÒ»Î»ÖÃÊÇµ±Ç°·ÖÇø±¾Éí
-		res = PosEntry(entry , 0);			//¶¨Î»µ½ÖÆ¶¨µÄÈë¿ÚËùÔÚµÄÉ½Çø
-		entry->mDir = 0;					//ÒòÎªÃ»ÓĞÖ»ÏëÈÎºÎÄ¿Â¼ ¶øÊÇµ±Ç°·ÖÇø ËùÒÔÃ»ÓĞÈë¿Ú
-	}else{									//Ò»¸öÖ¸¶¨µÄÄ¿Â¼
+	if (IsPathSeparator(path[0]))	++path;	//è·³è¿‡å‰é¢çš„åˆ†éš”ç¬¦
+	entry->mStartClust = m1stDirClut;	//ä»æ ¹ç›®å½•å¼€å§‹
+	if(path[0] == 0){						//ç©ºè·¯å¾„ä¹Ÿå°±ä¸€ä½ç½®æ˜¯å½“å‰åˆ†åŒºæœ¬èº«
+		res = PosEntry(entry , 0);			//å®šä½åˆ°åˆ¶å®šçš„å…¥å£æ‰€åœ¨çš„å±±åŒº
+		entry->mDir = 0;					//å› ä¸ºæ²¡æœ‰åªæƒ³ä»»ä½•ç›®å½• è€Œæ˜¯å½“å‰åˆ†åŒº æ‰€ä»¥æ²¡æœ‰å…¥å£
+	}else{									//ä¸€ä¸ªæŒ‡å®šçš„ç›®å½•
 		while (TRUE)
 		{
-			res = GetSegName(&path ,entry);	//»ñµÃpathÖĞµÄµÚÒ»¸öÂ·¾¶¶Î
+			res = GetSegName(&path ,entry);	//è·å¾—pathä¸­çš„ç¬¬ä¸€ä¸ªè·¯å¾„æ®µ
 		
-			if(res)  break;					//ÎÄ¼şÃûÓĞÎÊÌâ
+			if(res)  break;					//æ–‡ä»¶åæœ‰é—®é¢˜
 			
 			if (entry->mIsDelFile)
-			{//²éÕÒÒÑ¾­É¾³ıµÄÁËµÄÈë¿Ú
+			{//æŸ¥æ‰¾å·²ç»åˆ é™¤çš„äº†çš„å…¥å£
 				res = FindDelEntry(entry);
 			}else{
-				//Õı³£Èë¿Ú
-				res = FindEntry(entry);			//ÔÚÖ¸¶¨µÄÉÈÇø/´ØÖĞ²éÕÒÖÆ¶¨µÄÈë¿Ú
+				//æ­£å¸¸å…¥å£
+				res = FindEntry(entry);			//åœ¨æŒ‡å®šçš„æ‰‡åŒº/ç°‡ä¸­æŸ¥æ‰¾åˆ¶å®šçš„å…¥å£
 			}
 
 			
 			if(res != DR_OK)
-			{//²éÕÒÊ§°Ü
-				if(res == DR_FAT_EOF)   //ÊÕË÷´ÖÁ¶ÒÑ¾­½áÊø  
-					res = DR_NO_PATH;	//Ã»ÓĞÖ¸¶¨µÄÂ·¾¶
+			{//æŸ¥æ‰¾å¤±è´¥
+				if(res == DR_FAT_EOF)   //æ”¶ç´¢ç²—ç‚¼å·²ç»ç»“æŸ  
+					res = DR_NO_PATH;	//æ²¡æœ‰æŒ‡å®šçš„è·¯å¾„
 				break;
 			}
-			//´Ë´Î³É¹¦
-			if(entry->mStatus & ST_LAST)	//×îºóÒ»´ÎÒÑ¾­Æ¥ÅäÁË ÕÒµ½ÁË 
+			//æ­¤æ¬¡æˆåŠŸ
+			if(entry->mStatus & ST_LAST)	//æœ€åä¸€æ¬¡å·²ç»åŒ¹é…äº† æ‰¾åˆ°äº† 
 				break;
 
 			dir = entry->mDir;
 			attr = PSDE(dir)->mAttr;
-			if(!(attr & ATTR_DIRECTORY)){	//²»ÊÇÒ»¸öÄ¿Â¼ ÎŞ·¨ÔÙ¸üÏÂÈ¥ÁË
+			if(!(attr & ATTR_DIRECTORY)){	//ä¸æ˜¯ä¸€ä¸ªç›®å½• æ— æ³•å†æ›´ä¸‹å»äº†
 				res = DR_NO_PATH;
 				break;
 			}
@@ -592,45 +592,45 @@ DRES DFat32::FindEntry(PVOID entr)
 	BYTE*	dir		= NULL;
 	BYTE	flag	= 0;
 	BYTE	attr	= 0;
-	BYTE	chSum	= 0;		//¶ÌÎÄ¼şÃûĞ£ÑéºÍ
-	BYTE	order	= 0;		//Ä¿Â¼ÏîĞòºÅ
+	BYTE	chSum	= 0;		//çŸ­æ–‡ä»¶åæ ¡éªŒå’Œ
+	BYTE	order	= 0;		//ç›®å½•é¡¹åºå·
 	PDirEntry entry = PDirEntry(entr);
 
-	res = PosEntry(entry , 0);		//ÖØ¶¨Î»µ½µÚÒ»¸öÈë¿ÚµÄÎ»ÖÃ ¶¨Î»ÉÈÇø£¬0Ä¿Â¼µÄÎ»ÖÃ
-	if (res) return res;			//´Ó¶¨Î»Ê§°Ü
+	res = PosEntry(entry , 0);		//é‡å®šä½åˆ°ç¬¬ä¸€ä¸ªå…¥å£çš„ä½ç½® å®šä½æ‰‡åŒºï¼Œ0ç›®å½•çš„ä½ç½®
+	if (res) return res;			//ä»å®šä½å¤±è´¥
 	
-	do{	//±éÀúÄ¿Â¼ÖĞÃ¿Ò»¸öÈë¿Ú
+	do{	//éå†ç›®å½•ä¸­æ¯ä¸€ä¸ªå…¥å£
 		res = MoveView(entry->mCurSect);
 		if(res)  break;
-		dir = entry->mDir;			//Èë¿ÚµÄÎ»ÖÃ
+		dir = entry->mDir;			//å…¥å£çš„ä½ç½®
 		flag = dir[0];
-		if( flag == 0){				//µ½ÁËÄ¿Â¼µÄÄ©Î²
+		if( flag == 0){				//åˆ°äº†ç›®å½•çš„æœ«å°¾
 			res = DR_NO_FILE;
 			break;		
 		}
-		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//Ä¿Â¼ÏîµÄÊôĞÔ
+		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//ç›®å½•é¡¹çš„å±æ€§
 		
 		if (flag == 0xE5 || \
-			((attr & ATTR_VOLUME_ID) && attr != ATTR_LONG_NAME)) {	//²»ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
+			((attr & ATTR_VOLUME_ID) && attr != ATTR_LONG_NAME)) {	//ä¸æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
 			order = 0xFF;
-		} else {//ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
-			if(attr == ATTR_LONG_NAME){//³¤ÎÄ¼şÃûÈë¿Ú
-				if(flag & 0x40)	{	//ÊÇÒ»¸ö³¤ÎÄ¼şÃûĞòÁĞµÄ¿ªÊ¼  Ò²¾ÍÊÇÒ»¸ö³¤ÎÄ¼şÃûµÄ×îºóÒ»¸ö²¿·Ö
-					chSum = PLDE(dir)->mChksum;//ÎÄ¼şÃûµÄĞ£ÑéºÍ
-					flag &= 0xBF;	//È¥µô0x40µÄÑÚÂë  ¿Ù³öĞòºÅ
+		} else {//æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
+			if(attr == ATTR_LONG_NAME){//é•¿æ–‡ä»¶åå…¥å£
+				if(flag & 0x40)	{	//æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶ååºåˆ—çš„å¼€å§‹  ä¹Ÿå°±æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶åçš„æœ€åä¸€ä¸ªéƒ¨åˆ†
+					chSum = PLDE(dir)->mChksum;//æ–‡ä»¶åçš„æ ¡éªŒå’Œ
+					flag &= 0xBF;	//å»æ‰0x40çš„æ©ç   æŠ å‡ºåºå·
 					order = flag;			
 				}
-				//¼ÆËãÏÂÒ»¸ö³¤ÃûÄ¿Â¼µÄĞòºÅ
+				//è®¡ç®—ä¸‹ä¸€ä¸ªé•¿åç›®å½•çš„åºå·
 				order = (order == flag && chSum == PLDE(dir)->mChksum &&CompLFN(entry->mLFN ,dir))? order - 1 : 0xFF;
 
-			}else{  //Ò»¸ö¶ÌÎÄ¼şÃû
+			}else{  //ä¸€ä¸ªçŸ­æ–‡ä»¶å
 				if(!order && chSum == ChkSum(dir))
-					break;			//ÕÒµ½ÁËÆ¥ÅäµÄ³¤ÃûĞòÁĞ
+					break;			//æ‰¾åˆ°äº†åŒ¹é…çš„é•¿ååºåˆ—
 				order = 0xFF;
 				if(!(entry->mStatus & ST_LFN)&& CompSFN((char*)entry->mSFN , (char*)dir)) break;
 			}
 		}
-		res = NextEntry(entry);  //ÒÆµ½Ğ´Ò»¸öÈë¿Ú
+		res = NextEntry(entry);  //ç§»åˆ°å†™ä¸€ä¸ªå…¥å£
 	} while (!res);
 
 	return res;
@@ -642,81 +642,81 @@ DRES DFat32::FindDelEntry(PVOID entr)
 	BYTE*		dir		= NULL;
 	BYTE		flag	= 0;
 	BYTE		attr	= 0;
-	USHORT		chSum	= 0xFFFF;	//ÕâÀïµÄĞ£ÑéºÍÎªÁ½¸ö×Ö½Ú
-									//Ö÷ÒªÊÇÒòÎªÓÃ´ËÓò×öÅĞ¶ÏÊÇ·ñÊÇÒ»¸öĞÂµÄ³¤ÎÄ¼şÃûµÄ¿ªÊ¼
-									//Ó¦ÎªÊµ¼ÊµÄĞ£ÑéºÍÊÇÒ»¸ö×Ö½Ú,Ò²¾ÍÊÇËµ×íµ¹Îª0xFF 
-									//¶øÎÒÓÃ0xFFFF±íµ±Ç°»¹Ã»ÓĞÆ¥Åäµ½Ò»¸ö³¤ÃûÄ¿Â¼Ïî
-	BYTE		order	= 0;		//Ä¿Â¼ÏîĞòºÅ
+	USHORT		chSum	= 0xFFFF;	//è¿™é‡Œçš„æ ¡éªŒå’Œä¸ºä¸¤ä¸ªå­—èŠ‚
+									//ä¸»è¦æ˜¯å› ä¸ºç”¨æ­¤åŸŸåšåˆ¤æ–­æ˜¯å¦æ˜¯ä¸€ä¸ªæ–°çš„é•¿æ–‡ä»¶åçš„å¼€å§‹
+									//åº”ä¸ºå®é™…çš„æ ¡éªŒå’Œæ˜¯ä¸€ä¸ªå­—èŠ‚,ä¹Ÿå°±æ˜¯è¯´é†‰å€’ä¸º0xFF 
+									//è€Œæˆ‘ç”¨0xFFFFè¡¨å½“å‰è¿˜æ²¡æœ‰åŒ¹é…åˆ°ä¸€ä¸ªé•¿åç›®å½•é¡¹
+	BYTE		order	= 0;		//ç›®å½•é¡¹åºå·
 	PDirEntry	entry = PDirEntry(entr);
-	WCHAR		nambuf[MAX_LFN+1] = {0}; //ÎÄ¼şÃû»º´æ
-	WCHAR       path[MAX_PATH] = {0};	//Â·¾¶»º´æ
-	W_CHAR		w_w;					//ÓÃÓÚ¼ÆËãĞ£ÑéºÍ
+	WCHAR		nambuf[MAX_LFN+1] = {0}; //æ–‡ä»¶åç¼“å­˜
+	WCHAR       path[MAX_PATH] = {0};	//è·¯å¾„ç¼“å­˜
+	W_CHAR		w_w;					//ç”¨äºè®¡ç®—æ ¡éªŒå’Œ
 
-	res = PosEntry(entry , 0);		//ÖØ¶¨Î»µ½µÚÒ»¸öÈë¿ÚµÄÎ»ÖÃ ¶¨Î»ÉÈÇø£¬0Ä¿Â¼µÄÎ»ÖÃ
-	if (res) return res;			//´Ó¶¨Î»Ê§°Ü
+	res = PosEntry(entry , 0);		//é‡å®šä½åˆ°ç¬¬ä¸€ä¸ªå…¥å£çš„ä½ç½® å®šä½æ‰‡åŒºï¼Œ0ç›®å½•çš„ä½ç½®
+	if (res) return res;			//ä»å®šä½å¤±è´¥
 
-	do{	//±éÀúÄ¿Â¼ÖĞÃ¿Ò»¸öÈë¿Ú
+	do{	//éå†ç›®å½•ä¸­æ¯ä¸€ä¸ªå…¥å£
 		res = MoveView(entry->mCurSect);
-		if(res)  break;				//³ö´í
-		dir = entry->mDir;	//Èë¿ÚµÄÎ»ÖÃ
-		flag = dir[0];				//µÚÒ»¸ö×Ö½ÚµÄ±êÖ¾Î»
-		if( flag == 0){				//µ½ÁËÄ¿Â¼µÄÄ©Î²
+		if(res)  break;				//å‡ºé”™
+		dir = entry->mDir;	//å…¥å£çš„ä½ç½®
+		flag = dir[0];				//ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æ ‡å¿—ä½
+		if( flag == 0){				//åˆ°äº†ç›®å½•çš„æœ«å°¾
 			res = DR_FAT_EOF;
 			return DR_FAT_EOF;
 		}
-		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//Ä¿Â¼ÏîµÄÊôĞÔ
+		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//ç›®å½•é¡¹çš„å±æ€§
 
-		if (flag != 0xE5) {			//²»ÊÇÒ»¸öÉ¾³ıÁËµÄÈë¿Ú
+		if (flag != 0xE5) {			//ä¸æ˜¯ä¸€ä¸ªåˆ é™¤äº†çš„å…¥å£
 			chSum = 0xFFFF;
-		} else {//ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
-			if(attr == ATTR_LONG_NAME){//³¤ÎÄ¼şÃûÈë¿Ú
+		} else {//æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
+			if(attr == ATTR_LONG_NAME){//é•¿æ–‡ä»¶åå…¥å£
 
 				if(chSum == 0xFFFF)	{
-					//ÊÇÒ»¸ö³¤ÎÄ¼şÃûĞòÁĞµÄ¿ªÊ¼
-					//Ò²¾ÍÊÇÒ»¸ö³¤ÎÄ¼şÃûµÄ×îºóÒ»¸ö²¿·Ö
-					chSum = PLDE(dir)->mChksum;//¼ÇÂ¼ÏÂĞ£ÑéºÍ
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					//æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶ååºåˆ—çš„å¼€å§‹
+					//ä¹Ÿå°±æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶åçš„æœ€åä¸€ä¸ªéƒ¨åˆ†
+					chSum = PLDE(dir)->mChksum;//è®°å½•ä¸‹æ ¡éªŒå’Œ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 				}
-				//ÅĞ¶Ï
+				//åˆ¤æ–­
 				if(chSum == PLDE(dir)->mChksum)
-				{//Æ¥Åäµ½Ò»¸ö³¤ÎÄ¼şÃû
-					AppLFN(nambuf , dir);//È¡³öÎÄ¼şÃû½«ÆäÌí¼Óµ½»º´æµÄÇ°Ãæ
-				}else{//Æ¥ÅäÊ§°Ü , ·ÅÆúÔ­ÓĞµÄÆ¥Åä½á¹û  £¬½øĞĞÒ»¸öĞÂµÄÆ¥Åä¹ı³Ì
-					//Çå¿Õ»º´æ ,½øĞĞÏÂÒ»´ÎÆ¥Åä
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+				{//åŒ¹é…åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶å
+					AppLFN(nambuf , dir);//å–å‡ºæ–‡ä»¶åå°†å…¶æ·»åŠ åˆ°ç¼“å­˜çš„å‰é¢
+				}else{//åŒ¹é…å¤±è´¥ , æ”¾å¼ƒåŸæœ‰çš„åŒ¹é…ç»“æœ  ï¼Œè¿›è¡Œä¸€ä¸ªæ–°çš„åŒ¹é…è¿‡ç¨‹
+					//æ¸…ç©ºç¼“å­˜ ,è¿›è¡Œä¸‹ä¸€æ¬¡åŒ¹é…
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 
-					//½øĞĞÏÂÒ»´ÎÆ¥Åä
+					//è¿›è¡Œä¸‹ä¸€æ¬¡åŒ¹é…
 					chSum = PLDE(dir)->mChksum;
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
-					AppLFN(nambuf , dir);//È¡³öÎÄ¼şÃû½«ÆäÌí¼Óµ½»º´æµÄÇ°Ãæ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
+					AppLFN(nambuf , dir);//å–å‡ºæ–‡ä»¶åå°†å…¶æ·»åŠ åˆ°ç¼“å­˜çš„å‰é¢
 				}
 
-			}else{  //Ò»¸ö¶ÌÎÄ¼şÃû
-				//¶ÌÎÄ¼şÃûÈë¿ÚµÄµÚÒ»¸ö×Ö½ÚÉèÖÃÁË0xE5  ÒÑ¾­ÎŞ·¨¼ÆËãĞ£ÑéºÍÁË
-				//ÔÚÕâÀïÏÈ³¤ÎÄ¼şÃûÖĞ»¹Ô­£¬»¹Ô­ºóÔÙ¼ÆËã
+			}else{  //ä¸€ä¸ªçŸ­æ–‡ä»¶å
+				//çŸ­æ–‡ä»¶åå…¥å£çš„ç¬¬ä¸€ä¸ªå­—èŠ‚è®¾ç½®äº†0xE5  å·²ç»æ— æ³•è®¡ç®—æ ¡éªŒå’Œäº†
+				//åœ¨è¿™é‡Œå…ˆé•¿æ–‡ä»¶åä¸­è¿˜åŸï¼Œè¿˜åŸåå†è®¡ç®—
 				BYTE btBack;
 				w_w.charw = nambuf[0];
 				w_w = ChrConvert(w_w ,FALSE );
 				btBack = dir[0];
-				if (w_w.char1)//µÚÒ»¸ö×Ö·ûÊÇ¶à×Ö½Ú×Ö·û
+				if (w_w.char1)//ç¬¬ä¸€ä¸ªå­—ç¬¦æ˜¯å¤šå­—èŠ‚å­—ç¬¦
 					dir[0] = w_w.char1;
-				else		 //µÚÒ»¸ö×Ö·ûÊÇµ¥×Ö½Ú×Ö·û
+				else		 //ç¬¬ä¸€ä¸ªå­—ç¬¦æ˜¯å•å­—èŠ‚å­—ç¬¦
 					dir[0] = w_w.char2;
 
 				if(chSum == ChkSum(dir)){  
-					 dir[0] = btBack;   //±È½ÏÍêÁËºó¾Í¿ÉÒÔ»¹Ô­
-					//³¤ÎÄ¼şÃû±È½Ï
+					 dir[0] = btBack;   //æ¯”è¾ƒå®Œäº†åå°±å¯ä»¥è¿˜åŸ
+					//é•¿æ–‡ä»¶åæ¯”è¾ƒ
 					if (0 == memcmp(nambuf , entry->mLFN , wcslen(entry->mLFN) ))
-					{//ÕÒµ½ÁË
+					{//æ‰¾åˆ°äº†
 						break;
 					}
 					chSum = 0xFFFF;
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 			
-				}else{						//´¿´âµÄ¶ÌÎÄ¼şÃûÈë¿Ú
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+				}else{						//çº¯ç²¹çš„çŸ­æ–‡ä»¶åå…¥å£
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 
-//					(*(char*)dir) = '*';//É¾³ı±êÖ¾
+//					(*(char*)dir) = '*';//åˆ é™¤æ ‡å¿—
 					SetBYTE(dir , '*');
 					//SetSFN(nambuf ,dir);
 
@@ -729,8 +729,8 @@ DRES DFat32::FindDelEntry(PVOID entr)
 				}
 			}
 		}
-		res = NextEntry( entry );  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
-		if (res == DR_FAT_EOF)    //µ½ÁË´ÖÁ¶Î²²¿
+		res = NextEntry( entry );  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
+		if (res == DR_FAT_EOF)    //åˆ°äº†ç²—ç‚¼å°¾éƒ¨
 		{
 			return DR_FAT_EOF;
 		}
@@ -741,50 +741,50 @@ DRES DFat32::FindDelEntry(PVOID entr)
 
 BOOL DFat32::CompLFN(const WCHAR* path, BYTE* dir)
 {
-	//³¤ÎÄ¼şÃûÄ¿Â¼Èë¿ÚÖĞµÄÃ¿Ò»¸ö×Ö·ûËùÔÚµÄ×Ö½ÚÎ»ÖÃ
+	//é•¿æ–‡ä»¶åç›®å½•å…¥å£ä¸­çš„æ¯ä¸€ä¸ªå­—ç¬¦æ‰€åœ¨çš„å­—èŠ‚ä½ç½®
 	static const BYTE LfnOfs[] = {1,3,5,7,9,14,16,18,20,22,24,28,30};
 	BYTE	index = 0;
 	WCHAR	wp	  = 0;
 	WCHAR	wd	  = 0;
 	int		i	  = 0;
 	
-	index = dir[0] & 0xBF;			//¿Ù³öĞòºÅ
-	index = (index - 1) *13;		//ĞòºÅ¶ÔÓ¦µÄµÚÒ»¸ö×Ö·û  Ã¿¸öÄ¿Â¼×î¶àÊ®Èı¸ö×Ö·û£¬ĞòºÅ´ÓÒ»¿ªÊ¼ 
+	index = dir[0] & 0xBF;			//æŠ å‡ºåºå·
+	index = (index - 1) *13;		//åºå·å¯¹åº”çš„ç¬¬ä¸€ä¸ªå­—ç¬¦  æ¯ä¸ªç›®å½•æœ€å¤šåä¸‰ä¸ªå­—ç¬¦ï¼Œåºå·ä»ä¸€å¼€å§‹ 
 	do{
 		wd = (WCHAR)GetWORD(dir + LfnOfs[i]);
 		if(wd)
-		{		//ÒÑ¾­µ½ÁËÕû¸öÂ·¾¶µÄ½áÎ²
+		{		//å·²ç»åˆ°äº†æ•´ä¸ªè·¯å¾„çš„ç»“å°¾
 			wp = path[index++];
 			wd = WchrToUpper(wd);
 			wp = WchrToUpper(wp);
-			if(wd != wp)		//Æ¥ÅäÊ§°Ü
+			if(wd != wp)		//åŒ¹é…å¤±è´¥
 				return FALSE;
-		}else{	//ÒÑ¾­µ½ÁËÕû¸öÂ·¾¶µÄ½áÎ²
-			if(1+i == 13)  //¸ÕºÃ×îºóÒ»¸ö×Ö·ûÊÇ0
+		}else{	//å·²ç»åˆ°äº†æ•´ä¸ªè·¯å¾„çš„ç»“å°¾
+			if(1+i == 13)  //åˆšå¥½æœ€åä¸€ä¸ªå­—ç¬¦æ˜¯0
 				break;
 			wd = (WCHAR)GetWORD(dir + LfnOfs[++i]);
 			if(wd != 0xFFFF)	return FALSE;
 			else	return TRUE;
 		}
-	} while (++i < 13);				//Æ¥Åä13´Î  Ò»¸öÈë×î¶àÓĞÊ®Èı¸ö×Ö·û
+	} while (++i < 13);				//åŒ¹é…13æ¬¡  ä¸€ä¸ªå…¥æœ€å¤šæœ‰åä¸‰ä¸ªå­—ç¬¦
 
 	return TRUE;
 }
-//³¤ÎÄ¼şÃûÄ¿Â¼Èë¿ÚÖĞµÄÃ¿Ò»¸ö×Ö·ûËùÔÚµÄ×Ö½ÚÎ»ÖÃ
+//é•¿æ–‡ä»¶åç›®å½•å…¥å£ä¸­çš„æ¯ä¸€ä¸ªå­—ç¬¦æ‰€åœ¨çš„å­—èŠ‚ä½ç½®
 static const BYTE LfnOfs[] = {1,3,5,7,9,14,16,18,20,22,24,28,30};
 DRES DFat32::SetLFN( WCHAR* path, BYTE* dir)
 {
 	BYTE	index	= 0;
 	int		i		= 0;
 
-	index = dir[0] & 0xBF;			//¿Ù³öĞòºÅ
-	index = (index - 1) *13;		//ĞòºÅ¶ÔÓ¦µÄµÚÒ»¸ö×Ö·û  Ã¿¸öÄ¿Â¼×î¶àÊ®Èı¸ö×Ö·û£¬ĞòºÅ´ÓÒ»¿ªÊ¼ 
+	index = dir[0] & 0xBF;			//æŠ å‡ºåºå·
+	index = (index - 1) *13;		//åºå·å¯¹åº”çš„ç¬¬ä¸€ä¸ªå­—ç¬¦  æ¯ä¸ªç›®å½•æœ€å¤šåä¸‰ä¸ªå­—ç¬¦ï¼Œåºå·ä»ä¸€å¼€å§‹ 
 	do{
 		if(!(path[index++] = (WCHAR)GetWORD(dir + LfnOfs[i])))
 			break;		
-	} while (++i < 13);				//Æ¥Åä13´Î  Ò»¸öÈë×î¶àÓĞÊ®Èı¸ö×Ö·û
+	} while (++i < 13);				//åŒ¹é…13æ¬¡  ä¸€ä¸ªå…¥æœ€å¤šæœ‰åä¸‰ä¸ªå­—ç¬¦
 	
-	//ÎÄ¼şÃûµÄÄ©Î²ÁË
+	//æ–‡ä»¶åçš„æœ«å°¾äº†
 	//if((i == 13) && ((dir[0]&0xBF) == 1))
 	//	path[index] = 0;
 
@@ -794,18 +794,18 @@ DRES DFat32::AppLFN( WCHAR* c, BYTE* dir)
 {
 	WCHAR	temp  = 0;
 	int		i	  = 0;
-	size_t	len   = 0;//Ô­ÓĞµÄÊı¾İ³¤¶È
+	size_t	len   = 0;//åŸæœ‰çš„æ•°æ®é•¿åº¦
 	WCHAR	buf[14] = {0};
 	
 	for(i = 0 ; i < 13 ; ++i)
 	{
 		temp = (WCHAR)GetWORD(dir + LfnOfs[i]);
-		if (!temp)//½áÎ²ÁË
+		if (!temp)//ç»“å°¾äº†
 			break;
 		buf[i] = temp;
 	}
 	
-	//½«Ôª»º´æÖĞµÄÊı¾İºóÒá i¸ö×Ö·û
+	//å°†å…ƒç¼“å­˜ä¸­çš„æ•°æ®åè£” iä¸ªå­—ç¬¦
 	len = wcslen(c);
 	if(len) ::memmove(((BYTE*)c) + i * 2 , (BYTE*)c , len*2);
 	memcpy((BYTE*)c , (BYTE*)buf , i*2);
@@ -814,37 +814,37 @@ DRES DFat32::AppLFN( WCHAR* c, BYTE* dir)
 }
 DRES DFat32::SetSFN( WCHAR* path, BYTE* dir)
 {
-	//¶à×Ö½Ú×Ö·û»º´æ
+	//å¤šå­—èŠ‚å­—ç¬¦ç¼“å­˜
 	char buf[20] = {0};
 	int  bufi	 = 0;
 	char a		 = 0;
 	int  i		 = 0;
 	BYTE nameCase = PSDE(dir)->mNameCase;
 
-	//¿Ù³öÃû×Ö²¿·Ö
+	//æŠ å‡ºåå­—éƒ¨åˆ†
 	if (nameCase & FNAME_LOWER_CASE){
-		//ÎÄ¼şÃûÎªĞ¡Ğ´
+		//æ–‡ä»¶åä¸ºå°å†™
 		for(; i < 8 ; ++i){ a = dir[i]; if(a!= 0x20) buf[bufi++] = ChrToLower(a); }
-	}else{//ÎÄ¼şÃûÎª´óĞ´
+	}else{//æ–‡ä»¶åä¸ºå¤§å†™
 		for(; i < 8 ; ++i) { a = dir[i]; if(a!= 0x20) buf[bufi++] = a; }
 	}
 
-	//×·¼ÓÒ»¸öµã
+	//è¿½åŠ ä¸€ä¸ªç‚¹
 	buf[bufi++] = '.';
 
-	//È¡³öÀ©Õ¹Ãû
+	//å–å‡ºæ‰©å±•å
 	if (nameCase & FEXT_NAME_LOWER_CASE)
-	{//À©Õ¹ÃûÎª´óĞ´
+	{//æ‰©å±•åä¸ºå¤§å†™
 		for( ; (i < 11) && ((a = dir[i]) != 0x20); ++i) buf[bufi++] = ChrToLower(a);	
 	}else{
-		//À©Õ¹ÃûÎªĞ¡Ğ´
+		//æ‰©å±•åä¸ºå°å†™
 		for( ; (i < 11) && ((a = dir[i]) != 0x20); ++i) buf[bufi++] = a;
 	}
 
 
-	//ÊÕÎ²
-	if(buf[bufi-1] == '.')	buf[bufi-1] = 0;  //Ã»ÓĞÀ©Õ¹Ãû
-	else	buf[bufi] = 0;			//ÓĞÀ©Õ¹Ãû
+	//æ”¶å°¾
+	if(buf[bufi-1] == '.')	buf[bufi-1] = 0;  //æ²¡æœ‰æ‰©å±•å
+	else	buf[bufi] = 0;			//æœ‰æ‰©å±•å
 
 	MultyByteToUnic(buf , path , MAX_LFN+1);
 
@@ -864,22 +864,22 @@ DRES DFat32::NextEntry(PVOID entr)
 {
 	PDirEntry	entry	= PDirEntry(entr); 
 	WORD		i		= entry->mIndex + 1;
-	DWORD		idxSec	= 0;//ÏÂÒ»¸öÈë¿ÚËùÔÚµÄµ±Ç°Ä¿Â¼µÄÉÈÇøºÅ
+	DWORD		idxSec	= 0;//ä¸‹ä¸€ä¸ªå…¥å£æ‰€åœ¨çš„å½“å‰ç›®å½•çš„æ‰‡åŒºå·
 	DWORD		clust	= 0;
 
 	if(!(i % (SECTOR_SIZE /32)))
-	{								//ĞèÒª½øÈëÏÂÒ»¸öÉÈÇøÁË
-		++entry->mCurSect;			//ÎïÀíÉÈÇøÏÂÒÆ
+	{								//éœ€è¦è¿›å…¥ä¸‹ä¸€ä¸ªæ‰‡åŒºäº†
+		++entry->mCurSect;			//ç‰©ç†æ‰‡åŒºä¸‹ç§»
 		idxSec = i / (SECTOR_SIZE /32);
 		if(idxSec && !(idxSec % mSecPerClus))
 		{
 			clust = GetFATFromFAT1(entry->mCurClust);
 			if(clust == 1)
-				return DR_INIT_ERR;	//ÎŞĞ§´ØºÅ
+				return DR_INIT_ERR;	//æ— æ•ˆç°‡å·
 			if(clust == 0xFFFFFFFF)
-				return DR_DEV_IO_ERR;//Éè±¸IO´íÎó
+				return DR_DEV_IO_ERR;//è®¾å¤‡IOé”™è¯¯
 			if(clust > mMaxClust)
-				return DR_FAT_EOF;	//µ½ÁË½áÎ²ÁË
+				return DR_FAT_EOF;	//åˆ°äº†ç»“å°¾äº†
 			
 			entry->mCurClust = clust;
 			entry->mCurSect = ClustToSect(clust);
@@ -892,7 +892,7 @@ DRES DFat32::NextEntry(PVOID entr)
 }
 
 BYTE DFat32::ChkSum(BYTE* pFcbName)
-{//Ô´×Ô fatgen103.doc
+{//æºè‡ª fatgen103.doc
 	short FcbNameLen = 0;
 	BYTE  Sum		 = 0;
 
@@ -907,7 +907,7 @@ BYTE DFat32::ChkSum(BYTE* pFcbName)
 /*
 DRES DFat32::OpenFileA(const char* path , DFat32File* file)
 {
-	//²ÎÊı´íÎó
+	//å‚æ•°é”™è¯¯
 	if (path == NULL || file == NULL) return DR_INVALED_PARAM;
 	
 	size_t len = strlen(path);
@@ -931,14 +931,14 @@ DRES DFat32::OpenFileW(const WCHAR* path , DFat32File *file)
 	::memset(&entry , 0 , sizeof(entry));
 
 	DRES res = GetDirEntry(path, &entry);
-	if (res) //¸ú½øÊ§°Ü
+	if (res) //è·Ÿè¿›å¤±è´¥
 	{
-		file->mFS = NULL;	//·µ»ØµÄÎÄ¼ş¾ä±úNULL
+		file->mFS = NULL;	//è¿”å›çš„æ–‡ä»¶å¥æŸ„NULL
 		return res;
 	}
 
 	file->mFS = this;
-	//¿ªÊ¼´´½¨ÎÄ¼ş¶ÔÏó
+	//å¼€å§‹åˆ›å»ºæ–‡ä»¶å¯¹è±¡
 	return NewFileHandle(file , &entry , path);
 }
 
@@ -948,68 +948,68 @@ DRES DFat32::ListFile(DFat32File* fil, FIND_FILE listFun)
 		return DR_NO_OPEN;
 
 	if (!fil || !listFun)
-		return DR_INVALED_PARAM;		//²ÎÊı´íÎó
+		return DR_INVALED_PARAM;		//å‚æ•°é”™è¯¯
 	if (!(fil->mAttr & ATTR_DIRECTORY))
-		return DR_INVALED_PARAM;		//ĞèÒªµÄÊÇÒ»¸öÄ¿Â¼¶ø²»ÊÇÒ»¸öÎÄ¼ş
+		return DR_INVALED_PARAM;		//éœ€è¦çš„æ˜¯ä¸€ä¸ªç›®å½•è€Œä¸æ˜¯ä¸€ä¸ªæ–‡ä»¶
 
-	DirEntry	entry;		//Èë¿Ú½á¹¹
-	BYTE		chSum	= 0;		//¶ÌÎÄ¼şÃûĞ£ÑéºÍ
-	BYTE		order	= 0;		//Ä¿Â¼ÏîĞòºÅ
+	DirEntry	entry;		//å…¥å£ç»“æ„
+	BYTE		chSum	= 0;		//çŸ­æ–‡ä»¶åæ ¡éªŒå’Œ
+	BYTE		order	= 0;		//ç›®å½•é¡¹åºå·
 	WCHAR		nambuf[MAX_LFN+1] = {0};
 
-	entry.mStartClust = fil->mStartClust;//½øÈëÖ¸¶¨µÄÄ¿Â¼µÄµÚÒ»´Ø
-	DRES res = PosEntry(&entry, 0);			//¶¨Î»µÚÒ»¸öÉ½ÇøµÄµÚÒ»¸öÈë¿Ú½á¹¹
+	entry.mStartClust = fil->mStartClust;//è¿›å…¥æŒ‡å®šçš„ç›®å½•çš„ç¬¬ä¸€ç°‡
+	DRES res = PosEntry(&entry, 0);			//å®šä½ç¬¬ä¸€ä¸ªå±±åŒºçš„ç¬¬ä¸€ä¸ªå…¥å£ç»“æ„
 	if (res)
-		return res;				//¶¨Î»Ê§°Ü
+		return res;				//å®šä½å¤±è´¥
 
-	do{	//±éÀúÄ¿Â¼ÖĞÃ¿Ò»¸öÈë¿Ú
+	do{	//éå†ç›®å½•ä¸­æ¯ä¸€ä¸ªå…¥å£
 		res = MoveView(entry.mCurSect);
-		if(res)  break;				//³ö´í
-		BYTE* dir = entry.mDir;			//Èë¿ÚµÄÎ»ÖÃ
-		BYTE flag = dir[0];				//µÚÒ»¸ö×Ö½ÚµÄ±êÖ¾Î»
-		if( flag == 0){				//µ½ÁËÄ¿Â¼µÄÄ©Î²
-			(*listFun)(NULL);		//Í¨Öª»Øµ÷Õß²éÕÒÍê±Ï
+		if(res)  break;				//å‡ºé”™
+		BYTE* dir = entry.mDir;			//å…¥å£çš„ä½ç½®
+		BYTE flag = dir[0];				//ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æ ‡å¿—ä½
+		if( flag == 0){				//åˆ°äº†ç›®å½•çš„æœ«å°¾
+			(*listFun)(NULL);		//é€šçŸ¥å›è°ƒè€…æŸ¥æ‰¾å®Œæ¯•
 			break;		
 		}
 
-		BYTE attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//Ä¿Â¼ÏîµÄÊôĞÔ
+		BYTE attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//ç›®å½•é¡¹çš„å±æ€§
 
 		if (flag == 0xE5||\
-			((attr & ATTR_VOLUME_ID) && attr != ATTR_LONG_NAME)) {	//²»ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
+			((attr & ATTR_VOLUME_ID) && attr != ATTR_LONG_NAME)) {	//ä¸æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
 				order = 0xFF;
-		} else {//ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
-			if(attr == ATTR_LONG_NAME){//³¤ÎÄ¼şÃûÈë¿Ú
-				if(flag & 0x40)	{	//ÊÇÒ»¸ö³¤ÎÄ¼şÃûĞòÁĞµÄ¿ªÊ¼  Ò²¾ÍÊÇÒ»¸ö³¤ÎÄ¼şÃûµÄ×îºóÒ»¸ö²¿·Ö
-					chSum = PLDE(dir)->mChksum;//ÎÄ¼şÃûµÄĞ£ÑéºÍ
-					flag &= 0xBF;	//È¥µô0x40µÄÑÚÂë  ¿Ù³öĞòºÅ
+		} else {//æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
+			if(attr == ATTR_LONG_NAME){//é•¿æ–‡ä»¶åå…¥å£
+				if(flag & 0x40)	{	//æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶ååºåˆ—çš„å¼€å§‹  ä¹Ÿå°±æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶åçš„æœ€åä¸€ä¸ªéƒ¨åˆ†
+					chSum = PLDE(dir)->mChksum;//æ–‡ä»¶åçš„æ ¡éªŒå’Œ
+					flag &= 0xBF;	//å»æ‰0x40çš„æ©ç   æŠ å‡ºåºå·
 					order = flag;	
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 				}
-				//¼ÆËãÏÂÒ»¸ö³¤ÃûÄ¿Â¼µÄĞòºÅ
+				//è®¡ç®—ä¸‹ä¸€ä¸ªé•¿åç›®å½•çš„åºå·
 				if(order == flag && chSum == PLDE(dir)->mChksum)
-				{//Æ¥Åäµ½Ò»¸ö³¤ÎÄ¼şÃû
+				{//åŒ¹é…åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶å
 					--order; 
-					SetLFN(nambuf , dir);		//È¡³öÎÄ¼şÃû
-				}else{//Æ¥ÅäÊ§°Ü
+					SetLFN(nambuf , dir);		//å–å‡ºæ–‡ä»¶å
+				}else{//åŒ¹é…å¤±è´¥
 					order = 0xFF;
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 				}
 
-			}else{  //Ò»¸ö¶ÌÎÄ¼şÃû
+			}else{  //ä¸€ä¸ªçŸ­æ–‡ä»¶å
 				if(!order && chSum == ChkSum(dir)){
-					(*listFun)(nambuf);		//ÕÒµ½Ò»¸ö³¤ÎÄ¼şÃûÄ¿Â¼¶ÔÓ¦µÄ¶ÌÎÄ¼şÃûÈë¿Ú
-				}else{						//´¿´âµÄ¶ÌÎÄ¼şÃûÈë¿Ú
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					(*listFun)(nambuf);		//æ‰¾åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶åç›®å½•å¯¹åº”çš„çŸ­æ–‡ä»¶åå…¥å£
+				}else{						//çº¯ç²¹çš„çŸ­æ–‡ä»¶åå…¥å£
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 					order = 0xFF;
 					SetSFN(nambuf ,dir);
-					(*listFun)(nambuf);		//ÕÒµ½Ò»¸ö³¤ÎÄ¼şÃû	
+					(*listFun)(nambuf);		//æ‰¾åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶å	
 				}
 			}
 		}
-		res = NextEntry(&entry);  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
-		if (res == DR_FAT_EOF)    //µ½ÁË´ÖÁ¶Î²²¿
+		res = NextEntry(&entry);  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
+		if (res == DR_FAT_EOF)    //åˆ°äº†ç²—ç‚¼å°¾éƒ¨
 		{
-			(*listFun)(NULL);		//Í¨Öª»Øµ÷Õß²éÕÒÍê±Ï
+			(*listFun)(NULL);		//é€šçŸ¥å›è°ƒè€…æŸ¥æ‰¾å®Œæ¯•
 			return DR_OK;
 		}
 	} while (!res);
@@ -1019,13 +1019,13 @@ DRES DFat32::ListFile(DFat32File* fil, FIND_FILE listFun)
 
 DRES DFat32::FindFile( DFat32File* dir , FINDER* finder , BOOL findDel /*= FALSE*/ )
 {
-	//ÏÈÇåÀíÒ»ÏÂ½á¹û
+	//å…ˆæ¸…ç†ä¸€ä¸‹ç»“æœ
 	*finder = NULL;
 
 	if (!IsDevOpened())
 		return DR_NO_OPEN;
 
-	//ÀıĞĞ°²È«¼ì²é
+	//ä¾‹è¡Œå®‰å…¨æ£€æŸ¥
 	if (!dir || !finder)
 		return DR_INVALED_PARAM;
 	if (!dir->IsValid())
@@ -1033,30 +1033,30 @@ DRES DFat32::FindFile( DFat32File* dir , FINDER* finder , BOOL findDel /*= FALSE
 	if (!dir->IsDir())
 		return DR_IS_FILE;
 
-	//´´½¨Ò»¸ö²éÕÒ¾ä±ú
+	//åˆ›å»ºä¸€ä¸ªæŸ¥æ‰¾å¥æŸ„
 	std::unique_ptr<Fat32FileFinder> pfff(new Fat32FileFinder());
 
-	//ÊÇ·ñÊÇÒª²éÕÒÒÑ¾­É¾³ıÁËµÄÎÄ¼ş
+	//æ˜¯å¦æ˜¯è¦æŸ¥æ‰¾å·²ç»åˆ é™¤äº†çš„æ–‡ä»¶
 	pfff->isFindDel = findDel;
 	wcscpy(pfff->path , dir->mPath.c_str());
 	pfff->isEnd = FALSE;
 // 	len = wcslen(pfff->path);
-// 	//Ìí¼Ó·Ö¸î·û
+// 	//æ·»åŠ åˆ†å‰²ç¬¦
 // 	if (!IsPathSeparator(pfff->path[len - 1]))
 // 	{
 // 		pfff->path[len] = PATH_SEPAR;
 // 		pfff->path[len + 1] = 0;
 // 	}
 
-	pfff->entry.mStartClust = dir->mStartClust;//½øÈëÖ¸¶¨µÄÄ¿Â¼µÄµÚÒ»´Ø
-	DRES res = PosEntry(&(pfff->entry), 0);			//¶¨Î»µÚÒ»¸öÉ½ÇøµÄµÚÒ»¸öÈë¿Ú½á¹¹
+	pfff->entry.mStartClust = dir->mStartClust;//è¿›å…¥æŒ‡å®šçš„ç›®å½•çš„ç¬¬ä¸€ç°‡
+	DRES res = PosEntry(&(pfff->entry), 0);			//å®šä½ç¬¬ä¸€ä¸ªå±±åŒºçš„ç¬¬ä¸€ä¸ªå…¥å£ç»“æ„
 	if (res)
 	{
-		//¶¨Î»Ê§°Ü£¬ÕâÊÇÎÄ¼ş¾ä±úÓĞÎÊÌâ
-		return DR_INVALID_HANDLE;				//¶¨Î»Ê§°Ü
+		//å®šä½å¤±è´¥ï¼Œè¿™æ˜¯æ–‡ä»¶å¥æŸ„æœ‰é—®é¢˜
+		return DR_INVALID_HANDLE;				//å®šä½å¤±è´¥
 	}
 
-	//·µ»Ø²éÕÒ¾ä±ú
+	//è¿”å›æŸ¥æ‰¾å¥æŸ„
 	*finder = FINDER(pfff.release());
 
 	return DR_OK;
@@ -1069,7 +1069,7 @@ DRES DFat32::FindNextFileW( FINDER finder , DFat32File* file )
 	if (!finder && !file)
 		return DR_INVALED_PARAM;
 
-	//½øĞĞ¾ßÌåµÄ²éÕÒ
+	//è¿›è¡Œå…·ä½“çš„æŸ¥æ‰¾
 	PFat32FileFinder pfff = PFat32FileFinder(finder);
 	if (pfff->isFindDel)
 		return FindNextDelFile(finder, file);
@@ -1081,94 +1081,94 @@ DRES DFat32::FindNextFileW( FINDER finder , DFat32File* file )
 
 DRES DFat32::FindNextExistFile( FINDER find , DFat32File* file )
 {
-	PFat32FileFinder finder = PFat32FileFinder(find);//²éÑ¯½á¹¹Ìå
+	PFat32FileFinder finder = PFat32FileFinder(find);//æŸ¥è¯¢ç»“æ„ä½“
 	if (finder->isEnd)
 		return DR_FAT_EOF;
 
 	DRES		res		= DR_OK;
 	BYTE*		dir		= NULL;
-	BYTE		flag	= 0;		//µÚÒ»¸ö×Ö½ÚµÄ±ê×¼
-	BYTE		attr	= 0;		//ÊôĞÔ
-	BYTE		chSum	= 0;		//¶ÌÎÄ¼şÃûĞ£ÑéºÍ
-	BYTE		order	= 0;		//Ä¿Â¼ÏîĞòºÅ
+	BYTE		flag	= 0;		//ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æ ‡å‡†
+	BYTE		attr	= 0;		//å±æ€§
+	BYTE		chSum	= 0;		//çŸ­æ–‡ä»¶åæ ¡éªŒå’Œ
+	BYTE		order	= 0;		//ç›®å½•é¡¹åºå·
 	WCHAR		nambuf[MAX_LFN+1] = {0}; 
 	size_t		len = 0;
 	WCHAR		path[MAX_PATH + 1] = {0};
 
-	do{	//±éÀúÄ¿Â¼ÖĞÃ¿Ò»¸öÈë¿Ú
+	do{	//éå†ç›®å½•ä¸­æ¯ä¸€ä¸ªå…¥å£
 		res = MoveView(finder->entry.mCurSect);
-		if(res)  break;				//³ö´í
-		dir = finder->entry.mDir;	//Èë¿ÚµÄÎ»ÖÃ
-		flag = dir[0];				//µÚÒ»¸ö×Ö½ÚµÄ±êÖ¾Î»
-		if( flag == 0){				//µ½ÁËÄ¿Â¼µÄÄ©Î²
-			res = DR_FAT_EOF;		//µ½ÁËµ½ÁË½áÎ²
+		if(res)  break;				//å‡ºé”™
+		dir = finder->entry.mDir;	//å…¥å£çš„ä½ç½®
+		flag = dir[0];				//ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æ ‡å¿—ä½
+		if( flag == 0){				//åˆ°äº†ç›®å½•çš„æœ«å°¾
+			res = DR_FAT_EOF;		//åˆ°äº†åˆ°äº†ç»“å°¾
 			finder->isEnd = TRUE;
 			break;		
 		}
 		
-		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//Ä¿Â¼ÏîµÄÊôĞÔ
+		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//ç›®å½•é¡¹çš„å±æ€§
 		
 		if (flag == 0xE5||\
-			((attr & ATTR_VOLUME_ID) && attr != ATTR_LONG_NAME)) {	//²»ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
+			((attr & ATTR_VOLUME_ID) && attr != ATTR_LONG_NAME)) {	//ä¸æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
 			order = 0xFF;
-		} else {//ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
+		} else {//æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
 
-			if(attr == ATTR_LONG_NAME){//³¤ÎÄ¼şÃûÈë¿Ú
-				if(flag & 0x40)	{	//ÊÇÒ»¸ö³¤ÎÄ¼şÃûĞòÁĞµÄ¿ªÊ¼  Ò²¾ÍÊÇÒ»¸ö³¤ÎÄ¼şÃûµÄ×îºóÒ»¸ö²¿·Ö
-					chSum = PLDE(dir)->mChksum;//ÎÄ¼şÃûµÄĞ£ÑéºÍ
-					flag &= 0xBF;	//È¥µô0x40µÄÑÚÂë  ¿Ù³öĞòºÅ
+			if(attr == ATTR_LONG_NAME){//é•¿æ–‡ä»¶åå…¥å£
+				if(flag & 0x40)	{	//æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶ååºåˆ—çš„å¼€å§‹  ä¹Ÿå°±æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶åçš„æœ€åä¸€ä¸ªéƒ¨åˆ†
+					chSum = PLDE(dir)->mChksum;//æ–‡ä»¶åçš„æ ¡éªŒå’Œ
+					flag &= 0xBF;	//å»æ‰0x40çš„æ©ç   æŠ å‡ºåºå·
 					order = flag;	
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 				}
-				//¼ÆËãÏÂÒ»¸ö³¤ÃûÄ¿Â¼µÄĞòºÅ
+				//è®¡ç®—ä¸‹ä¸€ä¸ªé•¿åç›®å½•çš„åºå·
 				if(order == flag && chSum == PLDE(dir)->mChksum)
-				{//Æ¥Åäµ½Ò»¸ö³¤ÎÄ¼şÃû
+				{//åŒ¹é…åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶å
 					--order; 
-					SetLFN(nambuf , dir);		//È¡³öÎÄ¼şÃû
-				}else{//Æ¥ÅäÊ§°Ü
+					SetLFN(nambuf , dir);		//å–å‡ºæ–‡ä»¶å
+				}else{//åŒ¹é…å¤±è´¥
 					order = 0xFF;
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 				}
 				
-			}else{  //Ò»¸ö¶ÌÎÄ¼şÃû
+			}else{  //ä¸€ä¸ªçŸ­æ–‡ä»¶å
 				if(!order && chSum == ChkSum(dir)){
-				//ÕÒµ½Ò»¸ö³¤ÎÄ¼şÃûÄ¿Â¼¶ÔÓ¦µÄ¶ÌÎÄ¼şÃûÈë¿Ú
+				//æ‰¾åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶åç›®å½•å¯¹åº”çš„çŸ­æ–‡ä»¶åå…¥å£
 
-					//ĞèÒª½øĞĞÎÄ¼şÂ·¾¶Æ´½Ó
-					wcscpy(path , finder->path);//¸¸Â·¾¶
+					//éœ€è¦è¿›è¡Œæ–‡ä»¶è·¯å¾„æ‹¼æ¥
+					wcscpy(path , finder->path);//çˆ¶è·¯å¾„
 					if((len = wcslen(path)) > 1 
-						&& !IsPathSeparator(path[len - 1]))     //²»ÊÇÔÚ ¸üÄ¿Â¼ÖĞÕÒ
-						wcscat(path , L"/");	//·Ö¸ô·û
-					wcscat(path , nambuf);		//ÎÄ¼şÃû
+						&& !IsPathSeparator(path[len - 1]))     //ä¸æ˜¯åœ¨ æ›´ç›®å½•ä¸­æ‰¾
+						wcscat(path , L"/");	//åˆ†éš”ç¬¦
+					wcscat(path , nambuf);		//æ–‡ä»¶å
 
-					//´´½¨ÎÄ¼ş¼ş¾ä±ú
+					//åˆ›å»ºæ–‡ä»¶ä»¶å¥æŸ„
 					NewFileHandle(file , &(finder->entry) , path);
 					
-					//ÏÈ½øÈëÏÂÒ»´Î²éÕÒµÄÎ»ÖÃ
-					res = NextEntry(&(finder->entry));  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
+					//å…ˆè¿›å…¥ä¸‹ä¸€æ¬¡æŸ¥æ‰¾çš„ä½ç½®
+					res = NextEntry(&(finder->entry));  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
 					if (res == DR_FAT_EOF)
 						finder->isEnd = TRUE;
 					
 					return DR_OK;
 
 					//(*listFun)(nambuf);		
-				}else{						//´¿´âµÄ¶ÌÎÄ¼şÃûÈë¿Ú
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+				}else{						//çº¯ç²¹çš„çŸ­æ–‡ä»¶åå…¥å£
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 					order = 0xFF;
 					SetSFN(nambuf ,dir);
 
-					//ºÃÒ©½øĞĞÎÄ¼şÂ·¾¶Æ´½Ó
-					wcscpy(path , finder->path);//¸¸Â·¾¶
+					//å¥½è¯è¿›è¡Œæ–‡ä»¶è·¯å¾„æ‹¼æ¥
+					wcscpy(path , finder->path);//çˆ¶è·¯å¾„
 					if((len = wcslen(path)) > 1 
-						&& !IsPathSeparator(path[len - 1]))     //²»ÊÇÔÚ ¸üÄ¿Â¼ÖĞÕÒ
-						wcscat(path , L"/");	//·Ö¸ô·û
-					wcscat(path , nambuf);		//ÎÄ¼şÃû
+						&& !IsPathSeparator(path[len - 1]))     //ä¸æ˜¯åœ¨ æ›´ç›®å½•ä¸­æ‰¾
+						wcscat(path , L"/");	//åˆ†éš”ç¬¦
+					wcscat(path , nambuf);		//æ–‡ä»¶å
 
-					//´´½¨ÎÄ¼ş¾ä±ú
+					//åˆ›å»ºæ–‡ä»¶å¥æŸ„
 					NewFileHandle(file , &(finder->entry) , path);
 
-					//ÏÈ½øÈëÏÂÒ»´Î²éÕÒµÄÎ»ÖÃ
-					res = NextEntry(&(finder->entry));  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
+					//å…ˆè¿›å…¥ä¸‹ä¸€æ¬¡æŸ¥æ‰¾çš„ä½ç½®
+					res = NextEntry(&(finder->entry));  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
 					if (res == DR_FAT_EOF)
 						finder->isEnd = TRUE;
 					
@@ -1176,13 +1176,13 @@ DRES DFat32::FindNextExistFile( FINDER find , DFat32File* file )
 				}
 			}
 		}
-		res = NextEntry(&(finder->entry));  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
-		if (res == DR_FAT_EOF)    //µ½ÁË´ÖÁ¶Î²²¿
+		res = NextEntry(&(finder->entry));  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
+		if (res == DR_FAT_EOF)    //åˆ°äº†ç²—ç‚¼å°¾éƒ¨
 		{
 			finder->isEnd = TRUE;
 			return DR_FAT_EOF;
 // 			res = DR_FAT_EOF
-// /*			(*listFun)(NULL);		//Í¨Öª»Øµ÷Õß²éÕÒÍê±Ï*/
+// /*			(*listFun)(NULL);		//é€šçŸ¥å›è°ƒè€…æŸ¥æ‰¾å®Œæ¯•*/
 // 			return DR_OK;
 		}
 	} while (!res);
@@ -1196,135 +1196,135 @@ DRES DFat32::FindNextDelFile( FINDER find , DFat32File* file )
 	if (finder->isEnd)
 		return DR_FAT_EOF;
 
-	DRES		res		= DR_OK;	//²Ù×÷½á¹û
-	BYTE*		dir		= NULL;		//ÔÚ»º´æÖĞµÄÈë¿Ú½á¹¹
-	BYTE		flag	= 0;		//µÚÒ»¸ö×Ö½ÚµÄ±ê×¼
-	BYTE		attr	= 0;		//ÊôĞÔ
-	USHORT		chSum	= 0xFFFF;	//ÕâÀïµÄĞ£ÑéºÍÎªÁ½¸ö×Ö½Ú
-									//Ö÷ÒªÊÇÒòÎªÓÃ´ËÓò×öÅĞ¶ÏÊÇ·ñÊÇÒ»¸öĞÂµÄ³¤ÎÄ¼şÃûµÄ¿ªÊ¼
-									//Ó¦ÎªÊµ¼ÊµÄĞ£ÑéºÍÊÇÒ»¸ö×Ö½Ú,Ò²¾ÍÊÇËµ×íµ¹Îª0xFF 
-									//¶øÎÒÓÃ0xFFFF±íµ±Ç°»¹Ã»ÓĞÆ¥Åäµ½Ò»¸ö³¤ÃûÄ¿Â¼Ïî
-	WCHAR		nambuf[MAX_LFN+1] = {0}; //ÎÄ¼şÃû»º´æ
-	WCHAR       path[MAX_PATH] = {0};	//Â·¾¶»º´æ
+	DRES		res		= DR_OK;	//æ“ä½œç»“æœ
+	BYTE*		dir		= NULL;		//åœ¨ç¼“å­˜ä¸­çš„å…¥å£ç»“æ„
+	BYTE		flag	= 0;		//ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æ ‡å‡†
+	BYTE		attr	= 0;		//å±æ€§
+	USHORT		chSum	= 0xFFFF;	//è¿™é‡Œçš„æ ¡éªŒå’Œä¸ºä¸¤ä¸ªå­—èŠ‚
+									//ä¸»è¦æ˜¯å› ä¸ºç”¨æ­¤åŸŸåšåˆ¤æ–­æ˜¯å¦æ˜¯ä¸€ä¸ªæ–°çš„é•¿æ–‡ä»¶åçš„å¼€å§‹
+									//åº”ä¸ºå®é™…çš„æ ¡éªŒå’Œæ˜¯ä¸€ä¸ªå­—èŠ‚,ä¹Ÿå°±æ˜¯è¯´é†‰å€’ä¸º0xFF 
+									//è€Œæˆ‘ç”¨0xFFFFè¡¨å½“å‰è¿˜æ²¡æœ‰åŒ¹é…åˆ°ä¸€ä¸ªé•¿åç›®å½•é¡¹
+	WCHAR		nambuf[MAX_LFN+1] = {0}; //æ–‡ä»¶åç¼“å­˜
+	WCHAR       path[MAX_PATH] = {0};	//è·¯å¾„ç¼“å­˜
 	DFat32File	df;
-	W_CHAR		w_w;					//ÓÃÓÚ¼ÆËãĞ£ÑéºÍ
+	W_CHAR		w_w;					//ç”¨äºè®¡ç®—æ ¡éªŒå’Œ
 
-	do{	//±éÀúÄ¿Â¼ÖĞÃ¿Ò»¸öÈë¿Ú
+	do{	//éå†ç›®å½•ä¸­æ¯ä¸€ä¸ªå…¥å£
 		res = MoveView(finder->entry.mCurSect);
-		if(res)  break;				//³ö´í
-		dir = finder->entry.mDir;	//Èë¿ÚµÄÎ»ÖÃ
-		flag = dir[0];				//µÚÒ»¸ö×Ö½ÚµÄ±êÖ¾Î»
-		if( flag == 0){				//µ½ÁËÄ¿Â¼µÄÄ©Î²
+		if(res)  break;				//å‡ºé”™
+		dir = finder->entry.mDir;	//å…¥å£çš„ä½ç½®
+		flag = dir[0];				//ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æ ‡å¿—ä½
+		if( flag == 0){				//åˆ°äº†ç›®å½•çš„æœ«å°¾
 
 			res = DR_FAT_EOF;
 			finder->isEnd = TRUE;
 			return DR_FAT_EOF;
 		}
-		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//Ä¿Â¼ÏîµÄÊôĞÔ
+		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//ç›®å½•é¡¹çš„å±æ€§
 
-		if (flag != 0xE5) {			//²»ÊÇÒ»¸öÉ¾³ıÁËµÄÈë¿Ú
+		if (flag != 0xE5) {			//ä¸æ˜¯ä¸€ä¸ªåˆ é™¤äº†çš„å…¥å£
 			//order = 0xFF;
 			chSum = 0xFFFF;
-		} else {//ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
-			if(attr == ATTR_LONG_NAME){//³¤ÎÄ¼şÃûÈë¿Ú
+		} else {//æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
+			if(attr == ATTR_LONG_NAME){//é•¿æ–‡ä»¶åå…¥å£
 
 				if(chSum == 0xFFFF)	{
-					//ÊÇÒ»¸ö³¤ÎÄ¼şÃûĞòÁĞµÄ¿ªÊ¼
-					//Ò²¾ÍÊÇÒ»¸ö³¤ÎÄ¼şÃûµÄ×îºóÒ»¸ö²¿·Ö
-					chSum = PLDE(dir)->mChksum;//¼ÇÂ¼ÏÂĞ£ÑéºÍ
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					//æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶ååºåˆ—çš„å¼€å§‹
+					//ä¹Ÿå°±æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶åçš„æœ€åä¸€ä¸ªéƒ¨åˆ†
+					chSum = PLDE(dir)->mChksum;//è®°å½•ä¸‹æ ¡éªŒå’Œ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 				}
-				//ÅĞ¶Ï
+				//åˆ¤æ–­
 				if(chSum == PLDE(dir)->mChksum)
-				{//Æ¥Åäµ½Ò»¸ö³¤ÎÄ¼şÃû
-					AppLFN(nambuf , dir);//È¡³öÎÄ¼şÃû½«ÆäÌí¼Óµ½»º´æµÄÇ°Ãæ
-				}else{//Æ¥ÅäÊ§°Ü , ·ÅÆúÔ­ÓĞµÄÆ¥Åä½á¹û  £¬½øĞĞÒ»¸öĞÂµÄÆ¥Åä¹ı³Ì
-					//Çå¿Õ»º´æ ,½øĞĞÏÂÒ»´ÎÆ¥Åä
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+				{//åŒ¹é…åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶å
+					AppLFN(nambuf , dir);//å–å‡ºæ–‡ä»¶åå°†å…¶æ·»åŠ åˆ°ç¼“å­˜çš„å‰é¢
+				}else{//åŒ¹é…å¤±è´¥ , æ”¾å¼ƒåŸæœ‰çš„åŒ¹é…ç»“æœ  ï¼Œè¿›è¡Œä¸€ä¸ªæ–°çš„åŒ¹é…è¿‡ç¨‹
+					//æ¸…ç©ºç¼“å­˜ ,è¿›è¡Œä¸‹ä¸€æ¬¡åŒ¹é…
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 					
-					//½øĞĞÏÂÒ»´ÎÆ¥Åä
+					//è¿›è¡Œä¸‹ä¸€æ¬¡åŒ¹é…
 					chSum = PLDE(dir)->mChksum;
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
-					AppLFN(nambuf , dir);//È¡³öÎÄ¼şÃû½«ÆäÌí¼Óµ½»º´æµÄÇ°Ãæ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
+					AppLFN(nambuf , dir);//å–å‡ºæ–‡ä»¶åå°†å…¶æ·»åŠ åˆ°ç¼“å­˜çš„å‰é¢
 
 				}
 
-			}else{  //Ò»¸ö¶ÌÎÄ¼şÃû
-				//¶ÌÎÄ¼şÃûÈë¿ÚµÄµÚÒ»¸ö×Ö½ÚÉèÖÃÁË0xE5  ÒÑ¾­ÎŞ·¨¼ÆËãĞ£ÑéºÍÁË
-				//ÔÚÕâÀïÏÈ³¤ÎÄ¼şÃûÖĞ»¹Ô­£¬·¹ºóÔÙ¼ÆËã
-				BYTE btBack = 0;		//±¸·İµÚÒ»¸ö×Ö½Ú
+			}else{  //ä¸€ä¸ªçŸ­æ–‡ä»¶å
+				//çŸ­æ–‡ä»¶åå…¥å£çš„ç¬¬ä¸€ä¸ªå­—èŠ‚è®¾ç½®äº†0xE5  å·²ç»æ— æ³•è®¡ç®—æ ¡éªŒå’Œäº†
+				//åœ¨è¿™é‡Œå…ˆé•¿æ–‡ä»¶åä¸­è¿˜åŸï¼Œé¥­åå†è®¡ç®—
+				BYTE btBack = 0;		//å¤‡ä»½ç¬¬ä¸€ä¸ªå­—èŠ‚
 				w_w.charw = nambuf[0];
 				w_w = ChrConvert(w_w ,FALSE );
 				btBack = dir[0];
-				if (w_w.char1)//µÚÒ»¸ö×Ö·ûÊÇ¶à×Ö½Ú×Ö·û
+				if (w_w.char1)//ç¬¬ä¸€ä¸ªå­—ç¬¦æ˜¯å¤šå­—èŠ‚å­—ç¬¦
 					dir[0] = w_w.char1;
-				else		 //µÚÒ»¸ö×Ö·ûÊÇµ¥×Ö½Ú×Ö·û
+				else		 //ç¬¬ä¸€ä¸ªå­—ç¬¦æ˜¯å•å­—èŠ‚å­—ç¬¦
 					dir[0] = w_w.char2;
 				
 				if(chSum == ChkSum(dir)){
 
-					//´´½¨ÎÄ¼ş¾ä±ú
-					//ÉèÖÃÉ¾³ı±êÖ¾
-					wcscpy(path , finder->path);//¸¸Â·¾¶
-					if(wcslen(path) != 1)       //²»ÊÇÔÚ ¸üÄ¿Â¼ÖĞÕÒ
-						wcscat(path , L"/");	//·Ö¸ô·û
-					wcscat(path , L"*");		//É¾³ı±êÖ¾
-					wcscat(path , nambuf);		//ÎÄ¼şÃû
+					//åˆ›å»ºæ–‡ä»¶å¥æŸ„
+					//è®¾ç½®åˆ é™¤æ ‡å¿—
+					wcscpy(path , finder->path);//çˆ¶è·¯å¾„
+					if(wcslen(path) != 1)       //ä¸æ˜¯åœ¨ æ›´ç›®å½•ä¸­æ‰¾
+						wcscat(path , L"/");	//åˆ†éš”ç¬¦
+					wcscat(path , L"*");		//åˆ é™¤æ ‡å¿—
+					wcscat(path , nambuf);		//æ–‡ä»¶å
 
-					//³õÊ¼»¯·µ»ØµÄÎÄ¼ş¾ä±ú
-					NewFileHandle(file , &(finder->entry) , path);//´´½¨¾ä±ú
-					chSum = 0xFFFF;			//ÖØÖÃĞ£ÑéºÍ
+					//åˆå§‹åŒ–è¿”å›çš„æ–‡ä»¶å¥æŸ„
+					NewFileHandle(file , &(finder->entry) , path);//åˆ›å»ºå¥æŸ„
+					chSum = 0xFFFF;			//é‡ç½®æ ¡éªŒå’Œ
 					
-					//ÏÈÌáÇ°½øÈëÏÂÒ»¸öÈë¿Ú
-					res = NextEntry( &(finder->entry) );  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
-					if (res == DR_FAT_EOF)    //µ½ÁË´ÖÁ¶Î²²¿
+					//å…ˆæå‰è¿›å…¥ä¸‹ä¸€ä¸ªå…¥å£
+					res = NextEntry( &(finder->entry) );  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
+					if (res == DR_FAT_EOF)    //åˆ°äº†ç²—ç‚¼å°¾éƒ¨
 						finder->isEnd = TRUE;
 					
-					dir[0] = btBack;		//»¹Ô­»º´æÖĞµÄÊı¾İ
+					dir[0] = btBack;		//è¿˜åŸç¼“å­˜ä¸­çš„æ•°æ®
 					return DR_OK;				
 // 					res = DR_OK;
 // 
 // 					break;
-					//(*listFun)(df);		//ÕÒµ½Ò»¸ö³¤ÎÄ¼şÃûÄ¿Â¼¶ÔÓ¦µÄ¶ÌÎÄ¼şÃûÈë¿Ú
-				}else{						//´¿´âµÄ¶ÌÎÄ¼şÃûÈë¿Ú
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					//(*listFun)(df);		//æ‰¾åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶åç›®å½•å¯¹åº”çš„çŸ­æ–‡ä»¶åå…¥å£
+				}else{						//çº¯ç²¹çš„çŸ­æ–‡ä»¶åå…¥å£
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 					
-					(*(char*)dir) = '*';//É¾³ı±êÖ¾
+					(*(char*)dir) = '*';//åˆ é™¤æ ‡å¿—
 					SetSFN(nambuf ,dir);
 
-					wcscpy(path , finder->path);//¸¸Â·¾¶
-					if(wcslen(path) != 1)     //²»ÊÇÔÚ ¸üÄ¿Â¼ÖĞÕÒ
-						wcscat(path , L"/");	//·Ö¸ô·û
-					wcscat(path , nambuf);		//ÎÄ¼şÃû
+					wcscpy(path , finder->path);//çˆ¶è·¯å¾„
+					if(wcslen(path) != 1)     //ä¸æ˜¯åœ¨ æ›´ç›®å½•ä¸­æ‰¾
+						wcscat(path , L"/");	//åˆ†éš”ç¬¦
+					wcscat(path , nambuf);		//æ–‡ä»¶å
 
-					//³õÊ¼»¯·µ»ØµÄÎÄ¼ş¾ä±ú
-					NewFileHandle(file , &(finder->entry) , path);//´´½¨¾ä±ú
-					chSum = 0xFFFF;			//ÖØÖÃĞ£ÑéºÍ
+					//åˆå§‹åŒ–è¿”å›çš„æ–‡ä»¶å¥æŸ„
+					NewFileHandle(file , &(finder->entry) , path);//åˆ›å»ºå¥æŸ„
+					chSum = 0xFFFF;			//é‡ç½®æ ¡éªŒå’Œ
 
 					
-					//ÏÈÌáÇ°½øÈëÏÂÒ»¸öÈë¿Ú
-					res = NextEntry( &(finder->entry) );  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
-					if (res == DR_FAT_EOF)    //µ½ÁË´ÖÁ¶Î²²¿
+					//å…ˆæå‰è¿›å…¥ä¸‹ä¸€ä¸ªå…¥å£
+					res = NextEntry( &(finder->entry) );  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
+					if (res == DR_FAT_EOF)    //åˆ°äº†ç²—ç‚¼å°¾éƒ¨
 						finder->isEnd = TRUE;
 
-					dir[0] = btBack;  //»¹Ô­Ò»ÏÂÊı¾İ
+					dir[0] = btBack;  //è¿˜åŸä¸€ä¸‹æ•°æ®
 					return DR_OK;
 // 					res = DR_OK;
 // 
 // 					break;
 // 
-// 					//´´½¨É¾³ı±êÖ¾
-// /*					(*listFun)(df);		//ÕÒµ½Ò»¸ö³¤ÎÄ¼şÃû	*/
+// 					//åˆ›å»ºåˆ é™¤æ ‡å¿—
+// /*					(*listFun)(df);		//æ‰¾åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶å	*/
 					
 				}
 			}
 		}
-		res = NextEntry( &(finder->entry) );  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
-		if (res == DR_FAT_EOF)    //µ½ÁË´ÖÁ¶Î²²¿
+		res = NextEntry( &(finder->entry) );  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
+		if (res == DR_FAT_EOF)    //åˆ°äº†ç²—ç‚¼å°¾éƒ¨
 		{
 			finder->isEnd = TRUE;
 // 			df.mFS = NULL;
-// /*			(*listFun)(df);		//Í¨Öª»Øµ÷Õß²éÕÒÍê±Ï*/
+// /*			(*listFun)(df);		//é€šçŸ¥å›è°ƒè€…æŸ¥æ‰¾å®Œæ¯•*/
 			return DR_FAT_EOF;
 		}
 	} while (!res);
@@ -1344,107 +1344,107 @@ DRES DFat32::ListDelFile(DFat32File* fil, FIND_DEL_FILE listFun)
 		return DR_NO_OPEN;
 
 	if (!fil || !listFun)
-		return DR_INVALED_PARAM;		//²ÎÊı´íÎó
+		return DR_INVALED_PARAM;		//å‚æ•°é”™è¯¯
 	if (!(fil->mAttr & ATTR_DIRECTORY))
-		return DR_INVALED_PARAM;		//ĞèÒªµÄÊÇÒ»¸öÄ¿Â¼¶ø²»ÊÇÒ»¸öÎÄ¼ş
+		return DR_INVALED_PARAM;		//éœ€è¦çš„æ˜¯ä¸€ä¸ªç›®å½•è€Œä¸æ˜¯ä¸€ä¸ªæ–‡ä»¶
 
-	DRES		res		= DR_OK;	//²Ù×÷½á¹û
-	DirEntry	entry;		//Èë¿Ú½á¹¹
-	BYTE*		dir		= NULL;		//ÔÚ»º´æÖĞµÄÈë¿Ú½á¹¹
-	BYTE		flag	= 0;		//µÚÒ»¸ö×Ö½ÚµÄ±ê×¼
-	BYTE		attr	= 0;		//ÊôĞÔ
-	USHORT		chSum	= 0xFFFF;	//ÕâÀïµÄĞ£ÑéºÍÎªÁ½¸ö×Ö½Ú
-									//Ö÷ÒªÊÇÒòÎªÓÃ´ËÓò×öÅĞ¶ÏÊÇ·ñÊÇÒ»¸öĞÂµÄ³¤ÎÄ¼şÃûµÄ¿ªÊ¼
-									//Ó¦ÎªÊµ¼ÊµÄĞ£ÑéºÍÊÇÒ»¸ö×Ö½Ú,Ò²¾ÍÊÇËµ×íµ¹Îª0xFF 
-									//¶øÎÒÓÃ0xFFFF±íµ±Ç°»¹Ã»ÓĞÆ¥Åäµ½Ò»¸ö³¤ÃûÄ¿Â¼Ïî
-	WCHAR		nambuf[MAX_LFN+1] = {0}; //ÎÄ¼şÃû»º´æ
-	WCHAR       path[MAX_PATH] = {0};	//Â·¾¶»º´æ
+	DRES		res		= DR_OK;	//æ“ä½œç»“æœ
+	DirEntry	entry;		//å…¥å£ç»“æ„
+	BYTE*		dir		= NULL;		//åœ¨ç¼“å­˜ä¸­çš„å…¥å£ç»“æ„
+	BYTE		flag	= 0;		//ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æ ‡å‡†
+	BYTE		attr	= 0;		//å±æ€§
+	USHORT		chSum	= 0xFFFF;	//è¿™é‡Œçš„æ ¡éªŒå’Œä¸ºä¸¤ä¸ªå­—èŠ‚
+									//ä¸»è¦æ˜¯å› ä¸ºç”¨æ­¤åŸŸåšåˆ¤æ–­æ˜¯å¦æ˜¯ä¸€ä¸ªæ–°çš„é•¿æ–‡ä»¶åçš„å¼€å§‹
+									//åº”ä¸ºå®é™…çš„æ ¡éªŒå’Œæ˜¯ä¸€ä¸ªå­—èŠ‚,ä¹Ÿå°±æ˜¯è¯´é†‰å€’ä¸º0xFF 
+									//è€Œæˆ‘ç”¨0xFFFFè¡¨å½“å‰è¿˜æ²¡æœ‰åŒ¹é…åˆ°ä¸€ä¸ªé•¿åç›®å½•é¡¹
+	WCHAR		nambuf[MAX_LFN+1] = {0}; //æ–‡ä»¶åç¼“å­˜
+	WCHAR       path[MAX_PATH] = {0};	//è·¯å¾„ç¼“å­˜
 	DFat32File	df;
-	W_CHAR		w_w;					//ÓÃÓÚ¼ÆËãĞ£ÑéºÍ
+	W_CHAR		w_w;					//ç”¨äºè®¡ç®—æ ¡éªŒå’Œ
 
-	entry.mStartClust = fil->mStartClust;//½øÈëÖ¸¶¨µÄÄ¿Â¼µÄµÚÒ»´Ø
-	res = PosEntry(&entry , 0);			//¶¨Î»µÚÒ»¸öÉ½ÇøµÄµÚÒ»¸öÈë¿Ú½á¹¹
-	if (res) return res;				//¶¨Î»Ê§°Ü
+	entry.mStartClust = fil->mStartClust;//è¿›å…¥æŒ‡å®šçš„ç›®å½•çš„ç¬¬ä¸€ç°‡
+	res = PosEntry(&entry , 0);			//å®šä½ç¬¬ä¸€ä¸ªå±±åŒºçš„ç¬¬ä¸€ä¸ªå…¥å£ç»“æ„
+	if (res) return res;				//å®šä½å¤±è´¥
 
-	do{	//±éÀúÄ¿Â¼ÖĞÃ¿Ò»¸öÈë¿Ú
+	do{	//éå†ç›®å½•ä¸­æ¯ä¸€ä¸ªå…¥å£
 		res = MoveView(entry.mCurSect);
-		if(res)  break;				//³ö´í
-		dir = entry.mDir;			//Èë¿ÚµÄÎ»ÖÃ
-		flag = dir[0];				//µÚÒ»¸ö×Ö½ÚµÄ±êÖ¾Î»
-		if( flag == 0){				//µ½ÁËÄ¿Â¼µÄÄ©Î²
+		if(res)  break;				//å‡ºé”™
+		dir = entry.mDir;			//å…¥å£çš„ä½ç½®
+		flag = dir[0];				//ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æ ‡å¿—ä½
+		if( flag == 0){				//åˆ°äº†ç›®å½•çš„æœ«å°¾
 			df.mFS = NULL;
-			(*listFun)(df);		//Í¨Öª»Øµ÷Õß²éÕÒÍê±Ï
+			(*listFun)(df);		//é€šçŸ¥å›è°ƒè€…æŸ¥æ‰¾å®Œæ¯•
 			break;		
 		}
-		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//Ä¿Â¼ÏîµÄÊôĞÔ
+		attr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;//ç›®å½•é¡¹çš„å±æ€§
 
-		if (flag != 0xE5) {			//²»ÊÇÒ»¸öÉ¾³ıÁËµÄÈë¿Ú
+		if (flag != 0xE5) {			//ä¸æ˜¯ä¸€ä¸ªåˆ é™¤äº†çš„å…¥å£
 			//order = 0xFF;
 			chSum = 0xFFFF;
-		} else {//ÊÇÒ»¸öÓĞĞ§µÄÈë¿Ú
-			if(attr == ATTR_LONG_NAME){//³¤ÎÄ¼şÃûÈë¿Ú
+		} else {//æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„å…¥å£
+			if(attr == ATTR_LONG_NAME){//é•¿æ–‡ä»¶åå…¥å£
 
 				if(chSum == 0xFFFF)	{
-					//ÊÇÒ»¸ö³¤ÎÄ¼şÃûĞòÁĞµÄ¿ªÊ¼
-					//Ò²¾ÍÊÇÒ»¸ö³¤ÎÄ¼şÃûµÄ×îºóÒ»¸ö²¿·Ö
-					chSum = PLDE(dir)->mChksum;//¼ÇÂ¼ÏÂĞ£ÑéºÍ
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					//æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶ååºåˆ—çš„å¼€å§‹
+					//ä¹Ÿå°±æ˜¯ä¸€ä¸ªé•¿æ–‡ä»¶åçš„æœ€åä¸€ä¸ªéƒ¨åˆ†
+					chSum = PLDE(dir)->mChksum;//è®°å½•ä¸‹æ ¡éªŒå’Œ
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 				}
-				//ÅĞ¶Ï
+				//åˆ¤æ–­
 				if(chSum == PLDE(dir)->mChksum)
-				{//Æ¥Åäµ½Ò»¸ö³¤ÎÄ¼şÃû
-					AppLFN(nambuf , dir);//È¡³öÎÄ¼şÃû½«ÆäÌí¼Óµ½»º´æµÄÇ°Ãæ
-				}else{//Æ¥ÅäÊ§°Ü
-					//Çå¿Õ»º´æ
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+				{//åŒ¹é…åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶å
+					AppLFN(nambuf , dir);//å–å‡ºæ–‡ä»¶åå°†å…¶æ·»åŠ åˆ°ç¼“å­˜çš„å‰é¢
+				}else{//åŒ¹é…å¤±è´¥
+					//æ¸…ç©ºç¼“å­˜
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 				}
 
-			}else{  //Ò»¸ö¶ÌÎÄ¼şÃû
-				//¶ÌÎÄ¼şÃûÈë¿ÚµÄµÚÒ»¸ö×Ö½ÚÉèÖÃÁË0xE5  ÒÑ¾­ÎŞ·¨¼ÆËãĞ£ÑéºÍÁË
-				//ÔÚÕâÀïÏÈ³¤ÎÄ¼şÃûÖĞ»¹Ô­£¬·¹ºóÔÙ¼ÆËã
+			}else{  //ä¸€ä¸ªçŸ­æ–‡ä»¶å
+				//çŸ­æ–‡ä»¶åå…¥å£çš„ç¬¬ä¸€ä¸ªå­—èŠ‚è®¾ç½®äº†0xE5  å·²ç»æ— æ³•è®¡ç®—æ ¡éªŒå’Œäº†
+				//åœ¨è¿™é‡Œå…ˆé•¿æ–‡ä»¶åä¸­è¿˜åŸï¼Œé¥­åå†è®¡ç®—
 				w_w.charw = nambuf[0];
 				w_w = ChrConvert(w_w ,FALSE );
-				if (w_w.char1)//µÚÒ»¸ö×Ö·ûÊÇ¶à×Ö½Ú×Ö·û
+				if (w_w.char1)//ç¬¬ä¸€ä¸ªå­—ç¬¦æ˜¯å¤šå­—èŠ‚å­—ç¬¦
 					dir[0] = w_w.char1;
-				else		 //µÚÒ»¸ö×Ö·ûÊÇµ¥×Ö½Ú×Ö·û
+				else		 //ç¬¬ä¸€ä¸ªå­—ç¬¦æ˜¯å•å­—èŠ‚å­—ç¬¦
 					dir[0] = w_w.char2;
 				
 				if(chSum == ChkSum(dir)){
 
-					//´´½¨ÎÄ¼ş¾ä±ú
-					//ÉèÖÃÉ¾³ı±êÖ¾
-					wcscpy(path , fil->mPath.c_str());//¸¸Â·¾¶
-					if(wcslen(path) != 1)     //²»ÊÇÔÚ ¸üÄ¿Â¼ÖĞÕÒ
-						wcscat(path , L"/");	//·Ö¸ô·û
-					wcscat(path , L"*");		//É¾³ı±êÖ¾
-					wcscat(path , nambuf);		//ÎÄ¼şÃû
-					NewFileHandle(&df , &entry , path);//´´½¨¾ä±ú
+					//åˆ›å»ºæ–‡ä»¶å¥æŸ„
+					//è®¾ç½®åˆ é™¤æ ‡å¿—
+					wcscpy(path , fil->mPath.c_str());//çˆ¶è·¯å¾„
+					if(wcslen(path) != 1)     //ä¸æ˜¯åœ¨ æ›´ç›®å½•ä¸­æ‰¾
+						wcscat(path , L"/");	//åˆ†éš”ç¬¦
+					wcscat(path , L"*");		//åˆ é™¤æ ‡å¿—
+					wcscat(path , nambuf);		//æ–‡ä»¶å
+					NewFileHandle(&df , &entry , path);//åˆ›å»ºå¥æŸ„
 
-					(*listFun)(df);		//ÕÒµ½Ò»¸ö³¤ÎÄ¼şÃûÄ¿Â¼¶ÔÓ¦µÄ¶ÌÎÄ¼şÃûÈë¿Ú
-					chSum = 0xFFFF;			//ÖØÖÃĞ£ÑéºÍ
-				}else{						//´¿´âµÄ¶ÌÎÄ¼şÃûÈë¿Ú
-					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//Çå¿ÕÃû×Ö»º´æ
+					(*listFun)(df);		//æ‰¾åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶åç›®å½•å¯¹åº”çš„çŸ­æ–‡ä»¶åå…¥å£
+					chSum = 0xFFFF;			//é‡ç½®æ ¡éªŒå’Œ
+				}else{						//çº¯ç²¹çš„çŸ­æ–‡ä»¶åå…¥å£
+					::memset(nambuf , 0 , sizeof(WCHAR)*(MAX_LFN+1));//æ¸…ç©ºåå­—ç¼“å­˜
 					
-					(*(char*)dir) = '*';//É¾³ı±êÖ¾
+					(*(char*)dir) = '*';//åˆ é™¤æ ‡å¿—
 					SetSFN(nambuf ,dir);
 
-					wcscpy(path , fil->mPath.c_str());//¸¸Â·¾¶
-					if(wcslen(path) != 1)     //²»ÊÇÔÚ ¸üÄ¿Â¼ÖĞÕÒ
-						wcscat(path , L"/");	//·Ö¸ô·û
-					wcscat(path , nambuf);		//ÎÄ¼şÃû
-					NewFileHandle(&df , &entry , path);//´´½¨¾ä±ú
+					wcscpy(path , fil->mPath.c_str());//çˆ¶è·¯å¾„
+					if(wcslen(path) != 1)     //ä¸æ˜¯åœ¨ æ›´ç›®å½•ä¸­æ‰¾
+						wcscat(path , L"/");	//åˆ†éš”ç¬¦
+					wcscat(path , nambuf);		//æ–‡ä»¶å
+					NewFileHandle(&df , &entry , path);//åˆ›å»ºå¥æŸ„
 
-					//´´½¨É¾³ı±êÖ¾
-					(*listFun)(df);		//ÕÒµ½Ò»¸ö³¤ÎÄ¼şÃû	
-					chSum = 0xFFFF;			//ÖØÖÃĞ£ÑéºÍ
+					//åˆ›å»ºåˆ é™¤æ ‡å¿—
+					(*listFun)(df);		//æ‰¾åˆ°ä¸€ä¸ªé•¿æ–‡ä»¶å	
+					chSum = 0xFFFF;			//é‡ç½®æ ¡éªŒå’Œ
 				}
 			}
 		}
-		res = NextEntry(&entry);  //ÒÆµ½ÏÂÒ»¸öÈë¿Ú
-		if (res == DR_FAT_EOF)    //µ½ÁË´ÖÁ¶Î²²¿
+		res = NextEntry(&entry);  //ç§»åˆ°ä¸‹ä¸€ä¸ªå…¥å£
+		if (res == DR_FAT_EOF)    //åˆ°äº†ç²—ç‚¼å°¾éƒ¨
 		{
 			df.mFS = NULL;
-			(*listFun)(df);		//Í¨Öª»Øµ÷Õß²éÕÒÍê±Ï
+			(*listFun)(df);		//é€šçŸ¥å›è°ƒè€…æŸ¥æ‰¾å®Œæ¯•
 			return DR_OK;
 		}
 	} while (!res);
@@ -1472,7 +1472,7 @@ DRES DFat32::IsContainFat32Flag(const WCHAR* cDevName, LONG_INT offset)
 	if (cDevName == NULL)
 		return DR_INVALED_PARAM;
 
-	//´ò¿ªÉè±¸
+	//æ‰“å¼€è®¾å¤‡
 	HANDLE hDev = ::CreateFile(cDevName,
 								GENERIC_READ | GENERIC_WRITE,
 								FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1480,19 +1480,19 @@ DRES DFat32::IsContainFat32Flag(const WCHAR* cDevName, LONG_INT offset)
 								OPEN_EXISTING,
 								0,
 								NULL);
-	if (hDev == INVALID_HANDLE_VALUE) //´ò¿ªÉè±¸Ê§°Ü
+	if (hDev == INVALID_HANDLE_VALUE) //æ‰“å¼€è®¾å¤‡å¤±è´¥
 		return DR_OPEN_DEV_ERR;
 
 	DRES res = DR_OK;
 	if (offset.QuadPart > 0)
 	{
-		//ÉèÖÃÎÄ¼şÖ¸Õë
+		//è®¾ç½®æ–‡ä»¶æŒ‡é’ˆ
 		offset.LowPart = SetFilePointer(hDev , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 		if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 			res = DR_DEV_CTRL_ERR;
 	}
 
-	//¶ÁÈ¡Êı¾İ
+	//è¯»å–æ•°æ®
 	DWORD dwReaded = 0;
 	FAT32_DBR fDbr = {0};
 	if((DR_OK == res)
@@ -1500,36 +1500,36 @@ DRES DFat32::IsContainFat32Flag(const WCHAR* cDevName, LONG_INT offset)
 		&& (dwReaded != sizeof(FAT32_DBR)))
 		res =  DR_DEV_IO_ERR;
 	
-	//²»ĞèÒªÁË
+	//ä¸éœ€è¦äº†
 	CloseHandle(hDev);
-	//Éè±¸Ïà¹Ø²Ù×÷Ê§°Ü
+	//è®¾å¤‡ç›¸å…³æ“ä½œå¤±è´¥
 	if (res != DR_OK)
 		return res;
 	
-	if ( ( fDbr.bsEndSig  != MBR_END)	//dbr½áÊø±ê¼Ç¼ì²é 
-		||(fDbr.bsBytesPerSec != 512)	//Ã¿ÉÈÇøµÄ×Ö½ÚÊıÊÇ512µÄ±¶Êı£¬Ò»°ãÊÇ512 £¬ÎÒÕâÀïÒ²´¦Àí512µÄÇé¿ö
-		||(fDbr.bsFATs != 2)			//FAT±íÊıÒ»¶¨ÊÇ¶ş
-		||(fDbr.bsRootDirEnts != 0)		//¸ùÄ¿Â¼ÊıÒ»¶¨ÊÇ0  Õâ¸öÖµÊÇ¸øfat12/16ÓÃµÄ
-		||(fDbr.bsSectors != 0)			//×ÜÉÈÇøÊı  Ò²ÊÇfat12/16ÓÃµÄ
-		||(fDbr.bsFATsecs != 0)			//fat±íµÄÉÈÇøÊı  Ò²ÊÇfat12/16ÓÃµÄ
-		||(fDbr.bsHugeSectors == 0))	//Ò»¸öfat32¾íµÄÉÈÇøÊı  Ò»¶¨²¿Î»0
+	if ( ( fDbr.bsEndSig  != MBR_END)	//dbrç»“æŸæ ‡è®°æ£€æŸ¥ 
+		||(fDbr.bsBytesPerSec != 512)	//æ¯æ‰‡åŒºçš„å­—èŠ‚æ•°æ˜¯512çš„å€æ•°ï¼Œä¸€èˆ¬æ˜¯512 ï¼Œæˆ‘è¿™é‡Œä¹Ÿå¤„ç†512çš„æƒ…å†µ
+		||(fDbr.bsFATs != 2)			//FATè¡¨æ•°ä¸€å®šæ˜¯äºŒ
+		||(fDbr.bsRootDirEnts != 0)		//æ ¹ç›®å½•æ•°ä¸€å®šæ˜¯0  è¿™ä¸ªå€¼æ˜¯ç»™fat12/16ç”¨çš„
+		||(fDbr.bsSectors != 0)			//æ€»æ‰‡åŒºæ•°  ä¹Ÿæ˜¯fat12/16ç”¨çš„
+		||(fDbr.bsFATsecs != 0)			//fatè¡¨çš„æ‰‡åŒºæ•°  ä¹Ÿæ˜¯fat12/16ç”¨çš„
+		||(fDbr.bsHugeSectors == 0))	//ä¸€ä¸ªfat32å·çš„æ‰‡åŒºæ•°  ä¸€å®šéƒ¨ä½0
 		return DR_NO;
 
-	//ÒÔÉÏµÄ¶¼ÊÇ¿ÉÒÔºÜ¶¨µÄ£¬Ò²¾ÍÊÇËµÒ»¸öÕı³£µÄFAT32¾íÒÔÉÏµÄÌõ¼ş¶¼»áÂú×ã
-	//¿ÉºÜ¿Ï¶¨µÄÖµ»¹ÓĞÒ»Ğ©£¬±ÈÈçÔÚDBRÖĞµÄ¶¨ÒåµÄÉè±¸ÀàĞÍ(fDbr.bsMedia)»á
-	//ÔÚFAT±íµÄµÚÒ»¸ö×Ö½ÚÓĞÒ»¸öÏàÍ¬µÄÖµ,Ò»°ãÊÇ0xF8¡£»¹ÓĞ¾ÍÊÇ¸ùÄ¿Â¼ÖĞµÚÒ»
-	//¸öÈë¿ÚµÄÊÇÒ»¸ö¾í±êµÄ´æ·ÅÎ»ÖÃ£¬¿Ï¶¨»áº¬ÓĞATTR_VOLUME_ID(0x08)ÊôĞÔ
+	//ä»¥ä¸Šçš„éƒ½æ˜¯å¯ä»¥å¾ˆå®šçš„ï¼Œä¹Ÿå°±æ˜¯è¯´ä¸€ä¸ªæ­£å¸¸çš„FAT32å·ä»¥ä¸Šçš„æ¡ä»¶éƒ½ä¼šæ»¡è¶³
+	//å¯å¾ˆè‚¯å®šçš„å€¼è¿˜æœ‰ä¸€äº›ï¼Œæ¯”å¦‚åœ¨DBRä¸­çš„å®šä¹‰çš„è®¾å¤‡ç±»å‹(fDbr.bsMedia)ä¼š
+	//åœ¨FATè¡¨çš„ç¬¬ä¸€ä¸ªå­—èŠ‚æœ‰ä¸€ä¸ªç›¸åŒçš„å€¼,ä¸€èˆ¬æ˜¯0xF8ã€‚è¿˜æœ‰å°±æ˜¯æ ¹ç›®å½•ä¸­ç¬¬ä¸€
+	//ä¸ªå…¥å£çš„æ˜¯ä¸€ä¸ªå·æ ‡çš„å­˜æ”¾ä½ç½®ï¼Œè‚¯å®šä¼šå«æœ‰ATTR_VOLUME_ID(0x08)å±æ€§
 
-	//½ÓÏÂÀ´ÊÇÅĞ¶ÏFAT32±ê¼Ç£¬Êµ¼ÊÉÏ²¢²»ÊÇËùÓĞµÄFAT32¾í¶¼ÊÇÓÃÕâ¸ö±ê¼Ç£¬ÌØ
-	//±ğÊÇµÚÈı·½Çı¶¯
+	//æ¥ä¸‹æ¥æ˜¯åˆ¤æ–­FAT32æ ‡è®°ï¼Œå®é™…ä¸Šå¹¶ä¸æ˜¯æ‰€æœ‰çš„FAT32å·éƒ½æ˜¯ç”¨è¿™ä¸ªæ ‡è®°ï¼Œç‰¹
+	//åˆ«æ˜¯ç¬¬ä¸‰æ–¹é©±åŠ¨
 	if ( ( fDbr.bsFSType[0] != 0x46)	//F
 		||(fDbr.bsFSType[1] != 0x41)	//A
 		||(fDbr.bsFSType[2] != 0x54)	//T
 		||(fDbr.bsFSType[3] != 0x33)	//3
 		||(fDbr.bsFSType[4] != 0x32)	//2
-		||(fDbr.bsFSType[5] != 0x20)	//¿Õ¸ñ
-		||(fDbr.bsFSType[6] != 0x20)	//¿Õ¸ñ
-		||(fDbr.bsFSType[7] != 0x20))	//¿Õ¸ñ
+		||(fDbr.bsFSType[5] != 0x20)	//ç©ºæ ¼
+		||(fDbr.bsFSType[6] != 0x20)	//ç©ºæ ¼
+		||(fDbr.bsFSType[7] != 0x20))	//ç©ºæ ¼
 		return DR_NO;
 
 	return DR_OK;
@@ -1548,7 +1548,7 @@ DRES DFat32::GetVolumeName(OUT WCHAR* cNameBuf, IN int len)
 	UCHAR	buf[SECTOR_SIZE] = {0};
 	PSDE	sde		= PSDE(buf);
 
-	//µÚÒ»¸ö¸ùÄ¿Â¼µÄÉÈÇøºÅ
+	//ç¬¬ä¸€ä¸ªæ ¹ç›®å½•çš„æ‰‡åŒºå·
 	DRES res = ReadData(buf, ClustToSect(m1stDirClut), SECTOR_SIZE);
 	if (DR_OK != res)
 		return res;
@@ -1618,7 +1618,7 @@ DWORD DFat32::GetRemainSectorCnt()
 	if (!IsDevOpened())
 		return 0;
 
-	//£¨×ÜÉÈÇøÊı-µÚÒ»¸öÄ¿Â¼ËùÔÚ´ØºÅÉÈÇø£©%Ã¿´ØÉÈÇøÊı
+	//ï¼ˆæ€»æ‰‡åŒºæ•°-ç¬¬ä¸€ä¸ªç›®å½•æ‰€åœ¨ç°‡å·æ‰‡åŒºï¼‰%æ¯ç°‡æ‰‡åŒºæ•°
 	return (mSectors - (mResSec + (mFATs * mSecsPerFAT))) % mSecPerClus;
 }
 

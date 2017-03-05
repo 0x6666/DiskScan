@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////
 // Module:		Disk.cpp
-// Author:		ÑîËÉ
-// Created:		2012Äê3ÔÂ20ÈÕ ĞÇÆÚ¶ş
-// Purpose:		ÊµÏÖDiskÉùÃ÷µÄ·½·¨
-// Comment:		Õâ¸öÀàÖ÷ÒªÊÇ°üº¬ÁËÒ»ÏÂÎïÀí´ÅÅÌµÄ²Ù×÷·½·¨
+// Author:		æ¨æ¾
+// Created:		2012å¹´3æœˆ20æ—¥ æ˜ŸæœŸäºŒ
+// Purpose:		å®ç°Diskå£°æ˜çš„æ–¹æ³•
+// Comment:		è¿™ä¸ªç±»ä¸»è¦æ˜¯åŒ…å«äº†ä¸€ä¸‹ç‰©ç†ç£ç›˜çš„æ“ä½œæ–¹æ³•
 //////////////////////////////////////////////////////////////////////////
 
 #include "disktool.h"
@@ -33,21 +33,21 @@ Disk::~Disk(void)
 
 int Disk::GetDiskCount(void)
 {
-	int nCount = 0; //Éè±¸ÊıÁ¿
+	int nCount = 0; //è®¾å¤‡æ•°é‡
 
 	for (int i = 0; i < MAX_DISK_COUNT; ++i)
 	{
-		WCHAR czhDriveName[30] = {0};    //Éè±¸Ãû×Ö
+		WCHAR czhDriveName[30] = {0};    //è®¾å¤‡åå­—
 		wsprintf(czhDriveName, L"%s%d", DISK_PRE_NAME, i);
 		HANDLE hDrive = CreateFile(
-						czhDriveName,						//Òª´ò¿ªµÄÉè±¸ 
-						0,									//·ÃÎÊÄ£Ê½
-						FILE_SHARE_READ | FILE_SHARE_WRITE,	//¹²ÏíÄ£Ê½
-						NULL,								//Ä¬ÈÏµÄ°²È«ÊôĞÔ
-						OPEN_EXISTING,						//´ò¿ª·½Ê½
-						0,									//Ä¬ÈÏµÄÎÄ¼şµÄÊôĞÔ
-						NULL);								//²»¸´ÖÆÈÎºÎÎÄ¼şÊôĞÔ
-		if (hDrive == INVALID_HANDLE_VALUE)		//Ã»ÓĞÁË
+						czhDriveName,						//è¦æ‰“å¼€çš„è®¾å¤‡ 
+						0,									//è®¿é—®æ¨¡å¼
+						FILE_SHARE_READ | FILE_SHARE_WRITE,	//å…±äº«æ¨¡å¼
+						NULL,								//é»˜è®¤çš„å®‰å…¨å±æ€§
+						OPEN_EXISTING,						//æ‰“å¼€æ–¹å¼
+						0,									//é»˜è®¤çš„æ–‡ä»¶çš„å±æ€§
+						NULL);								//ä¸å¤åˆ¶ä»»ä½•æ–‡ä»¶å±æ€§
+		if (hDrive == INVALID_HANDLE_VALUE)		//æ²¡æœ‰äº†
 		{
 			continue;
 		}
@@ -63,7 +63,7 @@ int Disk::GetDiskCount(void)
 
 BOOL Disk::OpenDisk(int index)
 {
-	//ĞòºÅÎŞĞ§ÔòÊÇÊÇ²»
+	//åºå·æ— æ•ˆåˆ™æ˜¯æ˜¯ä¸
 	if(index < 0)	return FALSE;
 
 	WCHAR name[30] = {0};
@@ -74,7 +74,7 @@ BOOL Disk::OpenDisk(int index)
 
 BOOL Disk::OpenDisk(const WCHAR* czName)
 {
-	//Èç¹ûÒÑ¾­´ò¿ªÁËÒ»¸ö´ÅÅÌ¾Í²»ÄÜÔÚ´ò¿ªÁË
+	//å¦‚æœå·²ç»æ‰“å¼€äº†ä¸€ä¸ªç£ç›˜å°±ä¸èƒ½åœ¨æ‰“å¼€äº†
 	if ((NULL == czName) || wcslen(mDevName))
 		return FALSE;
 
@@ -93,36 +93,36 @@ BOOL Disk::OpenDisk(const WCHAR* czName)
 	}
 	else
 	{
-		//¼ÆËã´ÅÅÌµÄ¿É·ÖÇøµÄÉÈÇøÊı
+		//è®¡ç®—ç£ç›˜çš„å¯åˆ†åŒºçš„æ‰‡åŒºæ•°
 		DWORD dwOutBytes = 0;
 		DISK_GEOMETRY mGeometry  = {0};
-		res = ::DeviceIoControl(mDisk,		// Éè±¸¾ä±ú
-			IOCTL_DISK_GET_DRIVE_GEOMETRY,	// È¡´ÅÅÌ²ÎÊı
+		res = ::DeviceIoControl(mDisk,		// è®¾å¤‡å¥æŸ„
+			IOCTL_DISK_GET_DRIVE_GEOMETRY,	// å–ç£ç›˜å‚æ•°
 			NULL , 0 , &mGeometry,
-			sizeof(DISK_GEOMETRY),			// Êä³öÊı¾İ»º³åÇø
-			&dwOutBytes , (LPOVERLAPPED)NULL);			// ÓÃÍ¬²½I/O
+			sizeof(DISK_GEOMETRY),			// è¾“å‡ºæ•°æ®ç¼“å†²åŒº
+			&dwOutBytes , (LPOVERLAPPED)NULL);			// ç”¨åŒæ­¥I/O
 
-		if(!res)  //»ñÈ¡´ÅÅÌµÄĞÅÏ¢Ê§°Ü
+		if(!res)  //è·å–ç£ç›˜çš„ä¿¡æ¯å¤±è´¥
 		{
-			::CloseHandle(mDisk);//¹Ø±Õ´ò¿ªµÄ´ÅÅÌÉè±¸
+			::CloseHandle(mDisk);//å…³é—­æ‰“å¼€çš„ç£ç›˜è®¾å¤‡
 			mDisk = INVALID_HANDLE_VALUE;
 			return res;
 		}
-		//¼ÆËã´ÅÅÌµÄ¿É·ÖÇøµÄÉÈÇøÊı
+		//è®¡ç®—ç£ç›˜çš„å¯åˆ†åŒºçš„æ‰‡åŒºæ•°
 		this->mPartableSecCnt.QuadPart = mGeometry.Cylinders.QuadPart \
 			* mGeometry.TracksPerCylinder *  mGeometry.SectorsPerTrack;
 
-		wcscpy(mDevName, czName);//ÏÈ±£´æÒ»ÏÂÃû×Ö
+		wcscpy(mDevName, czName);//å…ˆä¿å­˜ä¸€ä¸‹åå­—
 		mSecPerTrack = mGeometry.SectorsPerTrack;
 		mTracksPerCylinder = mGeometry.TracksPerCylinder;
 		mCylinders.QuadPart = mGeometry.Cylinders.QuadPart;
 
-		//»ñÈ¡´ÅÅÌµÄ·ÖÇøÁĞ±í
+		//è·å–ç£ç›˜çš„åˆ†åŒºåˆ—è¡¨
 		if(LoadPartList(/*hDisk*/))
 		{
-			//ÅÅĞò
+			//æ’åº
 			mPPartList->SortList(ComparePart);
-			//Ìí¼Ó¸÷¸ö¿ÕÏ¶½Úµã
+			//æ·»åŠ å„ä¸ªç©ºéš™èŠ‚ç‚¹
 			MakeListContinue(/*hDisk*/);
 			res = TRUE;
 		}
@@ -148,12 +148,12 @@ BOOL Disk::ReadSecter(/*HANDLE hDisk ,*/LONG_INT offert , PVOID buf  ,DWORD* dwR
 
 DRES Disk::ReadData(void* buf , LONG_INT off , DWORD dwRead)
 {
-	//Éè±¸Ã»ÓĞ´ò¿ª
+	//è®¾å¤‡æ²¡æœ‰æ‰“å¼€
 	if (0 == wcslen(mDevName))
 		return DR_INIT_ERR;
 
 	if (off.QuadPart >= this->mPartableSecCnt.QuadPart + this->mUnPartSize / SECTOR_SIZE)
-	{//Ö¸ÕëÔ½½ç
+	{//æŒ‡é’ˆè¶Šç•Œ
 		return DR_DEV_CTRL_ERR;
 	}
 
@@ -161,15 +161,15 @@ DRES Disk::ReadData(void* buf , LONG_INT off , DWORD dwRead)
 	DWORD	 dwReaded = 0;
 	LONG_INT offset = { 0 };
 
-	offset.QuadPart = off.QuadPart; //¶ÁÈ¡Êı¾İµÄÊµ¼ÊÆ«ÒÆ
-	offset.QuadPart *= SECTOR_SIZE; //×Ö½ÚÆ«ÒÆ
+	offset.QuadPart = off.QuadPart; //è¯»å–æ•°æ®çš„å®é™…åç§»
+	offset.QuadPart *= SECTOR_SIZE; //å­—èŠ‚åç§»
 
-	//ÉèÖÃÎÄ¼şÖ¸Õë
+	//è®¾ç½®æ–‡ä»¶æŒ‡é’ˆ
 	offset.LowPart = SetFilePointer(mDisk , offset.LowPart , PLONG(&(offset.HighPart)) ,FILE_BEGIN );
 	if (offset.LowPart == -1 && GetLastError() != NO_ERROR )
 		res = DR_DEV_CTRL_ERR;
 
-	//¶ÁÈ¡Êı¾İ
+	//è¯»å–æ•°æ®
 	if(!res && !::ReadFile(mDisk , buf ,
 		dwRead ,&dwReaded ,NULL) && dwReaded != dwRead)	
 		res =  DR_DEV_IO_ERR;
@@ -185,7 +185,7 @@ int Disk::GetBytePerSec()
 
 int Disk::GetSectorPerTrack()
 {
-	//Éè±¸Ã»ÓĞ´ò¿ª
+	//è®¾å¤‡æ²¡æœ‰æ‰“å¼€
 	if (0 == wcslen(mDevName))
 		return -1;
 
@@ -194,7 +194,7 @@ int Disk::GetSectorPerTrack()
 
 DWORD Disk::GetTracksPerCylinder()
 {
-	//Éè±¸Ã»ÓĞ´ò¿ª
+	//è®¾å¤‡æ²¡æœ‰æ‰“å¼€
 	if (0 == wcslen(mDevName))
 		return 0;
 
@@ -205,7 +205,7 @@ LONG_INT Disk::GetCylinders()
 {
 	LONG_INT res;
 	res.QuadPart = -1;
-	//Éè±¸Ã»ÓĞ´ò¿ª
+	//è®¾å¤‡æ²¡æœ‰æ‰“å¼€
 	if (0 == wcslen(mDevName))
 		return res;
 
@@ -226,7 +226,7 @@ void clearDList(DList* pList)
 	if (!pList || pList->GetCount() == 0)
 		return;
 
-	//ÒªÉ¾³ıÃ¿Ò»¸ö½Úµã
+	//è¦åˆ é™¤æ¯ä¸€ä¸ªèŠ‚ç‚¹
 	int nCount = pList->GetCount();
 	for (int i = 0; i < nCount; ++i)
 	{
@@ -238,10 +238,10 @@ void clearDList(DList* pList)
 
 void Disk::CloseDisk(void)
 {
-	//ÇåÀíÒ»ÏÂÃû×Ö
+	//æ¸…ç†ä¸€ä¸‹åå­—
 	mDevName[0] = 0;
 
-	//ÊÍ·Å·ÖÇøÁ´±í
+	//é‡Šæ”¾åˆ†åŒºé“¾è¡¨
 	if (mPPartList)
 	{
 		clearDList(mPPartList);
@@ -249,7 +249,7 @@ void Disk::CloseDisk(void)
 		mPPartList = NULL;
 	}
 
-	//¹Ø±ÕÒÑ¾­´ò¿ªµÄÉè±¸
+	//å…³é—­å·²ç»æ‰“å¼€çš„è®¾å¤‡
 	CloseHandle(mDisk);
 	mDisk = INVALID_HANDLE_VALUE;
 
@@ -257,22 +257,22 @@ void Disk::CloseDisk(void)
 
 BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFirstDPT ,DWORD* pLogicDir)
 {
-	//Êµ¼ÊµÄEBR(MBR)  »ò·ÖÇøµÄÆ«ÒÆ
+	//å®é™…çš„EBR(MBR)  æˆ–åˆ†åŒºçš„åç§»
 	LONG_INT o    = {0};
 	PVOID	 pn	  = NULL;
 	DPT		 dpt  = *PDPT(dp);
 	PDList   list = PDList(this->mPPartList);
 
-	//Èç¹ûµ±Ç°»¹ÔÚ·ÖÎöµÚÒ»¸öDPT±íÖĞµÄ±íÏîÊÇ
-	//ÄÇÃ´EBR »òÕß ·ÖÇøµÄÎïÀíÆ«ÒÆ¾ÍÔÚDPTµÄ±íÏóÖĞ
-	//Èç¹û²»ÊÇ´ÅÅÌÖĞµÄµÚÒ»¸öDPT±íÁË  
-	//ÄÇÃ´EBRµÄÆ«ÒÆ¾ÍÊÇµ±Ç°DPTÖĞµÄÏà¶ÔÆ«ÒÆ¼ÓÉÏÀ©Õ¹·ÖÇøµÄÆ«ÒÆ
-	//¶ø·ÖÇøµÄÆ«ÒÆÔòÊÇÏë¶Ôµ±Ç°DPTµÄ
-	//À©Õ¹·ÖÇøµÄÆ«ÒÆ¾ÍÊÇ µÚÒ»¸öDPT±íÖĞµÄÀ©Õ¹·ÖÇø±íÏîµÄÏà¶ÔÆ«ÒÆ
+	//å¦‚æœå½“å‰è¿˜åœ¨åˆ†æç¬¬ä¸€ä¸ªDPTè¡¨ä¸­çš„è¡¨é¡¹æ˜¯
+	//é‚£ä¹ˆEBR æˆ–è€… åˆ†åŒºçš„ç‰©ç†åç§»å°±åœ¨DPTçš„è¡¨è±¡ä¸­
+	//å¦‚æœä¸æ˜¯ç£ç›˜ä¸­çš„ç¬¬ä¸€ä¸ªDPTè¡¨äº†  
+	//é‚£ä¹ˆEBRçš„åç§»å°±æ˜¯å½“å‰DPTä¸­çš„ç›¸å¯¹åç§»åŠ ä¸Šæ‰©å±•åˆ†åŒºçš„åç§»
+	//è€Œåˆ†åŒºçš„åç§»åˆ™æ˜¯æƒ³å¯¹å½“å‰DPTçš„
+	//æ‰©å±•åˆ†åŒºçš„åç§»å°±æ˜¯ ç¬¬ä¸€ä¸ªDPTè¡¨ä¸­çš„æ‰©å±•åˆ†åŒºè¡¨é¡¹çš„ç›¸å¯¹åç§»
 	if(isFirstDPT)
 	{
 		o.QuadPart = dpt.mRelativeSectors;
-		if(IsExtPart(&dpt))//µÚÒ»¸ö·ÖÇø±íÖĞµÄÀ©Õ¹¾ÍÊÇÕû¸ö´ÅÅÌµÄÀ©Õ¹·ÖÇø
+		if(IsExtPart(&dpt))//ç¬¬ä¸€ä¸ªåˆ†åŒºè¡¨ä¸­çš„æ‰©å±•å°±æ˜¯æ•´ä¸ªç£ç›˜çš„æ‰©å±•åˆ†åŒº
 			this->mExtPos.QuadPart = dpt.mRelativeSectors;
 	}
 	else
@@ -283,25 +283,25 @@ BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFi
 			o.QuadPart = dptoff.QuadPart + dpt.mRelativeSectors;
 	}
 
-	if (IsExtPart(&dpt))               //ÅĞ¶ÏÒª·ÖÎöµÄ·ÖÇøÊÇ·ñÊÇÀ©Õ¹·ÖÇø
-	{//µ±Ç°ÒªÁĞ¾ÙµÄ
+	if (IsExtPart(&dpt))               //åˆ¤æ–­è¦åˆ†æçš„åˆ†åŒºæ˜¯å¦æ˜¯æ‰©å±•åˆ†åŒº
+	{//å½“å‰è¦åˆ—ä¸¾çš„
 		int      i   = 0;
 		EBR      ebr = {0};
 		DWORD    dwReaded = 0;
-		if(!ReadSecter(/*mDisk ,*/ o , &ebr ,&dwReaded))              //¶ÁÈ¡À©Õ¹À©Õ¹·ÖÇøµÄEBR
-			return FALSE;                      //¶ÁÈ¡EBRÊ§°Ü
+		if(!ReadSecter(/*mDisk ,*/ o , &ebr ,&dwReaded))              //è¯»å–æ‰©å±•æ‰©å±•åˆ†åŒºçš„EBR
+			return FALSE;                      //è¯»å–EBRå¤±è´¥
 		if(ebr.mEndSig != MBR_END || dwReaded != SECTOR_SIZE)
 			return FALSE;
 		
-		//ĞÂ½¨Ò»¸öÏàÓ¦µÄ½ÚµãÌí¼Óµ½±íÖĞÈ¥
+		//æ–°å»ºä¸€ä¸ªç›¸åº”çš„èŠ‚ç‚¹æ·»åŠ åˆ°è¡¨ä¸­å»
 		pn = NewPart(NULL , &o  ,PART_EBR );
 		if(NULL != pn)
-			list->AddPart(PVOID(pn)); //½«½ÚµãÌí¼Óµ½Á´±íÖĞÈ¥
+			list->AddPart(PVOID(pn)); //å°†èŠ‚ç‚¹æ·»åŠ åˆ°é“¾è¡¨ä¸­å»
 
-		//ÔÚEBRÖĞ Ö»ÓĞÁ½ÌõDPTÓĞĞ§ £¬
-		//µÚÒ»ÌõDPT Ö¸Ïòµ±Ç°Âß¼­Çı¶¯Æ÷
-		//µÚ¶şÌõDPT Ö¸ÏòÏÂÒ»¸öÂß¼­·ÖÇøµÄEBR
-		for(i = 0 ; i < 4 ; ++i)               //µü´úÃ¿Ò»¸öEBRÖĞµÄDPT±íÏî
+		//åœ¨EBRä¸­ åªæœ‰ä¸¤æ¡DPTæœ‰æ•ˆ ï¼Œ
+		//ç¬¬ä¸€æ¡DPT æŒ‡å‘å½“å‰é€»è¾‘é©±åŠ¨å™¨
+		//ç¬¬äºŒæ¡DPT æŒ‡å‘ä¸‹ä¸€ä¸ªé€»è¾‘åˆ†åŒºçš„EBR
+		for(i = 0 ; i < 4 ; ++i)               //è¿­ä»£æ¯ä¸€ä¸ªEBRä¸­çš„DPTè¡¨é¡¹
 		{ 
 			if(ebr.mDPT[i].mSectorCount == 0)
 				continue;
@@ -310,12 +310,12 @@ BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFi
 	}
 	else
 	{
-		//²»ÊÇÂß¼­·ÖÇø	
-		//ĞÂ½¨Ò»¸öÏàÓ¦µÄ½ÚµãÌí¼Óµ½±íÖĞÈ¥
+		//ä¸æ˜¯é€»è¾‘åˆ†åŒº	
+		//æ–°å»ºä¸€ä¸ªç›¸åº”çš„èŠ‚ç‚¹æ·»åŠ åˆ°è¡¨ä¸­å»
 		pn = NewPart(&dpt , &o  , 0  , isFirstDPT , pLogicDir);
 		if(NULL != pn) {
-			list->AddPart(PVOID(pn)); //½«½ÚµãÌí¼Óµ½Á´±íÖĞÈ¥
-			if (isFirstDPT) ++mMainVolCount;  //ÊÇÖ÷·ÖÇø
+			list->AddPart(PVOID(pn)); //å°†èŠ‚ç‚¹æ·»åŠ åˆ°é“¾è¡¨ä¸­å»
+			if (isFirstDPT) ++mMainVolCount;  //æ˜¯ä¸»åˆ†åŒº
 		}
 	}
 	return TRUE;
@@ -323,128 +323,128 @@ BOOL Disk::ListPartion(/*HANDLE hDisk ,*/ PVOID dp , LONG_INT dptoff , BOOL isFi
 
 BOOL Disk::LoadPartList(/*HANDLE hDisk*/)
 {
-	//ÒÑ¾­¼ÓÔØÁËÁĞ±í
+	//å·²ç»åŠ è½½äº†åˆ—è¡¨
 	if(this->mPPartList)
 		return FALSE;
 
-	//´´½¨Á´±í
+	//åˆ›å»ºé“¾è¡¨
 	this->mPPartList = new DList();
 
-	//¿ªÊ¼½âÎö Õû¸öÎïÀí´ÅÅÌ   »ñµÃÆä·ÖÇøÁ´±í
+	//å¼€å§‹è§£æ æ•´ä¸ªç‰©ç†ç£ç›˜   è·å¾—å…¶åˆ†åŒºé“¾è¡¨
 	LONG_INT	offert  = {0};
-	MBR			mbr		= {0};      //´ÅÅÌµÄMBR
+	MBR			mbr		= {0};      //ç£ç›˜çš„MBR
 	int			i	    = 0 ;
 	DWORD		dwRead	= 0;
 	PDList		list	= PDList(this->mPPartList);
 	PVOID		pn		= NULL;
-	DWORD*		pLogicDir = NULL;		//Âß¼­Çı¶¯ĞÅÏ¢
-	BOOL		res		= TRUE;		//Ò»Ğ©²Ù×÷½á¹û 
+	DWORD*		pLogicDir = NULL;		//é€»è¾‘é©±åŠ¨ä¿¡æ¯
+	BOOL		res		= TRUE;		//ä¸€äº›æ“ä½œç»“æœ 
 
-	if (!ReadSecter(/*hDisk, */offert ,&mbr , &dwRead))          //¶ÁÈ¡´ÅÅÌµÄMBR
-		return FALSE;                              //¶ÁÈ¡MBRÊ§°Ü
+	if (!ReadSecter(/*hDisk, */offert ,&mbr , &dwRead))          //è¯»å–ç£ç›˜çš„MBR
+		return FALSE;                              //è¯»å–MBRå¤±è´¥
 
-	//¼ì²é½áÊø±ê¼Ç
+	//æ£€æŸ¥ç»“æŸæ ‡è®°
 	if(mbr.mEndSig != MBR_END || dwRead != SECTOR_SIZE)
 		return FALSE;
 
-	//»ñµÃÂß¼­Çı¶¯ĞÅÏ¢
+	//è·å¾—é€»è¾‘é©±åŠ¨ä¿¡æ¯
 	pLogicDir = GetLogicalDrives();
 
-	//TODO: »¹ÒªÅĞ¶ÏÊÇ·ñÊÇDBR»òÕßMBR  ÕâÀïÔİÊ±Ä¬ÈÏÎªMBR
+	//TODO: è¿˜è¦åˆ¤æ–­æ˜¯å¦æ˜¯DBRæˆ–è€…MBR  è¿™é‡Œæš‚æ—¶é»˜è®¤ä¸ºMBR
 
 
-	//ĞÂ½¨Ò»¸öÏàÓ¦µÄ½ÚµãÌí¼Óµ½±íÖĞÈ¥
+	//æ–°å»ºä¸€ä¸ªç›¸åº”çš„èŠ‚ç‚¹æ·»åŠ åˆ°è¡¨ä¸­å»
 	if (pn = NewPart(NULL, &offert, PART_MBR))
-		list->AddPart(pn); //½«½ÚµãÌí¼Óµ½Á´±íÖĞÈ¥
+		list->AddPart(pn); //å°†èŠ‚ç‚¹æ·»åŠ åˆ°é“¾è¡¨ä¸­å»
 	
 	res = TRUE;
-	for (i = 0 ; res == TRUE && i < 4 ; ++i)              //Ã¿¸ö·ÖÇø±í×î¶àÖ»ÓĞËÄÌõ¼ÇÂ¼
+	for (i = 0 ; res == TRUE && i < 4 ; ++i)              //æ¯ä¸ªåˆ†åŒºè¡¨æœ€å¤šåªæœ‰å››æ¡è®°å½•
 	{
 		if (!mbr.mDPT[i].mSectorCount)
-			continue;                      //µ±Ç°¼ÇÂ¼µÄ·ÖÇø³¤¶ÈÎª0
+			continue;                      //å½“å‰è®°å½•çš„åˆ†åŒºé•¿åº¦ä¸º0
 
 		res = ListPartion(&(mbr.mDPT[i]) , offert ,TRUE , pLogicDir);
 	}
 
-	if (res == FALSE)  //½âÎöMBRÖĞµÄ·ÖÇø±íÊ§°Ü£¿£¿
+	if (res == FALSE)  //è§£æMBRä¸­çš„åˆ†åŒºè¡¨å¤±è´¥ï¼Ÿï¼Ÿ
 	{
 		res = TRUE;
-		//¿ªÊ¼½âÎöµÚ¶ş¸öÉÈÇøµÄÖĞµÄ¿ÉÄÜ´æÔÚµÄ·ÖÇøĞÅÏ¢
-		char		extBuf[SECTOR_SIZE] = {0};	//Ò»¸öÉÈÇøµÄ»º³å¿Õ¼ä
-		PExtDPT		pExtDPT = NULL;//À©Õ¹·ÖÇø±íµÄÆğÊ¼µØÖ·
+		//å¼€å§‹è§£æç¬¬äºŒä¸ªæ‰‡åŒºçš„ä¸­çš„å¯èƒ½å­˜åœ¨çš„åˆ†åŒºä¿¡æ¯
+		char		extBuf[SECTOR_SIZE] = {0};	//ä¸€ä¸ªæ‰‡åŒºçš„ç¼“å†²ç©ºé—´
+		PExtDPT		pExtDPT = NULL;//æ‰©å±•åˆ†åŒºè¡¨çš„èµ·å§‹åœ°å€
 		LONG_INT	liSecOff;
 		int			i = 0;
-		int			flag	=	0;	//0±íÊ¾µÚÒ»¸ö±íÏî 
+		int			flag	=	0;	//0è¡¨ç¤ºç¬¬ä¸€ä¸ªè¡¨é¡¹ 
 		
-		liSecOff.QuadPart = 1;		//µÚÒ»¸öÒª¶ÁÈ¡µÄÊÇÒ»ºÅÉÈÇø
+		liSecOff.QuadPart = 1;		//ç¬¬ä¸€ä¸ªè¦è¯»å–çš„æ˜¯ä¸€å·æ‰‡åŒº
 	
 		if (!ReadSecter(liSecOff , extBuf , &dwRead , SECTOR_SIZE))
-		{//¶ÁÈ¡Êı¾İÊ§°Ü
+		{//è¯»å–æ•°æ®å¤±è´¥
 			res = FALSE;
 		}
 
 		if ((res != FALSE) && (PLONG_INT(PExtDPT(extBuf)->partName)->QuadPart != EXT_DPT_FLAG))
-		{//²»ÊÇÒ»¸öÀ©Õ¹·ÖÇø±í
+		{//ä¸æ˜¯ä¸€ä¸ªæ‰©å±•åˆ†åŒºè¡¨
 			res = FALSE;
 		}
 
 		if (TRUE == res )
-		{//ÊÇÒ»¸öÓĞĞ§µÄÀ©Õ¹·ÖÇø±í
-			//ĞèÒªÉ¾³ıÔ­À´ÒÑ¾­½¨Á¢ºÃµÄÁ´±í
-			//ÊÍ·Å·ÖÇøÁ´±í
+		{//æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„æ‰©å±•åˆ†åŒºè¡¨
+			//éœ€è¦åˆ é™¤åŸæ¥å·²ç»å»ºç«‹å¥½çš„é“¾è¡¨
+			//é‡Šæ”¾åˆ†åŒºé“¾è¡¨
 			if(NULL != list){
 				clearDList(list);
 				delete list;
 			}
 
-			//ÖØĞÂ·ÖÅäÁ´±í¿Õ¼ä
+			//é‡æ–°åˆ†é…é“¾è¡¨ç©ºé—´
 			list = new DList();
 			this->mPPartList = list;
 
-			//¸Ğ¾õMBR»¹ÊÇ±ØĞëÓĞµÄ
+			//æ„Ÿè§‰MBRè¿˜æ˜¯å¿…é¡»æœ‰çš„
 			offert.QuadPart = 0 ;
 			pn = NewPart(NULL , &offert  , PART_MBR );
 			if(NULL != pn)
-				list->AddPart(pn); //½«½ÚµãÌí¼Óµ½Á´±íÖĞÈ¥
+				list->AddPart(pn); //å°†èŠ‚ç‚¹æ·»åŠ åˆ°é“¾è¡¨ä¸­å»
 		}
 
 		while (TRUE == res)
 		{
 			for(i = 0 ; i < 16 ; ++i)
-			{//±éÀúÃ¿Ò»¸ö±íÏî
+			{//éå†æ¯ä¸€ä¸ªè¡¨é¡¹
 				pExtDPT = ((PExtDPT)extBuf) + i;
 				if (IsExtPDPTEmpty(pExtDPT))
-				{//ÕâÊÇÒ»¸ö¿Õ±íÏî
+				{//è¿™æ˜¯ä¸€ä¸ªç©ºè¡¨é¡¹
 					break;
 				}
 				
 				if (0 != PLONG_INT(pExtDPT->partName)->QuadPart)
-				{//ÊÇÒ»¸öÓĞĞ§µÄ±íÏî
+				{//æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„è¡¨é¡¹
 					offert.QuadPart = pExtDPT->startSector;
 					pn = NewPart(NULL , &offert  , pExtDPT->partFormate  , FALSE , pLogicDir);
 					if(NULL != pn) {
 						PDPart(pn)->mSecCount.QuadPart = (flag == 0) ? (pExtDPT->sectorCount - 0xEC000000) : pExtDPT->sectorCount;
-						list->AddPart(PVOID(pn)); //½«½ÚµãÌí¼Óµ½Á´±íÖĞÈ¥
+						list->AddPart(PVOID(pn)); //å°†èŠ‚ç‚¹æ·»åŠ åˆ°é“¾è¡¨ä¸­å»
 					}
 					flag = 1;
 				}
 			}
 
 			if (16 != i)
-			{//½âÎöÍê±Ï
+			{//è§£æå®Œæ¯•
 				break;
 			}else{
-				//ĞèÒª¶ÁÈ¡ÏÂÒ»¸öÉÈÇø½øĞĞ²âÊÔ
+				//éœ€è¦è¯»å–ä¸‹ä¸€ä¸ªæ‰‡åŒºè¿›è¡Œæµ‹è¯•
 				++liSecOff.QuadPart;
 				if (!ReadSecter(liSecOff , extBuf , &dwRead , SECTOR_SIZE))
-				{//¶ÁÈ¡Êı¾İÊ§°Ü
+				{//è¯»å–æ•°æ®å¤±è´¥
 					break;
 				}
 			}
 		}
 	}
 
-	//ĞèÒªµÄ»°¾ÍÇåÀíÒ»ÏÂ
+	//éœ€è¦çš„è¯å°±æ¸…ç†ä¸€ä¸‹
 	if (pLogicDir)
 		delete[] pLogicDir;
 
@@ -474,7 +474,7 @@ DWORD Disk::GetMainVolCount()
 const Disk::PDPart Disk::GetPart(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
-	//Ö¸¶¨·ÖÇø²»´æÔÚ
+	//æŒ‡å®šåˆ†åŒºä¸å­˜åœ¨
 	if (!p)
 		return NULL;
 
@@ -501,7 +501,7 @@ const Disk::PDPart Disk::GetPart( char letter )
 USHORT Disk::GetPartFormat(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
-	//Ö¸¶¨·ÖÇø²»´æÔÚ
+	//æŒ‡å®šåˆ†åŒºä¸å­˜åœ¨
 	if (!p)
 		return 0xFFFF;
 
@@ -511,7 +511,7 @@ USHORT Disk::GetPartFormat(int index)
 DWORD Disk::GetRelativeSectors(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
-	//Ö¸¶¨·ÖÇø²»´æÔÚ
+	//æŒ‡å®šåˆ†åŒºä¸å­˜åœ¨
 	if (!p)
 		return 0xFFFFFFFF;
 
@@ -521,7 +521,7 @@ DWORD Disk::GetRelativeSectors(int index)
 LONG_INT Disk::GetPartSectorCount(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
-	//Ö¸¶¨·ÖÇø²»´æÔÚ
+	//æŒ‡å®šåˆ†åŒºä¸å­˜åœ¨
 	if (!p)
 	{
 		LONG_INT li;
@@ -536,7 +536,7 @@ LONG_INT Disk::GetPartSectorCount(int index)
 LONG_INT Disk::GetPartOffset(int index)
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
-	//Ö¸¶¨·ÖÇø²»´æÔÚ
+	//æŒ‡å®šåˆ†åŒºä¸å­˜åœ¨
 	if (!p)
 	{
 		LONG_INT li;
@@ -551,7 +551,7 @@ LONG_INT Disk::GetPartOffset(int index)
 BOOL Disk::IsActivityPart( int index )
 {
 	PDPart p = PDPart(PDList(this->mPPartList)->GetPart(index));
-	//Ö¸¶¨·ÖÇø²»´æÔÚ
+	//æŒ‡å®šåˆ†åŒºä¸å­˜åœ¨
 	if (!p)
 	{
 		LONG_INT li;
@@ -572,36 +572,36 @@ PVOID Disk::NewPart(PVOID dp, PLONG_INT off , int type , BOOL isMainPart /*= FAL
 	DWORD		i = 0;
 	LONG_INT	offset = {0};
 
-	//ĞÂ½¨Ò»¸ö·ÖÇøÓò½Úµã
+	//æ–°å»ºä¸€ä¸ªåˆ†åŒºåŸŸèŠ‚ç‚¹
 	PDPart pn = new DPart();
 	memset(pn , 0 , sizeof(DPart) );
 	pn->mVolIndex = -1;
 
 	if(NULL != dpt)
 	{
-		//ÓĞDPTµÄÊı¾İ
+		//æœ‰DPTçš„æ•°æ®
 		pn->mIsActivity = (dpt->mGuidFlag == 0x80);
 		pn->mRelativeSectors = dpt->mRelativeSectors;
 		pn->mSecCount.QuadPart = dpt->mSectorCount;
 		type = dpt->mPartType;
 	}
 
-	pn->mType		= type;				//½ÚµãµÄÀàĞÍ
-	pn->mOffset		= *off;	            //½Úµã±äÁ¿µÄÎïÀíÆ«ÒÆµØÖ·
-	pn->mIsMainPart = isMainPart;		//ÊÇ·ñÎªÖ÷·ÖÇø
+	pn->mType		= type;				//èŠ‚ç‚¹çš„ç±»å‹
+	pn->mOffset		= *off;	            //èŠ‚ç‚¹å˜é‡çš„ç‰©ç†åç§»åœ°å€
+	pn->mIsMainPart = isMainPart;		//æ˜¯å¦ä¸ºä¸»åˆ†åŒº
 	if (IsPartFS(type))
-	{//µ±Ç°Ìí¼ÓµÄ½ÚµãÊÇÒ»¸öÎÄ¼şÏµÍ³
+	{//å½“å‰æ·»åŠ çš„èŠ‚ç‚¹æ˜¯ä¸€ä¸ªæ–‡ä»¶ç³»ç»Ÿ
 		pn->mVolIndex = ++this->mVolCnt;
 		if (pLogicDri)
 		{
-			//µ±Ç°ÇøÓòÔÚÎïÀíÉè±¸ÉÏµÄ×Ö½ÚÆ«ÒÆ
+			//å½“å‰åŒºåŸŸåœ¨ç‰©ç†è®¾å¤‡ä¸Šçš„å­—èŠ‚åç§»
 			offset = *off;
 			offset.QuadPart *= SECTOR_SIZE;
 
 			for(i = 0 ; i < 26 ; ++i)
 			{
 				if (PLOGCDRI(pLogicDri)[i].byteOffset.QuadPart == offset.QuadPart )
-				{//Æ¥Åäµ½ÁË
+				{//åŒ¹é…åˆ°äº†
 					pn->mLogicalLetter = (char)PLOGCDRI(pLogicDri)[i].letter;
 				}
 			}
@@ -626,42 +626,42 @@ DWORD* Disk::GetLogicalDrives()
 	wcscpy(devNmae, mDevName);
 
 	//17 == strlen("\\\\.\\PHYSICALDRIVE")
-	//20 == strlen("\\\\.\\PHYSICALDRIVE127")  ×î¶àÖ»ÓĞ128(0x80)¸ö´ÅÅÌ
+	//20 == strlen("\\\\.\\PHYSICALDRIVE127")  æœ€å¤šåªæœ‰128(0x80)ä¸ªç£ç›˜
 	size_t		len = wcslen(mDevName);
 	if (len < 18 || len > 20)
 		return NULL;
 
-	//ÏÈÈ«²¿×ª»»³Â´óĞ´
+	//å…ˆå…¨éƒ¨è½¬æ¢é™ˆå¤§å†™
 	for (int i = 0; i < len; ++i)
 	{
 		devNmae[i] = toupper(devNmae[i]);
 	}
 
-	//»ñµÃµ±Ç°Éè±¸µÄË÷Òı
+	//è·å¾—å½“å‰è®¾å¤‡çš„ç´¢å¼•
 	DWORD index = 0;
 	if (0 == swscanf(devNmae, L"\\\\.\\PHYSICALDRIVE%d", &index))
-		return NULL;  //»ñÈ¡Éè±¸Ë÷ÒıÊ§°Ü
+		return NULL;  //è·å–è®¾å¤‡ç´¢å¼•å¤±è´¥
 
-	//»ñµÃµ±Ç°ÏµÍ³ÖĞËùÓĞµÄÂß¼­Çı¶¯Æ÷
+	//è·å¾—å½“å‰ç³»ç»Ÿä¸­æ‰€æœ‰çš„é€»è¾‘é©±åŠ¨å™¨
 	DWORD dwDris = ::GetLogicalDrives();
 
 	if (0 == dwDris)
 		return NULL;
 
-	//·ÖÅä¿Õ¼ä
-	PLOGCDRI pLogic = new LOGCDRI[27];  //×î¶à26¸öÂß¼­Çı¶¯»¹ÓĞÓÃÓë±íÊ¾Êı×éµÄ½áÊø
+	//åˆ†é…ç©ºé—´
+	PLOGCDRI pLogic = new LOGCDRI[27];  //æœ€å¤š26ä¸ªé€»è¾‘é©±åŠ¨è¿˜æœ‰ç”¨ä¸è¡¨ç¤ºæ•°ç»„çš„ç»“æŸ
 	memset(pLogic , 0 , sizeof(LOGCDRI)*27);
 
 	size_t nCnt = 0;
 	WCHAR csLogicN[] = L"\\\\?\\A:";
-	char outBuf[100] = { 0 }; //Êı¾İ²éÑ¯Ê±µÄÊä³öBuf
+	char outBuf[100] = { 0 }; //æ•°æ®æŸ¥è¯¢æ—¶çš„è¾“å‡ºBuf
 	VOLUME_DISK_EXTENTS* pOutBuf = (VOLUME_DISK_EXTENTS*)outBuf;
 
-	//×î¶àÖ»ÓĞ26¸öÂß¼­Çı¶¯Æ÷
+	//æœ€å¤šåªæœ‰26ä¸ªé€»è¾‘é©±åŠ¨å™¨
 	for (int i = 0; i < 26; ++i)
 	{
 		if (0 == (dwDris & 0x00000001))
-		{//µ±Ç°Ã»ÓĞ
+		{//å½“å‰æ²¡æœ‰
 			dwDris >>= 1;
 			continue;
 		}
@@ -677,7 +677,7 @@ DWORD* Disk::GetLogicalDrives()
 		if (hDev == INVALID_HANDLE_VALUE)
 			continue;
 
-		//»ñÈ¡Ã¿Ò»¸öÔÚµ±Ç°´ÅÅÌÉÏµÄÃ¿Ò»¸ö¾íµÄÆ«ÒÆÎ»ÖÃ£¬ÒÔ±ãÓÚ»ñÈ¡Ã¿Ò»¸ö·ÖÇøµÄÂß¼­Çı¶¯×Ö·û
+		//è·å–æ¯ä¸€ä¸ªåœ¨å½“å‰ç£ç›˜ä¸Šçš„æ¯ä¸€ä¸ªå·çš„åç§»ä½ç½®ï¼Œä»¥ä¾¿äºè·å–æ¯ä¸€ä¸ªåˆ†åŒºçš„é€»è¾‘é©±åŠ¨å­—ç¬¦
 		DWORD bytesReturned = 0;
 		if(0 == ::DeviceIoControl(hDev,
 								IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
@@ -687,18 +687,18 @@ DWORD* Disk::GetLogicalDrives()
 								100,
 								&bytesReturned,
 								NULL))
-		{//»ñÈ¡ĞÅÏ¢Ê§°Ü
+		{//è·å–ä¿¡æ¯å¤±è´¥
 			CloseHandle(hDev);
 			continue;
 		}
 
 		if (pOutBuf->Extents[0].DiskNumber != index)
-		{//²»ÊÇµ±Ç°Éè±¸µÄ
+		{//ä¸æ˜¯å½“å‰è®¾å¤‡çš„
 			CloseHandle(hDev);
 			continue;
 		}
 
-		//ÕÒµ½ÁËÒ»¸öÊôÓÚµ±Ç°Éè±¸µÄ¾í
+		//æ‰¾åˆ°äº†ä¸€ä¸ªå±äºå½“å‰è®¾å¤‡çš„å·
 		pLogic[nCnt].byteOffset.QuadPart = pOutBuf->Extents[0].StartingOffset.QuadPart;
 		pLogic[nCnt++].letter = char('A' + i);
 		CloseHandle(hDev);
@@ -709,7 +709,7 @@ DWORD* Disk::GetLogicalDrives()
 
 BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 {
-	//¸øÅÄºÃĞòµÄÁ´±íÌí¼Ó¸÷¸ö¿ÕÏ¶½Úµã
+	//ç»™æ‹å¥½åºçš„é“¾è¡¨æ·»åŠ å„ä¸ªç©ºéš™èŠ‚ç‚¹
 	int			nCount	= this->GetPartCount();
 	LONG_INT	temp	= {0};
 	LONG_INT	offset	= {0};
@@ -728,11 +728,11 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 	{
 		t2 = PDPart(list->GetPart(i));
 		if(t1->mSecCount.QuadPart)
-		{		//ÓĞ·ÖÇø´óĞ¡
+		{		//æœ‰åˆ†åŒºå¤§å°
 			temp.QuadPart =t2->mOffset.QuadPart 
 				- t1->mOffset.QuadPart - t1->mSecCount.QuadPart;
 			if(temp.QuadPart)
-			{//ÓĞ¿ÕÏ¶
+			{//æœ‰ç©ºéš™
 				offset.QuadPart = t1->mOffset.QuadPart + t1->mSecCount.QuadPart;
 				pn = (PDPart)NewPart(NULL , &offset  , PART_UN_PART );
 				if(pn){
@@ -743,19 +743,19 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 				++i;
 			}
 		}
-		else	//Ã»ÓĞ·ÖÇø´óĞ¡
+		else	//æ²¡æœ‰åˆ†åŒºå¤§å°
 		{
 			t1->mSecCount.QuadPart = t2->mOffset.QuadPart - t1->mOffset.QuadPart;
 		}
 		t1 = t2;
 	}
 
-	//Ìí¼ÓÒ»¸öÎ´·ÖÇøµÄÇøÓò´óĞ¡½Úµã
-	t2 = PDPart(list->GetPart(nCount-1));      //»ñµÃ×îºóÒ»¸ö½Úµã
-	offset.QuadPart = t2->mSecCount.QuadPart + t2->mOffset.QuadPart;		    //Ã»ÓĞ·ÖÇøµÄÇøÓòÎïÀíÆ«ÒÆ
-	unPartCount.QuadPart = this->mPartableSecCnt.QuadPart - offset.QuadPart;//²»¿É·ÖÇøµÄÇøÓò´óĞ¡
-	if(unPartCount.QuadPart > 0 )				    //ÕâÀïÄ¬ÈÏµ±ÖĞÊÇLABÄ£Ê½
-	{//ºóÃæÓĞÃ»ÓĞ·ÖÇøµÄÇøÓò
+	//æ·»åŠ ä¸€ä¸ªæœªåˆ†åŒºçš„åŒºåŸŸå¤§å°èŠ‚ç‚¹
+	t2 = PDPart(list->GetPart(nCount-1));      //è·å¾—æœ€åä¸€ä¸ªèŠ‚ç‚¹
+	offset.QuadPart = t2->mSecCount.QuadPart + t2->mOffset.QuadPart;		    //æ²¡æœ‰åˆ†åŒºçš„åŒºåŸŸç‰©ç†åç§»
+	unPartCount.QuadPart = this->mPartableSecCnt.QuadPart - offset.QuadPart;//ä¸å¯åˆ†åŒºçš„åŒºåŸŸå¤§å°
+	if(unPartCount.QuadPart > 0 )				    //è¿™é‡Œé»˜è®¤å½“ä¸­æ˜¯LABæ¨¡å¼
+	{//åé¢æœ‰æ²¡æœ‰åˆ†åŒºçš„åŒºåŸŸ
 		if (pn = (PDPart)NewPart(NULL, &offset, PART_UN_PART))
 		{
 			pn->mSecCount = unPartCount;
@@ -763,15 +763,15 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 		}
 	}
 
-	//¼ÆËã´ÅÅÌµÄ²»¿É·ÖÇø¿Õ¼ä´óĞ¡
+	//è®¡ç®—ç£ç›˜çš„ä¸å¯åˆ†åŒºç©ºé—´å¤§å°
 	res = ::DeviceIoControl(mDisk , IOCTL_DISK_GET_LENGTH_INFO , NULL ,
-		0 , &gli , sizeof(gli) , &dwOutBytes,   NULL);			// ÓÃÍ¬²½I/O
+		0 , &gli , sizeof(gli) , &dwOutBytes,   NULL);			// ç”¨åŒæ­¥I/O
 	if(res)
-	{//³É¹¦»ñÈ¡´ÅÅÌµÄ´óĞ¡
-		//²»¿É·ÖÇøµÄÉÈÇøÊı
+	{//æˆåŠŸè·å–ç£ç›˜çš„å¤§å°
+		//ä¸å¯åˆ†åŒºçš„æ‰‡åŒºæ•°
 		mUnPartSize = (DWORD)(gli.Length.QuadPart  - mPartableSecCnt.QuadPart * SECTOR_SIZE);
 
-		//´´½¨Ò»¸öĞÂµÄ½Úµã
+		//åˆ›å»ºä¸€ä¸ªæ–°çš„èŠ‚ç‚¹
 		if (pn = (PDPart)NewPart(NULL, &mPartableSecCnt, PART_UNPARTBLE))
 		{
 			pn->mSecCount.QuadPart = mUnPartSize / SECTOR_SIZE;
@@ -785,7 +785,7 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 // 
 // BOOL Disk::GetUnPartSecCount(DWORD * secCount)
 // {
-// 	//DOS / Windows ÏµÍ³ÏÂ,»ù±¾·ÖÇø±ØĞëÒÔÖùÃæÎªµ¥Î»»®·Ö
+// 	//DOS / Windows ç³»ç»Ÿä¸‹,åŸºæœ¬åˆ†åŒºå¿…é¡»ä»¥æŸ±é¢ä¸ºå•ä½åˆ’åˆ†
 // 	LONG_INT	low		= this->mPartableSecCnt;
 // 	char		buf[SECTOR_SIZE] = {0};
 // 	BOOL		bres	= FALSE;
@@ -794,48 +794,48 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 // 	PDPart		pn		= NULL;
 // 	LONG_INT	offert	= {0};
 // 
-// 	//Èç¹ûÒÑ¾­´ò¿ªÁËÒ»¸ö´ÅÅÌ¾Í²»ÄÜÔÚ´ò¿ªÁË
-// 	if(!strlen(mDevName))	return FALSE;//Ã»ÓĞ³õÊ¼»¯¹ı
+// 	//å¦‚æœå·²ç»æ‰“å¼€äº†ä¸€ä¸ªç£ç›˜å°±ä¸èƒ½åœ¨æ‰“å¼€äº†
+// 	if(!strlen(mDevName))	return FALSE;//æ²¡æœ‰åˆå§‹åŒ–è¿‡
 // 
 // 
-// 	//¼ì²éÊÇ·ñÒÑ¾­²éÕÒÁË²»¿É·ÖÅäµÄ¿Õ¼ä 
-// 	if (mIsGetUnPartSec) {//ÒÑ¾­»ñµÃÁË²»¿É·ÖÅäµÄ¿Õ¼ä´óĞ¡
+// 	//æ£€æŸ¥æ˜¯å¦å·²ç»æŸ¥æ‰¾äº†ä¸å¯åˆ†é…çš„ç©ºé—´ 
+// 	if (mIsGetUnPartSec) {//å·²ç»è·å¾—äº†ä¸å¯åˆ†é…çš„ç©ºé—´å¤§å°
 // 
-// 		if (secCount)//ĞèÒª·µ»ØÊı¾İ
+// 		if (secCount)//éœ€è¦è¿”å›æ•°æ®
 // 			*secCount = this->mUnPartSecCnt;
 // 		return TRUE;
 // 	}
 // 
 // 
-// 	//´ò¿ªÒ»¸öĞÂµÄ¾ä±ú£¬Èç¹û²»ÕâÑùµÄ¾ÍËã½µ´ÅÅÌº¯Êı·½ÔÚÒ»¸ö¶ÀÁ¢µÄ
-// 	//Ïß³ÌÀïÃæµÄ»°Ò²»á×èÈû³ÌĞò
+// 	//æ‰“å¼€ä¸€ä¸ªæ–°çš„å¥æŸ„ï¼Œå¦‚æœä¸è¿™æ ·çš„å°±ç®—é™ç£ç›˜å‡½æ•°æ–¹åœ¨ä¸€ä¸ªç‹¬ç«‹çš„
+// 	//çº¿ç¨‹é‡Œé¢çš„è¯ä¹Ÿä¼šé˜»å¡ç¨‹åº
 // 
-// 	hDisk =   CreateFile(mDevName ,	//Òª´ò¿ªµÄÉè±¸ 
-// 		GENERIC_READ | GENERIC_WRITE,		 //·ÃÎÊÄ£Ê½
-// 		FILE_SHARE_READ | FILE_SHARE_WRITE,  //¹²ÏíÄ£Ê½
-// 		NULL , OPEN_EXISTING, 0 , NULL);								 //²»¸´ÖÆÈÎºÎÎÄ¼şÊôĞÔ
+// 	hDisk =   CreateFile(mDevName ,	//è¦æ‰“å¼€çš„è®¾å¤‡ 
+// 		GENERIC_READ | GENERIC_WRITE,		 //è®¿é—®æ¨¡å¼
+// 		FILE_SHARE_READ | FILE_SHARE_WRITE,  //å…±äº«æ¨¡å¼
+// 		NULL , OPEN_EXISTING, 0 , NULL);								 //ä¸å¤åˆ¶ä»»ä½•æ–‡ä»¶å±æ€§
 // 	if(hDisk == INVALID_HANDLE_VALUE)
-// 		return FALSE;						 //´ò¿ªÉè±¸Ê§°Ü
+// 		return FALSE;						 //æ‰“å¼€è®¾å¤‡å¤±è´¥
 // 	
 // 	
-// 	//              Çî¾Ù
+// 	//              ç©·ä¸¾
 // 	
-// 	//¼ÆËã×Ö½ÚÆ«ÒÆ
-// 	offert.QuadPart = low.QuadPart * SECTOR_SIZE; //×Ö½ÚÆ«ÒÆ
-// 	//ÒÆ¶¯¶ÁĞ´Ö¸Õë
+// 	//è®¡ç®—å­—èŠ‚åç§»
+// 	offert.QuadPart = low.QuadPart * SECTOR_SIZE; //å­—èŠ‚åç§»
+// 	//ç§»åŠ¨è¯»å†™æŒ‡é’ˆ
 // 	::SetFilePointer(hDisk , offert.LowPart ,  &(offert.HighPart ), FILE_BEGIN);
 // 
 // 	do{
 // 		bres = ::ReadFile(hDisk , buf, SECTOR_SIZE , &dwRead , NULL);
 // 		//bres = this->ReadSecter(/*hDisk ,*/low ,buf , &dwRead , SECTOR_SIZE);
 // 	}while(bres && dwRead == SECTOR_SIZE && ++low.QuadPart);
-// 	//²»ĞèÒªÁËÊ±ºò¼´Ê¹¹Ø±Õ¾ä±ú
+// 	//ä¸éœ€è¦äº†æ—¶å€™å³ä½¿å…³é—­å¥æŸ„
 // 	CloseHandle(hDisk);
 // 	
-// 	//²»¿É·ÖÇøµÄÉ½Çø×ÜÊı
+// 	//ä¸å¯åˆ†åŒºçš„å±±åŒºæ€»æ•°
 // 	this->mUnPartSecCnt= DWORD(low.QuadPart - this->mPartableSecCnt.QuadPart);
 // 	
-// 	if (secCount)//ĞèÒª·µ»ØÊı¾İ
+// 	if (secCount)//éœ€è¦è¿”å›æ•°æ®
 // 		*secCount = mUnPartSecCnt;
 // 	
 // 	pn = (PDPart)NewPart(NULL , &mPartableSecCnt  , PART_UNPARTBLE );
@@ -848,7 +848,7 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 // 	}
 // 
 // 	return TRUE;
-// 	//¼ÆËã´ÅÅÌµÄ²»¿É·ÖÇø¿Õ¼ä´óĞ¡
+// 	//è®¡ç®—ç£ç›˜çš„ä¸å¯åˆ†åŒºç©ºé—´å¤§å°
 // // 	DWORD dwUnPartCnt = 0;
 // // 	if(ComputeUnPartSecCont(&dwUnPartCnt))
 // // 	{
@@ -856,36 +856,36 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 // // 	}
 // 
 // 
-// //				Çî¾Ù
+// //				ç©·ä¸¾
 // 
-// /*				ÕÛ°ë²éÕÒ
+// /*				æŠ˜åŠæŸ¥æ‰¾
 // 
-// #define COM_TYPE 1	//1 ÊÇÒÔ¶ÁÈ¡Êı¾İ¼ÆËã  SECTOR_SIZE ÒÔÉèÖÃÖ¸Õë¼ÆËã
-// //¾­²âÊÔ ÉèÖÃÒÔÉèÖÃÖ¸Õë¼ÆËãÊÇ²»¿ÉĞĞµÄ£¬²»¹ÜÔõÃ´ÑùÉèÖÃÖ¸Õë¶¼»áÕıÈ· ½á¹û·µ»ØÒ»¸öÖùÃæµÄ´óĞ¡
-// //µ«ÊÇ¶ÁÈ¡É½ÇøÎÒµÄ·½Ê½ÊÇ¿ÉĞĞµÄ ÖÁÉÙºÍWinHexµÄ½á¹ûÒ»ÖÂ
+// #define COM_TYPE 1	//1 æ˜¯ä»¥è¯»å–æ•°æ®è®¡ç®—  SECTOR_SIZE ä»¥è®¾ç½®æŒ‡é’ˆè®¡ç®—
+// //ç»æµ‹è¯• è®¾ç½®ä»¥è®¾ç½®æŒ‡é’ˆè®¡ç®—æ˜¯ä¸å¯è¡Œçš„ï¼Œä¸ç®¡æ€ä¹ˆæ ·è®¾ç½®æŒ‡é’ˆéƒ½ä¼šæ­£ç¡® ç»“æœè¿”å›ä¸€ä¸ªæŸ±é¢çš„å¤§å°
+// //ä½†æ˜¯è¯»å–å±±åŒºæˆ‘çš„æ–¹å¼æ˜¯å¯è¡Œçš„ è‡³å°‘å’ŒWinHexçš„ç»“æœä¸€è‡´
 // 
 // 	LONG_INT high = mSecCount;
 // 	high.QuadPart +=(mGeometry.SectorsPerTrack * mGeometry.TracksPerCylinder -1);
 // 	LONG_INT mid;
 // 	DWORD res;
 // 	while(high >= low){
-// 		if(high == low){					//ÕÒµ½×îºóÒ»¸öÉÈÇøÁË
+// 		if(high == low){					//æ‰¾åˆ°æœ€åä¸€ä¸ªæ‰‡åŒºäº†
 // 			CloseHandle(hDisk);
 // 			*secCount = DWORD(low.QuadPart - mSecCount.QuadPart);
 // 			return TRUE;
 // 		}
 // 		mid.QuadPart =( high + low).QuadPart / 2u;
-// #if COM_TYPE == SECTOR_SIZE   //ÒÔÉèÖÃÖ¸Õë¼ÆËã
+// #if COM_TYPE == SECTOR_SIZE   //ä»¥è®¾ç½®æŒ‡é’ˆè®¡ç®—
 // 		mid.QuadPart *= SECTOR_SIZE;
 // 		mid.QuadPart += (SECTOR_SIZE -1);
 // 		res  = SetFilePointer(hDisk , mid.LowPart ,&mid.HighPart ,FILE_BEGIN);
-// #elif COM_TYPE == 1 //ÊÇÒÔ¶ÁÈ¡Êı¾İ¼ÆËã
+// #elif COM_TYPE == 1 //æ˜¯ä»¥è¯»å–æ•°æ®è®¡ç®—
 // 		bres = this->ReadSecter(hDisk ,mid ,buf , &dwRead , SECTOR_SIZE);
 // #endif
 // 		if (
-// #if COM_TYPE == SECTOR_SIZE //ÒÔÉèÖÃÖ¸Õë¼ÆËã
+// #if COM_TYPE == SECTOR_SIZE //ä»¥è®¾ç½®æŒ‡é’ˆè®¡ç®—
 // 			GetLastError()!=NO_ERROR && res == INVALID_SET_FILE_POINTER
-// #elif COM_TYPE == 1 //ÊÇÒÔ¶ÁÈ¡Êı¾İ¼ÆËã
+// #elif COM_TYPE == 1 //æ˜¯ä»¥è¯»å–æ•°æ®è®¡ç®—
 // 			!bres && dwRead != SECTOR_SIZE
 // #endif
 // 			){
@@ -893,11 +893,11 @@ BOOL Disk::MakeListContinue(/*HANDLE hDisk*/)
 // 		}else
 // 			low.QuadPart=mid.QuadPart / COM_TYPE + 1;
 // 	}
-// 				ÕÛ°ë²éÕÒ*/
+// 				æŠ˜åŠæŸ¥æ‰¾*/
 // 
-// // 	//²Ù×÷Ê§°Ü
+// // 	//æ“ä½œå¤±è´¥
 // // 	CloseHandle(hDisk);
-// // 	return FALSE;   //ÕÛ°ëÊÇ´Ë´¦·µ»ØFAlSE  
+// // 	return FALSE;   //æŠ˜åŠæ˜¯æ­¤å¤„è¿”å›FAlSE  
 // }
 
 LONG_INT Disk::GetPartableSecCount()

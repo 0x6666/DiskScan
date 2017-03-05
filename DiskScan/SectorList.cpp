@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SectorList.h"
 
 SectorList::SectorList(void)
@@ -27,7 +27,7 @@ BOOL SectorList::AddSector( LONG_INT sector ,LONG_INT nSecCount )
 
 
 	if (NULL != m_pSecList)
-	{//ĞòÁĞÊÇ¿Õ
+	{//åºåˆ—æ˜¯ç©º
 		m_pSecList = (PSECTOR_LIST_NODE)malloc(sizeof(SECTOR_LIST_NODE));
 		memset(m_pSecList , 0 , sizeof(SECTOR_LIST_NODE));
 		m_pSecList->mStartSector = sector;
@@ -35,40 +35,40 @@ BOOL SectorList::AddSector( LONG_INT sector ,LONG_INT nSecCount )
 		this->m_nListNodeCnt = 1;
 		return TRUE;
 	}else{
-		//ĞòÁĞÖĞÓĞÊı¾İ
+		//åºåˆ—ä¸­æœ‰æ•°æ®
 		int i;
 		for (i = 0 ; i < m_nListNodeCnt; ++i )
 		{
-			//¼ì²éÊÇ·ñ´æÔÚµ±Ç°½Úµã
+			//æ£€æŸ¥æ˜¯å¦å­˜åœ¨å½“å‰èŠ‚ç‚¹
 			if (m_pSecList[i].mStartSector.QuadPart <= sector.QuadPart &&
 				m_pSecList[i].mStartSector.QuadPart + 
 				m_pSecList[i].mSectorCnt.QuadPart > sector.QuadPart)
-			{//´æÔÚ
+			{//å­˜åœ¨
 				if (nSecCount.QuadPart != 1)
-				{//ĞèÒªÅĞ¶ÏÊÇ·ñÈ«²¿ÔÚ
+				{//éœ€è¦åˆ¤æ–­æ˜¯å¦å…¨éƒ¨åœ¨
 					if (sector.QuadPart + nSecCount.QuadPart > 
 						m_pSecList[i].mStartSector.QuadPart + 
 						m_pSecList[i].mSectorCnt.QuadPart )
-					{//³¬Î²ÁË
+					{//è¶…å°¾äº†
 						m_pSecList[i].mSectorCnt.QuadPart = 
 							sector.QuadPart + nSecCount.QuadPart - 
 							m_pSecList[i].mStartSector.QuadPart;
 					}
 				}
-				return TRUE;  //Ìí¼Ó³É¹¦
+				return TRUE;  //æ·»åŠ æˆåŠŸ
 			}
 
-			//¼ì²éÊÇ·ñÊÇµ±Ç°½Úµã×îºóÒ»ÉÈÇøµÄÏÂÒ»¸öÉÈÇø
+			//æ£€æŸ¥æ˜¯å¦æ˜¯å½“å‰èŠ‚ç‚¹æœ€åä¸€æ‰‡åŒºçš„ä¸‹ä¸€ä¸ªæ‰‡åŒº
 			if (sector.QuadPart == 
 				m_pSecList[i].mStartSector.QuadPart + 
 				m_pSecList[i].mSectorCnt.QuadPart)
-			{//¿ÉÒÔÖ±½Ó×·¼Ó
+			{//å¯ä»¥ç›´æ¥è¿½åŠ 
 				m_pSecList[i].mSectorCnt.QuadPart += nSecCount.QuadPart;
 				return TRUE;
 			}
 		}
 
-		//ĞèÒªÌí¼ÓÒ»¸ö½Úµã 
+		//éœ€è¦æ·»åŠ ä¸€ä¸ªèŠ‚ç‚¹ 
 		this->m_pSecList = (PSECTOR_LIST_NODE)realloc(m_pSecList , (++m_nListNodeCnt) * sizeof(SECTOR_LIST_NODE));
 		this->m_pSecList[i].mStartSector = sector;
 		this->m_pSecList[i].mSectorCnt.QuadPart = nSecCount.QuadPart;
@@ -98,12 +98,12 @@ BOOL SectorList::IsSectorExist( LONG_INT sector )
 	int i  = 0;
 	for (i = 0 ; i < m_nListNodeCnt ; ++i)
 	{
-		//¼ì²éÊÇ·ñ´æÔÚµ±Ç°½Úµã
+		//æ£€æŸ¥æ˜¯å¦å­˜åœ¨å½“å‰èŠ‚ç‚¹
 		if (m_pSecList[i].mStartSector.QuadPart <= sector.QuadPart &&
 			m_pSecList[i].mStartSector.QuadPart + 
 			m_pSecList[i].mSectorCnt.QuadPart > sector.QuadPart)
-		{//´æÔÚ
-			return TRUE;  //Ìí¼Ó³É¹¦
+		{//å­˜åœ¨
+			return TRUE;  //æ·»åŠ æˆåŠŸ
 		}
 	}
 	return FALSE;
@@ -118,67 +118,67 @@ LONG_INT SectorList::FixToNextSector( LONG_INT sector )
 {
 	LONG_INT  res = {-1};
 	int		i = 0;
-	if(0 > sector.QuadPart) return res;	//ÎŞĞ§´ØºÅ
-	if ( 0 == m_nListNodeCnt ) return res;	//Ã»ÓĞ´ØºÅ
+	if(0 > sector.QuadPart) return res;	//æ— æ•ˆç°‡å·
+	if ( 0 == m_nListNodeCnt ) return res;	//æ²¡æœ‰ç°‡å·
 	if (1 == m_nListNodeCnt)
-	{//ÓĞÒ»¸ö´ØºÅ
+	{//æœ‰ä¸€ä¸ªç°‡å·
 		if (m_pSecList[0].mStartSector.QuadPart <= sector.QuadPart && 
 			m_pSecList[0].mStartSector.QuadPart + 
 			m_pSecList[0].mSectorCnt.QuadPart > sector.QuadPart)
-		{//´æÔÚ
+		{//å­˜åœ¨
 			return sector;
 		}else
-			return res;  //²»´æÔÚ
+			return res;  //ä¸å­˜åœ¨
 	}
 
-	//³¬¹ıÒ»¸ö
+	//è¶…è¿‡ä¸€ä¸ª
 	for(i = 0 ; i < m_nListNodeCnt - 1 ; ++i )
 	{
 		if (m_pSecList[i].mStartSector.QuadPart <= sector.QuadPart && 
 			m_pSecList[i].mStartSector.QuadPart + 
 			m_pSecList[i].mSectorCnt.QuadPart > sector.QuadPart)
-		{//´æÔÚÓëµ±Ç°½Úµã
+		{//å­˜åœ¨ä¸å½“å‰èŠ‚ç‚¹
 			return sector;
 		}else if (m_pSecList[i + 1].mStartSector.QuadPart > sector.QuadPart)
-		{//ÔÚµ±Ç°½ÚµãºÍÏÂÒ»¸ö½ÚµãÖ®¼ä 
+		{//åœ¨å½“å‰èŠ‚ç‚¹å’Œä¸‹ä¸€ä¸ªèŠ‚ç‚¹ä¹‹é—´ 
 			return m_pSecList[i + 1].mStartSector;
 		}
 	}
-	return res;  //²»´æÔÚ
+	return res;  //ä¸å­˜åœ¨
 }
 
 LONG_INT SectorList::FixToPreSector( LONG_INT sector )
 {
 	LONG_INT  res = {-1};
 	int		i = 0;
-	if ( 0 > sector.QuadPart )	return res;	//ÎŞĞ§´ØºÅ
-	if ( 0 == m_nListNodeCnt )	return res;	//Ã»ÓĞ´ØºÅ
+	if ( 0 > sector.QuadPart )	return res;	//æ— æ•ˆç°‡å·
+	if ( 0 == m_nListNodeCnt )	return res;	//æ²¡æœ‰ç°‡å·
 	if ( 1 == m_nListNodeCnt )
-	{//ÓĞÒ»¸ö´ØºÅ
+	{//æœ‰ä¸€ä¸ªç°‡å·
 		if (m_pSecList[0].mStartSector.QuadPart <= sector.QuadPart && 
 			m_pSecList[0].mStartSector.QuadPart + 
 			m_pSecList[0].mSectorCnt.QuadPart > sector.QuadPart)
-		{//´æÔÚ
+		{//å­˜åœ¨
 			return sector;
 		}else
-			return res;  //²»´æÔÚ
+			return res;  //ä¸å­˜åœ¨
 	}
 
-	//³¬¹ıÒ»¸ö
+	//è¶…è¿‡ä¸€ä¸ª
 	for(i = 0 ; i < m_nListNodeCnt - 1 ; ++i )
 	{
 		if (m_pSecList[i].mStartSector.QuadPart <= sector.QuadPart && 
 			m_pSecList[i].mStartSector.QuadPart + 
 			m_pSecList[i].mSectorCnt.QuadPart > sector.QuadPart)
-		{//´æÔÚÓëµ±Ç°½Úµã
+		{//å­˜åœ¨ä¸å½“å‰èŠ‚ç‚¹
 			return sector;
 		}else if (m_pSecList[i + 1].mStartSector.QuadPart > sector.QuadPart)
-		{//ÔÚµ±Ç°½ÚµãºÍÏÂÒ»¸ö½ÚµãÖ®¼ä 
+		{//åœ¨å½“å‰èŠ‚ç‚¹å’Œä¸‹ä¸€ä¸ªèŠ‚ç‚¹ä¹‹é—´ 
 			res.QuadPart = m_pSecList[i].mStartSector.QuadPart + m_pSecList[i].mSectorCnt.QuadPart - 1;
 			return res;
 		}
 	}
-	return res;  //²»´æÔÚ
+	return res;  //ä¸å­˜åœ¨
 }
 
 SectorList* SectorList::Clone()

@@ -1,4 +1,4 @@
-// ColumnSplitter.cpp: implementation of the CColumnSplitter class.
+ï»¿// ColumnSplitter.cpp: implementation of the CColumnSplitter class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -36,9 +36,9 @@ CColumnSplitter::~CColumnSplitter()
 }
 void CColumnSplitter::OnMouseMove(UINT nFlags, CPoint point)
 {
-	//×èÖ¹½«·ÖÇÐ´°¿ÚÀ­µÄÌ«´ó
+	//é˜»æ­¢å°†åˆ†åˆ‡çª—å£æ‹‰çš„å¤ªå¤§
 	if(GetKeyState(VK_LBUTTON) & 0x8000)
-		if(point.x >= m_iMinWdith) return;// ×î´óÖµ
+		if(point.x >= m_iMinWdith) return;// æœ€å¤§å€¼
 
 
 	CSplitterWnd::OnMouseMove(nFlags, point);

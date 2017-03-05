@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "DataWnd.h"
 #include "Mmsystem.h"
 
@@ -10,25 +10,25 @@ static char THIS_FILE[] = __FILE__;
 
 #pragma warning(disable:4996)
 
-//Æ«ÒÆÇøµÄÃû×Ö
-#define  OFFSET_NAME	_T("Æ«ÒÆ")
+//åç§»åŒºçš„åå­—
+#define  OFFSET_NAME	_T("åç§»")
 
 //#define SCROLL_W			::GetSystemMetrics(SM_CXVSCROLL)
-#define LINE_W				5   //·Ö¸îÏßµÄ¿í¶È
+#define LINE_W				5   //åˆ†å‰²çº¿çš„å®½åº¦
 
-#define HEAD_H				25		//¶¥²¿µÄ¸ß¶È
-//#define DATA_H				(ALL_HEIGHT - HEAD_H)//Êı¾İÇøÓòµÄ¸ß¶È
+#define HEAD_H				25		//é¡¶éƒ¨çš„é«˜åº¦
+//#define DATA_H				(ALL_HEIGHT - HEAD_H)//æ•°æ®åŒºåŸŸçš„é«˜åº¦
 
-//#define OFF_C_W				16		//Æ«ÒÆÇøµÄÓÃ11¸ö×Ö·ûµÄ¿í¶È
-#define DATA_C_W			50		//(3*17)Êı¾İÇøµÄ´óĞ¡Ã¿¸ö×Ö½ÚÈı¸ö×Ö·û¿í¶È £¬ÔÚ¼ÒÉÏÈı¸ö¿Õ¸ñ)
-#define CHAR_C_W			18		//×Ö·ûÇøÊ®Áù¸ö×Ö·û
+//#define OFF_C_W				16		//åç§»åŒºçš„ç”¨11ä¸ªå­—ç¬¦çš„å®½åº¦
+#define DATA_C_W			50		//(3*17)æ•°æ®åŒºçš„å¤§å°æ¯ä¸ªå­—èŠ‚ä¸‰ä¸ªå­—ç¬¦å®½åº¦ ï¼Œåœ¨å®¶ä¸Šä¸‰ä¸ªç©ºæ ¼)
+#define CHAR_C_W			18		//å­—ç¬¦åŒºåå…­ä¸ªå­—ç¬¦
 
-#define BG_COLOR			RGB(255,255,255)//±³¾°ÑÕÉ«Îª°×É«
-#define SP_LING_COLOR		RGB(236,233,216)//·Ö¸îÏßµÄÑÕÉ«
-#define DATA_FONT_COLOR		RGB(0,0,0)		//Êı¾İÑÕÉ«ÎªºÚÉ«
-#define OFFSET_FONT_COLOR	RGB(0,0,191)	//Æ«ÒÆÎÄ×ÖµÄÑÕÉ«
+#define BG_COLOR			RGB(255,255,255)//èƒŒæ™¯é¢œè‰²ä¸ºç™½è‰²
+#define SP_LING_COLOR		RGB(236,233,216)//åˆ†å‰²çº¿çš„é¢œè‰²
+#define DATA_FONT_COLOR		RGB(0,0,0)		//æ•°æ®é¢œè‰²ä¸ºé»‘è‰²
+#define OFFSET_FONT_COLOR	RGB(0,0,191)	//åç§»æ–‡å­—çš„é¢œè‰²
 
-//´Ë°æ±¾vcÃ»ÓĞµÄºê 
+//æ­¤ç‰ˆæœ¬vcæ²¡æœ‰çš„å® 
 #ifndef GET_X_LPARAM
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
 #endif
@@ -42,42 +42,42 @@ static char THIS_FILE[] = __FILE__;
 DataWnd::DataWnd()
 {
 	isFirst		= TRUE;
-	mEtData		= new CEdit;	//Êı¾İÇø
-	mEtOffset	= new CEdit;	//Æ«ÒÆÇø
-	mEtChar		= new CEdit;	//×Ö·ûÇø
-/*	mVScro		= new CScrollBar;//¹ö¶¯Ìõ*/
+	mEtData		= new CEdit;	//æ•°æ®åŒº
+	mEtOffset	= new CEdit;	//åç§»åŒº
+	mEtChar		= new CEdit;	//å­—ç¬¦åŒº
+/*	mVScro		= new CScrollBar;//æ»šåŠ¨æ¡*/
 
-	//Êı¾İ»º´æ
+	//æ•°æ®ç¼“å­˜
 	mDBuf	= new DATA_BUF[3];
 	::memset(mDBuf , 0 ,3 * sizeof(DATA_BUF));
 
-	mCurBuf			= -1;		//µ±Ç°µÄ»º´æºÅ
-	mCount.QuadPart	= 0;		//×ÜÊı¾İ
+	mCurBuf			= -1;		//å½“å‰çš„ç¼“å­˜å·
+	mCount.QuadPart	= 0;		//æ€»æ•°æ®
 	mLineCnt		= 0;
 	mCurBufOff		= 0;
 
 	mBKBrush.CreateSolidBrush(COLORREF(BG_COLOR)); 
 
-	//mIsCharUnic = FALSE;	//Ä¬ÈÏÎª¶à×Ö½Ú×Ö·ûĞÎÊ½
-	mRadix		= 16;		//Ä¬ÈÏÊ®Áù½øÖÆ·½Ê½
+	//mIsCharUnic = FALSE;	//é»˜è®¤ä¸ºå¤šå­—èŠ‚å­—ç¬¦å½¢å¼
+	mRadix		= 16;		//é»˜è®¤åå…­è¿›åˆ¶æ–¹å¼
 /*	mVMaxLine	= 0;*/
 
-	//¸÷¸öÇøÓòµÄ¿í¶È  ÒÔ×Ö·ûÊıÀàºâÁ¿
+	//å„ä¸ªåŒºåŸŸçš„å®½åº¦  ä»¥å­—ç¬¦æ•°ç±»è¡¡é‡
 	this->m_iOffCharCnt = 11;
 
-	//¿ªÊ¼Ê±Ê²Ã´¶¼Ã»Ñ¡ÖĞ
+	//å¼€å§‹æ—¶ä»€ä¹ˆéƒ½æ²¡é€‰ä¸­
 	mSelEnd.QuadPart = -1;
 	mSelStart.QuadPart = -1;
 }
 
 DataWnd::~DataWnd()
 {
-	delete mEtData;		//Êı¾İÇø
-	delete mEtOffset;	//Æ«ÒÆÇø
-	delete mEtChar;		//×Ö·ûÇø
-/*	delete mVScro;		//¹ö¶¯Ìõ*/
+	delete mEtData;		//æ•°æ®åŒº
+	delete mEtOffset;	//åç§»åŒº
+	delete mEtChar;		//å­—ç¬¦åŒº
+/*	delete mVScro;		//æ»šåŠ¨æ¡*/
 
-	delete[] mDBuf;		//Êı¾İ»º´æ
+	delete[] mDBuf;		//æ•°æ®ç¼“å­˜
 
 	mBKBrush.DeleteObject();
 }
@@ -85,7 +85,7 @@ DataWnd::~DataWnd()
 BOOL DataWnd::Create(RECT &rc,CWnd *pParent)
 {
 	BOOL bRes;
-	GetLetterSize(pParent);	//½èÖú¸¸´°¿Ú»ñµÃ×ÖÌåµÄ´óĞ¡
+	GetLetterSize(pParent);	//å€ŸåŠ©çˆ¶çª—å£è·å¾—å­—ä½“çš„å¤§å°
 	bRes = CWnd::Create(_T("STATIC") , 	NULL , WS_CHILD|SS_NOTIFY|WS_CHILD , rc , pParent , IDC_DATA_CTRL);
 	
 	if (bRes) InitControl(rc);
@@ -93,20 +93,20 @@ BOOL DataWnd::Create(RECT &rc,CWnd *pParent)
 }
 void DataWnd::GetLetterSize(CWnd *pParent)
 {
-	//¿½±´×ÖÌå
+	//æ‹·è´å­—ä½“
 	LOGFONT lf ,oldf;
 	CFont f;
 	pParent->GetFont()->GetLogFont(&lf);
-	oldf = lf; //±£³ÖÔ­ÓĞµÄ¸¸´°¿Ú×ÖÌå
+	oldf = lf; //ä¿æŒåŸæœ‰çš„çˆ¶çª—å£å­—ä½“
 
-	_tcscpy(lf.lfFaceName , _T("ËÎÌå"));
+	_tcscpy(lf.lfFaceName , _T("å®‹ä½“"));
 	lf.lfHeight = 16;
 	//lf.lfWidth = 10;
 	this->mFont.DeleteObject();
 	this->mFont.CreateFontIndirect(&lf);
 	pParent->SetFont(&mFont ,FALSE);
 
-	//»ñÈ¡×ÖÌåµÄ´óĞ¡
+	//è·å–å­—ä½“çš„å¤§å°
 	GetTextExtentPoint32(pParent->GetDC()->GetSafeHdc() ,_T("A") , 1 , &mSize);
 
 	f.DeleteObject();
@@ -117,11 +117,11 @@ void DataWnd::GetLetterSize(CWnd *pParent)
 BEGIN_MESSAGE_MAP(DataWnd, CWnd)
 	//{{AFX_MSG_MAP(DataWnd)
 	ON_WM_PAINT()
-	ON_WM_CTLCOLOR()			//¿Ø¼şµÄ±³¾°ÑÕÉ«
-	ON_WM_SIZE()				//¿Õ¼äµÄ´óĞ¡¸Ä±äÏûÏ¢
+	ON_WM_CTLCOLOR()			//æ§ä»¶çš„èƒŒæ™¯é¢œè‰²
+	ON_WM_SIZE()				//ç©ºé—´çš„å¤§å°æ”¹å˜æ¶ˆæ¯
 /*	ON_WM_MOUSEWHEEL()*/
 /*	ON_MESSAGE(WM_MOUSEWHEEL, OnMouseWheel)*/
-/*	ON_WM_VSCROLL()				//´¹Ö±¹ö¶¯Ìõ*/	
+/*	ON_WM_VSCROLL()				//å‚ç›´æ»šåŠ¨æ¡*/	
 	//}}AFX_MSG_MAP(DataWnd)
 END_MESSAGE_MAP()
 
@@ -137,30 +137,30 @@ void DataWnd::OnPaint()
 	HRGN hHead;
 	HBRUSH hb;
 	
-	//¿Í»§ÇøµÄ´óĞ¡
+	//å®¢æˆ·åŒºçš„å¤§å°
 //	::GetClientRect(this->GetSafeHwnd() , &rect);
 	//::GetWindowRect()
 	this->GetWindowRect(&rect);
 
-	//¸÷¸öÇøÓòµÄ¿í¶È
-	int nOffW = mSize.cx * m_iOffCharCnt;//Æ«ÒÆÇøµÄ¿í¶È
+	//å„ä¸ªåŒºåŸŸçš„å®½åº¦
+	int nOffW = mSize.cx * m_iOffCharCnt;//åç§»åŒºçš„å®½åº¦
 	int nDatW = mSize.cx * DATA_C_W;
 
-	//´°¿ÚµÄ¿í¶È
+	//çª—å£çš„å®½åº¦
 	//ww = rect.right - rect.left;
 	//ww = min(ww , GetMinWidth());
 	ww = GetMinWidth();
 
 
-	//ÏÈ½«Í·²¿ÇøÓòÌî°×
+	//å…ˆå°†å¤´éƒ¨åŒºåŸŸå¡«ç™½
 	hHead = CreateRectRgn(0 , 0 , ww , HEAD_H);
 	hb = CreateSolidBrush(BG_COLOR);
 	FillRgn(dc.GetSafeHdc() , hHead , hb);
 	DeleteObject(hHead);
 	
-	DrawHead(dc);		//»æÖÆ¶¥²¿µÄÇøÓò
+	DrawHead(dc);		//ç»˜åˆ¶é¡¶éƒ¨çš„åŒºåŸŸ
 	
-	//¿ªÊ¼»­¸÷¸ö·Ö¸îÏß
+	//å¼€å§‹ç”»å„ä¸ªåˆ†å‰²çº¿
 	HPEN pen = CreatePen(PS_SOLID , LINE_W ,COLORREF(SP_LING_COLOR));
 	HGDIOBJ hAld = SelectObject(dc.GetSafeHdc() ,pen);
 	dc.MoveTo( 0 , HEAD_H);
@@ -173,14 +173,14 @@ void DataWnd::OnPaint()
 	dc.LineTo(nOffW + nDatW +2 * LINE_W,rect.bottom - rect.top);
 	
 	
-	//»¹Ô­
+	//è¿˜åŸ
 	SelectObject(dc.GetSafeHdc() ,hAld);
 	DeleteObject(pen);
 
 }
 void DataWnd::InitControl(RECT rc)
 {	
-	//Õû¸ö´°¿ÚµÄ´óĞ¡
+	//æ•´ä¸ªçª—å£çš„å¤§å°
  	RECT wr;
 // //	::GetClientRect(this->GetSafeHwnd() , &wr);
 	this->GetWindowRect(&wr);	
@@ -188,7 +188,7 @@ void DataWnd::InitControl(RECT rc)
 	//wr.right = wr.left + this->GetMinWidth();
 
 	RECT rect;
-	//´´½¨Æ«ÒÆÇøEDIT
+	//åˆ›å»ºåç§»åŒºEDIT
 	rect.left = 0;
 	rect.right = mSize.cx * m_iOffCharCnt + 3;
 	rect.top = HEAD_H + LINE_W;
@@ -197,9 +197,9 @@ void DataWnd::InitControl(RECT rc)
 		WS_CHILD|WS_VISIBLE|ES_UPPERCASE|ES_READONLY/*|ES_NOHIDESEL*/|ES_MULTILINE|ES_CENTER
 		,rect,this,IDC_ET_OFFSET);
 	this->mEtOffset->SetFont(&mFont);
-	this->mEtOffset->SetMargins(this->mSize.cx , this->mSize.cx); //Á½±ß¶¼ÁôÁËÒ»¸ö×Ö·ûµÄ¿ñ¶È
+	this->mEtOffset->SetMargins(this->mSize.cx , this->mSize.cx); //ä¸¤è¾¹éƒ½ç•™äº†ä¸€ä¸ªå­—ç¬¦çš„ç‹‚åº¦
 	
-	//´´½¨Êı¾İÇøEDIT
+	//åˆ›å»ºæ•°æ®åŒºEDIT
 	rect.left = rect.right + LINE_W ;
 	rect.right = rect.left + mSize.cx * DATA_C_W;
 	this->mEtData->Create(
@@ -208,7 +208,7 @@ void DataWnd::InitControl(RECT rc)
 	this->mEtData->SetFont(&mFont);
 	this->mEtData->SetMargins(mSize.cx , mSize.cx);
 	
-	//´´½¨×Ö·ûÇøEDIT
+	//åˆ›å»ºå­—ç¬¦åŒºEDIT
 	rect.left = rect.right + LINE_W  ;
 	rect.right = rect.left + mSize.cx * CHAR_C_W ;
 	this->mEtChar->Create(
@@ -217,7 +217,7 @@ void DataWnd::InitControl(RECT rc)
 	this->mEtChar->SetFont(&mFont);
 	this->mEtChar->SetMargins(this->mSize.cx , this->mSize.cx);
 
-// 	//´¹Ö±¹ö¶¯Ìõ¿Ø¼ş
+// 	//å‚ç›´æ»šåŠ¨æ¡æ§ä»¶
 // 	rc.right = GetMinWidth();
 // 	this->mVScro->Create(
 // 		WS_VISIBLE|WS_CHILD|SBS_VERT |SBS_RIGHTALIGN|SBS_RIGHTALIGN  ,rc,this ,IDC_VSCROLL);
@@ -226,31 +226,31 @@ void DataWnd::InitControl(RECT rc)
 void DataWnd::ReSize(RECT rc)
 {
 	RECT rect;
-	//´´½¨Æ«ÒÆÇøEDIT
+	//åˆ›å»ºåç§»åŒºEDIT
 	rect.left = 0;
 	rect.right = mSize.cx * m_iOffCharCnt + 3;
 	rect.top = HEAD_H + LINE_W;
 	rect.bottom = /*ALL_HEIGHT*/rc.bottom - rc.top;
 	this->mEtOffset->MoveWindow(&rect , TRUE);
 
-	//´´½¨Êı¾İÇøEDIT
+	//åˆ›å»ºæ•°æ®åŒºEDIT
 	rect.left = rect.right + LINE_W ;
 	rect.right = rect.left + mSize.cx * DATA_C_W;
 	this->mEtData->MoveWindow(&rect , TRUE);
 	
-	//´´½¨×Ö·ûÇøEDIT
+	//åˆ›å»ºå­—ç¬¦åŒºEDIT
 	rect.left = rect.right + LINE_W  ;
 	rect.right = rect.left + mSize.cx * CHAR_C_W ;
 	this->mEtChar->MoveWindow(&rect , TRUE);
 	
-// 	//´¹Ö±¹ö¶¯Ìõ¿Ø¼ş
+// 	//å‚ç›´æ»šåŠ¨æ¡æ§ä»¶
 // 	rect.top = 0;
 // 	rect.right = min(GetMinWidth() , rc.right - rc.left);
 // 	rect.left = rect.right - SCROLL_W ;
 // 	this->mVScro->MoveWindow(&rect , TRUE);
 // 	this->mVScro->ShowScrollBar(TRUE);
 
-	//ÖØĞÂ»æÖÆ¿Ø¼ş
+	//é‡æ–°ç»˜åˆ¶æ§ä»¶
 	this->Invalidate(FALSE);
 }
 void DataWnd::DoDataExchange(CDataExchange* pDX) 
@@ -269,28 +269,28 @@ void DataWnd::DrawHead(CPaintDC& dc)
 	int i = 0;
 	int nOffw = mSize.cx * m_iOffCharCnt;
 
-	//ÉèÖÃÎÄ×ÖµÄÑÕÉ«
+	//è®¾ç½®æ–‡å­—çš„é¢œè‰²
 	SetTextColor(dc.GetSafeHdc() , OFFSET_FONT_COLOR);
 	::SelectObject(dc.GetSafeHdc() , this->mFont.GetSafeHandle());
 	
 	y = (HEAD_H - mSize.cy )/2;
 	x = (nOffw - mSize.cx * 4)/2;
-	//×óÉÏ½ÇµÄÆ«ÒÆ±êÖ¾
+	//å·¦ä¸Šè§’çš„åç§»æ ‡å¿—
 	dc.TextOut(x , y ,OFFSET_NAME);
 	
 	for (i = 0 ; i < 16 ; ++i)
 	{
-		x = LINE_W+  nOffw + celLen * i + this->mSize.cx /2/*¸öÈË¸Ğ¾õÕâÀï²»Ó¦¸Ã³ı2 £¬µ«ÊÇ³ıËÆºõºÃ¿´Ò»µã*/;
+		x = LINE_W+  nOffw + celLen * i + this->mSize.cx /2/*ä¸ªäººæ„Ÿè§‰è¿™é‡Œä¸åº”è¯¥é™¤2 ï¼Œä½†æ˜¯é™¤ä¼¼ä¹å¥½çœ‹ä¸€ç‚¹*/;
 		if(i >= 8)	x += this->mSize.cx ;
 		x += (celLen - mSize.cx)/2;
 		if(this->mRadix == 10)	buf.Format(_T("%d") , i);
-		else buf.Format(_T("%X") , i);	//Èç¹ûÉèÖÃµÄ²»ÊÇÊ®½øÖÆÔò²»¹ÜÆäËûµÄ Í³Ò»Ê®Áù½øÖÆ(°ÔµÀµÄÈËÉú´Ó²»½âÊÍ)
+		else buf.Format(_T("%X") , i);	//å¦‚æœè®¾ç½®çš„ä¸æ˜¯åè¿›åˆ¶åˆ™ä¸ç®¡å…¶ä»–çš„ ç»Ÿä¸€åå…­è¿›åˆ¶(éœ¸é“çš„äººç”Ÿä»ä¸è§£é‡Š)
 		dc.TextOut(x , y , buf);
 	}
 }
 HBRUSH DataWnd::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
-	// TODO:  ÔÚ´Ë¸ü¸Ä DC µÄÈÎºÎÊôĞÔ
+	// TODO:  åœ¨æ­¤æ›´æ”¹ DC çš„ä»»ä½•å±æ€§
 	int id = pWnd-> GetDlgCtrlID();
 	if(id==IDC_ET_OFFSET 
 		||id == IDC_ET_CHAR
@@ -305,37 +305,37 @@ HBRUSH DataWnd::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 
 void DataWnd::AppEndAll(int lineCnt)
 {
-	//ĞĞÊı×î¶àÊÇÁ½¸öÉÈÇøµÄĞĞÊı
+	//è¡Œæ•°æœ€å¤šæ˜¯ä¸¤ä¸ªæ‰‡åŒºçš„è¡Œæ•°
 	ASSERT(lineCnt <= LINE_PER_SEC * 2);
 	if(0 == lineCnt)	return;
 
-	//µ±Ç°Ê¹µÄ»»³ÉÇø
+	//å½“å‰ä½¿çš„æ¢æˆåŒº
 	DATA_BUF* buf = mDBuf + mCurBuf;
 	
-	//ÒªÌí¼ÓµÄµÚÒ»ĞĞµÄĞĞºÅ(Ïà¶Ôµ±Ç°»º³å)
+	//è¦æ·»åŠ çš„ç¬¬ä¸€è¡Œçš„è¡Œå·(ç›¸å¯¹å½“å‰ç¼“å†²)
 	UINT bfLnOff = this->mCurBufOff + this->mLineCnt;
-	//ÒªÌí¼ÓµÄµÚÒ»ĞĞµÄÊµ¼ÊĞĞÆ«ÒÆ£¨Ïà¶Ô´ÅÅÌÆğÊ¼Î»ÖÃ£©
+	//è¦æ·»åŠ çš„ç¬¬ä¸€è¡Œçš„å®é™…è¡Œåç§»ï¼ˆç›¸å¯¹ç£ç›˜èµ·å§‹ä½ç½®ï¼‰
 	LONG_INT off;
 	off.QuadPart= buf->mOff.QuadPart * LINE_PER_SEC + bfLnOff;
 
 	int no1;
-	//ÅĞ¶Ï×îºóÒ»ĞĞÊÇ·ñ´îµ½ÁËÏÂÒ»¸ö»º´æÇø
+	//åˆ¤æ–­æœ€åä¸€è¡Œæ˜¯å¦æ­åˆ°äº†ä¸‹ä¸€ä¸ªç¼“å­˜åŒº
 	int no = (bfLnOff + lineCnt -1) / LINE_PER_SEC;
 
-	if(no /*== 2*/){//ĞèÒªµÄÏÂÏÂÒ»¸öÊı¾İ»º´æ
-		no1 = (mCurBuf + no) % 3;//×îºóÒ»ĞĞËùÔÚ»º³åºÅ
-		no = (mCurBuf + no - 1) % 3;//×îºóÒ»ĞĞËùÔÚµÄ»º³åµÄÇ°Ò»¸ö»º³å
+	if(no /*== 2*/){//éœ€è¦çš„ä¸‹ä¸‹ä¸€ä¸ªæ•°æ®ç¼“å­˜
+		no1 = (mCurBuf + no) % 3;//æœ€åä¸€è¡Œæ‰€åœ¨ç¼“å†²å·
+		no = (mCurBuf + no - 1) % 3;//æœ€åä¸€è¡Œæ‰€åœ¨çš„ç¼“å†²çš„å‰ä¸€ä¸ªç¼“å†²
 		
 		if(mDBuf[no1].mOff.QuadPart != mDBuf[no].mOff.QuadPart +1)
-		{//ÏÂÒ»¸ö»º´æÇø²»ÊÇºÏ·¨µÄÊı¾İ  ĞèÒª¶ÁÈ¡
-			//ÉèÖÃÉÈÇøºÅ
+		{//ä¸‹ä¸€ä¸ªç¼“å­˜åŒºä¸æ˜¯åˆæ³•çš„æ•°æ®  éœ€è¦è¯»å–
+			//è®¾ç½®æ‰‡åŒºå·
 			mDBuf[no1].mOff.QuadPart = mDBuf[no].mOff.QuadPart +1;
-			FillBuf(no1 , TRUE);//Ìî³ä»º´æ
-			if(  -1 == mDBuf[no1].mOff.QuadPart)//²»ÔÚÏÔÊ¾ÁË
-			{//Ã»ÓĞÏÂÒ»¸ö»º´æÇøÃ»ÓĞÊı¾İ
-				//ĞèÒªĞŞ¸ÄĞĞÊı
+			FillBuf(no1 , TRUE);//å¡«å……ç¼“å­˜
+			if(  -1 == mDBuf[no1].mOff.QuadPart)//ä¸åœ¨æ˜¾ç¤ºäº†
+			{//æ²¡æœ‰ä¸‹ä¸€ä¸ªç¼“å­˜åŒºæ²¡æœ‰æ•°æ®
+				//éœ€è¦ä¿®æ”¹è¡Œæ•°
 
-				//Èç¹ûÒªÌí¼ÓµÄµÚÒ»ĞĞ¾ÍÔÚÏÂÒ»¸ö»º´æµÄ»°£¬Ö±½Ó·µ»Ø
+				//å¦‚æœè¦æ·»åŠ çš„ç¬¬ä¸€è¡Œå°±åœ¨ä¸‹ä¸€ä¸ªç¼“å­˜çš„è¯ï¼Œç›´æ¥è¿”å›
 				if (0 != bfLnOff / LINE_PER_SEC)
 				{
 					lineCnt = 0;
@@ -343,7 +343,7 @@ void DataWnd::AppEndAll(int lineCnt)
 					return ;
 				}
 
-				//µ±Ç°»»³ÉÓĞÊı¾İ¿ÉÒÔÌí¼Ó
+				//å½“å‰æ¢æˆæœ‰æ•°æ®å¯ä»¥æ·»åŠ 
 				lineCnt = LINE_PER_SEC - mCurBufOff;
 				if (!lineCnt)
 					return;
@@ -354,61 +354,61 @@ void DataWnd::AppEndAll(int lineCnt)
 	AppEndOff(off ,lineCnt);
 	AppEndData(off ,lineCnt);
 	AppEndChar(off ,lineCnt);
-	//ĞĞÊıÔö¼Ó
+	//è¡Œæ•°å¢åŠ 
 	mLineCnt += lineCnt;
 	this->UpdateData(FALSE);
 }
 BOOL DataWnd::AppHeadAll( int lineCnt )
 {
 	BOOL res = FALSE;
-	//ĞĞÊı×î¶àÊÇ2¸öÉÈÇø
+	//è¡Œæ•°æœ€å¤šæ˜¯2ä¸ªæ‰‡åŒº
 	ASSERT(lineCnt <= 2 * LINE_PER_SEC);
-	if(0 == lineCnt)	//Ã»ÓĞÊ²Ã´ÒªÌí¼ÓµÄ
+	if(0 == lineCnt)	//æ²¡æœ‰ä»€ä¹ˆè¦æ·»åŠ çš„
 		return res;
 
-	//µ±Ç°µÄ»º´æÇø
+	//å½“å‰çš„ç¼“å­˜åŒº
 	DATA_BUF* buf = mDBuf + mCurBuf;	
 	int no = 0;
 	
 	if(mCurBufOff < lineCnt )
-	{//ĞèÒªÊ¹ÓÃÉÏÒ»¸ö»º´æÇøµÄÊı¾İ
-		no = (mCurBuf + 2) % 3;  //ÉÏÒ»¸ö»º³åÇøºÅ
+	{//éœ€è¦ä½¿ç”¨ä¸Šä¸€ä¸ªç¼“å­˜åŒºçš„æ•°æ®
+		no = (mCurBuf + 2) % 3;  //ä¸Šä¸€ä¸ªç¼“å†²åŒºå·
 		if( mDBuf[no].mOff.QuadPart != buf->mOff.QuadPart - 1 )
-		{//ÉÏÒ»¸ö»º´æµÄÊı¾İ»¹Ã»ÓĞ¶ÁÈ¡³öÀ´
-			//ÉèÖÃÉÈÇøºÅ
+		{//ä¸Šä¸€ä¸ªç¼“å­˜çš„æ•°æ®è¿˜æ²¡æœ‰è¯»å–å‡ºæ¥
+			//è®¾ç½®æ‰‡åŒºå·
 			mDBuf[no].mOff.QuadPart = buf->mOff.QuadPart - 1;
-			FillBuf(no , FALSE);//Ìî³ä»º´æ
-			if(mDBuf[no].mOff.QuadPart == -1)//²»ÔÚÏÔÊ¾ÁË
+			FillBuf(no , FALSE);//å¡«å……ç¼“å­˜
+			if(mDBuf[no].mOff.QuadPart == -1)//ä¸åœ¨æ˜¾ç¤ºäº†
 				return res;
 		}	
 
-		//µ±Ç°ÉÈÇøºÅÓĞ±ä»¯
+		//å½“å‰æ‰‡åŒºå·æœ‰å˜åŒ–
 		res = TRUE;
 	}
-	AppHeadOff(lineCnt);//ÔÚÆ«ÒÆÇøÌí¼ÓÊı¾İ
+	AppHeadOff(lineCnt);//åœ¨åç§»åŒºæ·»åŠ æ•°æ®
 	AppHeadData(lineCnt);
 	AppHeadChar(lineCnt);
-	//ĞĞÊıÔö¼Ó
+	//è¡Œæ•°å¢åŠ 
 	this->mLineCnt += lineCnt;
-	UpdateData(FALSE);//Êı¾İÖØÏÔ
+	UpdateData(FALSE);//æ•°æ®é‡æ˜¾
 	
 	return res;
 }
-void DataWnd::AppEndOff(LONG_INT start/*ÆğÊ¼ĞĞºÅ*/ ,int lineCnt/*ĞĞÊı*/)
+void DataWnd::AppEndOff(LONG_INT start/*èµ·å§‹è¡Œå·*/ ,int lineCnt/*è¡Œæ•°*/)
 {
 	if(!lineCnt) return;
 	
 	CString buf , temp;
 	int index = 0 ,nSC = 0, nEC = 0 ,i = 0;
 	LONG_INT tempLi;
-	start.QuadPart *= BYTE_PER_LINE;  //×ª»»×Ö½ÚÆ«ÒÆ
+	start.QuadPart *= BYTE_PER_LINE;  //è½¬æ¢å­—èŠ‚åç§»
 	
 	for(i = 0 ;i < lineCnt ; ++i){
 
 		if(this->mRadix == 10)
-		{//Ê®½øÖÆ
+		{//åè¿›åˆ¶
 			if (start.QuadPart % SEC_SIZE == 0 )
-			{//Ò»¸öÉ½ÇøµÄÆäÊµ
+			{//ä¸€ä¸ªå±±åŒºçš„å…¶å®
 				tempLi.QuadPart = start.QuadPart / SEC_SIZE;
 				temp.Format(_T("%d%d\r\n") , tempLi.HighPart , tempLi.LowPart);
 				if (tempLi.QuadPart)
@@ -417,45 +417,45 @@ void DataWnd::AppEndOff(LONG_INT start/*ÆğÊ¼ĞĞºÅ*/ ,int lineCnt/*ĞĞÊı*/)
 					temp.Format(_T("%d\r\n") ,  tempLi.LowPart);
 			}else
 				temp.Format(_T("%d%d\r\n") , start.HighPart , start.LowPart);
-		}else{//Ê®Áù½øÖÆ
+		}else{//åå…­è¿›åˆ¶
 			if (start.QuadPart % SEC_SIZE == 0 )
-			{//ÉÈÇøºÅ
+			{//æ‰‡åŒºå·
 				tempLi.QuadPart = start.QuadPart / SEC_SIZE;
-				if (tempLi.HighPart)//ÓĞ¸ßÎ»
+				if (tempLi.HighPart)//æœ‰é«˜ä½
 					temp.Format(_T("%X%X#\r\n") , tempLi.HighPart , tempLi.LowPart);
-				else//Ã»ÓĞ¸ßÎ»
+				else//æ²¡æœ‰é«˜ä½
 					temp.Format(_T("%X#\r\n") ,  tempLi.LowPart);
-			}else //×Ö½ÚÆ«ÒÆ
+			}else //å­—èŠ‚åç§»
 				temp.Format(_T("%X%08X\r\n") , start.HighPart , start.LowPart);
 		}
-		//×·¼Ó½«ÒªÏÔÊ¾µÄÊı¾İ
+		//è¿½åŠ å°†è¦æ˜¾ç¤ºçš„æ•°æ®
 		buf += temp;
 
-		//ÅĞ¶ÏÊÇ·ñĞèÒª¸Ä±ä´°¿ÚµÄ´óĞ¡
+		//åˆ¤æ–­æ˜¯å¦éœ€è¦æ”¹å˜çª—å£çš„å¤§å°
 		if(start.QuadPart % SEC_SIZE != 0){
 			temp.TrimRight();
 			if (temp.GetLength() + 2 != m_iOffCharCnt )
 				SetOffCharCnt(temp.GetLength());
 		}
-		//ÏÂÃæ½«ÒªÏÔÊ¾µÄÆ«ÒÆ
+		//ä¸‹é¢å°†è¦æ˜¾ç¤ºçš„åç§»
 		start.QuadPart += 16;
 	}
 	this->mOB += buf;
 }
-void DataWnd::AppEndData(LONG_INT start/*ÆğÊ¼ĞĞºÅ*/ ,int lineCnt/*ĞĞÊı*/)
+void DataWnd::AppEndData(LONG_INT start/*èµ·å§‹è¡Œå·*/ ,int lineCnt/*è¡Œæ•°*/)
 {
 	CString buf , temp;
 	int index = 0 ,nSC = 0 , nEC = 0 , i = 0 , j = 0;
 	BYTE b;
-	DATA_BUF* dBuf = mDBuf + mCurBuf;		//µ±Ç°»º´æ
+	DATA_BUF* dBuf = mDBuf + mCurBuf;		//å½“å‰ç¼“å­˜
 	UINT bfLnOff = (UINT)(start.QuadPart -\
-		dBuf->mOff.QuadPart * LINE_PER_SEC); //µ±Ç°»º´æµÄĞĞÆ«ÒÆ
-	int no  = 0 ;//µ±Ç°»º´æºÅÆ«ÒÆ
+		dBuf->mOff.QuadPart * LINE_PER_SEC); //å½“å‰ç¼“å­˜çš„è¡Œåç§»
+	int no  = 0 ;//å½“å‰ç¼“å­˜å·åç§»
 
 
 	for(i = 0 ;i < lineCnt ; ++i){
 		no = (bfLnOff + i) / LINE_PER_SEC;
-		no = (mCurBuf + no)%3;//ÏÂÒ»¸ö»º´æºÅ
+		no = (mCurBuf + no)%3;//ä¸‹ä¸€ä¸ªç¼“å­˜å·
 		//buf+=_T(" ");
 		for (j = 0 ; j < BYTE_PER_LINE ; ++j)
 		{
@@ -471,39 +471,39 @@ void DataWnd::AppEndData(LONG_INT start/*ÆğÊ¼ĞĞºÅ*/ ,int lineCnt/*ĞĞÊı*/)
 
 	this->mDB += buf;
 }
-void DataWnd::AppEndChar(LONG_INT start/*ÆğÊ¼ĞĞºÅ*/ ,int lineCnt/*ĞĞÊı*/)
+void DataWnd::AppEndChar(LONG_INT start/*èµ·å§‹è¡Œå·*/ ,int lineCnt/*è¡Œæ•°*/)
 {
 	CString buf;
 	int index = 0 ,nSC = 0 , nEC = 0 , i = 0 , j = 0;
-	DATA_BUF* dBuf = mDBuf + mCurBuf;		//µ±Ç°»º´æ
+	DATA_BUF* dBuf = mDBuf + mCurBuf;		//å½“å‰ç¼“å­˜
 	UINT bfLnOff = (UINT)(start.QuadPart -\
-		dBuf->mOff.QuadPart * LINE_PER_SEC); //µ±Ç°»º´æµÄĞĞÆ«ÒÆ
-	int no  = 0 ;//µ±Ç°»º´æºÅÆ«ÒÆ
+		dBuf->mOff.QuadPart * LINE_PER_SEC); //å½“å‰ç¼“å­˜çš„è¡Œåç§»
+	int no  = 0 ;//å½“å‰ç¼“å­˜å·åç§»
 	W_CHAR ww;
 
 
 	BYTE temp[18] = {0};		
 	for(i = 0 ;i < lineCnt ; ++i){
 		no = (bfLnOff + i) / LINE_PER_SEC;
-		no = (mCurBuf + no)%3;//ÏÂÒ»¸ö»º´æºÅ
+		no = (mCurBuf + no)%3;//ä¸‹ä¸€ä¸ªç¼“å­˜å·
 
 		::memcpy(temp , mDBuf[no].mBuf + ((bfLnOff + i) % LINE_PER_SEC)*BYTE_PER_LINE , BYTE_PER_LINE);
-		temp[16] = 0;//ÎŞĞ§±àÂë,±ãÓÚÅĞ¶Ï
-		temp[17] = 0;//ÎŞĞ§±àÂë£¬±ãÓÚÅĞ¶Ï
+		temp[16] = 0;//æ— æ•ˆç¼–ç ,ä¾¿äºåˆ¤æ–­
+		temp[17] = 0;//æ— æ•ˆç¼–ç ï¼Œä¾¿äºåˆ¤æ–­
 
-		//if(mIsCharUnic){//CStringµÄ+=ÓĞ±àÂë×ª»»µÄ¹¦ÄÜ
+		//if(mIsCharUnic){//CStringçš„+=æœ‰ç¼–ç è½¬æ¢çš„åŠŸèƒ½
 		//	buf+=(WCHAR*)temp;				
 	//	}else{
 		for (j = 0 ; j < 16 ; ++j)
 		{
 			ww.char1 = temp[j];
 			ww.char2 = temp[j+1];
-			if (IsValidCode(ww , CP_GBK)){ //½ÓÏÂÀ´ÊÇÒ»¸öÓĞĞ§µÄgbk±àÂë
+			if (IsValidCode(ww , CP_GBK)){ //æ¥ä¸‹æ¥æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„gbkç¼–ç 
 				++j;
 				continue;
 			}
 
-			//²»ÊÇÓĞĞ§µÄgbk±àÂëÊ±ÅĞ¶ÏÊÇ²»ÊÇascllÂë
+			//ä¸æ˜¯æœ‰æ•ˆçš„gbkç¼–ç æ—¶åˆ¤æ–­æ˜¯ä¸æ˜¯ascllç 
 			if(temp[j] < 0x20 || temp[j] > 0x7E)	
 				temp[j] =  '.';
 
@@ -528,14 +528,14 @@ void DataWnd::AppHeadOff(int lineCnt)
 	CString buf , temp;
 	int i = 0;
 
-	//ÒªÌí¼ÓµÄµÚÒ»¸ö×Ö½ÚÆ«ÒÆ
-	start.QuadPart =BYTE_PER_LINE*(mDBuf[mCurBuf].mOff.QuadPart * LINE_PER_SEC + mCurBufOff - lineCnt);  //×ª»»×Ö½ÚÆ«ÒÆ
+	//è¦æ·»åŠ çš„ç¬¬ä¸€ä¸ªå­—èŠ‚åç§»
+	start.QuadPart =BYTE_PER_LINE*(mDBuf[mCurBuf].mOff.QuadPart * LINE_PER_SEC + mCurBufOff - lineCnt);  //è½¬æ¢å­—èŠ‚åç§»
 
 	for(i = 0 ;i < lineCnt ; ++i){
 		if(this->mRadix == 10)
 		{
 			if (start.QuadPart % SEC_SIZE == 0 )
-			{//Ò»¸öÉ½ÇøµÄÆäÊµ
+			{//ä¸€ä¸ªå±±åŒºçš„å…¶å®
 				tempLi.QuadPart = start.QuadPart / SEC_SIZE;
 				if (tempLi.QuadPart)
 					temp.Format(_T("%d%d\r\n") , tempLi.HighPart , tempLi.LowPart);
@@ -545,11 +545,11 @@ void DataWnd::AppHeadOff(int lineCnt)
 				temp.Format(_T("%d%d\r\n") , start.HighPart , start.LowPart);
 		}else{
 			if (start.QuadPart % SEC_SIZE == 0 )
-			{//ÉÈÇøºÅ
+			{//æ‰‡åŒºå·
 				tempLi.QuadPart = start.QuadPart / SEC_SIZE;
-				if (tempLi.HighPart)//ÓĞ¸ßÎ»
+				if (tempLi.HighPart)//æœ‰é«˜ä½
 					temp.Format(_T("%X%X#\r\n") , tempLi.HighPart , tempLi.LowPart);
-				else//Ã»ÓĞ¸ßÎ»
+				else//æ²¡æœ‰é«˜ä½
 					temp.Format(_T("%X#\r\n") ,  tempLi.LowPart);
 			}else
 				temp.Format(_T("%X%08X\r\n") , start.HighPart , start.LowPart);
@@ -557,30 +557,30 @@ void DataWnd::AppHeadOff(int lineCnt)
 		start.QuadPart += 16;
 		buf +=temp;
 	}
-	this->mOB= buf + mOB;    //½«Êı¾İÌí¼Óµ½Í·²¿
+	this->mOB= buf + mOB;    //å°†æ•°æ®æ·»åŠ åˆ°å¤´éƒ¨
 }
 void DataWnd::AppHeadData(int lineCnt)
 {
 	CString buf ,temp; 
 	int i = 0 , j = 0 ,no = 0;
 	BYTE b;
-	DATA_BUF* dBuf = mDBuf + mCurBuf;		//µ±Ç°»º´æ
+	DATA_BUF* dBuf = mDBuf + mCurBuf;		//å½“å‰ç¼“å­˜
 	UINT bfLnOff = (UINT)(mDBuf[mCurBuf].mOff.QuadPart * LINE_PER_SEC \
-		+ mCurBufOff - lineCnt)%LINE_PER_SEC; //Êµ¼ÊµÄĞĞºÅ
+		+ mCurBufOff - lineCnt)%LINE_PER_SEC; //å®é™…çš„è¡Œå·
 
 	for(i = 0 ;i < lineCnt ; ++i){
-		//µ±Ç°µÄÒªÌí¼ÓµÄĞĞËùÔÚ»º´æºÅ
+		//å½“å‰çš„è¦æ·»åŠ çš„è¡Œæ‰€åœ¨ç¼“å­˜å·
 		no = (lineCnt - i > mCurBufOff)?(mCurBuf + 2)%3:mCurBuf;
 
 		for (j = 0 ; j < BYTE_PER_LINE ; ++j)
-		{//È¡³öÒ»ĞĞÖĞµÄÃ¿Ò»¸ö×Ö½Ú
+		{//å–å‡ºä¸€è¡Œä¸­çš„æ¯ä¸€ä¸ªå­—èŠ‚
 			b = mDBuf[no].mBuf[((bfLnOff + i) % LINE_PER_SEC)*BYTE_PER_LINE + j];
 			temp.Format(_T("%02X ") , b);
 			if(j == 7)
 				temp+=_T(" ");
 			buf += temp;
 		}
-		//È¥µô×îºóµÄ¿Õ¸ñ
+		//å»æ‰æœ€åçš„ç©ºæ ¼
 		buf.TrimRight();
 		buf+=_T("\r\n");
 	}
@@ -593,31 +593,31 @@ void DataWnd::AppHeadChar(int lineCnt)
 	BYTE temp[18] = {0};	
 	W_CHAR ww;
 
-	DATA_BUF* dBuf = mDBuf + mCurBuf;		//µ±Ç°»º´æ
+	DATA_BUF* dBuf = mDBuf + mCurBuf;		//å½“å‰ç¼“å­˜
 	UINT bfLnOff = (UINT)(mDBuf[mCurBuf].mOff.QuadPart * LINE_PER_SEC \
-		+ mCurBufOff - lineCnt)%LINE_PER_SEC; //Êµ¼ÊµÄĞĞºÅ
+		+ mCurBufOff - lineCnt)%LINE_PER_SEC; //å®é™…çš„è¡Œå·
 
 	for(i = 0 ;i < lineCnt ; ++i){
-		//µ±Ç°µÄÒªÌí¼ÓµÄĞĞËùÔÚ»º´æºÅ
+		//å½“å‰çš„è¦æ·»åŠ çš„è¡Œæ‰€åœ¨ç¼“å­˜å·
 		no = (lineCnt - i > mCurBufOff)?(mCurBuf + 2)%3:mCurBuf;
 
 		::memcpy(temp , mDBuf[no].mBuf + ((bfLnOff + i) % LINE_PER_SEC)*BYTE_PER_LINE , BYTE_PER_LINE);
 		temp[16] = 0;
 		temp[17] = 0;
 
-		//if(mIsCharUnic){//CStringµÄ+=ÓĞ±àÂë×ª»»µÄ¹¦ÄÜ
+		//if(mIsCharUnic){//CStringçš„+=æœ‰ç¼–ç è½¬æ¢çš„åŠŸèƒ½
 		//	buf+=(WCHAR*)temp;				
 		//	}else{
 		for (j = 0 ; j < 16 ; ++j)
 		{
 			ww.char1 = temp[j];
 			ww.char2 = temp[j+1];
-			if (IsValidCode(ww , CP_GBK)){ //½ÓÏÂÀ´ÊÇÒ»¸öÓĞĞ§µÄgbk±àÂë
+			if (IsValidCode(ww , CP_GBK)){ //æ¥ä¸‹æ¥æ˜¯ä¸€ä¸ªæœ‰æ•ˆçš„gbkç¼–ç 
 				++j;
 				continue;
 			}
 			
-			//²»ÊÇÓĞĞ§µÄgbk±àÂëÊ±ÅĞ¶ÏÊÇ²»ÊÇascllÂë
+			//ä¸æ˜¯æœ‰æ•ˆçš„gbkç¼–ç æ—¶åˆ¤æ–­æ˜¯ä¸æ˜¯ascllç 
 			if(temp[j] < 0x20 || temp[j] > 0x7E)	
 				temp[j] =  '.';
 // 			if((temp[j] < 0x20 || temp[j] > 0x7E)&&(!IsGBKHead(temp[j])))	
@@ -639,15 +639,15 @@ void DataWnd::OnSize(UINT nType, int cx, int cy)
   	CRect rect;
 //  	int h = 0;
 // 	
-// 	//»æÖÆ¿Ø¼ş±ß¿ò
+// 	//ç»˜åˆ¶æ§ä»¶è¾¹æ¡†
  	::GetClientRect(this->GetSafeHwnd() , &rect);
 // 	this->GetWindowRect(&rect);
 // 		
-// 	//ÕıÔò¿ÉÒÔÏÔÊ¾³öÀ´µÄĞĞÊı
+// 	//æ­£åˆ™å¯ä»¥æ˜¾ç¤ºå‡ºæ¥çš„è¡Œæ•°
 // 	h = rect.Height() - HEAD_H - LINE_W;
 // 	mVMaxLine = h/mSize.cy;
 	
-	//µ÷ÕûÆ«ÒÆÇøµÄ´óĞ¡
+	//è°ƒæ•´åç§»åŒºçš„å¤§å°
 	if (::IsWindow(this->mEtOffset->GetSafeHwnd()))
 		ReSize(rect);
 
@@ -655,19 +655,19 @@ void DataWnd::OnSize(UINT nType, int cx, int cy)
 BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 {
 	//static bool isFirst = true;
-	//ÆÁ±ÎESC¼ü
+	//å±è”½ESCé”®
 	if (pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_ESCAPE)
 		return TRUE;
 
-	//Ã»ÓĞ¼ÓÔØ¹ıÊı¾İµÄ»° ¾ÍÊ²Ã´¶¼²»×ö
+	//æ²¡æœ‰åŠ è½½è¿‡æ•°æ®çš„è¯ å°±ä»€ä¹ˆéƒ½ä¸åš
 	if (mCurBuf == -1) 		return CWnd::PreTranslateMessage(pMsg);
 
-	//»ñµÃµ±Ç°Êó±êµÄÎ»ÖÃ
+	//è·å¾—å½“å‰é¼ æ ‡çš„ä½ç½®
 	int xPos = GET_X_LPARAM(pMsg->lParam); 
 	int yPos = GET_Y_LPARAM(pMsg->lParam); 
 	CRect rect;
 	
-	if (pMsg->message == WM_MOUSEWHEEL)		//Êó±ê¹öÂÖÏûÏ¢
+	if (pMsg->message == WM_MOUSEWHEEL)		//é¼ æ ‡æ»šè½®æ¶ˆæ¯
 	{
 		if(!OnMouseWheel(pMsg))
 			return CWnd::PreTranslateMessage(pMsg);
@@ -675,16 +675,16 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 	}
 	
-	//°´×¡×ó¼üÒÆ¶¯
+	//æŒ‰ä½å·¦é”®ç§»åŠ¨
 	if( (pMsg->wParam & MK_LBUTTON) && (pMsg->message == WM_MOUSEMOVE))
 	{
 		if (isFirst)
 			return CWnd::PreTranslateMessage(pMsg);
 // #ifdef _DEBUG
-// 		AfxMessageBox(_T("Êó±êÒÆ¶¯"));
+// 		AfxMessageBox(_T("é¼ æ ‡ç§»åŠ¨"));
 // #endif // _DEBUG
 
-		//¹â±êÔÚ×Ó¿Ø¼şµÄÎ»ÖÃ
+		//å…‰æ ‡åœ¨å­æ§ä»¶çš„ä½ç½®
 		mEtData->GetWindowRect(&rect);
 		if(rect.PtInRect(pMsg->pt)){
 			if(!OnDataLBtnMsMv(pMsg))
@@ -694,8 +694,8 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 
 		mEtChar->GetWindowRect(&rect);
 		if (rect.PtInRect(pMsg->pt))
-		{	//ÔÚ×Ö·ûÏÔÊ¾Çø
-			//½«×Ö·ûÇøµÄÑ¡ÔñÍ¬²½¸øÊı¾İÇø
+		{	//åœ¨å­—ç¬¦æ˜¾ç¤ºåŒº
+			//å°†å­—ç¬¦åŒºçš„é€‰æ‹©åŒæ­¥ç»™æ•°æ®åŒº
 			SyncSel(2 , true);
 
 			//if(!OnCharLBtnMsMv(pMsg))
@@ -705,12 +705,12 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 
 // 		mEtOffset->GetWindowRect(&rect);
 // 		if (rect.PtInRect(pMsg->pt))
-// 		{	//ÔÚÆ«ÒÆÇø
+// 		{	//åœ¨åç§»åŒº
 // 
 // 		}
 	}
 	
-	//Êó±ê×ó°´¼üÊÂ¼ş
+	//é¼ æ ‡å·¦æŒ‰é”®äº‹ä»¶
 	if(pMsg->message == WM_LBUTTONDOWN ||pMsg->message == WM_LBUTTONDBLCLK )
 	{
 // 		CWnd * wndFocus = GetFocus();
@@ -722,7 +722,7 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 
 		isFirst = false;
 
-		//¹á±êÔÚ×Ó¿Ø¼şµÄÎ»ÖÃ
+		//è´¯æ ‡åœ¨å­æ§ä»¶çš„ä½ç½®
 		mEtData->GetWindowRect(&rect);
 		if(rect.PtInRect(pMsg->pt)){
 			if(!OnDataLBtnDown(pMsg)) 
@@ -733,7 +733,7 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 
 		mEtChar->GetWindowRect(&rect);
 		if (rect.PtInRect(pMsg->pt))
-		{	//ÔÚ×Ö·ûÏÔÊ¾Çø
+		{	//åœ¨å­—ç¬¦æ˜¾ç¤ºåŒº
 			if(!OnCharLBtnDown(pMsg)) 
 				return CWnd::PreTranslateMessage(pMsg);
 			else
@@ -741,7 +741,7 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 		}
 // 		mEtOffset->GetWindowRect(&rect);
 // 		if (rect.PtInRect(pMsg->pt))
-// 		{	//ÔÚÆ«ÒÆÇø
+// 		{	//åœ¨åç§»åŒº
 // 
 // 		}
 	}
@@ -752,33 +752,33 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 // {
 // 	if(pSBar != this->mVScro) return;
 // 
-// 	//¹ö¶¯ÌõĞÅÏ¢
+// 	//æ»šåŠ¨æ¡ä¿¡æ¯
 // 	SCROLLINFO scif;
 // 	int i = 0;
-// 	//»ñµÃµ±Ç°¹ö¶¯ÌõµÄĞÅÏ¢
+// 	//è·å¾—å½“å‰æ»šåŠ¨æ¡çš„ä¿¡æ¯
 // 	pSBar->GetScrollInfo(&scif,SIF_ALL);   
 // 	i = scif.nPos;
 // 	switch (nSBCode)   
 // 	{  
-// 	case SB_BOTTOM:		//¹ö¶¯µ½Ä©Î²
+// 	case SB_BOTTOM:		//æ»šåŠ¨åˆ°æœ«å°¾
 // 		//pSBar->sroScrollWindow(0,(scrollinfo.nPos-scrollinfo.nMax));   
 // 		scif.nPos = scif.nMax;
 // 		
 // 		break;   
-// 	case SB_TOP:		//¹öµ½¶¥²¿ 
+// 	case SB_TOP:		//æ»šåˆ°é¡¶éƒ¨ 
 // 		scif.nPos = 0;
 // 		break;   
-// 	case SB_LINEUP:		//ÉÏÃæÒ»ĞĞ 
+// 	case SB_LINEUP:		//ä¸Šé¢ä¸€è¡Œ 
 // 		scif.nPos = scif.nPos -2;
 // 		if(scif.nPos < scif.nMin)
 // 			scif.nPos  = scif.nMin;
 // 		break;   
-// 	case SB_LINEDOWN:	//ÏÂÒ»ĞĞ
+// 	case SB_LINEDOWN:	//ä¸‹ä¸€è¡Œ
 // 		scif.nPos = scif.nPos +2;
 // 		if (scif.nPos > scif.nMax)     
 // 			scif.nPos = scif.nMax;   
 // 		break; 
-// 	case SB_PAGEUP:		//ÉÏÒ»Ò³
+// 	case SB_PAGEUP:		//ä¸Šä¸€é¡µ
 // 		scif.nPos -= 5;
 // 		if (scif.nPos<scif.nMin)
 // 			scif.nPos = scif.nMin;    
@@ -800,57 +800,57 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 // 
 // BOOL DataWnd::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) 
 // {
-// 	//ÏÈÉ¾ºóÌí
+// 	//å…ˆåˆ åæ·»
 // //	int zDelta = GET_WHEEL_DELTA_WPARAM(pMsg->wParam);
-// 	int lc = 0 ;  //ĞĞÊı
+// 	int lc = 0 ;  //è¡Œæ•°
 // 	int toDel = 0;
 // 
-// 	AfxMessageBox(_T("ÊÕµ½ÁËÁËÏûÏ¢"));
+// 	AfxMessageBox(_T("æ”¶åˆ°äº†äº†æ¶ˆæ¯"));
 // 	
-// 	//»¹Ã»ÓĞ¼ÓÔØ¹ıÊı¾İ
+// 	//è¿˜æ²¡æœ‰åŠ è½½è¿‡æ•°æ®
 // 	if (mCurBuf == -1)
 // 		return TRUE;
 // 	
-// 	if(zDelta < 0){   //Ò³ÃæÍùÉÏÒÆ
-// 		//ÅĞ¶ÏÊÇ·ñ¿ÉÒÔÍùÉÏÒÆ
-// 		if(mLineCnt <= this->mVMaxLine) //¹ö²»¶¯ÁË
+// 	if(zDelta < 0){   //é¡µé¢å¾€ä¸Šç§»
+// 		//åˆ¤æ–­æ˜¯å¦å¯ä»¥å¾€ä¸Šç§»
+// 		if(mLineCnt <= this->mVMaxLine) //æ»šä¸åŠ¨äº†
 // 			return TRUE;
 // 		lc = (zDelta / (-120)) * 2 ;
 // 		lc = 3;
 // 		DelHeadLn(lc);
 // 		this->mLineCnt -= lc;
 // 		this->mCurBufOff += lc;
-// 		if(mCurBufOff / LINE_PER_SEC > 0){	//¸ÃÏÔÊ¾ÏÂÒ»¸ö»º´æÇøÁË£¿£¿
-// 			mCurBuf = (mCurBuf + 1) % 3;	//ÏÂÒ»¸ö»º´æ
-// 			mCurBufOff %= LINE_PER_SEC;			//ÏßµÄÆ«ÒÆ
+// 		if(mCurBufOff / LINE_PER_SEC > 0){	//è¯¥æ˜¾ç¤ºä¸‹ä¸€ä¸ªç¼“å­˜åŒºäº†ï¼Ÿï¼Ÿ
+// 			mCurBuf = (mCurBuf + 1) % 3;	//ä¸‹ä¸€ä¸ªç¼“å­˜
+// 			mCurBufOff %= LINE_PER_SEC;			//çº¿çš„åç§»
 // 		}
 // 		AppEndAll(lc);
 // 		
 // 	}else if(zDelta > 0)
-// 	{//Ò³ÃæÍùÏÂÒÆ
+// 	{//é¡µé¢å¾€ä¸‹ç§»
 // 		DATA_BUF* dBuf = mDBuf + mCurBuf;
-// 		if(dBuf->mOff.QuadPart <= 0 && mCurBufOff == 0)//²»ÄÜÍùÏÂ¹öÁË
+// 		if(dBuf->mOff.QuadPart <= 0 && mCurBufOff == 0)//ä¸èƒ½å¾€ä¸‹æ»šäº†
 // 			return TRUE;
 // 		lc = (zDelta / 120) * 2 ;
-// 		AfxMessageBox("³ö´íÁË");
+// 		AfxMessageBox("å‡ºé”™äº†");
 // 		
 // 		lc = 3;
-// 		if(!lc)	return TRUE;//Ã»ÓĞÒª¹ö¶¯µÄÊı¾İ
+// 		if(!lc)	return TRUE;//æ²¡æœ‰è¦æ»šåŠ¨çš„æ•°æ®
 // 		
 // 		
-// 		//É¾³ıÎ²²¿µÄ¼¸ĞĞÊı¾İ
-// 		toDel = (mLineCnt + lc)%(LINE_PER_SEC * 2);//ÒªÉ¾³ıµÄĞĞÊı
-// 		if(toDel){//Êı¾İ³¬¹ıÁË Á½¸öÉÈÇøµÄ»º´æ   ĞèÒªÉ¾³ı
+// 		//åˆ é™¤å°¾éƒ¨çš„å‡ è¡Œæ•°æ®
+// 		toDel = (mLineCnt + lc)%(LINE_PER_SEC * 2);//è¦åˆ é™¤çš„è¡Œæ•°
+// 		if(toDel){//æ•°æ®è¶…è¿‡äº† ä¸¤ä¸ªæ‰‡åŒºçš„ç¼“å­˜   éœ€è¦åˆ é™¤
 // 			DelTailLn(toDel);
 // 			mLineCnt -= toDel;
 // 		}
-// 		AppHeadAll(lc);		//¸üĞÂ¸÷¸öÏÔÊ¾Çø
-// 		//¼ÆËãµ±Ç°»º´æµÄÆ«ÒÆ
+// 		AppHeadAll(lc);		//æ›´æ–°å„ä¸ªæ˜¾ç¤ºåŒº
+// 		//è®¡ç®—å½“å‰ç¼“å­˜çš„åç§»
 // 		mCurBufOff -= lc;
 // 		if (mCurBufOff < 0)
-// 		{//µ½ÁËÉÏÒ»¸ö»º´æ
-// 			mCurBuf = (mCurBuf + 2)%3;//ÉÏÒ»¸ö»º´æºÅ
-// 			mCurBufOff += LINE_PER_SEC; //ÉÏÒ»¸ö»º´æÖĞÆ«ÒÆ
+// 		{//åˆ°äº†ä¸Šä¸€ä¸ªç¼“å­˜
+// 			mCurBuf = (mCurBuf + 2)%3;//ä¸Šä¸€ä¸ªç¼“å­˜å·
+// 			mCurBufOff += LINE_PER_SEC; //ä¸Šä¸€ä¸ªç¼“å­˜ä¸­åç§»
 // 		}
 // 	}
 // 	return TRUE;
@@ -860,90 +860,90 @@ BOOL DataWnd::PreTranslateMessage(MSG* pMsg)
 
 BOOL DataWnd::OnMouseWheel(MSG* pMsg)
 {
-	//ÏÈÉ¾ºóÌí
+	//å…ˆåˆ åæ·»
 	short	zDelta =  (short) HIWORD(pMsg->wParam);
-	int		lc = 0 ;  //ĞĞÊı
+	int		lc = 0 ;  //è¡Œæ•°
 	int		toDel = 0;
 	DATA_BUF* dBuf = NULL;
 
-	BOOL isCurSecChg = FALSE;		//µ±Ç°ÉÈÇøÊÇ·ñÓĞ±ä»¯
+	BOOL isCurSecChg = FALSE;		//å½“å‰æ‰‡åŒºæ˜¯å¦æœ‰å˜åŒ–
 
-	//»¹Ã»ÓĞ¼ÓÔØ¹ıÊı¾İ
+	//è¿˜æ²¡æœ‰åŠ è½½è¿‡æ•°æ®
 	if (-1 == mCurBuf || 0 == zDelta)
 		return TRUE;
 	
-	if(zDelta < 0){   //Ò³ÃæÍùÉÏÒÆ  ĞèÒªÏÔÊ¾ºóÃæµÄÊı¾İ
-		//ÅĞ¶ÏÊÇ·ñ¿ÉÒÔÍùÉÏÒÆ
+	if(zDelta < 0){   //é¡µé¢å¾€ä¸Šç§»  éœ€è¦æ˜¾ç¤ºåé¢çš„æ•°æ®
+		//åˆ¤æ–­æ˜¯å¦å¯ä»¥å¾€ä¸Šç§»
 		
-		//ĞèÒª²éÑ¯ÅäÖÃÎÄ¼ş×îĞ¡¿ÉÒÔÏÔÊ¾µÄĞĞÊı
-		TRACE0("ĞèÒª²éÑ¯×îÉÙ¿ÉÒÔÏÔÊ¾µÄĞĞÊı");
+		//éœ€è¦æŸ¥è¯¢é…ç½®æ–‡ä»¶æœ€å°å¯ä»¥æ˜¾ç¤ºçš„è¡Œæ•°
+		TRACE0("éœ€è¦æŸ¥è¯¢æœ€å°‘å¯ä»¥æ˜¾ç¤ºçš„è¡Œæ•°");
 
-		if(mLineCnt <= 5) //¹ö²»¶¯ÁË
+		if(mLineCnt <= 5) //æ»šä¸åŠ¨äº†
 			return TRUE;
 		lc = (zDelta / (-WHEEL_DELTA)) * 2 ;
 
 		DelHeadLn(lc);
 		this->mLineCnt -= lc;
 		this->mCurBufOff += lc;
-		if(mCurBufOff / LINE_PER_SEC > 0)//¸ÃÏÔÊ¾ÏÂÒ»¸ö»º´æÇøÁË£¿£¿
+		if(mCurBufOff / LINE_PER_SEC > 0)//è¯¥æ˜¾ç¤ºä¸‹ä¸€ä¸ªç¼“å­˜åŒºäº†ï¼Ÿï¼Ÿ
 		{					
-			mCurBuf = (mCurBuf + 1) % 3;	//ÏÂÒ»¸ö»º´æ
-			mCurBufOff %= LINE_PER_SEC;		//ÏßµÄÆ«ÒÆ
-			isCurSecChg = TRUE;				//µ±Ç°ÉÈºÅÓĞ±ä»¯
+			mCurBuf = (mCurBuf + 1) % 3;	//ä¸‹ä¸€ä¸ªç¼“å­˜
+			mCurBufOff %= LINE_PER_SEC;		//çº¿çš„åç§»
+			isCurSecChg = TRUE;				//å½“å‰æ‰‡å·æœ‰å˜åŒ–
 		}
 
-		//ÔÚºóÃæÌí¼ÓÊı¾İ
+		//åœ¨åé¢æ·»åŠ æ•°æ®
 		AppEndAll(lc);
 		
-	}else if(zDelta > 0)   //ĞèÒªÏÔÊ¾Ç°ÃæµÄÊı¾İ
-	{//Ò³ÃæÍùÏÂÒÆ
-		dBuf = mDBuf + mCurBuf;  //µ±Ç°»º´æ
+	}else if(zDelta > 0)   //éœ€è¦æ˜¾ç¤ºå‰é¢çš„æ•°æ®
+	{//é¡µé¢å¾€ä¸‹ç§»
+		dBuf = mDBuf + mCurBuf;  //å½“å‰ç¼“å­˜
 
-		//ÒªÒÆ¶¯µÄĞĞÊı
+		//è¦ç§»åŠ¨çš„è¡Œæ•°
 		lc = (zDelta / WHEEL_DELTA) * 2 ;
 		
 		if(mStartSector.QuadPart == dBuf->mOff.QuadPart )
-		{//²»ÄÜÍùÏÂ¹öÁË
+		{//ä¸èƒ½å¾€ä¸‹æ»šäº†
 			
-			if(mCurBufOff == 0) //ÒÑ¾­Ã»ÓĞÊ²Ã´ÒªÏÔÊ¾µÄÁË
+			if(mCurBufOff == 0) //å·²ç»æ²¡æœ‰ä»€ä¹ˆè¦æ˜¾ç¤ºçš„äº†
 				return TRUE;
 
 			if (mCurBufOff < lc)
-			{//ÔÚµÚÒ»¸öÉÈÇø×î´ó¹ö¶¯µÄĞĞÊıÓĞÏŞ
+			{//åœ¨ç¬¬ä¸€ä¸ªæ‰‡åŒºæœ€å¤§æ»šåŠ¨çš„è¡Œæ•°æœ‰é™
 				lc = mCurBufOff;
 			}
 		}
 		
 
-		if(0 == lc)//Ã»ÓĞÒª¹ö¶¯µÄÊı¾İ
+		if(0 == lc)//æ²¡æœ‰è¦æ»šåŠ¨çš„æ•°æ®
 			return TRUE;
 				
-		//É¾³ıÎ²²¿µÄ¼¸ĞĞÊı¾İ
+		//åˆ é™¤å°¾éƒ¨çš„å‡ è¡Œæ•°æ®
 		
 		if (mLineCnt + lc > LINE_PER_SEC * 2)
-		{//ÓĞĞèÒªµÄÉ¾³ıµÄ
-			toDel = (mLineCnt + lc)%(LINE_PER_SEC * 2);//ÒªÉ¾³ıµÄĞĞÊı
-			if(toDel){//Êı¾İ³¬¹ıÁË Á½¸öÉÈÇøµÄ»º´æ   ĞèÒªÉ¾³ı
+		{//æœ‰éœ€è¦çš„åˆ é™¤çš„
+			toDel = (mLineCnt + lc)%(LINE_PER_SEC * 2);//è¦åˆ é™¤çš„è¡Œæ•°
+			if(toDel){//æ•°æ®è¶…è¿‡äº† ä¸¤ä¸ªæ‰‡åŒºçš„ç¼“å­˜   éœ€è¦åˆ é™¤
 				DelTailLn(toDel);
 				mLineCnt -= toDel;
 			}
 		}
 
-		AppHeadAll(lc);//¸üĞÂ¸÷¸öÏÔÊ¾Çø		
-		//¼ÆËãµ±Ç°»º´æµÄÆ«ÒÆ
+		AppHeadAll(lc);//æ›´æ–°å„ä¸ªæ˜¾ç¤ºåŒº		
+		//è®¡ç®—å½“å‰ç¼“å­˜çš„åç§»
 		mCurBufOff -= lc;
 		if (mCurBufOff < 0)
-		{//µ½ÁËÉÏÒ»¸ö»º´æ
-			mCurBuf = (mCurBuf + 2) % 3;//ÉÏÒ»¸ö»º´æºÅ
-			mCurBufOff += LINE_PER_SEC; //ÉÏÒ»¸ö»º´æÖĞÆ«ÒÆ
+		{//åˆ°äº†ä¸Šä¸€ä¸ªç¼“å­˜
+			mCurBuf = (mCurBuf + 2) % 3;//ä¸Šä¸€ä¸ªç¼“å­˜å·
+			mCurBufOff += LINE_PER_SEC; //ä¸Šä¸€ä¸ªç¼“å­˜ä¸­åç§»
 			isCurSecChg = TRUE;
 		}
 	}
 
 	
-	if (isCurSecChg)//ÓĞĞèÒªµÄ»°Ïò¸¸´°¿Ú·¢ËÍÏûÏ¢
+	if (isCurSecChg)//æœ‰éœ€è¦çš„è¯å‘çˆ¶çª—å£å‘é€æ¶ˆæ¯
 	{
-		dBuf = mDBuf + mCurBuf;  //µ±Ç°»º´æ
+		dBuf = mDBuf + mCurBuf;  //å½“å‰ç¼“å­˜
 		this->GetParent()->SendMessage(DATA_CHANGE_SECTOR , dBuf->mOff.LowPart , dBuf->mOff.HighPart);
 	}
 
@@ -954,50 +954,50 @@ BOOL DataWnd::OnMouseWheel(MSG* pMsg)
 
 BOOL DataWnd::OnDataLBtnMsMv(MSG* pMsg)
 {
-	//´Îº¯ÊıÎÒ±íÊ¾ºÜÓôÃÆ   
-	//ÏÈÊÇµ±Ç°Êó±êµÄÎ»ÖÃ  xPos yPos
-	//ÔÙÍ¨¹ı´Ëµã»ñµÃ×Ö·ûµÄÆ«ÒÆ
-	//Ö®ºó¾ÍÊÇ¼ÆËã×Ö·ûÔÚĞĞÖĞµÄÆ«ÒÆ
-	//Ò»ĞĞ¿ÉÒÔÏÔÊ¾ 16¸ö×Ö½Ú£¬Ã¿¸ö×Ö½ÚÓÃÁ½¸ö×Ö·û±íÊ¾
-	//Ã¿ÏÔÊ¾Ò»¸ö×Ö½Úºóºó¼ÓÒ»¸ö¿Õ¸ñ£¬Ò²¾ÍÏàµ±ÓÚÒ»¸ö×Ö½ÚĞèÒª3¸ö×Ö·û¸öÏÔÊ¾¿Õ¼ä 
-	//ÏÔÊ¾ÁË8¸ö×Ö½ÚÖ®ºóÓÃÒ»¸ö¿Õ¸ñ¸ô¿ª
-	//ĞĞÎ²ÊÇ \r\n  
-	//Ò²¾ÍÊÇËµÃ¿16¸ö×Ö½ÚĞèÒª 16*3+2 = 50¸ö×Ö·û¿Õ¼ä
-	//¸ü¾ßÒÔÉÏµÄÃèÊö¾Í¿ÉÒÔ¼ÆËãÑ¡ÔñÎÄ±¾µÄ·½Ê½ÁË
+	//æ¬¡å‡½æ•°æˆ‘è¡¨ç¤ºå¾ˆéƒé—·   
+	//å…ˆæ˜¯å½“å‰é¼ æ ‡çš„ä½ç½®  xPos yPos
+	//å†é€šè¿‡æ­¤ç‚¹è·å¾—å­—ç¬¦çš„åç§»
+	//ä¹‹åå°±æ˜¯è®¡ç®—å­—ç¬¦åœ¨è¡Œä¸­çš„åç§»
+	//ä¸€è¡Œå¯ä»¥æ˜¾ç¤º 16ä¸ªå­—èŠ‚ï¼Œæ¯ä¸ªå­—èŠ‚ç”¨ä¸¤ä¸ªå­—ç¬¦è¡¨ç¤º
+	//æ¯æ˜¾ç¤ºä¸€ä¸ªå­—èŠ‚åååŠ ä¸€ä¸ªç©ºæ ¼ï¼Œä¹Ÿå°±ç›¸å½“äºä¸€ä¸ªå­—èŠ‚éœ€è¦3ä¸ªå­—ç¬¦ä¸ªæ˜¾ç¤ºç©ºé—´ 
+	//æ˜¾ç¤ºäº†8ä¸ªå­—èŠ‚ä¹‹åç”¨ä¸€ä¸ªç©ºæ ¼éš”å¼€
+	//è¡Œå°¾æ˜¯ \r\n  
+	//ä¹Ÿå°±æ˜¯è¯´æ¯16ä¸ªå­—èŠ‚éœ€è¦ 16*3+2 = 50ä¸ªå­—ç¬¦ç©ºé—´
+	//æ›´å…·ä»¥ä¸Šçš„æè¿°å°±å¯ä»¥è®¡ç®—é€‰æ‹©æ–‡æœ¬çš„æ–¹å¼äº†
 
 
-	//µ±Ç°¹á±êÔÚÉè±¸¿Í»§ÇøµÄÎ»ÖÃ
+	//å½“å‰è´¯æ ‡åœ¨è®¾å¤‡å®¢æˆ·åŒºçš„ä½ç½®
 	int xPos = GET_X_LPARAM(pMsg->lParam); 
 	int yPos = GET_Y_LPARAM(pMsg->lParam); 
 
 	CPoint   myPt(xPos , yPos); 
 	int	n = mEtData->CharFromPos(myPt); 
-	int ncIdx = LOWORD(n); //¹â±êËùÔÚµÄ×Ö·ûµÄÎ»ÖÃ
-	int nSs , nEs;//¾ßÌåÑ¡ÔñµÄÎ»ÖÃ
+	int ncIdx = LOWORD(n); //å…‰æ ‡æ‰€åœ¨çš„å­—ç¬¦çš„ä½ç½®
+	int nSs , nEs;//å…·ä½“é€‰æ‹©çš„ä½ç½®
 
-	//»ñµÃµ±Ç°Ñ¡ÔñµÄÇøÓò
+	//è·å¾—å½“å‰é€‰æ‹©çš„åŒºåŸŸ
 	mEtData->GetSel(nSs ,nEs);
- 	if((abs(ncIdx - nSs) > abs(nEs - ncIdx ))//µ±Ç°Êó±ê¸ü¿¿½üÒÑÑ¡ÔñµÄ×îºóÒ»¸ö×Ö·û
-		||((nSs == nEs)&&(ncIdx > nEs)))	 //»¹Ã»ÓĞÑ¡Ôñ£¬µ«ÊÇÊó±êÔÚ²åÈëµãµÄºóÃæ
- 	{//¹á±ê¿¿½ü±»Ñ¡ÖĞµÄ×îºóÒ»¸ö×Ö·û
+ 	if((abs(ncIdx - nSs) > abs(nEs - ncIdx ))//å½“å‰é¼ æ ‡æ›´é è¿‘å·²é€‰æ‹©çš„æœ€åä¸€ä¸ªå­—ç¬¦
+		||((nSs == nEs)&&(ncIdx > nEs)))	 //è¿˜æ²¡æœ‰é€‰æ‹©ï¼Œä½†æ˜¯é¼ æ ‡åœ¨æ’å…¥ç‚¹çš„åé¢
+ 	{//è´¯æ ‡é è¿‘è¢«é€‰ä¸­çš„æœ€åä¸€ä¸ªå­—ç¬¦
 
-		if(nSs%50 < 3*8)//ÒÑÑ¡ÔñµÄ×Ö·ûÔÚÒ»ĞĞµÄÇ°°ëĞĞ
+		if(nSs%50 < 3*8)//å·²é€‰æ‹©çš„å­—ç¬¦åœ¨ä¸€è¡Œçš„å‰åŠè¡Œ
 			nSs = nSs/50*50 + (nSs%50+1)/3*3;
-		else			//ÒÑÑ¡ÔñµÄ×Ö·ûÔÚÒ»ĞĞµÄºó°ë²¿·Ö
+		else			//å·²é€‰æ‹©çš„å­—ç¬¦åœ¨ä¸€è¡Œçš„ååŠéƒ¨åˆ†
 			nSs = nSs/50*50 + nSs%50/3*3+1;
 
-		if(ncIdx%50 < 3*8)		//µ±Ç°Êó±êÔÚÒ»ĞĞµÄÇ°°ë²¿·Ö
+		if(ncIdx%50 < 3*8)		//å½“å‰é¼ æ ‡åœ¨ä¸€è¡Œçš„å‰åŠéƒ¨åˆ†
 			nEs = ncIdx/50*50 + ncIdx%50/3*3+2 ;
-		else if(ncIdx%50 > 3*8)	//µ±Ç°Êó±êÔÚÒ»ĞĞµÄºó°ë²¿·Ö
+		else if(ncIdx%50 > 3*8)	//å½“å‰é¼ æ ‡åœ¨ä¸€è¡Œçš„ååŠéƒ¨åˆ†
 			nEs =ncIdx/50*50 + (ncIdx%50+2)/3*3;
-		else					//ÖĞ¼ä
+		else					//ä¸­é—´
 			nEs =ncIdx/50*50 + (ncIdx%50-1)/3*3 +2;
 
  	}
  	else 
 	if((abs(ncIdx - nSs) < abs(nEs - ncIdx) + 1) || ((nSs == nEs)&&(ncIdx < nSs))
 		)
-	{//¹â±ê¿¿½ü±»Ñ¡ÖĞµÄµÚÒ»¸ö×Ö·û
+	{//å…‰æ ‡é è¿‘è¢«é€‰ä¸­çš„ç¬¬ä¸€ä¸ªå­—ç¬¦
 
 		if (nEs%50 < 3*8)
 			nEs = nEs/50*50 + (nEs%50-1)/3*3+2;
@@ -1014,15 +1014,15 @@ BOOL DataWnd::OnDataLBtnMsMv(MSG* pMsg)
 	else
 		return FALSE;
 
-	//ÉèÖÃÑ¡ÔñµÄ×Ö·û
+	//è®¾ç½®é€‰æ‹©çš„å­—ç¬¦
 	if(nEs >= nSs){
-		//ÉèÖÃµ±Ç°Ñ¡ÔñÏî
+		//è®¾ç½®å½“å‰é€‰æ‹©é¡¹
  		mEtData->SetSel(nSs ,  nEs , FALSE);
 
-		//±£´æÒ»ÏÂÑ¡ÔñÎ»ÖÃ
+		//ä¿å­˜ä¸€ä¸‹é€‰æ‹©ä½ç½®
 		SeveSelPos(nSs , nEs);
 
- 		//Í¬²½µ½×Ö·ûÇø
+ 		//åŒæ­¥åˆ°å­—ç¬¦åŒº
 		SyncSel(1 , true);
 	}
 
@@ -1037,22 +1037,22 @@ BOOL DataWnd::OnDataLBtnMsMv(MSG* pMsg)
 // 	CPoint   myPt(xPos , yPos); 
 // 	int	n = mEtChar->CharFromPos(myPt); 
 // 	int ncIdx = LOWORD(n); 
-// 	int nSs , nEs;//¾ßÌåÑ¡ÔñµÄÎ»ÖÃ
+// 	int nSs , nEs;//å…·ä½“é€‰æ‹©çš„ä½ç½®
 // 
-// 	//»ñµÃµ±Ç°Ñ¡ÔñµÄÇøÓò
+// 	//è·å¾—å½“å‰é€‰æ‹©çš„åŒºåŸŸ
 // 	mEtData->GetSel(nSs ,nEs);
 // 	
 // 	if((abs(ncIdx - nSs) > abs(nEs - ncIdx ))||((nSs == nEs)&&(ncIdx > nEs)))
-// 	{//¹á±ê¿¿½ü±»Ñ¡ÖĞµÄ×îºóÒ»¸ö×Ö·û
+// 	{//è´¯æ ‡é è¿‘è¢«é€‰ä¸­çš„æœ€åä¸€ä¸ªå­—ç¬¦
 // 		nEs = ncIdx;
 // 	}else  if((abs(ncIdx - nSs) < abs(nEs - ncIdx))||((nSs == nEs)&&(ncIdx < nSs)))
-// 	{//¹á±ê¿¿½ü±»Ñ¡ÖĞµÄµÚÒ»¸ö×Ö·û
+// 	{//è´¯æ ‡é è¿‘è¢«é€‰ä¸­çš„ç¬¬ä¸€ä¸ªå­—ç¬¦
 // 		nSs = ncIdx;
 // 	}else
 // 		return TRUE;
 // 
 // 	mEtData->GetSel(nSs ,nEs);
-// 	SyncSel(2);//Í¬²½Ñ¡ÔñÊı¾İÇø
+// 	SyncSel(2);//åŒæ­¥é€‰æ‹©æ•°æ®åŒº
 // 
 // 	return FALSE;
 // 
@@ -1063,7 +1063,7 @@ BOOL DataWnd::OnCharLBtnDown(MSG *pMsg)
 	int yPos = GET_Y_LPARAM(pMsg->lParam);
 	
 	::SetFocus(mEtChar->GetSafeHwnd());
-	//ÔÚÊı¾İÇøÒÆ¶¯
+	//åœ¨æ•°æ®åŒºç§»åŠ¨
 	CPoint   myPt(xPos , yPos); 
 	int	n = mEtChar->CharFromPos(myPt); 
 	int  ncIdx = LOWORD(n); 
@@ -1079,7 +1079,7 @@ BOOL DataWnd::OnDataLBtnDown(MSG* pMsg)
 	int yPos = GET_Y_LPARAM(pMsg->lParam);
 
 	::SetFocus(mEtData->GetSafeHwnd());
-	//ÔÚÊı¾İÇøÒÆ¶¯
+	//åœ¨æ•°æ®åŒºç§»åŠ¨
 	CPoint   myPt(xPos , yPos); 
 	int	n = mEtData->CharFromPos(myPt); 
 	int  ncIdx = LOWORD(n); 
@@ -1093,7 +1093,7 @@ BOOL DataWnd::OnDataLBtnDown(MSG* pMsg)
 
 	mEtData->SetSel( ncIdx ,  ncIdx , TRUE);
 
-	//È¡ÏûÑ¡ÔñÇøÓòµÄÑ¡Ôñ
+	//å–æ¶ˆé€‰æ‹©åŒºåŸŸçš„é€‰æ‹©
 	this->mSelEnd.QuadPart = -1;
 	this->mSelStart.QuadPart = -1;
 
@@ -1111,18 +1111,18 @@ BOOL DataWnd::FillBuf(int num , BOOL isNext)
 void DataWnd::DelHeadLn(int lnSize)
 {
 	int i , dC = 0;
-	//È¥µôÆ«ÒÆµÄ¼¸ĞĞ
+	//å»æ‰åç§»çš„å‡ è¡Œ
 	for(i = 0 ; i < lnSize ; ++i)
 		dC = this->mOB.Find(_T("\r\n") ,dC) + 2;
 	mOB = mOB.Mid(dC);
 	
-	//È¥µôÊı¾İµÄ¼¸ĞĞ
+	//å»æ‰æ•°æ®çš„å‡ è¡Œ
 	dC = 0;
 	for(i = 0 ; i < lnSize ; ++i)
 		dC = this->mDB.Find(_T("\r\n") ,dC) + 2;
 	mDB = mDB.Mid(dC);
 
-	//È¥µôÊı¾İµÄ¼¸ĞĞ
+	//å»æ‰æ•°æ®çš„å‡ è¡Œ
 	dC = 0;
 	for(i = 0 ; i < lnSize ; ++i)
 		dC = this->mCB.Find(_T("\r\n") ,dC) + 2;
@@ -1132,7 +1132,7 @@ void DataWnd::DelHeadLn(int lnSize)
 void DataWnd::DelTailLn(int lnC)
 {
 	ASSERT(lnC > 0);
-	//È¥µôÆ«ÒÆµÄ¼¸ĞĞ
+	//å»æ‰åç§»çš„å‡ è¡Œ
 	int i = 0;
 	int index = 0;
 	for(i = 0 ; i <= lnC ; ++i )
@@ -1150,10 +1150,10 @@ void DataWnd::DelTailLn(int lnC)
 
 BOOL DataWnd::SetDataSec( LONG_INT liSecStart ,LONG_INT liSecCount )
 {
-	//ÉèÖÃÉèÖÃÉÈÇø×ÜÊı
+	//è®¾ç½®è®¾ç½®æ‰‡åŒºæ€»æ•°
 	this->mCount.QuadPart = liSecCount.QuadPart;
 	this->mStartSector = liSecStart;
-// 	//ÉèÖÃ¹ö¶¯ÌõĞÅÏ¢
+// 	//è®¾ç½®æ»šåŠ¨æ¡ä¿¡æ¯
 // 	SCROLLINFO scif;
 // 	scif.cbSize = sizeof(SCROLLINFO);
 // 	scif.fMask = SIF_RANGE | SIF_POS | SIF_TRACKPOS;
@@ -1162,41 +1162,41 @@ BOOL DataWnd::SetDataSec( LONG_INT liSecStart ,LONG_INT liSecCount )
 // 	scif.nPos = 0;
 // 	this->mVScro->SetScrollInfo(&scif);
 
-	//ÉèÖÃµ±Ç°ÏÔÊ¾µÄÉÈÇø
+	//è®¾ç½®å½“å‰æ˜¾ç¤ºçš„æ‰‡åŒº
 	return SetCurSec(liSecStart);
 }
 
 BOOL DataWnd::SetCurSec( LONG_INT liSec )
 {
-	//ÉÈÇøºÅ²»ºÏ·¨
+	//æ‰‡åŒºå·ä¸åˆæ³•
 	if((liSec.QuadPart >= mCount.QuadPart)||(liSec.QuadPart < 0))
 		return FALSE;
 
-	//×ÜµÄÉÈÇøÊı
-	::memset(this->mDBuf , 0 , sizeof(DATA_BUF)*3);//ÇåÀí»º´æ
+	//æ€»çš„æ‰‡åŒºæ•°
+	::memset(this->mDBuf , 0 , sizeof(DATA_BUF)*3);//æ¸…ç†ç¼“å­˜
 	this->mDBuf[0].mOff.QuadPart = liSec.QuadPart;
 	this->mCurBufOff = 0;
 	this->mCurBuf = 0;
 	this->mLineCnt = 0;
 
-	//·¢ËÍÏûÏ¢»ñÈ¡Êı¾İ
-	FillBuf(0 , TRUE);				//Ìî³äÒ»ºÅ»º´æ
-	if (this->mDBuf[0].mOff.QuadPart == -1)//»ñÈ¡Ö¸¶¨µÄÉ½ÇøÊı¾İÊ§°Ü
+	//å‘é€æ¶ˆæ¯è·å–æ•°æ®
+	FillBuf(0 , TRUE);				//å¡«å……ä¸€å·ç¼“å­˜
+	if (this->mDBuf[0].mOff.QuadPart == -1)//è·å–æŒ‡å®šçš„å±±åŒºæ•°æ®å¤±è´¥
 		return FALSE;
 
-	//ÏÖÔÚÇåÀíËùÓĞÒÑ¾­ÏÔÊ¾ÁËµÄÊı¾İ
+	//ç°åœ¨æ¸…ç†æ‰€æœ‰å·²ç»æ˜¾ç¤ºäº†çš„æ•°æ®
 	this->mDB = _T("");
 	this->mOB = _T("");
 	this->mCB = _T("");
 
-	this->AppEndAll( LINE_PER_SEC * 2  );//³õÊ¼¸üÏÔ Á½¸öÉÈÇø
+	this->AppEndAll( LINE_PER_SEC * 2  );//åˆå§‹æ›´æ˜¾ ä¸¤ä¸ªæ‰‡åŒº
 
-	//Í¨ÖªÒ»ÏÂµ±Ç°ÉÈÇøºÅÒÑ¾­ÖØĞÂÉèÖÃÁË
-	//ÔÚÕâÀï²»Ö±½Ó·¢Íù´°¿ÚµÄÔ­ÒòÊÇ£¬µÚÒ»´Îµ÷ÓÃÊ±»á¶ÏÑÔ´íÎó£¬ËùÒÔÖ±½Ó·¢¸ø×Ô¼º
-	//ÒòÎª×Ö½ÚÃ»ÓĞ´¦ÀíÕâ¸öÏûÏ¢£¬ËùÒÔÈç¹û¸¸´°¿Ú¿ÉÓÃµÄ»°£¬¸¸´°¿Ú»á´¦ÀíµÄ
+	//é€šçŸ¥ä¸€ä¸‹å½“å‰æ‰‡åŒºå·å·²ç»é‡æ–°è®¾ç½®äº†
+	//åœ¨è¿™é‡Œä¸ç›´æ¥å‘å¾€çª—å£çš„åŸå› æ˜¯ï¼Œç¬¬ä¸€æ¬¡è°ƒç”¨æ—¶ä¼šæ–­è¨€é”™è¯¯ï¼Œæ‰€ä»¥ç›´æ¥å‘ç»™è‡ªå·±
+	//å› ä¸ºå­—èŠ‚æ²¡æœ‰å¤„ç†è¿™ä¸ªæ¶ˆæ¯ï¼Œæ‰€ä»¥å¦‚æœçˆ¶çª—å£å¯ç”¨çš„è¯ï¼Œçˆ¶çª—å£ä¼šå¤„ç†çš„
 	::SendMessage( this->GetSafeHwnd(), DATA_CHANGE_SECTOR , liSec.LowPart , liSec.HighPart);
 
-	//ÖØĞÂÑ¡ÔñÊı¾İ
+	//é‡æ–°é€‰æ‹©æ•°æ®
 	ReSel();
 	return TRUE;
 }
@@ -1204,38 +1204,38 @@ void  DataWnd::SyncSel(int type , bool isMsgCall)
 {
 	int nS , nE  , t;
 	if(type == 1)
-	{//Í¬²½Êı¾İÊı¾İÇøµ½×Ö·ûÇø
+	{//åŒæ­¥æ•°æ®æ•°æ®åŒºåˆ°å­—ç¬¦åŒº
 		this->mEtData->GetSel(nS ,nE);
 		t = nS;
-		nS = nS/50 *18 + (nS%50 )/3;//¼ÆËãÆğÊ¼Î»ÖÃÔÚ×Ö·ûÈ¥µÄÎ»ÖÃ
+		nS = nS/50 *18 + (nS%50 )/3;//è®¡ç®—èµ·å§‹ä½ç½®åœ¨å­—ç¬¦å»çš„ä½ç½®
 		
-		if (t == nE)//Ã»ÓĞÑ¡ÔñµÄÊı¾İ
+		if (t == nE)//æ²¡æœ‰é€‰æ‹©çš„æ•°æ®
 			nE = nS;
 		else{
 
-			//¼ÆËã½èËŞÎ»ÖÃÔÚ×Ö·ûÇøµÄÎ»ÖÃ
+			//è®¡ç®—å€Ÿå®¿ä½ç½®åœ¨å­—ç¬¦åŒºçš„ä½ç½®
 			if(nE%50 > 3*8)
 				nE = nE/50 *18 + (nE%50+1)/3;
 			else
 				nE = nE/50 *18 + (nE%50+2)/3;
 		}
 		
-		//ÔÚ×Ö·ûÈ¥Ñ¡ÔñÏàÓ¦µÄÇøÓò
+		//åœ¨å­—ç¬¦å»é€‰æ‹©ç›¸åº”çš„åŒºåŸŸ
 		this->mEtChar->SetSel(nS , nE);
 
 	}else if (type == 2)
-	{//Í¬²½×Ö·ûÇøµ½Êı¾İÇø
+	{//åŒæ­¥å­—ç¬¦åŒºåˆ°æ•°æ®åŒº
 		this->mEtChar->GetSel(nS ,nE);
 		t = nS;
 		
-		//¼ÆËãÔÚÊı¾İÇøµÄÑ¡ÔñÇøÆğÊ¼Î»ÖÃ
+		//è®¡ç®—åœ¨æ•°æ®åŒºçš„é€‰æ‹©åŒºèµ·å§‹ä½ç½®
 		if (nS%18 < 8)
 			nS = nS/18*50 + nS%18*3;
 		else
 			nS = nS/18*50 + nS%18*3 +1;
 
-		//¼ÆËãÔÚÊı¾İÇøµÄÑ¡ÔñÇø½áÊøÎ»ÖÃ
-		if(t == nE){//Ã»ÓĞÑ¡ÔñÊı¾İ  Ö»ÊÇ¶¨Î»
+		//è®¡ç®—åœ¨æ•°æ®åŒºçš„é€‰æ‹©åŒºç»“æŸä½ç½®
+		if(t == nE){//æ²¡æœ‰é€‰æ‹©æ•°æ®  åªæ˜¯å®šä½
 			nE = nS;
 		}else{
 			if (nE%18 <= 8)
@@ -1244,11 +1244,11 @@ void  DataWnd::SyncSel(int type , bool isMsgCall)
 				nE = nE/18*50 + nE%18*3;
 		}
 		
-		//Ñ¡ÔñÊı¾İÇøÓòµÄÊı¾İ
+		//é€‰æ‹©æ•°æ®åŒºåŸŸçš„æ•°æ®
 		this->mEtData->SetSel(nS , nE);
 
-		//±£´æÒ»ÏÂÑ¡ÔñÇøÓòµÄÎ»ÖÃ
-		if (isMsgCall)  //ÏûÏ¢Çı¶¯µÄ¾ÍĞèÒª±£´æÒ»ÏÂ
+		//ä¿å­˜ä¸€ä¸‹é€‰æ‹©åŒºåŸŸçš„ä½ç½®
+		if (isMsgCall)  //æ¶ˆæ¯é©±åŠ¨çš„å°±éœ€è¦ä¿å­˜ä¸€ä¸‹
 			SeveSelPos(nS , nE);
 	}
 }
@@ -1260,7 +1260,7 @@ int DataWnd::GetMinWidth()
 
 // void DataWnd::DrawSpLine(void)
 // {
-// 	//»º´æÇøÖĞÃ»ÓĞÊı¾İ
+// 	//ç¼“å­˜åŒºä¸­æ²¡æœ‰æ•°æ®
 // 	if (this->mDBuf[this->mCurBuf].mOff.QuadPart == -1)
 // 		return;
 // 	
@@ -1287,13 +1287,13 @@ void DataWnd::SetOffCharCnt( int cnt )
 {
 	CRect rect;
 	if (this->m_iOffCharCnt != cnt + 2)
-	{//ĞèÒª¸Ä±ä¿í¶È
+	{//éœ€è¦æ”¹å˜å®½åº¦
 		m_iOffCharCnt = cnt + 2;
 		this->GetWindowRect(&rect);
 		this->ReSize(rect);
 
 		this->GetParent()->SendMessage(DATA_CHANGE_WIDTH , GetMinWidth() , 0);
-		//Í¨Öª¸¸´°¿Ú¸Ä±ä´°¿ÚµÄ´óĞ¡
+		//é€šçŸ¥çˆ¶çª—å£æ”¹å˜çª—å£çš„å¤§å°
 
 	}
 
@@ -1311,17 +1311,17 @@ void DataWnd::SetSel( LONG_INT start , LONG_INT end )
 		return ;
 	
 	if (start.QuadPart > end.QuadPart)
-	{//ĞèÒª½»»»Ò»ÏÂ
+	{//éœ€è¦äº¤æ¢ä¸€ä¸‹
 		temp  = end;
 		end   = start;
 		start = temp;
 	}
 
-	//ÏÈ±£´æÒ»ÏÂÑ¡ÔñÁËµÄÇøÓò
+	//å…ˆä¿å­˜ä¸€ä¸‹é€‰æ‹©äº†çš„åŒºåŸŸ
 	this->mSelStart = start;
 	this->mSelEnd	= end;
 
-	//ÉèÖÃÒ»ÏÂÑ¡ÔñÇøÓò
+	//è®¾ç½®ä¸€ä¸‹é€‰æ‹©åŒºåŸŸ
 	ReSel();
 }
 
@@ -1330,43 +1330,43 @@ void DataWnd::ReSel()
 	if (this->mSelStart.QuadPart < 0 || this->mSelEnd.QuadPart < 0) 
 		return ;
 
-	LONG_INT cStart = {0};//µ±Ç°ÏÔÊ¾µÄµÚÒ»×Ö½ÚµÄÊµ¼ÊÆ«ÒÆ
+	LONG_INT cStart = {0};//å½“å‰æ˜¾ç¤ºçš„ç¬¬ä¸€å­—èŠ‚çš„å®é™…åç§»
 	LONG_INT start = {0};	
 	LONG_INT end   = {0};
 
-	//µ±Ç°ÏÔÊ¾µÄµÚÒ»¸ö×Ö½ÚµÄÊµ¼ÊÆ«ÒÆ
+	//å½“å‰æ˜¾ç¤ºçš„ç¬¬ä¸€ä¸ªå­—èŠ‚çš„å®é™…åç§»
 	cStart.QuadPart = mDBuf[mCurBuf].mOff.QuadPart * SEC_SIZE + BYTE_PER_LINE * mCurBufOff;
 	start = cStart;
-	//µ±Ç°ÏÔÊ¾µÄ×îºóÒ»¸ö×Ö½Ú
+	//å½“å‰æ˜¾ç¤ºçš„æœ€åä¸€ä¸ªå­—èŠ‚
 	end.QuadPart = start.QuadPart + mLineCnt * BYTE_PER_LINE;
 
 	if ( end.QuadPart < this->mSelStart.QuadPart ||
 		start.QuadPart > this->mSelEnd.QuadPart) 
-		return ;//ÔÚÒÑ¾­ÏÔÊ¾ÁËµÄµØ·½Ã»ÓĞÊ²Ã´¿ÉÒÔÑ¡ÔñµÄ
+		return ;//åœ¨å·²ç»æ˜¾ç¤ºäº†çš„åœ°æ–¹æ²¡æœ‰ä»€ä¹ˆå¯ä»¥é€‰æ‹©çš„
 
 
-	//ÔÚÏÔÊ¾ÇøÓòÖĞĞèÒªÑ¡ÔñµÄÎ»ÖÃ
+	//åœ¨æ˜¾ç¤ºåŒºåŸŸä¸­éœ€è¦é€‰æ‹©çš„ä½ç½®
 	if ( this->mSelStart.QuadPart > start.QuadPart )	start = this->mSelStart;
 	if (this->mSelEnd.QuadPart <  end.QuadPart)         end = this->mSelEnd;
 
-	//×ª»»µ½µ±Ç°ÏÔÊ¾ÇøµÄÏà¶ÔÎ»ÖÃ
+	//è½¬æ¢åˆ°å½“å‰æ˜¾ç¤ºåŒºçš„ç›¸å¯¹ä½ç½®
 	start.QuadPart = start.QuadPart - cStart.QuadPart;
 	end.QuadPart   = end.QuadPart - cStart.QuadPart;
 	
-	//Ã¿Ò»ĞĞÌí¼ÓÁ½¸ö×Ö½Ú  (»»ĞĞ)
+	//æ¯ä¸€è¡Œæ·»åŠ ä¸¤ä¸ªå­—èŠ‚  (æ¢è¡Œ)
 	start.QuadPart = (start.QuadPart / 0x10) * 18 + start.QuadPart % 0x10;
 	end.QuadPart   = (end.QuadPart   / 0x10) * 18 + end.QuadPart % 0x10;
 
-	//Ñ¡Ôñ×Ö·ûÇø
+	//é€‰æ‹©å­—ç¬¦åŒº
 	this->mEtChar->SetSel((int)start.QuadPart , (int)end.QuadPart);
-	SyncSel(2 , false);  //Í¬²½µ½×Ö·ûÇø
+	SyncSel(2 , false);  //åŒæ­¥åˆ°å­—ç¬¦åŒº
 }
 
 void DataWnd::SeveSelPos( int nSs , int nEs )
 {
-	//±£´æÑ¡ÔñµÄÇøÓòÎ»ÖÃ
+	//ä¿å­˜é€‰æ‹©çš„åŒºåŸŸä½ç½®
 	LONG_INT cStart = {0};
-	//µ±Ç°ÏÔÊ¾µÄµÚÒ»¸ö×Ö½ÚµÄÊµ¼ÊÆ«ÒÆ
+	//å½“å‰æ˜¾ç¤ºçš„ç¬¬ä¸€ä¸ªå­—èŠ‚çš„å®é™…åç§»
 	cStart.QuadPart = mDBuf[mCurBuf].mOff.QuadPart * SEC_SIZE + BYTE_PER_LINE * mCurBufOff;
 
 	nSs = ( nSs / 50 ) * 48 + nSs % 50 ;

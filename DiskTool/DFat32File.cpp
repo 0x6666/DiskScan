@@ -1,10 +1,10 @@
 //////////////////////////////////////////////////////////////////////////
 // FileName:	DFat32File.cpp
-// Author:		ÑîËÉ
-// Created:		2012Äê3ÔÂ20ÈÕ ĞÇÆÚ¶ş
-// Purpose:		ÊµÏÖÀàËùÉêÃ÷µÄº¯ÊıDFat32File
-// Comment:		±¾À´Ã»ÓĞ±ØÒªÕâ¸öÀàÒÔ¼°Õâ¸öÎÄ¼şµÄ£¬µ«ÊÇºóÀ´ÓĞ³ÌĞòµÄ½á¹¹µÄµ÷Õû
-//				¾ö¶¨»¹ÊÇÌí¼ÓÁËÕâ¸öÀà
+// Author:		æ¨æ¾
+// Created:		2012å¹´3æœˆ20æ—¥ æ˜ŸæœŸäºŒ
+// Purpose:		å®ç°ç±»æ‰€ç”³æ˜çš„å‡½æ•°DFat32File
+// Comment:		æœ¬æ¥æ²¡æœ‰å¿…è¦è¿™ä¸ªç±»ä»¥åŠè¿™ä¸ªæ–‡ä»¶çš„ï¼Œä½†æ˜¯åæ¥æœ‰ç¨‹åºçš„ç»“æ„çš„è°ƒæ•´
+//				å†³å®šè¿˜æ˜¯æ·»åŠ äº†è¿™ä¸ªç±»
 //////////////////////////////////////////////////////////////////////////
 
 #include "disktool.h"
@@ -38,17 +38,17 @@ const WCHAR* DFat32File::GetFileName()
 	size_t len = 0;
 
 
-	if (this->mFS == NULL) return NULL;	//µ±Ç°ÎÄ¼ş¸ù±¾¾ÍÃ»ÓĞ´ò¿ª
-	len = mPath.length();//ÎÄ¼şÂ·¾¶µÄ³¤¶È
+	if (this->mFS == NULL) return NULL;	//å½“å‰æ–‡ä»¶æ ¹æœ¬å°±æ²¡æœ‰æ‰“å¼€
+	len = mPath.length();//æ–‡ä»¶è·¯å¾„çš„é•¿åº¦
 	
 	if (!len)
 		return NULL;
 
-	//¾ÍÊÇ¸úÄ¿Â¼
+	//å°±æ˜¯è·Ÿç›®å½•
 	if (len == 1)
 		return mPath.c_str();
 
-	//ÕÒ×îºóÒ»¸ö,Â·¾¶·Ö¸î·û
+	//æ‰¾æœ€åä¸€ä¸ª,è·¯å¾„åˆ†å‰²ç¬¦
 	const WCHAR* p = this->mPath.c_str() + len - 1;
 	for (; !IsPathSeparator(*p); --p);
 
@@ -57,7 +57,7 @@ const WCHAR* DFat32File::GetFileName()
 }
 BOOL DFat32File::IsDir()
 {
-	//¼ì²éÊôĞÔ¶ÔÏó
+	//æ£€æŸ¥å±æ€§å¯¹è±¡
 	return (this->mAttr & ATTR_DIRECTORY);
 }
 
@@ -80,49 +80,49 @@ void DFat32File::Close()
 DRES DFat32File::ReadFile( char* buf, DWORD* dwReaded, DWORD dwToRead /*= SECTOR_SIZE*/ )
 {
 	DRES  res		= DR_OK;
-	DWORD pSec		= 0;			//ÉÈÇøÖ¸Õë
-	DWORD pClust	= 0;			//´ØÖ¸Õë
-	DWORD pSSec     = 0;			//±¾´ÎµÄÆäÊµÉ½ÇøºÅ
-	BYTE  tBuf[SECTOR_SIZE] = {0};	//ÁÙÊ±Êı¾İ»º´æ
-	DWORD pBuf		= 0;			//bufµÄĞ´Ö¸Õë
-	DWORD ptBuf		= 0;			//tBufµÄ¶ÁÖ¸Õë
-	DWORD rLen		= 0;			//Êµ¼ÊĞèÒªÍùbufÀïÃæĞ´µÄÊı¾İ´óĞ¡
+	DWORD pSec		= 0;			//æ‰‡åŒºæŒ‡é’ˆ
+	DWORD pClust	= 0;			//ç°‡æŒ‡é’ˆ
+	DWORD pSSec     = 0;			//æœ¬æ¬¡çš„å…¶å®å±±åŒºå·
+	BYTE  tBuf[SECTOR_SIZE] = {0};	//ä¸´æ—¶æ•°æ®ç¼“å­˜
+	DWORD pBuf		= 0;			//bufçš„å†™æŒ‡é’ˆ
+	DWORD ptBuf		= 0;			//tBufçš„è¯»æŒ‡é’ˆ
+	DWORD rLen		= 0;			//å®é™…éœ€è¦å¾€bufé‡Œé¢å†™çš„æ•°æ®å¤§å°
 	int	  i			= 0;
 
 
-	//ÎÄ¼ş¸ù±¾¾ÍÃ»ÓĞ´ò¿ª
+	//æ–‡ä»¶æ ¹æœ¬å°±æ²¡æœ‰æ‰“å¼€
 	if (!mFS) return DR_NO_OPEN;
 
 	if(!mFS || !buf || ! dwReaded )
-		return DR_INVALED_PARAM;		//²ÎÊı´íÎó
+		return DR_INVALED_PARAM;		//å‚æ•°é”™è¯¯
 	
-	*dwReaded = 0;						//ÏÈÇåÀíÒ»ÏÂ
+	*dwReaded = 0;						//å…ˆæ¸…ç†ä¸€ä¸‹
 	
-	if(this->mAttr & ATTR_DIRECTORY)		//²»ÊÇÎÄ¼ş
+	if(this->mAttr & ATTR_DIRECTORY)		//ä¸æ˜¯æ–‡ä»¶
 		return DR_IS_DIR;
 	
-	if(this->mStatus & F_ST_EOF)			//ÒÑ¾­ÊÇÎÄ¼şÎ²ÁË			
+	if(this->mStatus & F_ST_EOF)			//å·²ç»æ˜¯æ–‡ä»¶å°¾äº†			
 		return DR_OK;
 	
 	
-	if(dwToRead > this->mFileSize - this->mPointer)//Òª¶ÁÈ¡µÄÊı¾İ³¤¶ÈÊÇ·ñ´óÓÚÊ£ÏÂµÄÊı¾İ
-		dwToRead = this->mFileSize - this->mPointer;//½Ø¶ÏÒª¶ÁÈ¡µÄÊı¾İ
+	if(dwToRead > this->mFileSize - this->mPointer)//è¦è¯»å–çš„æ•°æ®é•¿åº¦æ˜¯å¦å¤§äºå‰©ä¸‹çš„æ•°æ®
+		dwToRead = this->mFileSize - this->mPointer;//æˆªæ–­è¦è¯»å–çš„æ•°æ®
 	
-	//ÎÄ¼şÄÚµÄ´ØºÅ
+	//æ–‡ä»¶å†…çš„ç°‡å·
 	pClust = this->mPointer / (SECTOR_SIZE * this->mFS->mSecPerClus); 
-	//¼ÆËãµ±Ç°µÄ´ØºÅ
+	//è®¡ç®—å½“å‰çš„ç°‡å·
 	for (i = pClust ,pClust = this->mStartClust; i != 0 ; --i )
 	{
 		pClust = mFS->GetFATFromFAT1(pClust);
-		if(pClust == 1 || pClust >= mFS->mMaxClust)			//ÎŞĞ§´ØºÅ
+		if(pClust == 1 || pClust >= mFS->mMaxClust)			//æ— æ•ˆç°‡å·
 			return DR_INIT_ERR;
-		if(pClust == 0xFFFFFFFF)//IO´íÎó
+		if(pClust == 0xFFFFFFFF)//IOé”™è¯¯
 			return DR_DEV_IO_ERR;
 	}	
 	
-	//±¾´ÎµÄÆğÊ¼ÉÈÇøºÅ
+	//æœ¬æ¬¡çš„èµ·å§‹æ‰‡åŒºå·
 	pSSec = mFS->ClustToSect(pClust);
-	//Êµ¼ÊµÄÉ½ÇøºÅ
+	//å®é™…çš„å±±åŒºå·
 	pSec = pSSec + \
 		(this->mPointer / SECTOR_SIZE) % mFS->mSecPerClus;
 	
@@ -130,42 +130,42 @@ DRES DFat32File::ReadFile( char* buf, DWORD* dwReaded, DWORD dwToRead /*= SECTOR
 	while (dwToRead > 0)
 	{
 		if((pSec != pSSec)&&!(pSec % mFS->mSecPerClus))
-		{//µ½ÁËÏÂÒ»´Ø
-			//Êµ¼ÊµÄ´ØºÅ
+		{//åˆ°äº†ä¸‹ä¸€ç°‡
+			//å®é™…çš„ç°‡å·
 			pClust = mFS->GetFATFromFAT1(pClust); 
 // 			if (IsFATEnd(pClust))
-// 			{//½áÊøÁË
+// 			{//ç»“æŸäº†
 // 				this->mStatus |= F_ST_EOF;
 // 				return DR_OK;
 // 			}
-			if(pClust == 1 || pClust >= mFS->mMaxClust)			//ÎŞĞ§´ØºÅ
+			if(pClust == 1 || pClust >= mFS->mMaxClust)			//æ— æ•ˆç°‡å·
 				return DR_INIT_ERR;
-			if(pClust == 0xFFFFFFFF)//IO´íÎó
+			if(pClust == 0xFFFFFFFF)//IOé”™è¯¯
 				return DR_DEV_IO_ERR;
 			
-			//Êµ¼ÊµÄÉÈÇøºÅ
+			//å®é™…çš„æ‰‡åŒºå·
 			pSec = mFS->ClustToSect(pClust) + \
 				(this->mPointer / SECTOR_SIZE) % mFS->mSecPerClus;
 		}
 		
-		res = mFS->ReadData(tBuf , pSec);//¶ÁÈ¡Ò»¸öÉÈÇøµÄÊı¾İ
-		if(res) return res ;		//¶ÁÈ¡Êı¾İ´íÎó
+		res = mFS->ReadData(tBuf , pSec);//è¯»å–ä¸€ä¸ªæ‰‡åŒºçš„æ•°æ®
+		if(res) return res ;		//è¯»å–æ•°æ®é”™è¯¯
 		
-		//ĞèÒªµÄÊı¾İÊÇ·ñÒÑ¾­¶ÁÈ¡ÍêÁË
+		//éœ€è¦çš„æ•°æ®æ˜¯å¦å·²ç»è¯»å–å®Œäº†
 		if(dwToRead < DWORD(SECTOR_SIZE -  ptBuf))
 			rLen = USHORT(dwToRead);
 		else
 			rLen = SECTOR_SIZE -  ptBuf;
 		
 		::memcpy(buf + pBuf , tBuf + ptBuf , rLen);
-		pBuf += rLen;		  //BufµÄĞ´Ö¸Õë
-		*dwReaded += rLen;	  //ÒÑ¾­¶ÁÈ¡ÁËµÄÊı¾İ
+		pBuf += rLen;		  //Bufçš„å†™æŒ‡é’ˆ
+		*dwReaded += rLen;	  //å·²ç»è¯»å–äº†çš„æ•°æ®
 		ptBuf = 0;
-		this->mPointer += rLen;//ÒÆ¶¯ÎÄ¼şÖ¸Õë
-		dwToRead -= rLen;	  //»¹ĞèÒª¶ÁÈ¡µÄÊı¾İ
-		++pSec;				  //µ½ÁËÏÂÒ»¸öÉÈÇø
+		this->mPointer += rLen;//ç§»åŠ¨æ–‡ä»¶æŒ‡é’ˆ
+		dwToRead -= rLen;	  //è¿˜éœ€è¦è¯»å–çš„æ•°æ®
+		++pSec;				  //åˆ°äº†ä¸‹ä¸€ä¸ªæ‰‡åŒº
 	}
-	//ÎÄ¼şÒÑ¾­¶ÁÈ¡ÍêÁË
+	//æ–‡ä»¶å·²ç»è¯»å–å®Œäº†
 	if(this->mPointer >= this->mFileSize)
 		this->mStatus |= F_ST_EOF;
 	
@@ -176,14 +176,14 @@ DRES DFat32File::InitFile( PVOID entr ,const WCHAR* path ,DFat32 * fs )
 {
 	PDirEntry	entry = PDirEntry(entr);
 	BYTE*		dir	  = NULL;
-	//²ÎÊı¼ì²é
+	//å‚æ•°æ£€æŸ¥
 	if (!entr || !path || ! fs) return DR_INVALED_PARAM;
 	
-	//¿ªÊ¼´´½¨ÎÄ¼ş¶ÔÏó
+	//å¼€å§‹åˆ›å»ºæ–‡ä»¶å¯¹è±¡
 	dir = entry->mDir;
 	this->mFS = fs;
 
-	//Ò»Ğ©ÊôĞÔµÄÇåÀí
+	//ä¸€äº›å±æ€§çš„æ¸…ç†
 	mAttr		= 0;
 	mStatus		= 0;
 	mStartClust = 0 ;
@@ -198,7 +198,7 @@ DRES DFat32File::InitFile( PVOID entr ,const WCHAR* path ,DFat32 * fs )
 
 	mPath = path;
 
-	if(!dir)//¸úÄ¿Â¼
+	if(!dir)//è·Ÿç›®å½•
 	{
 		this->mAttr = ATTR_VOLUME_ID|ATTR_DIRECTORY;
 		this->mStartClust = this->mFS->m1stDirClut;
@@ -206,11 +206,11 @@ DRES DFat32File::InitFile( PVOID entr ,const WCHAR* path ,DFat32 * fs )
 	}
 	else
 	{
-		this->mAttr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;	//ÎÄ¼şÊôĞÔ
-		this->mStartClust = (PSDE(dir)->mFstClusHI << 16)|PSDE(dir)->mFstClusLO;//´ØºÅ
-		this->mFileSize = PSDE(dir)->mFileSize;//ÎÄ¼şµÄ´óĞ¡
+		this->mAttr = PSDE(dir)->mAttr & ATTR_FAT32_MASK;	//æ–‡ä»¶å±æ€§
+		this->mStartClust = (PSDE(dir)->mFstClusHI << 16)|PSDE(dir)->mFstClusLO;//ç°‡å·
+		this->mFileSize = PSDE(dir)->mFileSize;//æ–‡ä»¶çš„å¤§å°
 
-		//Ê±¼ä
+		//æ—¶é—´
 		mCrtDate	= PSDE(dir)->mCrtDate;
 		mCrtTime	= PSDE(dir)->mCrtTime;
 		mLstAccDate = PSDE(dir)->mLstAccDate;
@@ -235,8 +235,8 @@ DWORD DFat32File::GetStartClust()
 
 DWORD DFat32File::GetSecCount()
 {
-	BYTE  SecPerClust = 0; //Ã¿´ØµÄÉÈÇøÊı
-	DWORD ClustSize = 0;  //´ØµÄ´óĞ¡(×Ö½Ú)
+	BYTE  SecPerClust = 0; //æ¯ç°‡çš„æ‰‡åŒºæ•°
+	DWORD ClustSize = 0;  //ç°‡çš„å¤§å°(å­—èŠ‚)
 
 	if (this->mFS == NULL || this->mFileSize == 0 ) return 0;
 
@@ -258,7 +258,7 @@ LONG_INT DFat32File::GetCreateTime(void)
 
 	cTm = mktime(this->mCrtDate , this->mCrtTime);
 	
-	//Ê±¼ä×ª»¯
+	//æ—¶é—´è½¬åŒ–
 	crtTime.QuadPart = mktime(&cTm);
 	
 	return crtTime;
@@ -269,10 +269,10 @@ LONG_INT DFat32File::GetWriteTime(void)
 	struct tm cTm	  = {0};
 	LONG_INT  crtTime = {0};
 	
-	//»ñµÃÏà¹ØÊ±¼äÖµ
+	//è·å¾—ç›¸å…³æ—¶é—´å€¼
 	cTm = mktime(this->mWrtDate , this->mWrtTime);
 
-	//Ê±¼ä×ª»¯
+	//æ—¶é—´è½¬åŒ–
 	crtTime.QuadPart = mktime(&cTm);
 	
 	return crtTime;
@@ -284,7 +284,7 @@ LONG_INT DFat32File::GetAccessTime(void)
 	
 	cTm = mktime(this->mLstAccDate , 0);
 	
-	//Ê±¼ä×ª»¯
+	//æ—¶é—´è½¬åŒ–
 	crtTime.QuadPart = mktime(&cTm);
 	
 	return crtTime;

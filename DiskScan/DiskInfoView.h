@@ -1,18 +1,18 @@
-#pragma once
+ï»¿#pragma once
 #include "InfoView.h"
 #include "afxwin.h"
 #include "DiskScanDoc.h"
 
 
 
-// CDiskInfoView ´°ÌåÊÓÍ¼
+// CDiskInfoView çª—ä½“è§†å›¾
 
 class CDiskInfoView : public CInfoView
 {
 	DECLARE_DYNCREATE(CDiskInfoView)
 
 protected:
-	CDiskInfoView();           // ¶¯Ì¬´´½¨ËùÊ¹ÓÃµÄÊÜ±£»¤µÄ¹¹Ôìº¯Êı
+	CDiskInfoView();           // åŠ¨æ€åˆ›å»ºæ‰€ä½¿ç”¨çš„å—ä¿æŠ¤çš„æ„é€ å‡½æ•°
 	virtual ~CDiskInfoView();
 
 public:
@@ -25,95 +25,95 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual void OnInitialUpdate();
 
 
-private: //¸÷ÖÖÏÔÊ¾ĞÅÏ¢µÄ¿Ø¼ş
+private: //å„ç§æ˜¾ç¤ºä¿¡æ¯çš„æ§ä»¶
 	CStatic m_wndSTName;
 	CEdit	m_wndETDevName;
 
-	//´ÅÅÌ¿É·ÖÇø´óĞ¡
-	CStatic m_wndSTCanPart;			//¿É·ÖÇø´óĞ¡±êÇ©
-	CEdit	m_wndETCanPartByte;		//¿É·ÖÇø´óĞ¡×Ö½ÚÊı
-	CEdit	m_wndETCanPartSize;		//¿É·ÖÇø´óĞ¡³ß´ç
+	//ç£ç›˜å¯åˆ†åŒºå¤§å°
+	CStatic m_wndSTCanPart;			//å¯åˆ†åŒºå¤§å°æ ‡ç­¾
+	CEdit	m_wndETCanPartByte;		//å¯åˆ†åŒºå¤§å°å­—èŠ‚æ•°
+	CEdit	m_wndETCanPartSize;		//å¯åˆ†åŒºå¤§å°å°ºå¯¸
 
-	//Î´·ÖÇø´óĞ¡
-	CStatic m_wndSTNoPart;			//Î´·ÖÇø´óĞ¡±êÇ©
-	CEdit	m_wndETNoPartByte;		//Î´·ÖÇø´óĞ¡×Ö½ÚÊı
-	CEdit	m_wndETNoPartSize;		//Î´·ÖÇø´óĞ¡³ß´ç
+	//æœªåˆ†åŒºå¤§å°
+	CStatic m_wndSTNoPart;			//æœªåˆ†åŒºå¤§å°æ ‡ç­¾
+	CEdit	m_wndETNoPartByte;		//æœªåˆ†åŒºå¤§å°å­—èŠ‚æ•°
+	CEdit	m_wndETNoPartSize;		//æœªåˆ†åŒºå¤§å°å°ºå¯¸
 
-	//Ã¿ÉÈÇø×Ö½ÚÊı
+	//æ¯æ‰‡åŒºå­—èŠ‚æ•°
 	CStatic m_wndSTBytePerSector;	
 	CEdit	m_wndETBytePerSector;
 
-	//Ã¿´ÅµÀÉÈÇøÊı 
+	//æ¯ç£é“æ‰‡åŒºæ•° 
 	CStatic m_wndSTSectorPerTrack;
 	CEdit	m_wndETSectorPerTrack;
 	
-	//Ã¿ÖùÃæ´ÅµÀÊı
+	//æ¯æŸ±é¢ç£é“æ•°
 	CStatic m_wndSTTracksPerCylinder;
 	CEdit	m_wndETTracksPerCylinder;
 
-	//ÖùÃæÊı
+	//æŸ±é¢æ•°
 	CStatic m_wndSTCylinders;
 	CEdit	m_wndETCylinders;
 
 
-	//´ÅÅÌµÄÏêÏ¸ĞÅÏ¢µÄ¿ò¼Ü£¬ÕâÖÖ¿ò¼Ü±¾À´ÊôÓÚCStaticµÄ£¬
-	//µ«Êµ¼ÊÉÏĞèÒªÊ¹ÓÃµÄÊôĞÔBS_GROUPBOXÊÇCButtonµÄËùÒÔ
-	//ÔÚÕâÀïÊ¹ÓÃCButtonÁË,²»¹ı³ıÁËÔÚÉùÃ÷ÊÇÊ¹ÓÃCButtonÖ®
-	//ÍâÃ»ÆäËûµØ·½¶¼µ±CStatic´¦Àí
+	//ç£ç›˜çš„è¯¦ç»†ä¿¡æ¯çš„æ¡†æ¶ï¼Œè¿™ç§æ¡†æ¶æœ¬æ¥å±äºCStaticçš„ï¼Œ
+	//ä½†å®é™…ä¸Šéœ€è¦ä½¿ç”¨çš„å±æ€§BS_GROUPBOXæ˜¯CButtonçš„æ‰€ä»¥
+	//åœ¨è¿™é‡Œä½¿ç”¨CButtonäº†,ä¸è¿‡é™¤äº†åœ¨å£°æ˜æ˜¯ä½¿ç”¨CButtonä¹‹
+	//å¤–æ²¡å…¶ä»–åœ°æ–¹éƒ½å½“CStaticå¤„ç†
 	CButton m_wndSTCanPartArea;
 
-	//²»¿É·ÖÇøĞÅÏ¢
+	//ä¸å¯åˆ†åŒºä¿¡æ¯
 	CButton	m_wndSTCanNotPartArea;
 
-	//´ÅÅÌ²»¿É·ÖÇø´óĞ¡
-	CStatic m_wndSTCanNotPart;			//²»¿É·ÖÇø´óĞ¡±êÇ©
-	CEdit	m_wndETCanNotPartByte;		//²»¿É·ÖÇø´óĞ¡×Ö½ÚÊı
-	CEdit	m_wndETCanNotPartSize;		//²»¿É·ÖÇø´óĞ¡³ß´ç
+	//ç£ç›˜ä¸å¯åˆ†åŒºå¤§å°
+	CStatic m_wndSTCanNotPart;			//ä¸å¯åˆ†åŒºå¤§å°æ ‡ç­¾
+	CEdit	m_wndETCanNotPartByte;		//ä¸å¯åˆ†åŒºå¤§å°å­—èŠ‚æ•°
+	CEdit	m_wndETCanNotPartSize;		//ä¸å¯åˆ†åŒºå¤§å°å°ºå¯¸
 
-	//Âß¼­Çı¶¯ÇøÓò
+	//é€»è¾‘é©±åŠ¨åŒºåŸŸ
 	CButton	m_wndSTLgcDrivArea;
 
-	//×Ü·ÖÇøÊı
-	CStatic m_wndSTPartCnt;		//·ÖÇøÊı
+	//æ€»åˆ†åŒºæ•°
+	CStatic m_wndSTPartCnt;		//åˆ†åŒºæ•°
 	CEdit	m_wndETPartCnt;	
 
-	//Ö÷·ÖÇøÊı
+	//ä¸»åˆ†åŒºæ•°
 	CStatic m_wndSTMainPartCnt;
 	CEdit	m_wndETMainPartCnt;
 
-	//Âß¼­·ÖÇøÊı
+	//é€»è¾‘åˆ†åŒºæ•°
 	CStatic m_wndSTLgcPartCnt;
 	CEdit	m_wndETLgcPartCnt;
 
 
 
-	//Êı¾İä¯ÀÀ
+	//æ•°æ®æµè§ˆ
 	CButton	m_wndSTDataScanArea;
 
-	//ÉÈÇøºÅ
+	//æ‰‡åŒºå·
 	CStatic m_wndSTSectorScan;
 	CEdit	m_wndETSectorNum;
 
-	//ÉÏ/ÏÂÒ»ÉÈÇø
-	CButton m_wndBtnPreSector;	//ÉÏÒ»ÉÈÇø
-	CButton m_wndBtnNextSector;	//ÏÂÒ»ÉÈÇø
+	//ä¸Š/ä¸‹ä¸€æ‰‡åŒº
+	CButton m_wndBtnPreSector;	//ä¸Šä¸€æ‰‡åŒº
+	CButton m_wndBtnNextSector;	//ä¸‹ä¸€æ‰‡åŒº
 
-	//µÚÒ»/×îºóÉÈÇø
-	CButton m_wndBtnFirstSector;//µÚÒ»ÉÈÇø
-	CButton m_wndBtnLastSector;	//×îºóÒ»ÉÈÇø
+	//ç¬¬ä¸€/æœ€åæ‰‡åŒº
+	CButton m_wndBtnFirstSector;//ç¬¬ä¸€æ‰‡åŒº
+	CButton m_wndBtnLastSector;	//æœ€åä¸€æ‰‡åŒº
 
 // 
-// 	//Ò»¸ö×Ö·ûµÄ´óĞ¡
+// 	//ä¸€ä¸ªå­—ç¬¦çš„å¤§å°
 // 	CSize	m_szChar;
 protected:
-	// ÖØÖÃ¿Ø¼şµÄÎ»ÖÃ
+	// é‡ç½®æ§ä»¶çš„ä½ç½®
 	int RePositionCtrl(void);
 
 	CDiskDoc* GetDocument();
@@ -126,7 +126,7 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÔÚµ±Ç°ÉÈÇø±à¼­¿òÉÏ°´ÏÂÁË»Ø³µ¼ü
+	//åœ¨å½“å‰æ‰‡åŒºç¼–è¾‘æ¡†ä¸ŠæŒ‰ä¸‹äº†å›è½¦é”®
 	//////////////////////////////////////////////////////////////////////////
 	void OnEnterCurSector();
 };

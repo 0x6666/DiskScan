@@ -1,10 +1,10 @@
 /***********************************************************************
  * FileName:	ntfsattr.cpp
- * Author:		ÑîËÉ
- * Created:		2012Äê4ÔÂ20ÈÕ ĞÇÆÚÎå
- * Purpose:		ÕâÊÇNtfsAttrµÄ¾ßÌåÊµÏÖ
- * Comment:		Õâ¸öÀàÊÇ¶ÔNtfsÎÄ¼şµÄ¸÷ÖÖÊôĞÔµÄÒ»¸ö³éÏó,²»¹ıÎÒ¸Ğ¾õÕâÀï»ù±¾
- *				ÊÇÒ»Ğ©À¬»ø´úÂë
+ * Author:		æ¨æ¾
+ * Created:		2012å¹´4æœˆ20æ—¥ æ˜ŸæœŸäº”
+ * Purpose:		è¿™æ˜¯NtfsAttrçš„å…·ä½“å®ç°
+ * Comment:		è¿™ä¸ªç±»æ˜¯å¯¹Ntfsæ–‡ä»¶çš„å„ç§å±æ€§çš„ä¸€ä¸ªæŠ½è±¡,ä¸è¿‡æˆ‘æ„Ÿè§‰è¿™é‡ŒåŸºæœ¬
+ *				æ˜¯ä¸€äº›åƒåœ¾ä»£ç 
  ***********************************************************************/
 
 #include "disktool.h"
@@ -19,14 +19,14 @@ DNtfsAttr::~DNtfsAttr(){}
 
 DRES DNtfsAttr::InitAttr(void* src)
 {
-	int off = 0;  //ÏÂÒ»´ÎÔÚsrcÖĞµÄ¶ÁÈ¡»º´æ
-	//ÀıĞĞ¹«Îñ
+	int off = 0;  //ä¸‹ä¸€æ¬¡åœ¨srcä¸­çš„è¯»å–ç¼“å­˜
+	//ä¾‹è¡Œå…¬åŠ¡
 	if (NULL == src)  return DR_INVALED_PARAM;
 
-	//ÒÑ¾­µ½ÁËÊôĞÔÁĞ±íµÄÄ©Î²ÁË
+	//å·²ç»åˆ°äº†å±æ€§åˆ—è¡¨çš„æœ«å°¾äº†
 	if (GetDWORD(src) == 0xFFFFFFFF)    return DR_FAT_EOF;
 
-	//ÏÈ±£ÁôÊı¾İ°É
+	//å…ˆä¿ç•™æ•°æ®å§
 	this->mAttrBuf = (BYTE*)src;
 
 	return DR_OK;
@@ -68,7 +68,7 @@ WORD DNtfsAttr::GetAttrID()
 
 WORD DNtfsAttr::R_GetStdHeadLen()
 {
-	return STD_ATTR_HEAD_LEN + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
+	return STD_ATTR_HEAD_LEN + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
 }
 
 BYTE* DNtfsAttr::GetAttrHeadPtr()
@@ -77,7 +77,7 @@ BYTE* DNtfsAttr::GetAttrHeadPtr()
 }
 BYTE* DNtfsAttr::R_GetAttrBodyPtr()
 {
-	DWORD offset = STD_ATTR_HEAD_LEN + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
+	DWORD offset = STD_ATTR_HEAD_LEN + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
 	return (BYTE*)(this->mAttrBuf + offset);
 }
 DWORD DNtfsAttr::R_GetAttrLen()
@@ -88,53 +88,53 @@ DWORD DNtfsAttr::R_GetAttrOff()
 {
 	return PRESID_ATTR_HEAD(this->mAttrBuf)->ATTR_DatOff;
 }
-LONG_INT DNtfsAttr::NR_GetStartVCN()  //»ñµÃ±¾ÊôĞÔÊı¾İÁ÷µÄ¿ªÊ¼ĞéÄâ´ØºÅ
+LONG_INT DNtfsAttr::NR_GetStartVCN()  //è·å¾—æœ¬å±æ€§æ•°æ®æµçš„å¼€å§‹è™šæ‹Ÿç°‡å·
 {
 	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_StartVCN;
 }
-LONG_INT DNtfsAttr::NR_GetEndVCN()	//»ñµÃ±¾ÊôĞÔÊı¾İÁ÷µÄ½áÊøĞéÄâ´ØºÅ
+LONG_INT DNtfsAttr::NR_GetEndVCN()	//è·å¾—æœ¬å±æ€§æ•°æ®æµçš„ç»“æŸè™šæ‹Ÿç°‡å·
 {
 	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_EndVCN;
 }
-WORD	 DNtfsAttr::NR_GetDataOff()	//»ñµÃÊı¾İÁ÷ÃèÊöÏà¶ÔÓÚÊôĞÔÍ·µÄÆ«ÒÆ£¬Êı¾İÓ¦¸Ã°´Ë«×Ö¶ÔÆë
+WORD	 DNtfsAttr::NR_GetDataOff()	//è·å¾—æ•°æ®æµæè¿°ç›¸å¯¹äºå±æ€§å¤´çš„åç§»ï¼Œæ•°æ®åº”è¯¥æŒ‰åŒå­—å¯¹é½
 {
 	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_DataOff;
 }
-WORD     DNtfsAttr::NR_GetCmpSize()	//Ñ¹Ëõµ¥ÔªµÄ³ß´ç¡£Ñ¹Ëõµ¥ÔªµÄ³ß´ç±ØĞëÊÇ2µÄÕûÊı´ÎÃİ£¬Îª0±íÊ¾Î´Ñ¹Ëõ
+WORD     DNtfsAttr::NR_GetCmpSize()	//å‹ç¼©å•å…ƒçš„å°ºå¯¸ã€‚å‹ç¼©å•å…ƒçš„å°ºå¯¸å¿…é¡»æ˜¯2çš„æ•´æ•°æ¬¡å¹‚ï¼Œä¸º0è¡¨ç¤ºæœªå‹ç¼©
 {
 	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_CmpSize;
 }
-LONG_INT DNtfsAttr::NR_GetAllocSize() //ÊôĞÔ¼ÇÂ¼Êı¾İ¿é·ÖÅäµÄ¿Õ¼äµÄ³ß´ç£¬¸Ã³ß´ç°´´Ø³ß´ç¶ÔÆë
+LONG_INT DNtfsAttr::NR_GetAllocSize() //å±æ€§è®°å½•æ•°æ®å—åˆ†é…çš„ç©ºé—´çš„å°ºå¯¸ï¼Œè¯¥å°ºå¯¸æŒ‰ç°‡å°ºå¯¸å¯¹é½
 {
 	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_AllocSize;
 }
-LONG_INT DNtfsAttr::NR_GetValidSize() //ÊôĞÔ¼ÇÂ¼Êı¾İ¿éµÄÊµ¼Ê³ß´ç
+LONG_INT DNtfsAttr::NR_GetValidSize() //å±æ€§è®°å½•æ•°æ®å—çš„å®é™…å°ºå¯¸
 {
 	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_ValidSize;
 }
-LONG_INT DNtfsAttr::NR_GetInitedSize()//ÊôĞÔ¼ÇÂ¼Êı¾İ¿éÒÑ¾­³õÊ¼»¯Êı¾İµÄ³ß´ç£¬µ½Ä¿Ç°ÎªÖ¹¸ÃÖµ¶¼ÓëÊôĞÔ¼ÇÂ¼Êı¾İ¿é·ÖÅäµÄ³ß´çÏàÍ¬
+LONG_INT DNtfsAttr::NR_GetInitedSize()//å±æ€§è®°å½•æ•°æ®å—å·²ç»åˆå§‹åŒ–æ•°æ®çš„å°ºå¯¸ï¼Œåˆ°ç›®å‰ä¸ºæ­¢è¯¥å€¼éƒ½ä¸å±æ€§è®°å½•æ•°æ®å—åˆ†é…çš„å°ºå¯¸ç›¸åŒ
 {
 	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_InitedSize;
 }
 BYTE*	 DNtfsAttr::NR_GetDataPtr()
 {
-	return mAttrBuf + PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_DataOff;//ÔËĞĞµÄÆäÊµÊı¾İµØÖ·
+	return mAttrBuf + PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_DataOff;//è¿è¡Œçš„å…¶å®æ•°æ®åœ°å€
 }
 
 DWORD DNtfsAttr::NR_GetStdHeadLen()
 {
-	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_DataOff;//ÔËĞĞµÄÆäÊµÊı¾İµØÖ·
+	return PNON_RESID_ATTR_HEAD(this->mAttrBuf)->ATTR_DataOff;//è¿è¡Œçš„å…¶å®æ•°æ®åœ°å€
 }
 
 DRES DNtfsAttr::GetAttrName(WCHAR* buf , int len0)
 {
 	int len = this->GetNameLen();
-	if (0 == len){  //Ã»ÓĞÎÄ¼şÃû
+	if (0 == len){  //æ²¡æœ‰æ–‡ä»¶å
 		buf[0] = 0;
 		return DR_NO;
 	}
 	if (len0 < len + 1)
-	{//»º´æ²»¹»
+	{//ç¼“å­˜ä¸å¤Ÿ
 		buf[0] = 0;
 		return DR_BUF_OVER;
 	}
@@ -147,30 +147,30 @@ DRES DNtfsAttr::GetAttrName(WCHAR* buf , int len0)
 
 DWORD DNtfsAttr::FNGetFileNameLen()
 {
-	DWORD		offset =0x18 + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
+	DWORD		offset =0x18 + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
 	PFILE_NAME  pfn = PFILE_NAME(this->mAttrBuf + offset);
 	
 	return pfn->FN_NameSize;
 }
 DRES  DNtfsAttr::FNGetFileName(WCHAR* buf)
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += ( 0x18 + 0x42); //³ıµôÊôĞÔÊôĞÔÍ·µÄÎÄ¼şÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += ( 0x18 + 0x42); //é™¤æ‰å±æ€§å±æ€§å¤´çš„æ–‡ä»¶åé•¿åº¦åç§»
 
-	//ÎÄ¼şÃû³¤¶È
+	//æ–‡ä»¶åé•¿åº¦
 	DWORD len = FNGetFileNameLen();
 	
-	//¸´ÖÆÎÄ¼şÃûÊı¾İ
+	//å¤åˆ¶æ–‡ä»¶åæ•°æ®
 	memcpy(buf ,this->mAttrBuf  +  offset , len*2 );
 
 	return DR_OK;
 }
 BYTE DNtfsAttr::FNGetFileNameSpase()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += 0x18; //³ıµôÊôĞÔÊôĞÔÍ·µÄÎÄ¼şÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += 0x18; //é™¤æ‰å±æ€§å±æ€§å¤´çš„æ–‡ä»¶åé•¿åº¦åç§»
 
 	PFILE_NAME pfn = PFILE_NAME(mAttrBuf + offset);
 
@@ -179,9 +179,9 @@ BYTE DNtfsAttr::FNGetFileNameSpase()
 
 LONG_INT DNtfsAttr::FNGetParentMftIndx()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += 0x18; //³ıµôÊôĞÔÊôĞÔÍ·µÄÎÄ¼şÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += 0x18; //é™¤æ‰å±æ€§å±æ€§å¤´çš„æ–‡ä»¶åé•¿åº¦åç§»
 
 	PFILE_NAME pfn = PFILE_NAME(mAttrBuf + offset);
 
@@ -190,9 +190,9 @@ LONG_INT DNtfsAttr::FNGetParentMftIndx()
 
 DWORD DNtfsAttr::FNGetFlags()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += 0x18; //³ıµôÊôĞÔÊôĞÔÍ·µÄÎÄ¼şÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += 0x18; //é™¤æ‰å±æ€§å±æ€§å¤´çš„æ–‡ä»¶åé•¿åº¦åç§»
 
 	PFILE_NAME pfn = PFILE_NAME(mAttrBuf + offset);
 
@@ -201,9 +201,9 @@ DWORD DNtfsAttr::FNGetFlags()
 
 LONG_INT DNtfsAttr::FNGetRealSize()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += 0x18; //³ıµôÊôĞÔÊôĞÔÍ·µÄÎÄ¼şÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += 0x18; //é™¤æ‰å±æ€§å±æ€§å¤´çš„æ–‡ä»¶åé•¿åº¦åç§»
 
 	PFILE_NAME pfn = PFILE_NAME(mAttrBuf + offset);
 
@@ -212,9 +212,9 @@ LONG_INT DNtfsAttr::FNGetRealSize()
 
 LONG_INT DNtfsAttr::FNGetAllocateSize()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += 0x18; //³ıµôÊôĞÔÊôĞÔÍ·µÄÎÄ¼şÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += 0x18; //é™¤æ‰å±æ€§å±æ€§å¤´çš„æ–‡ä»¶åé•¿åº¦åç§»
 
 	PFILE_NAME pfn = PFILE_NAME(mAttrBuf + offset);
 
@@ -223,7 +223,7 @@ LONG_INT DNtfsAttr::FNGetAllocateSize()
 
 DWORD DNtfsAttr::IRGetAttrAttrType()
 {
-	DWORD offset =0x18 + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
+	DWORD offset =0x18 + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
 
 	PINDEX_ROOT pr = PINDEX_ROOT(mAttrBuf + offset);
 
@@ -231,7 +231,7 @@ DWORD DNtfsAttr::IRGetAttrAttrType()
 }
 DWORD DNtfsAttr::IRGetIndexBlockSize()
 {
-	DWORD offset =0x18 + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
+	DWORD offset =0x18 + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
 
 	PINDEX_ROOT pr = PINDEX_ROOT(mAttrBuf + offset);
 
@@ -239,9 +239,9 @@ DWORD DNtfsAttr::IRGetIndexBlockSize()
 }
 BOOL DNtfsAttr::IRIsLargeIndex()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += ( 0x18 ); //³ıµôÊôĞÔÊôĞÔÍ·µÄÊôĞÔÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += ( 0x18 ); //é™¤æ‰å±æ€§å±æ€§å¤´çš„å±æ€§åé•¿åº¦åç§»
 
 	PINDEX_ROOT pr = PINDEX_ROOT(mAttrBuf + offset);
 
@@ -249,9 +249,9 @@ BOOL DNtfsAttr::IRIsLargeIndex()
 }
 DWORD DNtfsAttr::IRGetIndexEntriesSize()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += ( 0x18 ); //³ıµôÊôĞÔÊôĞÔÍ·µÄÊôĞÔÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += ( 0x18 ); //é™¤æ‰å±æ€§å±æ€§å¤´çš„å±æ€§åé•¿åº¦åç§»
 
 	PINDEX_ROOT pr = PINDEX_ROOT(mAttrBuf + offset);
 
@@ -259,9 +259,9 @@ DWORD DNtfsAttr::IRGetIndexEntriesSize()
 }
 DWORD DNtfsAttr::IRGetAlloIndexEntriesSize()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset += ( 0x18 ); //³ıµôÊôĞÔÊôĞÔÍ·µÄÊôĞÔÃû³¤¶ÈÆ«ÒÆ
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset += ( 0x18 ); //é™¤æ‰å±æ€§å±æ€§å¤´çš„å±æ€§åé•¿åº¦åç§»
 
 	PINDEX_ROOT pr = PINDEX_ROOT(mAttrBuf + offset);
 
@@ -269,9 +269,9 @@ DWORD DNtfsAttr::IRGetAlloIndexEntriesSize()
 }
 BYTE* DNtfsAttr::IRGetFistEntry()
 {
-	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-	//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-	offset +=  0x18 ;//¶¨Î»ÖÆ¶¨µÄ×Ö¶ÎµÄÆ¬Î»ÖÃ(Ïà¶ÔÓÚÊôĞÔµÄÆäÊµÎ»ÖÃ)
+	DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+	//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+	offset +=  0x18 ;//å®šä½åˆ¶å®šçš„å­—æ®µçš„ç‰‡ä½ç½®(ç›¸å¯¹äºå±æ€§çš„å…¶å®ä½ç½®)
 
 	PINDEX_ROOT pr = PINDEX_ROOT(mAttrBuf + offset);
 
@@ -280,51 +280,51 @@ BYTE* DNtfsAttr::IRGetFistEntry()
 
 LONG_INT DNtfsAttr::IAGetLCNByVCN(LONG_INT* vcn , PLONG_INT ClustCnt)
 {
-	//Âß¼­´ØºÅ
+	//é€»è¾‘ç°‡å·
 	LONG_INT lcn = {0};
-	LONG_INT start = this->NR_GetStartVCN();//ÆäÊµĞéÄâ´ØºÅ
-	LONG_INT end   = this->NR_GetEndVCN();  //½èËŞĞéÄâ´ØºÅ
-	BYTE*	 run	   = this->mAttrBuf + this->NR_GetDataOff();//ÔËĞĞµÄÆäÊµÊı¾İµØÖ·
-	DWORD	 runOff   = 0;		//ÔËĞĞÖĞµÄÊı¾İÆ«ÒÆ
+	LONG_INT start = this->NR_GetStartVCN();//å…¶å®è™šæ‹Ÿç°‡å·
+	LONG_INT end   = this->NR_GetEndVCN();  //å€Ÿå®¿è™šæ‹Ÿç°‡å·
+	BYTE*	 run	   = this->mAttrBuf + this->NR_GetDataOff();//è¿è¡Œçš„å…¶å®æ•°æ®åœ°å€
+	DWORD	 runOff   = 0;		//è¿è¡Œä¸­çš„æ•°æ®åç§»
 	DWORD	 temp = 0;
 	PRunHead runHead = NULL;
 
-	//ÎÒ²»ÖªµÀRunµÄµÚ¶ş¸öºÍµÚÈı¸ö×Ö¶ÎµÄµÄÊı¾İ×î´óÄÜÕ¼¶àÉÙ¸ö×Ö½Ú
-	//ÕâÀïÈ¥8¸ö×Ö½Ú£¬ÕâÓ¦¸ÃÃ»ÎÊÌâ°É, 
+	//æˆ‘ä¸çŸ¥é“Runçš„ç¬¬äºŒä¸ªå’Œç¬¬ä¸‰ä¸ªå­—æ®µçš„çš„æ•°æ®æœ€å¤§èƒ½å å¤šå°‘ä¸ªå­—èŠ‚
+	//è¿™é‡Œå»8ä¸ªå­—èŠ‚ï¼Œè¿™åº”è¯¥æ²¡é—®é¢˜å§, 
 	LONG_INT dataBuf = {0};
 
-	//Ô½½çÁË  ·µ»Ø0  
+	//è¶Šç•Œäº†  è¿”å›0  
 	if (vcn->QuadPart > end.QuadPart || vcn->QuadPart < start.QuadPart){
 		dataBuf.QuadPart = 0;
 		return dataBuf;
 	}
-	//Ñ­»·¿ØÖÆ
+	//å¾ªç¯æ§åˆ¶
 	int i = (int)(vcn->QuadPart - start.QuadPart) + 1;
 	for ( ; i != 0 ; --i )
 	{	
-		runHead = PRunHead(run + runOff++);  //¶ÁÈ¡runµÄÍ·²¿
+		runHead = PRunHead(run + runOff++);  //è¯»å–runçš„å¤´éƒ¨
 		if (runHead->all == 0)
-			break;			     //±éÀúÍêÁËµ±Ç°ÊôĞÔµÄËùÓĞÔËĞĞ
+			break;			     //éå†å®Œäº†å½“å‰å±æ€§çš„æ‰€æœ‰è¿è¡Œ
 		
-		if (ClustCnt)	{//ĞèÒª¶ÁÈ¡ ´ØÊı
-			ClustCnt->QuadPart = 0;//ÏÈÇåÀíÒ»ÏÂ
-			//¶ÁÈ¡Êı¾İ´ØÊı  length
+		if (ClustCnt)	{//éœ€è¦è¯»å– ç°‡æ•°
+			ClustCnt->QuadPart = 0;//å…ˆæ¸…ç†ä¸€ä¸‹
+			//è¯»å–æ•°æ®ç°‡æ•°  length
 			memcpy(ClustCnt , run + runOff , runHead->length);
 		}
 		runOff += runHead->length;
 
-		//×îºóÒ»¸ö×Ö·ûµÄ»º´æÏÂ±ê
+		//æœ€åä¸€ä¸ªå­—ç¬¦çš„ç¼“å­˜ä¸‹æ ‡
 		temp = runOff + runHead->offset -1;
 
-		//ºûµûlcnÕâ¸ö¿ÉÄÜÊÇÒ»¸ö¸ºÊı £¬ËùÒÔÏÈ×öÓĞ·ûºÅÊı¶ÁÈ¡¶ÁÈ¡³öÀ´
+		//è´è¶lcnè¿™ä¸ªå¯èƒ½æ˜¯ä¸€ä¸ªè´Ÿæ•° ï¼Œæ‰€ä»¥å…ˆåšæœ‰ç¬¦å·æ•°è¯»å–è¯»å–å‡ºæ¥
 		dataBuf.QuadPart = (char)run[temp--];
-		//Ò»´Î¶ÁÈ¡meiyi8geÊ£ÏÂµÄ×Ö½Ú
+		//ä¸€æ¬¡è¯»å–meiyi8geå‰©ä¸‹çš„å­—èŠ‚
 		for (; temp >= runOff; --temp)
 			dataBuf.QuadPart = (dataBuf.QuadPart << 8) + GetBYTE(run + temp);
 	
-		//Êµ¼ÊµÄlcn
+		//å®é™…çš„lcn
 		lcn.QuadPart += dataBuf.QuadPart;
-		//ÏÂÒ»¸örunµÄÎ»ÖÃ
+		//ä¸‹ä¸€ä¸ªrunçš„ä½ç½®
 		runOff += runHead->offset;
 	}
 
@@ -336,58 +336,58 @@ BOOL DNtfsAttr::BMIsBitSet(LONG_INT bit , DNtfs* fs)
 	BYTE	bt = 0;
 	DWORD	byteCnt = 0;
 
-	//ÒªÅĞ¶Ïµ±Ç°ÊôĞÔÊÇ·ñÊÇ³£×¤µÄ
+	//è¦åˆ¤æ–­å½“å‰å±æ€§æ˜¯å¦æ˜¯å¸¸é©»çš„
 	if (this->IsNonResident())
-	{//·Ç³£×¤µÄ
-		DRun run;				//»ñÈ¡ÔËĞĞÁĞ±í
+	{//éå¸¸é©»çš„
+		DRun run;				//è·å–è¿è¡Œåˆ—è¡¨
 		if(DR_OK != run.InitRunList(this))
 			return FALSE;
 
 		LONG_INT	vcn;
-		DWORD		secNum = 0;//´ØÖĞµÄÉÈÇøÆ«ÒÆ
-		DWORD		byteNum	= 0;//ÉÈÇøÖĞµÄ×Ö½ÚÆ«ÒÆ
-		char		buf[SECTOR_SIZE] = {0};//ÉÈÇø»º´æ
+		DWORD		secNum = 0;//ç°‡ä¸­çš„æ‰‡åŒºåç§»
+		DWORD		byteNum	= 0;//æ‰‡åŒºä¸­çš„å­—èŠ‚åç§»
+		char		buf[SECTOR_SIZE] = {0};//æ‰‡åŒºç¼“å­˜
 		DRES		res = DR_OK;
 		
-		//¼ÆËãÖ¸¶¨µÄÎ»ËùÔÚµÄvcn
+		//è®¡ç®—æŒ‡å®šçš„ä½æ‰€åœ¨çš„vcn
 		vcn.QuadPart = ((bit.QuadPart / 8)/SECTOR_SIZE)/fs->GetSecPerClust();
 
-		//²éÑ¯LCV
+		//æŸ¥è¯¢LCV
 		vcn = run.GetLCNByVCN(vcn , NULL);
-		run.Close();//ºÃ£¬ÄãµÄÊ¹ÃüÒÑ¾­Íê³ÉÁË
+		run.Close();//å¥½ï¼Œä½ çš„ä½¿å‘½å·²ç»å®Œæˆäº†
 		
 		if ( -1 == vcn.QuadPart )
-			return FALSE;  //»ñÈ¡lcnÊ§°Ü
+			return FALSE;  //è·å–lcnå¤±è´¥
 		
-		//¼ÆËãËùÔÚLCNÖĞµÄÉÈÇøºÅ
+		//è®¡ç®—æ‰€åœ¨LCNä¸­çš„æ‰‡åŒºå·
 		secNum = ((bit.QuadPart / 8) / SECTOR_SIZE) % fs->GetSecPerClust();
 
-		//¼ÆËãÉÈÇøµÄ×Ö½ÚÆ«ÒÆ
+		//è®¡ç®—æ‰‡åŒºçš„å­—èŠ‚åç§»
 		byteNum = (bit.QuadPart / 8) % SECTOR_SIZE;
 
-		//¼ÆËãÎ»Æ«ÒÆ
+		//è®¡ç®—ä½åç§»
 		byteCnt = bit.QuadPart % 8;
 
-		//¶ÁÈ¡Êı¾İ
+		//è¯»å–æ•°æ®
 		vcn.QuadPart *= fs->GetSecPerClust();
 		vcn.QuadPart += secNum;
 		res = fs->ReadData(buf , &vcn , SECTOR_SIZE , TRUE );
 		if (DR_OK !=  res) return FALSE;
 
-		//È¡³öÖ¸¶¨µÄ×Ö½Ú
+		//å–å‡ºæŒ‡å®šçš„å­—èŠ‚
 		bt = GetBYTE(buf + byteNum);
 
-	}else{//³£×¤µÄ
-		DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
-		//ÎÄ¼şÃû³¤¶ÈÊı¾İÆ«ÒÆ
-		offset +=  0x18 ;//¶¨Î»ÖÆ¶¨µÄ×Ö¶ÎµÄÆ¬Î»ÖÃ(Ïà¶ÔÓÚÊôĞÔµÄÆäÊµÎ»ÖÃ)
+	}else{//å¸¸é©»çš„
+		DWORD offset = PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
+		//æ–‡ä»¶åé•¿åº¦æ•°æ®åç§»
+		offset +=  0x18 ;//å®šä½åˆ¶å®šçš„å­—æ®µçš„ç‰‡ä½ç½®(ç›¸å¯¹äºå±æ€§çš„å…¶å®ä½ç½®)
 
-		//¼ÆËã×Ö½ÚÊıÆ«ÒÆ
+		//è®¡ç®—å­—èŠ‚æ•°åç§»
 		byteCnt = DWORD(bit.QuadPart / 8 );
 
-		//»ñµÃÖ¸¶¨ÎªËùÔÚµÄ×Ö½Ú
+		//è·å¾—æŒ‡å®šä¸ºæ‰€åœ¨çš„å­—èŠ‚
 		bt = GetBYTE(mAttrBuf + offset + byteCnt);
-		//Î»Æ«ÒÆ
+		//ä½åç§»
 		byteCnt = bit.QuadPart % 8;
 	}
 
@@ -399,7 +399,7 @@ BOOL DNtfsAttr::BMIsBitSet(LONG_INT bit , DNtfs* fs)
 
 DWORD DNtfsAttr::SIGetFlags()
 {
-	DWORD		offset = 0x18 + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//ÊôĞÔÃû³ß´ç(×Ö½Ú)
+	DWORD		offset = 0x18 + PATTR_HEAD(this->mAttrBuf)->ATTR_NamSz * 2;//å±æ€§åå°ºå¯¸(å­—èŠ‚)
 	PSTD_INFO  psi = PSTD_INFO(this->mAttrBuf + offset);
 
 	return psi->SI_DOSAttr;

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "DiskScan.h"
 #include "publicFun.h"
 #include "DiskScanView.h"
@@ -28,9 +28,9 @@ CString GetPartName(USHORT format, const WCHAR* cDevname, LONG_INT off)
 		//fName.LoadString(IDS_FAT32_PART);
 		
 		if(DR_OK == fat32.OpenDev(cDevname , off))
-		{//´ò¿ªÉè±¸³É¹¦
+		{//æ‰“å¼€è®¾å¤‡æˆåŠŸ
 			fat32.GetVolumeName(wBuf, (MAX_NTFS_VOLUME_NAME_LEN + 1));
-			fat32.CloseDev();	//¹Ø±ÕÒÑ¾­´ò¿ªµÄÉè±¸
+			fat32.CloseDev();	//å…³é—­å·²ç»æ‰“å¼€çš„è®¾å¤‡
 			res = wBuf;
 		}
 		else
@@ -43,9 +43,9 @@ CString GetPartName(USHORT format, const WCHAR* cDevname, LONG_INT off)
 	case 0x17://	Hidden HPFS/HTFS
 		//fName.LoadString(IDS_NTFS_PART);
 		if(DR_OK == ntfs.OpenDev(cDevname , &off))
-		{//´ò¿ªÉè±¸³É¹¦
+		{//æ‰“å¼€è®¾å¤‡æˆåŠŸ
 			ntfs.GetVolumeName(wBuf , (MAX_NTFS_VOLUME_NAME_LEN + 1));
-			ntfs.CloseDev();	//¹Ø±ÕÒÑ¾­´ò¿ªµÄÉè±¸
+			ntfs.CloseDev();	//å…³é—­å·²ç»æ‰“å¼€çš„è®¾å¤‡
 			res = wBuf;
 		}
 		else
@@ -54,21 +54,21 @@ CString GetPartName(USHORT format, const WCHAR* cDevname, LONG_INT off)
 		}
 		break;
 
-		//Ò»ÏÂÊÇÎÒ×Ô¼º¶¨ÒåµÄ¼¸ÖÖÀàĞÍ
+		//ä¸€ä¸‹æ˜¯æˆ‘è‡ªå·±å®šä¹‰çš„å‡ ç§ç±»å‹
 	case 0x100://			//MBR
 		res.LoadString(IDS_MBR_NAME);
 		break;
 	case 0x101://			//EBR
 		res.LoadString(IDS_EBR_NAME);
 		break;
-	case 0x102://			//Ã»·ÖÇøµÄ¿ÕÏĞÇøÓò
+	case 0x102://			//æ²¡åˆ†åŒºçš„ç©ºé—²åŒºåŸŸ
 		res.LoadString(IDS_EMPTY_PART_NAME);
 		break;
-	case 0x103:			//²»ÄÜ·ÖÇøµÄÇøÓò
+	case 0x103:			//ä¸èƒ½åˆ†åŒºçš„åŒºåŸŸ
 		res.LoadString(IDS_REMAIN_PART_NAME);
 		break;
 
-	default://ÆäËûÇé¿ö¾ÍÃ»°ì·¨ÁË 
+	default://å…¶ä»–æƒ…å†µå°±æ²¡åŠæ³•äº† 
 		res = GetPartFormatName(format);
 	}
 
@@ -80,7 +80,7 @@ CString GetPartFormatName(USHORT format)
 	CString fName;
 	switch(format)
 	{
-	case 0x0://¿Õ  Microsoft ²»¿ÉÒÔÊ¹ÓÃ
+	case 0x0://ç©º  Microsoft ä¸å¯ä»¥ä½¿ç”¨
 		fName.LoadString(IDS_NO_USE_PART);
 		break;
 
@@ -111,8 +111,8 @@ CString GetPartFormatName(USHORT format)
 		fName.LoadString(IDS_XENIX_USR_PART);
 		break;
 
-	case 0x05://	Externded  À©Õ¹·ÖÇø
-	case 0x0F://	Win95 externded£¨>8GB£©
+	case 0x05://	Externded  æ‰©å±•åˆ†åŒº
+	case 0x0F://	Win95 externdedï¼ˆ>8GBï¼‰
 		fName.LoadString(IDS_EXT_PART);
 		break;
 
@@ -295,17 +295,17 @@ CString GetPartFormatName(USHORT format)
 		fName.LoadString(IDS_BBT_PART);
 		break;
 
-		//Ò»ÏÂÊÇÎÒ×Ô¼º¶¨ÒåµÄ¼¸ÖÖÀàĞÍ
+		//ä¸€ä¸‹æ˜¯æˆ‘è‡ªå·±å®šä¹‰çš„å‡ ç§ç±»å‹
 	case 0x100://			//MBR
 		fName.LoadString(IDS_MBR_PART);
 		break;
 	case 0x101://			//EBR
 		fName.LoadString(IDS_EBR_PART);
 		break;
-	case 0x102://			//Ã»·ÖÇøµÄ¿ÕÏĞÇøÓò
+	case 0x102://			//æ²¡åˆ†åŒºçš„ç©ºé—²åŒºåŸŸ
 		fName.LoadString(IDS_EMPTY_PART);
 		break;
-	case 0x103:			//²»ÄÜ·ÖÇøµÄÇøÓò
+	case 0x103:			//ä¸èƒ½åˆ†åŒºçš„åŒºåŸŸ
 		fName.LoadString(IDS_REMAIN_PART);
 		break;
 	
@@ -317,24 +317,24 @@ CString GetPartFormatName(USHORT format)
 
 CString GetSizeToString(LONG_INT len)
 {
-	//²ÎÊı²»ºÏ¸ñ
+	//å‚æ•°ä¸åˆæ ¼
 	CString strSize(_T("0"));
 
 //	len.QuadPart *= SECTOR_SIZE;
 	
 	if(len.QuadPart < (LONGLONG)1024)
-	{////Ğ¡ÓÚ1K
+	{////å°äº1K
 		strSize.Format(_T("%dB") , len.QuadPart);
 	}else if (len.QuadPart < (LONGLONG)1024 * 1024)
-	{////Ğ¡ÓÚ1M
+	{////å°äº1M
 		strSize.Format(_T("%.2fKB") , len.QuadPart / 1024.0);
 	} 
 	else if (len.QuadPart < (__int64)1024 * 1024 * 1024)
-	{//Ğ¡ÓÚ1G
+	{//å°äº1G
 		strSize.Format(_T("%.2fMB") , len.QuadPart / 1024.0 / 1024.0);
 	} 
 	else if (len.QuadPart < (__int64)1024 * 1024 * 1024 * 1024)
-	{//Ğ¡ÓÚ1T
+	{//å°äº1T
 		strSize.Format(_T("%.2fGB") , len.QuadPart / 1024.0 / 1024.0/1024.0);
 	} 
 	else 
@@ -363,26 +363,26 @@ LONG_INT HexStrToLONG_INT(CString str)
 	char a = 0;
 	int i = 0;
 	
-	//³¬³öÁË·¶Î§
+	//è¶…å‡ºäº†èŒƒå›´
 	if (len == 0 || len > 16 )
 		return li;
 	
-	//»ñÈ¡Ã¿Ò»¸ö×Ö·û
+	//è·å–æ¯ä¸€ä¸ªå­—ç¬¦
 	for (i = 0 ; i < len; ++i)
 	{
 		li.QuadPart <<= 4;
 		a = (char)str.GetAt(i);
 		if ( a >= '0' && a <= '9' )
-		{//Êı×Ö
+		{//æ•°å­—
 			li.QuadPart |= (0x0F & ( a - '0'));
 		}else if(a >= 'a' && a <= 'f')
-		{//Ğ¡Ğ´×Ö·û
+		{//å°å†™å­—ç¬¦
 			li.QuadPart |= (0x0F & ( a - 'a' + 10));
 		}else if(a >= 'A' && a <= 'F')
-		{//´óĞ´×Ö·û
+		{//å¤§å†™å­—ç¬¦
 			li.QuadPart |= (0x0F & ( a - 'A' + 10));
-		}else{//³öÏÖÁË²»ºÍ·¢µÄ×Ö·û
-			li.QuadPart >>= 4;//»¹Ô­
+		}else{//å‡ºç°äº†ä¸å’Œå‘çš„å­—ç¬¦
+			li.QuadPart >>= 4;//è¿˜åŸ
 			return li;
 		}
 	}
@@ -397,21 +397,21 @@ DWORD WINAPI GetUnPartableSectorCntThread(PVOID wParam)
 	CDataDoc * pDoc = pView->GetDocument();
 	
 	
-	//TODO  ´íÎó´¦Àí,  ÊÕµ½ÁËÒ»¸ö²»Ó¦¸ÃµÄµÄÎÄµµ
+	//TODO  é”™è¯¯å¤„ç†,  æ”¶åˆ°äº†ä¸€ä¸ªä¸åº”è¯¥çš„çš„æ–‡æ¡£
 	if (!pDoc->IsKindOf(RUNTIME_CLASS(CDiskDoc)))
 		return 0;
 	
 
-	//¿ªÊ¼»ñÈ¡²»¿É·ÖÅäµÄÉÈÇøÊı
+	//å¼€å§‹è·å–ä¸å¯åˆ†é…çš„æ‰‡åŒºæ•°
 	if(((CDiskDoc*)pDoc)->GetUnPartSecCount(&size))
-	{//»ñÈ¡³É¹¦
+	{//è·å–æˆåŠŸ
 		if (::IsWindow(pView->GetSafeHwnd()))
 		{
 			pView->SendMessage(DMSG_GOT_UNPARTABLE_SEC , (WPARAM)size , 0 );
 		}
 		
 	}else{
-		//TODO  ¼ÆËã´ÅÅÌµÄ²»¿É·ÖÇøµÄ´óĞ¡Ê§°Ü
+		//TODO  è®¡ç®—ç£ç›˜çš„ä¸å¯åˆ†åŒºçš„å¤§å°å¤±è´¥
 	}
 
 	return 0;	
@@ -424,29 +424,29 @@ CString GetParamByName(CString pathName , TCHAR* pName)
 	int index = 0 , index2 = 0;
 	CString upCase;
 	CString res = _T("");
-	//»ñµÃÂ·¾¶µÄ´óĞ´ĞÎÊ½
+	//è·å¾—è·¯å¾„çš„å¤§å†™å½¢å¼
 	upCase = pathName;
 	upCase.MakeUpper();
 	
 	
 	index  = upCase.Find(pName);
 	if (index == -1)
-		res = _T("");	//Ã»ÓĞË÷Òı²ÎÊı
-	else{//ÕÒµ½ÁË²ÎÊı
+		res = _T("");	//æ²¡æœ‰ç´¢å¼•å‚æ•°
+	else{//æ‰¾åˆ°äº†å‚æ•°
 		
-		//»ñÈ¡²ÎÊı
+		//è·å–å‚æ•°
 		index2 = upCase.Find(_T(" ") , index);
 		
-		if (index2 == -1)//Ã»ÓĞ²ÎÊıÊµÌå
+		if (index2 == -1)//æ²¡æœ‰å‚æ•°å®ä½“
 			res = _T("");
-		else{//ÓĞ²ÎÊıÊµÌå
-			pathName = pathName.Mid(index2);  //»ñµÃ²ÎÊıÊı¾İ²¿·Ö
+		else{//æœ‰å‚æ•°å®ä½“
+			pathName = pathName.Mid(index2);  //è·å¾—å‚æ•°æ•°æ®éƒ¨åˆ†
 			pathName.TrimLeft();
-			if (pathName.GetAt(0) == _T('-'))  //Ã»ÓĞµ±Ç°²ÎÊıÊı¾İ
+			if (pathName.GetAt(0) == _T('-'))  //æ²¡æœ‰å½“å‰å‚æ•°æ•°æ®
 				res = _T("");
 			else{
 				index = pathName.Find(_T(" "));
-				if (index == -1)  //½ÓÏÂÀ´Ã»ÓĞ²ÎÊıÁË
+				if (index == -1)  //æ¥ä¸‹æ¥æ²¡æœ‰å‚æ•°äº†
 					res = pathName;
 				else{
 					res = pathName.Mid(0 , index);
@@ -462,7 +462,7 @@ CString GetParamByName(CString pathName , TCHAR* pName)
 CString GetPathParam( CString pathName , int paramType )
 {
 	CString res;
-	CString upCase;		//Â·¾¶´óĞ´ĞÎÊ½
+	CString upCase;		//è·¯å¾„å¤§å†™å½¢å¼
 	CString strTmp;		
 	int index = 0 , index2 = 0;
 	
@@ -470,35 +470,35 @@ CString GetPathParam( CString pathName , int paramType )
 	pathName.TrimLeft();
 	
 	if (!pathName.GetLength()){
-		//TODO ³öÏÖÁËÎŞĞ§µÄÂ·¾¶
+		//TODO å‡ºç°äº†æ— æ•ˆçš„è·¯å¾„
 		return _T("");
 	}
 	
-	//»ñµÃÂ·¾¶µÄ´óĞ´ĞÎÊ½
+	//è·å¾—è·¯å¾„çš„å¤§å†™å½¢å¼
 	upCase = pathName;
 	upCase.MakeUpper();
 	
 	switch(paramType){
-	case PT_DEVNAME:	//»ñµÃÉè±¸µÄÃû×Ö
+	case PT_DEVNAME:	//è·å¾—è®¾å¤‡çš„åå­—
 		index  = upCase.Find(_T(" "));
 		if (index == -1)
-			res = pathName;	//Ã»ÓĞ²ÎÊı
+			res = pathName;	//æ²¡æœ‰å‚æ•°
 		else
 			res  = pathName.Mid( 0 , index);
 		break;
-	case PT_INDEX:		//»ñµÃÒª´ò¿ªµÄÇøÓòÔÚÉè±¸ÉÏµÄÇøÓòĞòºÅ
+	case PT_INDEX:		//è·å¾—è¦æ‰“å¼€çš„åŒºåŸŸåœ¨è®¾å¤‡ä¸Šçš„åŒºåŸŸåºå·
 		//index  = upCase.Find();
 		res = GetParamByName(pathName , PN_INDEX);
 		break;
-	case PT_OFFSET:		//»ñµÃÇøÓòµÄÆ«ÒÆ
+	case PT_OFFSET:		//è·å¾—åŒºåŸŸçš„åç§»
 		index  = upCase.Find(PN_OFFSET);
 		res = GetParamByName(pathName , PN_OFFSET);
 		break;
-	case PT_LETTER:		//ÅÌ·û
+	case PT_LETTER:		//ç›˜ç¬¦
 		index  = upCase.Find(PN_LETTER);
 		res = GetParamByName(pathName , PN_LETTER);
 		break;
-	default://³öÏÖÁËÃ»ÓĞµÄ²ÎÊıÀàĞÍ
+	default://å‡ºç°äº†æ²¡æœ‰çš„å‚æ•°ç±»å‹
 		return _T("");
 	}
 	return res;
@@ -523,29 +523,29 @@ DWORD WINAPI EnumFAT32File(PVOID wParam)
 
 	DRES		res = DR_OK;
 
-	//ÏÈÇåÀíÒ»ÏÂÏÖÓĞµÄÊı¾İ
+	//å…ˆæ¸…ç†ä¸€ä¸‹ç°æœ‰çš„æ•°æ®
 	pList->DeleteAllItems();
 
 	pDoc->m_bIsRun = TRUE;
 
-	//Òª´ò¿ªµÄÉè±¸Ãû×Ö
+	//è¦æ‰“å¼€çš„è®¾å¤‡åå­—
 #ifdef  _UNICODE
 	wcscpy(path , (LPCTSTR)curPath);
 #else
 	MultyByteToUnic((LPCTSTR)curPath , path , MAX_PATH + 1);
 #endif
 
-//  ID  ÎÄ¼şÃû ÆğÊ¼ÉÈÇøºÅ  ×ÜÉÈÇøÊı  ´óĞ¡ ´´½¨Ê±¼ä ĞŞ¸ÄÊ±¼ä ·ÃÎÊÊ±¼ä
+//  ID  æ–‡ä»¶å èµ·å§‹æ‰‡åŒºå·  æ€»æ‰‡åŒºæ•°  å¤§å° åˆ›å»ºæ—¶é—´ ä¿®æ”¹æ—¶é—´ è®¿é—®æ—¶é—´
 	
 	res = pFat32->OpenFileW( path , &root);
 
 	if (res != DR_OK)
-	{//TODO  ´ò¿ªÖ¸¶¨µÄÄ¿Â¼Ê§°Ü
+	{//TODO  æ‰“å¼€æŒ‡å®šçš„ç›®å½•å¤±è´¥
 		return 0;
 	}
 	res = pFat32->FindFile(&root  , &Finder );
 	if (res != DR_OK)
-	{//TODO  ³õÊ¼»¯²éÕÒÊ§°Ü
+	{//TODO  åˆå§‹åŒ–æŸ¥æ‰¾å¤±è´¥
 		root.Close();
 		return 0;
 	}
@@ -553,85 +553,85 @@ DWORD WINAPI EnumFAT32File(PVOID wParam)
 	while (res == DR_OK)
 	{
 		if ( pDoc->m_bIsRun == FALSE)
-		{//ĞèÒªÍË³öÁË
-			//ÊÍ·ÅĞèÒªÊÍ·ÅµÄ×ÊÔ´
+		{//éœ€è¦é€€å‡ºäº†
+			//é‡Šæ”¾éœ€è¦é‡Šæ”¾çš„èµ„æº
 			pFat32->FindClose(Finder);
 		
 			return 0;
 		}
 
 		res = pFat32->FindNextFileW(Finder , &file  );
-		if (res == DR_FAT_EOF)//TODO³¬ÕÒÍê±ÏÁË
+		if (res == DR_FAT_EOF)//TODOè¶…æ‰¾å®Œæ¯•äº†
 			break;
 		
-		if (res != DR_OK)//TODO ³¬ÕÒÊ§°ÜÁË
+		if (res != DR_OK)//TODO è¶…æ‰¾å¤±è´¥äº†
 			break;
 				
-		//  ID  ÎÄ¼şÃû ÆğÊ¼ÉÈÇøºÅ  ×ÜÉÈÇøÊı  Êµ¼Ê´óĞ¡ ·ÖÅä´óĞ¡ ´´½¨Ê±¼ä ĞŞ¸ÄÊ±¼ä ·ÃÎÊÊ±¼ä
+		//  ID  æ–‡ä»¶å èµ·å§‹æ‰‡åŒºå·  æ€»æ‰‡åŒºæ•°  å®é™…å¤§å° åˆ†é…å¤§å° åˆ›å»ºæ—¶é—´ ä¿®æ”¹æ—¶é—´ è®¿é—®æ—¶é—´
 
 		strTemp.Format(_T("%d") , i);//ID
-		if (!file.IsDir()){  //ÎÄ¼ş
+		if (!file.IsDir()){  //æ–‡ä»¶
 			pList->InsertItem( i  , strTemp , 0 );
-		}else{				//Ä¿Â¼
+		}else{				//ç›®å½•
 			pList->InsertItem( i  , strTemp , 1);
 		}
-		//ÎÄ¼şÃû
+		//æ–‡ä»¶å
 		strTemp = file.GetFileName();
-		pList->SetItemText(i , 1  , strTemp);//Ãû×Ö
+		pList->SetItemText(i , 1  , strTemp);//åå­—
 
-		//ÆğÊ¼ÉÈÇøºÅ
+		//èµ·å§‹æ‰‡åŒºå·
 		dwTemp = file.GetStartSec();
 		strTemp.Format(_T("%X") , dwTemp);
-		pList->SetItemText(i , 2  , strTemp);//ÆäÊµÉÈÇøºÅ
+		pList->SetItemText(i , 2  , strTemp);//å…¶å®æ‰‡åŒºå·
 
 		if (!file.IsDir())
-		{//Ä¿Â¼ÊÇÃ»ÓĞÎÄ¼ş´óĞ¡µÄ
-			//Õ¼ÓÃµÄÉÈÇøÊı  Èç¹ûÊÇÄ¿Â¼µÄ»°ÖµÎª-1  ±ãÓÚÒÔºó¼ì²é
+		{//ç›®å½•æ˜¯æ²¡æœ‰æ–‡ä»¶å¤§å°çš„
+			//å ç”¨çš„æ‰‡åŒºæ•°  å¦‚æœæ˜¯ç›®å½•çš„è¯å€¼ä¸º-1  ä¾¿äºä»¥åæ£€æŸ¥
 			strTemp.Format(_T("%X") , file.GetSecCount());
-			pList->SetItemText(i , 3  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+			pList->SetItemText(i , 3  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 		
-			//ÎÄ¼şµÄ´óĞ¡
+			//æ–‡ä»¶çš„å¤§å°
 			dwTemp = file.GetFileSize();
 			strTemp = GetSizeToString(dwTemp);
-			pList->SetItemText(i , 4  , strTemp);//ÎÄ¼şµÄ´óĞ¡
+			pList->SetItemText(i , 4  , strTemp);//æ–‡ä»¶çš„å¤§å°
 
-			//ÎÄ¼şµÄ·ÖÅä´óĞ¡
+			//æ–‡ä»¶çš„åˆ†é…å¤§å°
 			dwTemp = file.GetSecCount() * SECTOR_SIZE;
 			strTemp = GetSizeToString(dwTemp);
-			pList->SetItemText(i , 5  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+			pList->SetItemText(i , 5  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 		
 		}
 
-		//ÎÄ¼şµÄ´´½¨Ê±¼ä
+		//æ–‡ä»¶çš„åˆ›å»ºæ—¶é—´
 		tTemp = (time_t)file.GetCreateTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d %02d:%02d:%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday ,
 			tmTemp.tm_hour , tmTemp.tm_min , tmTemp.tm_sec);
-		pList->SetItemText(i , 6  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 6  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
 
-		//ÎÄ¼şµÄĞŞ¸ÄÊ±¼ä
+		//æ–‡ä»¶çš„ä¿®æ”¹æ—¶é—´
 		tTemp = (time_t)file.GetWriteTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d %02d:%02d:%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday ,
 			tmTemp.tm_hour , tmTemp.tm_min , tmTemp.tm_sec);
-		pList->SetItemText(i , 7  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 7  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
-		//ÎÄ¼şµÄ·ÃÎÊÊ±¼ä
+		//æ–‡ä»¶çš„è®¿é—®æ—¶é—´
 		tTemp = (time_t)file.GetAccessTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday);
-		pList->SetItemText(i , 8  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 8  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
 
 		file.Close();
 		++i;
 	}
 
-	//ÊÍ·ÅĞèÒªÊÍ·ÅµÄ×ÊÔ´
+	//é‡Šæ”¾éœ€è¦é‡Šæ”¾çš„èµ„æº
 	pFat32->FindClose(Finder);
 
 	return 0;
@@ -656,29 +656,29 @@ DWORD WINAPI EnumDelFAT32File(PVOID wParam)
 
 	DRES		res = DR_OK;
 
-	//ÏÈÇåÀíÒ»ÏÂÏÖÓĞµÄÊı¾İ
+	//å…ˆæ¸…ç†ä¸€ä¸‹ç°æœ‰çš„æ•°æ®
 	//pList->DeleteAllItems();
 
 	pDoc->m_bIsRun = TRUE;
 
-	//Òª´ò¿ªµÄÉè±¸Ãû×Ö
+	//è¦æ‰“å¼€çš„è®¾å¤‡åå­—
 #ifdef  _UNICODE
 	wcscpy(path , (LPCTSTR)curPath);
 #else
 	MultyByteToUnic((LPCTSTR)curPath , path , MAX_PATH + 1);
 #endif
 
-	//  ID  ÎÄ¼şÃû ÆğÊ¼ÉÈÇøºÅ  ×ÜÉÈÇøÊı  ´óĞ¡ ´´½¨Ê±¼ä ĞŞ¸ÄÊ±¼ä ·ÃÎÊÊ±¼ä
+	//  ID  æ–‡ä»¶å èµ·å§‹æ‰‡åŒºå·  æ€»æ‰‡åŒºæ•°  å¤§å° åˆ›å»ºæ—¶é—´ ä¿®æ”¹æ—¶é—´ è®¿é—®æ—¶é—´
 
 	res = pFat32->OpenFileW( path , &root);
 
 	if (res != DR_OK)
-	{//TODO  ´ò¿ªÖ¸¶¨µÄÄ¿Â¼Ê§°Ü
+	{//TODO  æ‰“å¼€æŒ‡å®šçš„ç›®å½•å¤±è´¥
 		return 0;
 	}
 	res = pFat32->FindFile(&root  , &Finder , TRUE );
 	if (res != DR_OK)
-	{//TODO  ³õÊ¼»¯²éÕÒÊ§°Ü
+	{//TODO  åˆå§‹åŒ–æŸ¥æ‰¾å¤±è´¥
 		root.Close();
 		return 0;
 	}
@@ -687,82 +687,82 @@ DWORD WINAPI EnumDelFAT32File(PVOID wParam)
 	while (res == DR_OK)
 	{
 		if ( pDoc->m_bIsRun == FALSE)
-		{//ĞèÒªÍË³öÁË
-			//ÊÍ·ÅĞèÒªÊÍ·ÅµÄ×ÊÔ´
+		{//éœ€è¦é€€å‡ºäº†
+			//é‡Šæ”¾éœ€è¦é‡Šæ”¾çš„èµ„æº
 			pFat32->FindClose(Finder);
 
 			return 0;
 		}
 
 		res = pFat32->FindNextFileW(Finder , &file  );
-		if (res == DR_FAT_EOF)//TODO³¬ÕÒÍê±ÏÁË
+		if (res == DR_FAT_EOF)//TODOè¶…æ‰¾å®Œæ¯•äº†
 			break;
 
-		if (res != DR_OK)//TODO ³¬ÕÒÊ§°ÜÁË
+		if (res != DR_OK)//TODO è¶…æ‰¾å¤±è´¥äº†
 			break;
 
-		//  ID  ÎÄ¼şÃû ÆğÊ¼ÉÈÇøºÅ  ×ÜÉÈÇøÊı  Êµ¼Ê´óĞ¡ ·ÖÅä´óĞ¡ ´´½¨Ê±¼ä ĞŞ¸ÄÊ±¼ä ·ÃÎÊÊ±¼ä
+		//  ID  æ–‡ä»¶å èµ·å§‹æ‰‡åŒºå·  æ€»æ‰‡åŒºæ•°  å®é™…å¤§å° åˆ†é…å¤§å° åˆ›å»ºæ—¶é—´ ä¿®æ”¹æ—¶é—´ è®¿é—®æ—¶é—´
 
 		strTemp.Format(_T("%d") , i);//ID
 		pList->InsertItem( i  , strTemp ,1 );
 
-		//ÎÄ¼şÃû
+		//æ–‡ä»¶å
 		strTemp = file.GetFileName();
-		pList->SetItemText(i , 1  , strTemp);//Ãû×Ö
+		pList->SetItemText(i , 1  , strTemp);//åå­—
 
-		//ÆğÊ¼ÉÈÇøºÅ
+		//èµ·å§‹æ‰‡åŒºå·
 		dwTemp = file.GetStartSec();
 		strTemp.Format(_T("%X") , dwTemp);
-		pList->SetItemText(i , 2  , strTemp);//ÆäÊµÉÈÇøºÅ
+		pList->SetItemText(i , 2  , strTemp);//å…¶å®æ‰‡åŒºå·
 
 		if (!file.IsDir())
-		{//Ä¿Â¼ÊÇÃ»ÓĞÎÄ¼ş´óĞ¡µÄ
-			//Õ¼ÓÃµÄÉÈÇøÊı  Èç¹ûÊÇÄ¿Â¼µÄ»°ÖµÎª-1  ±ãÓÚÒÔºó¼ì²é
+		{//ç›®å½•æ˜¯æ²¡æœ‰æ–‡ä»¶å¤§å°çš„
+			//å ç”¨çš„æ‰‡åŒºæ•°  å¦‚æœæ˜¯ç›®å½•çš„è¯å€¼ä¸º-1  ä¾¿äºä»¥åæ£€æŸ¥
 			strTemp.Format(_T("%X") , file.GetSecCount());
-			pList->SetItemText(i , 3  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+			pList->SetItemText(i , 3  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
-			//ÎÄ¼şµÄ´óĞ¡
+			//æ–‡ä»¶çš„å¤§å°
 			dwTemp = file.GetFileSize();
 			strTemp = GetSizeToString(dwTemp);
-			pList->SetItemText(i , 4  , strTemp);//ÎÄ¼şµÄ´óĞ¡
+			pList->SetItemText(i , 4  , strTemp);//æ–‡ä»¶çš„å¤§å°
 
-			//ÎÄ¼şµÄ·ÖÅä´óĞ¡
+			//æ–‡ä»¶çš„åˆ†é…å¤§å°
 			dwTemp = file.GetSecCount() * SECTOR_SIZE;
 			strTemp = GetSizeToString(dwTemp);
-			pList->SetItemText(i , 5  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+			pList->SetItemText(i , 5  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
 		}
 
-		//ÎÄ¼şµÄ´´½¨Ê±¼ä
+		//æ–‡ä»¶çš„åˆ›å»ºæ—¶é—´
 		tTemp = (time_t)file.GetCreateTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d %02d:%02d:%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday ,
 			tmTemp.tm_hour , tmTemp.tm_min , tmTemp.tm_sec);
-		pList->SetItemText(i , 6  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 6  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
 
-		//ÎÄ¼şµÄĞŞ¸ÄÊ±¼ä
+		//æ–‡ä»¶çš„ä¿®æ”¹æ—¶é—´
 		tTemp = (time_t)file.GetWriteTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d %02d:%02d:%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday ,
 			tmTemp.tm_hour , tmTemp.tm_min , tmTemp.tm_sec);
-		pList->SetItemText(i , 7  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 7  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
-		//ÎÄ¼şµÄ·ÃÎÊÊ±¼ä
+		//æ–‡ä»¶çš„è®¿é—®æ—¶é—´
 		tTemp = (time_t)file.GetAccessTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday);
-		pList->SetItemText(i , 8  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 8  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
 
 		file.Close();
 		++i;
 	}
 
-	//ÊÍ·ÅĞèÒªÊÍ·ÅµÄ×ÊÔ´
+	//é‡Šæ”¾éœ€è¦é‡Šæ”¾çš„èµ„æº
 	pFat32->FindClose(Finder);
 
 	return 0;
@@ -787,43 +787,43 @@ DWORD WINAPI EnumNtfsFile(PVOID wParam)
 
 	DRES		res = DR_OK;
 
-	//ÏÈÇåÀíÒ»ÏÂÏÖÓĞµÄÊı¾İ
+	//å…ˆæ¸…ç†ä¸€ä¸‹ç°æœ‰çš„æ•°æ®
 	pList->DeleteAllItems();
 	pDoc->m_bIsRun = TRUE;
 
-	if (1 < curPath.GetLength()) //·Ç¸ùÄ¿Â¼
+	if (1 < curPath.GetLength()) //éæ ¹ç›®å½•
 	{
 		res = pNtfs->OpenFile(curPath , &file );
-		if (DR_OK != res) return 0;//³ö´íÁË
+		if (DR_OK != res) return 0;//å‡ºé”™äº†
 		
-		//ÔÚNtfsµÄÄ¿Â¼ÖĞÊÇÃ»ÓĞdot(.)ºÍdotdot(..)Ä¿Â¼µÄ,ÔÚÕâÀïÎÒÎªÁË·½±ã×Ô¼ºÌí¼Ó
+		//åœ¨Ntfsçš„ç›®å½•ä¸­æ˜¯æ²¡æœ‰dot(.)å’Œdotdot(..)ç›®å½•çš„,åœ¨è¿™é‡Œæˆ‘ä¸ºäº†æ–¹ä¾¿è‡ªå·±æ·»åŠ 
 		//dot
 		strTemp.Format(_T("%d") , i);	//ID
 		pList->InsertItem( i  , strTemp ,1 );
-		pList->SetItemText(i , 1  , _T("."));//Ãû×Ö
+		pList->SetItemText(i , 1  , _T("."));//åå­—
 		
-		//MFT¼ÇÂ¼
+		//MFTè®°å½•
 		liMft = file.GetMftIndex();
 		liMft.HighPart == 0 ? strTemp.Format(_T("%X") , liMft.LowPart) :strTemp.Format(_T("%X%X") ,liMft.HighPart , liMft.LowPart) ;
-		pList->SetItemText(i++ , 2  , strTemp);//ÆäÊµÉÈÇøºÅ
+		pList->SetItemText(i++ , 2  , strTemp);//å…¶å®æ‰‡åŒºå·
 		
 		//dotdot
 		strTemp.Format(_T("%d") , i);	//ID
 		pList->InsertItem( i  , strTemp ,1 );
-		pList->SetItemText(i , 1  , _T(".."));//Ãû×Ö
+		pList->SetItemText(i , 1  , _T(".."));//åå­—
 		
-		//MFT¼ÇÂ¼
+		//MFTè®°å½•
 		liMft = file.GetParentMftIndex();
 		liMft.HighPart == 0 ? strTemp.Format(_T("%X") , liMft.LowPart) :strTemp.Format(_T("%X%X") ,liMft.HighPart , liMft.LowPart) ;
-		pList->SetItemText(i++ , 2  , strTemp);//ÆäÊµÉÈÇøºÅ
+		pList->SetItemText(i++ , 2  , strTemp);//å…¶å®æ‰‡åŒºå·
 		file.Close();
 	}
 
 
-	//¿ªÊ¼Ò»¸ö²éÕÒ¹ı³Ì
+	//å¼€å§‹ä¸€ä¸ªæŸ¥æ‰¾è¿‡ç¨‹
 	res = pNtfs->FindFile(curPath  , &Finder );
 	if (res != DR_OK)
-	{//TODO  ³õÊ¼»¯²éÕÒÊ§°Ü
+	{//TODO  åˆå§‹åŒ–æŸ¥æ‰¾å¤±è´¥
 		return 0;
 	}
 	
@@ -831,28 +831,28 @@ DWORD WINAPI EnumNtfsFile(PVOID wParam)
 	while (res == DR_OK)
 	{
 		if (pDoc->m_bIsRun == FALSE)
-		{//ÍâÃæÒÑ¾­Í¨Öª½áÊøÁË
+		{//å¤–é¢å·²ç»é€šçŸ¥ç»“æŸäº†
 			pNtfs->CloseFind(Finder);
 			return 0;
 		}
 // 		if (WAIT_OBJECT_0 == WaitForSingleObject(pDoc->m_pEveIsRun->m_hObject , 0))
-// 		{//ÒÑ¾­³ö·¢ÁË  ĞèÒª·µ»Ø
+// 		{//å·²ç»å‡ºå‘äº†  éœ€è¦è¿”å›
 // 			pDoc->m_pEveIsRun->ResetEvent();
 // 			pNtfs->CloseFind(Finder);
 // 			return 0;
 // 		}
 
 		res = pNtfs->FindNext(Finder , &liMft  );
-		if (res == DR_FAT_EOF)//TODO³¬ÕÒÍê±ÏÁË
+		if (res == DR_FAT_EOF)//TODOè¶…æ‰¾å®Œæ¯•äº†
 			break;
 		
-		if (res != DR_OK)//TODO ³¬ÕÒÊ§°ÜÁË
+		if (res != DR_OK)//TODO è¶…æ‰¾å¤±è´¥äº†
 			break;
 
 		res = pNtfs->OpenFileW(&file , liMft);
 		//if (res != DR_OK)			
 		
-//  ID  ÎÄ¼şÃû MFT¼ÇÂ¼ Êµ¼Ê´óĞ¡  ·ÖÅä´óĞ¡ ´´½¨Ê±¼ä MFTĞŞ¸ÄÊ±¼ä  Êı¾İĞŞ¸ÄÊ±¼ä ·ÃÎÊÊ±¼ä 
+//  ID  æ–‡ä»¶å MFTè®°å½• å®é™…å¤§å°  åˆ†é…å¤§å° åˆ›å»ºæ—¶é—´ MFTä¿®æ”¹æ—¶é—´  æ•°æ®ä¿®æ”¹æ—¶é—´ è®¿é—®æ—¶é—´ 
 		strTemp.Format(_T("%d") , i);	//ID
 
 		if (file.IsDir())
@@ -863,73 +863,73 @@ DWORD WINAPI EnumNtfsFile(PVOID wParam)
 		}
 		
 
-		//ÎÄ¼şÃû
+		//æ–‡ä»¶å
 		file.GetFileName( path , MAX_PATH + 1 );
 		strTemp = path;
-		pList->SetItemText(i , 1  , strTemp);//Ãû×Ö
+		pList->SetItemText(i , 1  , strTemp);//åå­—
 
-		//MFT¼ÇÂ¼
+		//MFTè®°å½•
 		liMft.HighPart == 0 ? strTemp.Format(_T("%X") , liMft.LowPart) :strTemp.Format(_T("%X%X") ,liMft.HighPart , liMft.LowPart) ;
-		pList->SetItemText(i , 2  , strTemp);//ÆäÊµÉÈÇøºÅ
+		pList->SetItemText(i , 2  , strTemp);//å…¶å®æ‰‡åŒºå·
 
 		if (!file.IsDir())
-		{//Ä¿Â¼ÊÇÃ»ÓĞÎÄ¼ş´óĞ¡µÄ
-			//Êµ¼Ê´óĞ¡
+		{//ç›®å½•æ˜¯æ²¡æœ‰æ–‡ä»¶å¤§å°çš„
+			//å®é™…å¤§å°
 			strTemp = GetSizeToString(file.GetRealSize());
 			//liTemp.HighPart == 0 ? strTemp.Format(_T("%X") , liTemp.LowPart) :strTemp.Format(_T("%X%X") ,liTemp.HighPart , liTemp.LowPart) ;
-			pList->SetItemText(i , 3  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+			pList->SetItemText(i , 3  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 		
-			//ÎÄ¼şµÄ·ÖÅä´óÏÂ
+			//æ–‡ä»¶çš„åˆ†é…å¤§ä¸‹
 		//	dwTemp = file.GetFileSize();
 			strTemp = GetSizeToString(file.GetAllocSize());
-			pList->SetItemText(i , 4  , strTemp);//ÎÄ¼şµÄ´óĞ¡
+			pList->SetItemText(i , 4  , strTemp);//æ–‡ä»¶çš„å¤§å°
 
-// 			//ÎÄ¼şµÄ·ÖÅä´óĞ¡
+// 			//æ–‡ä»¶çš„åˆ†é…å¤§å°
 // 			dwTemp = file.GetSecCount() * SECTOR_SIZE;
 // 			strTemp = GetSizeToString(dwTemp);
-// 			pList->SetItemText(i , 5  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+// 			pList->SetItemText(i , 5  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 		
 		}
 
-		//ÎÄ¼şµÄ´´½¨Ê±¼ä
+		//æ–‡ä»¶çš„åˆ›å»ºæ—¶é—´
 		tTemp = (time_t)file.GetCreateTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d %02d:%02d:%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday ,
 			tmTemp.tm_hour , tmTemp.tm_min , tmTemp.tm_sec);
-		pList->SetItemText(i , 5  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 5  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
 
-		//MFTĞŞ¸ÄÊ±¼ä
+		//MFTä¿®æ”¹æ—¶é—´
 		tTemp = (time_t)file.GetMFTChgTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d %02d:%02d:%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday ,
 			tmTemp.tm_hour , tmTemp.tm_min , tmTemp.tm_sec);
-		pList->SetItemText(i , 6  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 6  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
-		//Êı¾İĞŞ¸ÄÊ±¼ä
+		//æ•°æ®ä¿®æ”¹æ—¶é—´
 		tTemp = (time_t)file.GetAlteredTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d %02d:%02d:%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday ,
 			tmTemp.tm_hour , tmTemp.tm_min , tmTemp.tm_sec);
-		pList->SetItemText(i , 7  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 7  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
-		//·ÃÎÊÊ±¼ä
+		//è®¿é—®æ—¶é—´
 		tTemp = (time_t)file.GetReadTime().QuadPart;
 		tmTemp = *localtime(&tTemp);
 		strTemp.Format(_T("%d-%02d-%02d %02d:%02d:%02d")
 			,tmTemp.tm_year + 1900 , tmTemp.tm_mon + 1 , tmTemp.tm_mday ,
 			tmTemp.tm_hour , tmTemp.tm_min , tmTemp.tm_sec);
-		pList->SetItemText(i , 8  , strTemp);//Õ¼ÓÃµÄÉÈÇøÊı
+		pList->SetItemText(i , 8  , strTemp);//å ç”¨çš„æ‰‡åŒºæ•°
 
 
 		file.Close();
 		++i;
 	}
 
-	//ÊÍ·ÅĞèÒªÊÍ·ÅµÄ×ÊÔ´
+	//é‡Šæ”¾éœ€è¦é‡Šæ”¾çš„èµ„æº
 	pNtfs->CloseFind(Finder);
 //	pNtfs->FindClose(Finder);
 
@@ -938,7 +938,7 @@ DWORD WINAPI EnumNtfsFile(PVOID wParam)
 
 DWORD WINAPI GetFATClustList( PVOID wParam )
 {
-	//fat32ÎÄ¼şÊôĞÔ¶Ô»°¿ò
+	//fat32æ–‡ä»¶å±æ€§å¯¹è¯æ¡†
 	CFat32FileDlg* dlg = (CFat32FileDlg*)wParam;
 	CListCtrl*		pList = NULL;
 	DFat32File*		pFile = dlg->m_pFile;
@@ -948,23 +948,23 @@ DWORD WINAPI GetFATClustList( PVOID wParam )
 	DWORD			dIndex = 0;
 	CString			strTemp;
 
-	//ÆğÊ¼´ØºÅ
+	//èµ·å§‹ç°‡å·
 	dwStartClust = pFile->GetStartClust();
-	//±íÃ÷Ïß³ÌÒÑ¾­ÔÚÊ¹ÓÃ
+	//è¡¨æ˜çº¿ç¨‹å·²ç»åœ¨ä½¿ç”¨
 	dlg->m_bIsThreadRun = TRUE;
 	
-	//FAT1 ´ØÁ´
+	//FAT1 ç°‡é“¾
 	pList = (CListCtrl*)(dlg->GetDlgItem(IDC_FAT1_LIST));
 	
-	//ÏÈÇåÀíÒ»ÏÂ¿Õ¼ä
+	//å…ˆæ¸…ç†ä¸€ä¸‹ç©ºé—´
 	pList->DeleteAllItems();
 
-	//»ñµÃÆğÊ¼´ØºÅ
+	//è·å¾—èµ·å§‹ç°‡å·
 	dwClust = dwStartClust;
 	dIndex = 0;
 	while ((0 != dwClust) && !IsFATEnd(dwClust))
 	{
-		if (FALSE == dlg->m_bIsThreadRun)  //·Â·ğÔÚÏß³ÌÍâÃæĞèÒª¹Ø±ÕÏß³ÌÁË
+		if (FALSE == dlg->m_bIsThreadRun)  //ä»¿ä½›åœ¨çº¿ç¨‹å¤–é¢éœ€è¦å…³é—­çº¿ç¨‹äº†
 			return 0 ;
 		strTemp.Format(_T("%d") , dIndex);
 		pList->InsertItem(dIndex , strTemp );
@@ -973,22 +973,22 @@ DWORD WINAPI GetFATClustList( PVOID wParam )
 		
 		dwClust = pFat32->GetFATFromFAT1(dwClust);
 		if (1 == dwClust || 0xFFFFFFFF == dwClust)
-		{//ÎŞĞ§´ØºÅ
+		{//æ— æ•ˆç°‡å·
 			break;
 		}
 		++dIndex;
 	}
 
-	//FAT1 ´ØÁ´
+	//FAT1 ç°‡é“¾
 	pList = (CListCtrl*)(dlg->GetDlgItem(IDC_FAT2_LIST));
-	//ÏÈÇåÀíÒ»ÏÂ¿Õ¼ä
+	//å…ˆæ¸…ç†ä¸€ä¸‹ç©ºé—´
 	pList->DeleteAllItems();
-	//»ñµÃÆğÊ¼´ØºÅ
+	//è·å¾—èµ·å§‹ç°‡å·
 	dwClust = dwStartClust;
 	dIndex = 0;
 	while ((0 != dwClust) && !IsFATEnd(dwClust))
 	{
-		if (FALSE == dlg->m_bIsThreadRun)  //·Â·ğÔÚÏß³ÌÍâÃæĞèÒª¹Ø±ÕÏß³ÌÁË
+		if (FALSE == dlg->m_bIsThreadRun)  //ä»¿ä½›åœ¨çº¿ç¨‹å¤–é¢éœ€è¦å…³é—­çº¿ç¨‹äº†
 			return 0 ;
 		strTemp.Format(_T("%d") , dIndex);
 		pList->InsertItem(dIndex , strTemp );
@@ -997,13 +997,13 @@ DWORD WINAPI GetFATClustList( PVOID wParam )
 
 		dwClust = pFat32->GetFATFromFAT2(dwClust);
 		if (1 == dwClust || 0xFFFFFFFF == dwClust)
-		{//ÎŞĞ§´ØºÅ
+		{//æ— æ•ˆç°‡å·
 			break;
 		}
 		++dIndex;
 	}
 	
-	//¹Ø±ÕÏß³ÌµÄÕ¼ÓÃ
+	//å…³é—­çº¿ç¨‹çš„å ç”¨
 	dlg->m_bIsThreadRun = FALSE;
 
 	return 0;
@@ -1012,60 +1012,60 @@ DWORD WINAPI GetFATClustList( PVOID wParam )
 DWORD WINAPI CopyFat32File( PVOID wParam )
 {
 	CCopyProcessDlg*	pDlg = (CCopyProcessDlg*)wParam;
-	DFat32File			dFile;//FAT32µÄÎÄ¼ş
-	HANDLE				hFile;//½«ÒªĞ´µÄÎÄ¼ş
-	CProgressCtrl*		pProg;//½ø¶ÈÌõ
-	CStatic*			pStatic;		//½ø¶È¿ØÖÆ
+	DFat32File			dFile;//FAT32çš„æ–‡ä»¶
+	HANDLE				hFile;//å°†è¦å†™çš„æ–‡ä»¶
+	CProgressCtrl*		pProg;//è¿›åº¦æ¡
+	CStatic*			pStatic;		//è¿›åº¦æ§åˆ¶
 	DRES				res = DR_OK;
-	char				buf[SECTOR_SIZE * 10] = {0};//ÎÄ¼şÊı¾İ»º´æ
-	DWORD				dwSize = 0;		//ÎÄ¼şµÄ×Ü´óĞ¡
-	DWORD				dwRead = 0;		//ÎÄ¼şÒÑ¾­¶ÁÈ¡ÁËµÄ´óĞ¡
-	DWORD				dwReaded = 0;	//Ò»´Î¶ÁÈ¡µÄÊı¾İ
+	char				buf[SECTOR_SIZE * 10] = {0};//æ–‡ä»¶æ•°æ®ç¼“å­˜
+	DWORD				dwSize = 0;		//æ–‡ä»¶çš„æ€»å¤§å°
+	DWORD				dwRead = 0;		//æ–‡ä»¶å·²ç»è¯»å–äº†çš„å¤§å°
+	DWORD				dwReaded = 0;	//ä¸€æ¬¡è¯»å–çš„æ•°æ®
 	DWORD				dwWrite = 0;
-	double				fRate = 0;		//¸´ÖÆ±ÈÀı
+	double				fRate = 0;		//å¤åˆ¶æ¯”ä¾‹
 	CString				strTemp;
 	DFat32*				pFAT32;
 
-	//»ñµÃ½ø¶ÈÌõµÄÖ¸Õë
+	//è·å¾—è¿›åº¦æ¡çš„æŒ‡é’ˆ
 	pProg = (CProgressCtrl*)pDlg->GetDlgItem(IDC_COPY_PROGRESS );
-	//»ñµÃ½ø¶ÈĞÅÏ¢µÄ¿Ø¼ş
+	//è·å¾—è¿›åº¦ä¿¡æ¯çš„æ§ä»¶
 	pStatic = (CStatic*)pDlg->GetDlgItem(IDC_ST_PROGRESS );
 
 	pFAT32 = ((CFat32Doc*)pDlg->m_pDoc)->m_pFat32;
-	//´ò¿ª½«Òª¶ÁÈ¡ÎÄ¼ş
+	//æ‰“å¼€å°†è¦è¯»å–æ–‡ä»¶
 	res = pFAT32->OpenFile(pDlg->m_strFileToRead , &dFile);
 	if ( DR_OK != res )
-	{//´ò¿ªÎÄ¼şÊ§°Ü
+	{//æ‰“å¼€æ–‡ä»¶å¤±è´¥
 		::SendMessage(pDlg->GetSafeHwnd() , DMSG_OPEN_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToRead) , 0);
 		return 0;
 	}
 
-	//´ò¿ªÒªĞ´µÄÎÄ¼ş
+	//æ‰“å¼€è¦å†™çš„æ–‡ä»¶
 	hFile = ::CreateFile(pDlg->m_strFileToWrite , GENERIC_WRITE , FILE_SHARE_READ , NULL , CREATE_ALWAYS ,FILE_ATTRIBUTE_NORMAL , NULL);
 	if (INVALID_HANDLE_VALUE == hFile)
-	{//´ò¿ª½«ÒªĞ´µÄÎÄ¼şÊ§°Ü 
+	{//æ‰“å¼€å°†è¦å†™çš„æ–‡ä»¶å¤±è´¥ 
 		::SendMessage(pDlg->GetSafeHwnd() , DMSG_OPEN_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToWrite) , 0);
 		dFile.Close();
 		return 0;
 	}
 
-	//¿ªÊ¼¿½±´
+	//å¼€å§‹æ‹·è´
 	pDlg->m_bIsCopying = TRUE;
 
 	dwSize = dFile.GetFileSize();
 	dwRead = 0;
-	//¿ªÊ¼¸´ÖÆÎÄ¼ş
+	//å¼€å§‹å¤åˆ¶æ–‡ä»¶
 	while( (DR_OK == res) && !dFile.IsEOF() )
 	{
 		if (pDlg->m_bIsCopying == FALSE)
-		{//ÒÑ¾­ÔÚÍâÃæ¹Ø±ÕÁË
+		{//å·²ç»åœ¨å¤–é¢å…³é—­äº†
 			dFile.Close();
 			CloseHandle(hFile);
 			return 0;
 		}
 		res = dFile.ReadFile(buf , &dwReaded , SECTOR_SIZE * 10 );
 		if(FALSE == WriteFile(hFile , buf, dwReaded , &dwWrite , NULL ))
-		{//Ğ´ÎÄ¼şÊ§°Ü
+		{//å†™æ–‡ä»¶å¤±è´¥
 			::SendMessage(pDlg->GetSafeHwnd() , DMSG_COPY_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToRead) , (WPARAM)&(pDlg->m_strFileToWrite));
 			dFile.Close();
 			::CloseHandle(hFile);
@@ -1073,7 +1073,7 @@ DWORD WINAPI CopyFat32File( PVOID wParam )
 			return 0;
 		}
 		
-		//×ÜµÄ¶ÁÈ¡ÁËµÄÎÄ¼ş
+		//æ€»çš„è¯»å–äº†çš„æ–‡ä»¶
 		dwRead += dwReaded;
 		fRate = (dwRead/(dwSize * 1.0)) * 100;
 		strTemp.Format(_T("(%s/%s) %.2f%%") , GetSizeToString(dwRead) , GetSizeToString(dwSize) , fRate);
@@ -1082,14 +1082,14 @@ DWORD WINAPI CopyFat32File( PVOID wParam )
 	}
 
 	if (dFile.IsEOF())
-	{//ÎÄ¼ş¸´ÖÆ½áÊø  
+	{//æ–‡ä»¶å¤åˆ¶ç»“æŸ  
 		::PostMessage(pDlg->GetSafeHwnd() , DMSG_COPY_SUCCESS , 0 , 0);
 	}else{
-		//¸´ÖÆÎÄ¼şÊ§°Ü
+		//å¤åˆ¶æ–‡ä»¶å¤±è´¥
 		::SendMessage(pDlg->GetSafeHwnd() , DMSG_COPY_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToRead) , (WPARAM)&(pDlg->m_strFileToWrite));
 	}
 
-	//ÊÍ·ÅÒ»Ğ©×ÊÔ´
+	//é‡Šæ”¾ä¸€äº›èµ„æº
 	dFile.Close();
 	CloseHandle(hFile);
 	pDlg->m_bIsCopying = FALSE;
@@ -1100,61 +1100,61 @@ DWORD WINAPI CopyFat32File( PVOID wParam )
 DWORD WINAPI CopyNtfsFile( PVOID wParam )
 {
 	CCopyProcessDlg*	pDlg = (CCopyProcessDlg*)wParam;
-	DNtfsFile			dFile;	//NTFSµÄÎÄ¼ş
-	HANDLE				hFile;	//½«ÒªĞ´µÄÎÄ¼ş
-	CProgressCtrl*		pProg;	//½ø¶ÈÌõ
-	CStatic*			pStatic;//½ø¶È¿ØÖÆ
+	DNtfsFile			dFile;	//NTFSçš„æ–‡ä»¶
+	HANDLE				hFile;	//å°†è¦å†™çš„æ–‡ä»¶
+	CProgressCtrl*		pProg;	//è¿›åº¦æ¡
+	CStatic*			pStatic;//è¿›åº¦æ§åˆ¶
 	DRES				res = DR_OK;
-	char				buf[SECTOR_SIZE * 10] = {0};//ÎÄ¼şÊı¾İ»º´æ
-	LONG_INT			dwSize = {0};	//ÎÄ¼şµÄ×Ü´óĞ¡
-	DWORD				dwRead = 0;		//ÎÄ¼şÒÑ¾­¶ÁÈ¡ÁËµÄ´óĞ¡
-	DWORD				dwReaded = 0;	//Ò»´Î¶ÁÈ¡µÄÊı¾İ
+	char				buf[SECTOR_SIZE * 10] = {0};//æ–‡ä»¶æ•°æ®ç¼“å­˜
+	LONG_INT			dwSize = {0};	//æ–‡ä»¶çš„æ€»å¤§å°
+	DWORD				dwRead = 0;		//æ–‡ä»¶å·²ç»è¯»å–äº†çš„å¤§å°
+	DWORD				dwReaded = 0;	//ä¸€æ¬¡è¯»å–çš„æ•°æ®
 	DWORD				dwWrite = 0;
-	double				fRate = 0;		//¸´ÖÆ±ÈÀı
+	double				fRate = 0;		//å¤åˆ¶æ¯”ä¾‹
 	CString				strTemp;
 	DNtfs*				pNtfs;
 
-	//»ñµÃ½ø¶ÈÌõµÄÖ¸Õë
+	//è·å¾—è¿›åº¦æ¡çš„æŒ‡é’ˆ
 	pProg = (CProgressCtrl*)pDlg->GetDlgItem(IDC_COPY_PROGRESS );
-	//»ñµÃ½ø¶ÈĞÅÏ¢µÄ¿Ø¼ş
+	//è·å¾—è¿›åº¦ä¿¡æ¯çš„æ§ä»¶
 	pStatic = (CStatic*)pDlg->GetDlgItem(IDC_ST_PROGRESS );
 
 	pNtfs = ((CNtfsDoc*)pDlg->m_pDoc)->m_pNtfs.get();
-	//´ò¿ª½«Òª¶ÁÈ¡ÎÄ¼ş
+	//æ‰“å¼€å°†è¦è¯»å–æ–‡ä»¶
 	res = pNtfs->OpenFile(pDlg->m_strFileToRead, &dFile);
 	if ( DR_OK != res )
-	{//´ò¿ªÎÄ¼şÊ§°Ü
+	{//æ‰“å¼€æ–‡ä»¶å¤±è´¥
 		::SendMessage(pDlg->GetSafeHwnd() , DMSG_OPEN_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToRead) , 0);
 		return 0;
 	}
 
-	//´ò¿ªÒªĞ´µÄÎÄ¼ş
+	//æ‰“å¼€è¦å†™çš„æ–‡ä»¶
 	hFile = ::CreateFile(pDlg->m_strFileToWrite , GENERIC_WRITE , FILE_SHARE_READ , NULL , CREATE_ALWAYS ,FILE_ATTRIBUTE_NORMAL , NULL);
 	if (INVALID_HANDLE_VALUE == hFile)
-	{//´ò¿ª½«ÒªĞ´µÄÎÄ¼şÊ§°Ü 
+	{//æ‰“å¼€å°†è¦å†™çš„æ–‡ä»¶å¤±è´¥ 
 		::SendMessage(pDlg->GetSafeHwnd() , DMSG_OPEN_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToWrite) , 0);
 		dFile.Close();
 		return 0;
 	}
 
-	//¿ªÊ¼¿½±´
+	//å¼€å§‹æ‹·è´
 	pDlg->m_bIsCopying = TRUE;
 
-	//»ñµÃÎÄ¼şµÄÊµ¼Ê´óĞ¡
+	//è·å¾—æ–‡ä»¶çš„å®é™…å¤§å°
 	dwSize = dFile.GetRealSize();
 	dwRead = 0;
-	//¿ªÊ¼¸´ÖÆÎÄ¼ş
+	//å¼€å§‹å¤åˆ¶æ–‡ä»¶
 	while( (DR_OK == res) && !dFile.IsEOF() )
 	{
 		if (pDlg->m_bIsCopying == FALSE)
-		{//ÒÑ¾­ÔÚÍâÃæ¹Ø±ÕÁË
+		{//å·²ç»åœ¨å¤–é¢å…³é—­äº†
 			dFile.Close();
 			CloseHandle(hFile);
 			return 0;
 		}
 		res = dFile.ReadFile(buf , &dwReaded , SECTOR_SIZE * 10 );
 		if(FALSE == WriteFile(hFile , buf, dwReaded , &dwWrite , NULL ))
-		{//Ğ´ÎÄ¼şÊ§°Ü
+		{//å†™æ–‡ä»¶å¤±è´¥
 			::SendMessage(pDlg->GetSafeHwnd() , DMSG_COPY_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToRead) , (WPARAM)&(pDlg->m_strFileToWrite));
 			dFile.Close();
 			::CloseHandle(hFile);
@@ -1162,7 +1162,7 @@ DWORD WINAPI CopyNtfsFile( PVOID wParam )
 			return 0;
 		}
 
-		//×ÜµÄ¶ÁÈ¡ÁËµÄÎÄ¼ş
+		//æ€»çš„è¯»å–äº†çš„æ–‡ä»¶
 		dwRead += dwReaded;
 		fRate = (dwRead/(dwSize.QuadPart * 1.0)) * 100;
 		strTemp.Format(_T("(%s/%s) %.2f%%") , GetSizeToString(dwRead) , GetSizeToString(dwSize) , fRate);
@@ -1171,14 +1171,14 @@ DWORD WINAPI CopyNtfsFile( PVOID wParam )
 	}
 
 	if (dFile.IsEOF())
-	{//ÎÄ¼ş¸´ÖÆ½áÊø  
+	{//æ–‡ä»¶å¤åˆ¶ç»“æŸ  
 		::PostMessage(pDlg->GetSafeHwnd() , DMSG_COPY_SUCCESS , 0 , 0);
 	}else{
-		//¸´ÖÆÎÄ¼şÊ§°Ü
+		//å¤åˆ¶æ–‡ä»¶å¤±è´¥
 		::SendMessage(pDlg->GetSafeHwnd() , DMSG_COPY_FILE_FAILED ,(WPARAM)&(pDlg->m_strFileToRead) , (WPARAM)&(pDlg->m_strFileToWrite));
 	}
 
-	//ÊÍ·ÅÒ»Ğ©×ÊÔ´
+	//é‡Šæ”¾ä¸€äº›èµ„æº
 	dFile.Close();
 	CloseHandle(hFile);
 	pDlg->m_bIsCopying = FALSE;
@@ -1205,37 +1205,37 @@ CString	GetNtfsAttrTypeName( DWORD attrType)
 
 	switch (attrType)
 	{
-	case AD_STANDARD_INFORMATION:  //±ê×¼ÊôĞÔ
+	case AD_STANDARD_INFORMATION:  //æ ‡å‡†å±æ€§
 		strType.LoadString(IDS_AD_STANDARD_INFORMATION);
 		break;
-	case AD_ATTRIBUTE_LIST:	//ÊôĞÔÁĞ±í
+	case AD_ATTRIBUTE_LIST:	//å±æ€§åˆ—è¡¨
 		strType.LoadString(IDS_AD_ATTRIBUTE_LIST);
 		break;
-	case AD_FILE_NAME://ÎÄ¼şÃû
+	case AD_FILE_NAME://æ–‡ä»¶å
 		strType.LoadString(IDS_AD_FILE_NAME);
 		break; 
 
 #if FOR_NT == 1 
-	case AD_VOLUME_VERSION://¾í°æ±¾//WinNT
+	case AD_VOLUME_VERSION://å·ç‰ˆæœ¬//WinNT
 		strType.LoadString(IDS_AD_VOLUME_VERSION);
 		break;
 
 #elif FOR_NT == 0 
-	case AD_OBJECT_ID://¶ÔÏóID //Win2K
+	case AD_OBJECT_ID://å¯¹è±¡ID //Win2K
 		strType.LoadString(IDS_AD_OBJECT_ID);
 		break;
 #endif // FOR_NT
  
-	case AD_SECURITY_DESCRIPTOR://°²È«ÃèÊö
+	case AD_SECURITY_DESCRIPTOR://å®‰å…¨æè¿°
 		strType.LoadString(IDS_AD_SECURITY_DESCRIPTOR);
 		break;
-	case AD_VOLUME_NAME://¾íÃû
+	case AD_VOLUME_NAME://å·å
 		strType.LoadString(IDS_AD_VOLUME_NAME);
 		break;
-	case AD_VOLUME_INFORMATION://¾íĞÅÏ¢
+	case AD_VOLUME_INFORMATION://å·ä¿¡æ¯
 		strType.LoadString(IDS_AD_VOLUME_INFORMATION);
 		break;
-	case AD_DATA://Êı¾İÊôĞÔ
+	case AD_DATA://æ•°æ®å±æ€§
 		strType.LoadString(IDS_AD_DATA);
 		break;
 	case AD_INDEX_ROOT:
@@ -1285,27 +1285,27 @@ DWORD WINAPI GetFAT32FileSectorList( PVOID wParam )
 	SectorList*     pSecList = pDoc->m_pCurSecList;
 	DWORD			dwSecPerClust = pFat32->GetSecPerClust();
 
-	//ÆğÊ¼´ØºÅ
+	//èµ·å§‹ç°‡å·
 	dwClust = pFat32->SectToClust( DWORD(pDoc->m_secList.GetStartSector().QuadPart) );
-	//±íÃ÷Ïß³ÌÒÑ¾­ÔÚÊ¹ÓÃ
+	//è¡¨æ˜çº¿ç¨‹å·²ç»åœ¨ä½¿ç”¨
 	pDoc->m_bIsGetSeclistRun = TRUE;
 
 	while ((0 != dwClust) && !IsFATEnd(dwClust))
 	{
-		if (FALSE == pDoc->m_hGetSectorListThread)  //·Â·ğÔÚÏß³ÌÍâÃæĞèÒª¹Ø±ÕÏß³ÌÁË
+		if (FALSE == pDoc->m_hGetSectorListThread)  //ä»¿ä½›åœ¨çº¿ç¨‹å¤–é¢éœ€è¦å…³é—­çº¿ç¨‹äº†
 			return 0 ;
-		//»ñµÃÏÂÒ»´Ø
+		//è·å¾—ä¸‹ä¸€ç°‡
 		dwClust = pFat32->GetFATFromFAT1(dwClust);
 		if (1 == dwClust || 0xFFFFFFFF == dwClust)
-		{//ÎŞĞ§´ØºÅ
+		{//æ— æ•ˆç°‡å·
 			break;
 		}
 		
-		//Ìí¼ÓÒ»¸ö´ØµÄÊı¾İ
+		//æ·»åŠ ä¸€ä¸ªç°‡çš„æ•°æ®
 		pSecList->AddSector(pFat32->ClustToSect(dwClust) , dwSecPerClust);
 	}
 
-	//±ê¼ÇÏß³ÌÍË³ö
+	//æ ‡è®°çº¿ç¨‹é€€å‡º
 	pDoc->m_bIsGetSeclistRun = FALSE;
 
 	return 0 ;

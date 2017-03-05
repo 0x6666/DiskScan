@@ -1,67 +1,67 @@
-#pragma once
+ï»¿#pragma once
 #include "InfoView.h"
 #include "Fat32Doc.h"
 
 
 
-// CFat32InfoView ´°ÌåÊÓÍ¼
+// CFat32InfoView çª—ä½“è§†å›¾
 
 class CFat32InfoView : public CInfoView
 {
 	DECLARE_DYNCREATE(CFat32InfoView)
 
 protected:
-	CFat32InfoView();           // ¶¯Ì¬´´½¨ËùÊ¹ÓÃµÄÊÜ±£»¤µÄ¹¹Ôìº¯Êı
+	CFat32InfoView();           // åŠ¨æ€åˆ›å»ºæ‰€ä½¿ç”¨çš„å—ä¿æŠ¤çš„æ„é€ å‡½æ•°
 	virtual ~CFat32InfoView();
 
-	//Éè±¸ĞÅÏ¢ÇøÓò
+	//è®¾å¤‡ä¿¡æ¯åŒºåŸŸ
 	CButton m_wndSTDevInfoArea;
 
-	//Éè±¸Ãû×Ö
+	//è®¾å¤‡åå­—
 	CStatic m_wndSTName;
 	CEdit	m_wndETDevName;
 
-	//Éè±¸ÇøÓòĞòºÅ
+	//è®¾å¤‡åŒºåŸŸåºå·
 	CStatic m_wndSTDevAreaIdx;
 	CEdit	m_wndETDevAreaIdx;
 
-	//ÆğÊ¼ÉÈÇøºÅ
+	//èµ·å§‹æ‰‡åŒºå·
 	CStatic m_wndSTStartSector;
 	CEdit	m_wndETStartSector;
 
-	//·ÖÇøĞÅÏ¢ÇøÓò
+	//åˆ†åŒºä¿¡æ¯åŒºåŸŸ
 	CButton m_wndSTPartInfoArea;
 
-	//·ÖÇøÃû×Ö
+	//åˆ†åŒºåå­—
 	CStatic m_wndSTPartName;
 	CEdit	m_wndETPartName;
 
-	//·ÖÇø´óĞ¡
+	//åˆ†åŒºå¤§å°
 	CStatic m_wndSTPartSize;
 	CEdit	m_wndETPartSizeByte;
 	CEdit	m_wndETPartSize;
 
-	//×ÜÉÈÇøÊı
+	//æ€»æ‰‡åŒºæ•°
 	CStatic m_wndSTSectorCount;
 	CEdit	m_wndETSectorCount;
 
-	//±£ÁôÉÈÇøÊı
+	//ä¿ç•™æ‰‡åŒºæ•°
 	CStatic m_wndSTReserveSector;
 	CEdit	m_wndETReserveSector;
 
-	//Ã¿´ØÉÈÇøÊı
+	//æ¯ç°‡æ‰‡åŒºæ•°
 	CStatic m_wndSTSectorPerClust;
 	CEdit	m_wndETSectorPerClust;
 
-	//Ã¿FATÉÈÇøÊı
+	//æ¯FATæ‰‡åŒºæ•°
 	CStatic m_wndSTSectorPerFAT;
 	CEdit	m_wndETSectorPerFAT;
 
-	//µÚÒ»¸öFATÎ»ÖÃ
+	//ç¬¬ä¸€ä¸ªFATä½ç½®
 	CStatic m_wndSTFAT1;
 	CEdit	m_wndETFAT1;
 
-	//µÚ¶ş¸öFATÎ»ÖÃ
+	//ç¬¬äºŒä¸ªFATä½ç½®
 	CStatic m_wndSTFAT2;
 	CEdit	m_wndETFAT2;
 
@@ -69,57 +69,57 @@ protected:
 	CStatic m_wndSTFSInfo;
 	CEdit	m_wndETFSInfo;
 
-	//¸úÄ¿Â¼ÉÈÇø
+	//è·Ÿç›®å½•æ‰‡åŒº
 	CStatic m_wndSTRootDir;
 	CEdit	m_wndETRootDir;
 
 
-	//Ê£ÓàÉÈÇø
+	//å‰©ä½™æ‰‡åŒº
 	CButton m_wndSTRemainSectorArea;
 
-	//Ê£ÓàÉÈÇøµÄÆğÊ¼ÉÈÇøºÅ
+	//å‰©ä½™æ‰‡åŒºçš„èµ·å§‹æ‰‡åŒºå·
 	CStatic m_wndSTRemainStartSector;	
 	CEdit	m_wndETRemainStartSector;
 
-	//Ê£ÓàÉÈÇøÊı
+	//å‰©ä½™æ‰‡åŒºæ•°
 	CStatic m_wndSTRemainCount;	
 	CEdit	m_wndETRemainCount;
 
-	//Ê£ÓàÉÈÇø´óĞ¡
+	//å‰©ä½™æ‰‡åŒºå¤§å°
 	CStatic m_wndSTRemainSize;	
 	CEdit	m_wndETRemainSize;
 
-	//ÎÄ¼şÏµÍ³
+	//æ–‡ä»¶ç³»ç»Ÿ
 	CStatic m_wndSTFileSys;	
 	CEdit	m_wndETFileSys;
 
 
-	//Êı¾İä¯ÀÀ
+	//æ•°æ®æµè§ˆ
 	CButton	m_wndSTDataScanArea;
 
-	//ÉÈÇøºÅ
+	//æ‰‡åŒºå·
 	CStatic m_wndSTSectorScan;
 	CEdit	m_wndETSectorNum;
 
-	//ÉÏ/ÏÂÒ»ÉÈÇø
-	CButton m_wndBtnPreSector;	//ÉÏÒ»ÉÈÇø
-	CButton m_wndBtnNextSector;	//ÏÂÒ»ÉÈÇø
+	//ä¸Š/ä¸‹ä¸€æ‰‡åŒº
+	CButton m_wndBtnPreSector;	//ä¸Šä¸€æ‰‡åŒº
+	CButton m_wndBtnNextSector;	//ä¸‹ä¸€æ‰‡åŒº
 
-	//µÚÒ»/×îºóÉÈÇø
-	CButton m_wndBtnFirstSector;//µÚÒ»ÉÈÇø
-	CButton m_wndBtnLastSector;	//×îºóÒ»ÉÈÇø
+	//ç¬¬ä¸€/æœ€åæ‰‡åŒº
+	CButton m_wndBtnFirstSector;//ç¬¬ä¸€æ‰‡åŒº
+	CButton m_wndBtnLastSector;	//æœ€åä¸€æ‰‡åŒº
 
-	//´ØºÅä¯ÀÀ
+	//ç°‡å·æµè§ˆ
 	CStatic m_wndSTClustScan;
 	CEdit	m_wndETClustNum;
 
-	//ÉÏ/ÏÂÒ»´Ø
-	CButton m_wndBtnPreClust;	//ÉÏÒ»´Ø
-	CButton m_wndBtnNextClust;	//ÏÂÒ»´Ø
+	//ä¸Š/ä¸‹ä¸€ç°‡
+	CButton m_wndBtnPreClust;	//ä¸Šä¸€ç°‡
+	CButton m_wndBtnNextClust;	//ä¸‹ä¸€ç°‡
 
-	//µÚÒ»/×îºó´Ø
-	CButton m_wndBtnFirstClust; //µÚÒ»´Ø
-	CButton m_wndBtnLastClust;	//×îºóÒ»´Ø
+	//ç¬¬ä¸€/æœ€åç°‡
+	CButton m_wndBtnFirstClust; //ç¬¬ä¸€ç°‡
+	CButton m_wndBtnLastClust;	//æœ€åä¸€ç°‡
 
 public:
 	enum { IDD = IDD_INFOVIEW };
@@ -131,9 +131,9 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
-	//»ñµÃµ±Ç°ÊÓÍ¼¶ÔÓ¦µÄÎÄµµ
+	//è·å¾—å½“å‰è§†å›¾å¯¹åº”çš„æ–‡æ¡£
 	CFat32Doc* GetDocument();
 
 	DECLARE_MESSAGE_MAP()

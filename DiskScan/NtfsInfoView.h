@@ -1,17 +1,17 @@
-#pragma once
+ï»¿#pragma once
 #include "InfoView.h"
 #include "NtfsDoc.h"
 
 
 
-// CNtfsInfoView ´°ÌåÊÓÍ¼
+// CNtfsInfoView çª—ä½“è§†å›¾
 
 class CNtfsInfoView : public CInfoView
 {
 	DECLARE_DYNCREATE(CNtfsInfoView)
 
 protected:
-	CNtfsInfoView();           // ¶¯Ì¬´´½¨ËùÊ¹ÓÃµÄÊÜ±£»¤µÄ¹¹Ôìº¯Êı
+	CNtfsInfoView();           // åŠ¨æ€åˆ›å»ºæ‰€ä½¿ç”¨çš„å—ä¿æŠ¤çš„æ„é€ å‡½æ•°
 	virtual ~CNtfsInfoView();
 
 public:
@@ -24,114 +24,114 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
 	DECLARE_MESSAGE_MAP()
 public:
 
-	//»ñµÃµ±Ç°ÊÓÍ¼¶ÔÓ¦µÄÎÄµµ
+	//è·å¾—å½“å‰è§†å›¾å¯¹åº”çš„æ–‡æ¡£
 	CNtfsDoc* GetDocument();
 
-	//³õÊ¼»¯ÊÓÍ¼£¬ÒÔ¼°´´½¨¸÷¸ö¿Ø¼ş
+	//åˆå§‹åŒ–è§†å›¾ï¼Œä»¥åŠåˆ›å»ºå„ä¸ªæ§ä»¶
 	virtual void OnInitialUpdate();
 
 	//////////////////////////////////////////////////////////////////////////
-	//µ÷ÕûÊÓÍ¼ÖĞ¸÷¸ö¿Ø¼şµÄÎ»ÖÃ
+	//è°ƒæ•´è§†å›¾ä¸­å„ä¸ªæ§ä»¶çš„ä½ç½®
 	//////////////////////////////////////////////////////////////////////////
 	virtual int RePositionCtrl();
 
 protected:
-	//Éè±¸ĞÅÏ¢ÇøÓò
+	//è®¾å¤‡ä¿¡æ¯åŒºåŸŸ
 	CButton m_wndSTDevInfoArea;
 
-	//Éè±¸Ãû×Ö
+	//è®¾å¤‡åå­—
 	CStatic m_wndSTName;
 	CEdit	m_wndETDevName;
 
-	//Éè±¸ÇøÓòĞòºÅ
+	//è®¾å¤‡åŒºåŸŸåºå·
 	CStatic m_wndSTDevAreaIdx;
 	CEdit	m_wndETDevAreaIdx;
 
-	//ÆğÊ¼ÉÈÇøºÅ
+	//èµ·å§‹æ‰‡åŒºå·
 	CStatic m_wndSTStartSector;
 	CEdit	m_wndETStartSector;
 
-	//·ÖÇøĞÅÏ¢ÇøÓò
+	//åˆ†åŒºä¿¡æ¯åŒºåŸŸ
 	CButton m_wndSTPartInfoArea;
-	//·ÖÇøÃû×Ö
+	//åˆ†åŒºåå­—
 	CStatic m_wndSTPartName;
 	CEdit	m_wndETPartName;
 
-	//·ÖÇø´óĞ¡
+	//åˆ†åŒºå¤§å°
 	CStatic m_wndSTPartSize;
 	CEdit	m_wndETPartSizeByte;
 	CEdit	m_wndETPartSize;
 
-	//×ÜÉÈÇøÊı
+	//æ€»æ‰‡åŒºæ•°
 	CStatic m_wndSTSectorCount;
 	CEdit	m_wndETSectorCount;
 
-	//Ã¿´ØÉÈÇøÊı
+	//æ¯ç°‡æ‰‡åŒºæ•°
 	CStatic m_wndSTSectorPerClust;
 	CEdit	m_wndETSectorPerClust;
 
-	//MFTµÄµÚÒ»¸ö´ØºÅ
+	//MFTçš„ç¬¬ä¸€ä¸ªç°‡å·
 	CStatic m_wndSTMFTClust;
 	CEdit	m_wndETMFTClust;
 
-	//MFTMirrµÄµÚÒ»¸ö´ØºÅ
+	//MFTMirrçš„ç¬¬ä¸€ä¸ªç°‡å·
 	CStatic m_wndSTMFTMirrClust;
 	CEdit	m_wndETMFTMirrClust;
 
 
-	//ÎÄ¼şÏµÍ³
+	//æ–‡ä»¶ç³»ç»Ÿ
 	CStatic m_wndSTFileSys;	
 	CEdit	m_wndETFileSys;
 
 
-	//Ê£ÓàÉÈÇø
+	//å‰©ä½™æ‰‡åŒº
 	CButton m_wndSTRemainSectorArea;
 
-	//Ê£ÓàÉÈÇøµÄÆğÊ¼ÉÈÇøºÅ
+	//å‰©ä½™æ‰‡åŒºçš„èµ·å§‹æ‰‡åŒºå·
 	CStatic m_wndSTRemainStartSector;	
 	CEdit	m_wndETRemainStartSector;
 
-	//Ê£ÓàÉÈÇøÊı
+	//å‰©ä½™æ‰‡åŒºæ•°
 	CStatic m_wndSTRemainCount;	
 	CEdit	m_wndETRemainCount;
 
-	//Ê£ÓàÉÈÇø´óĞ¡
+	//å‰©ä½™æ‰‡åŒºå¤§å°
 	CStatic m_wndSTRemainSize;	
 	CEdit	m_wndETRemainSize;
 
 
-	//Êı¾İä¯ÀÀ
+	//æ•°æ®æµè§ˆ
 	CButton	m_wndSTDataScanArea;
 
-	//ÉÈÇøºÅ
+	//æ‰‡åŒºå·
 	CStatic m_wndSTSectorScan;
 	CEdit	m_wndETSectorNum;
 
-	//ÉÏ/ÏÂÒ»ÉÈÇø
-	CButton m_wndBtnPreSector;	//ÉÏÒ»ÉÈÇø
-	CButton m_wndBtnNextSector;	//ÏÂÒ»ÉÈÇø
+	//ä¸Š/ä¸‹ä¸€æ‰‡åŒº
+	CButton m_wndBtnPreSector;	//ä¸Šä¸€æ‰‡åŒº
+	CButton m_wndBtnNextSector;	//ä¸‹ä¸€æ‰‡åŒº
 
-	//µÚÒ»/×îºóÉÈÇø
-	CButton m_wndBtnFirstSector;//µÚÒ»ÉÈÇø
-	CButton m_wndBtnLastSector;	//×îºóÒ»ÉÈÇø
+	//ç¬¬ä¸€/æœ€åæ‰‡åŒº
+	CButton m_wndBtnFirstSector;//ç¬¬ä¸€æ‰‡åŒº
+	CButton m_wndBtnLastSector;	//æœ€åä¸€æ‰‡åŒº
 
 
-	//´ØºÅä¯ÀÀ
+	//ç°‡å·æµè§ˆ
 	CStatic m_wndSTClustScan;
 	CEdit	m_wndETClustNum;
 
-	//ÉÏ/ÏÂÒ»´Ø
-	CButton m_wndBtnPreClust;	//ÉÏÒ»´Ø
-	CButton m_wndBtnNextClust;	//ÏÂÒ»´Ø
+	//ä¸Š/ä¸‹ä¸€ç°‡
+	CButton m_wndBtnPreClust;	//ä¸Šä¸€ç°‡
+	CButton m_wndBtnNextClust;	//ä¸‹ä¸€ç°‡
 
-	//µÚÒ»/×îºó´Ø
-	CButton m_wndBtnFirstClust; //µÚÒ»´Ø
-	CButton m_wndBtnLastClust;	//×îºóÒ»´Ø
+	//ç¬¬ä¸€/æœ€åç°‡
+	CButton m_wndBtnFirstClust; //ç¬¬ä¸€ç°‡
+	CButton m_wndBtnLastClust;	//æœ€åä¸€ç°‡
 
 
 public:
@@ -142,12 +142,12 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÔÚµ±Ç°ÉÈÇø±à¼­¿òÉÏ°´ÏÂÁË»Ø³µ¼ü
+	//åœ¨å½“å‰æ‰‡åŒºç¼–è¾‘æ¡†ä¸ŠæŒ‰ä¸‹äº†å›è½¦é”®
 	//////////////////////////////////////////////////////////////////////////
 	void OnEnterCurSector();
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÔÚµ±Ç°´ØºÅ±à¼­¿òÉÏ°´ÏÂÁË»Ø³µ¼ü
+	//åœ¨å½“å‰ç°‡å·ç¼–è¾‘æ¡†ä¸ŠæŒ‰ä¸‹äº†å›è½¦é”®
 	//////////////////////////////////////////////////////////////////////////
 	void OnEnterCurClust();
 };

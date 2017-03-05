@@ -1,4 +1,4 @@
-// NtfsInfoView.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// NtfsInfoView.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -33,7 +33,7 @@ BEGIN_MESSAGE_MAP(CNtfsInfoView, CInfoView)
 END_MESSAGE_MAP()
 
 
-// CNtfsInfoView Õï¶Ï
+// CNtfsInfoView è¯Šæ–­
 
 #ifdef _DEBUG
 void CNtfsInfoView::AssertValid() const
@@ -52,7 +52,7 @@ void CNtfsInfoView::Dump(CDumpContext& dc) const
 
 void CNtfsInfoView::OnInitialUpdate()
 {
-	//»ñµÃµ±Ç°ÊÓÍ¼¶ÔÓ¦µÄÎÄµµ¶ÔÏó
+	//è·å¾—å½“å‰è§†å›¾å¯¹åº”çš„æ–‡æ¡£å¯¹è±¡
 	CNtfsDoc*	pDoc = GetDocument();
 	DNtfs*		pNtfs = pDoc->m_pNtfs.get();
 	LONG_INT	size = {0};
@@ -63,42 +63,42 @@ void CNtfsInfoView::OnInitialUpdate()
 
 	CInfoView::OnInitialUpdate();
 
-	//Éè±¸Ãû×Ö±êÇ©
+	//è®¾å¤‡åå­—æ ‡ç­¾
 	CRT_STATIC(m_wndSTName ,IDC_ST_DEV_NAME ,  IDS_DEV_NAME);
 
-	//Éè±¸Ãû×Ö
-	strTemp = pNtfs->GetDevName();  //Éè±¸µÄÃû×Ö
+	//è®¾å¤‡åå­—
+	strTemp = pNtfs->GetDevName();  //è®¾å¤‡çš„åå­—
 	CRT_EDIT(m_wndETDevName , IDC_ET_DEV_NAME ,strTemp );
 
-	//Éè±¸ÇøÓòĞòºÅ
+	//è®¾å¤‡åŒºåŸŸåºå·
 	CRT_STATIC(m_wndSTDevAreaIdx ,IDC_ST_DEV_AREA_INDEX , IDS_DEV_AREA_INDEX );
 	strTemp = GetPathParam(pDoc->m_strOpenParam , PT_INDEX);
 	CRT_EDIT(m_wndETDevAreaIdx , IDC_ET_DEV_AREA_INDEX , strTemp.GetLength()?strTemp:_T("0"));
 
-	//ÆğÊ¼ÉÈÇøºÅ
+	//èµ·å§‹æ‰‡åŒºå·
 	CRT_STATIC(m_wndSTStartSector ,IDC_ST_START_SECTOR , IDS_START_SECTOR );
 	strTemp = GetPathParam(pDoc->m_strOpenParam , PT_OFFSET);
 	CRT_EDIT(m_wndETStartSector , IDC_ET_START_SECTOR , strTemp.GetLength()?strTemp:_T("0"));
 
-	//´ÅÅÌÏêÏ¸ĞÅÏ¢µÄ¿ò¼Ü
+	//ç£ç›˜è¯¦ç»†ä¿¡æ¯çš„æ¡†æ¶
 	CRT_STATIC_AREA(m_wndSTDevInfoArea , IDC_ST_DEV_INFO_AREA, IDS_DEV_INFO_AREA);
 
-	//·ÖÇøĞÅÏ¢ÇøÓò
+	//åˆ†åŒºä¿¡æ¯åŒºåŸŸ
 	CRT_STATIC_AREA(m_wndSTPartInfoArea , IDC_ST_PART_INFO_AREA , IDS_PART_INFO);
 
-	//·ÖÇøÃû×Ö
+	//åˆ†åŒºåå­—
 	CRT_STATIC(m_wndSTPartName , IDC_ST_PART_NAME , IDS_PART_NAME);
 	pNtfs->GetVolumeName(volName , MAX_NTFS_VOLUME_NAME_LEN * 2 + 2);
 	strTemp = volName;
 	CRT_EDIT(m_wndETPartName , IDC_ET_PART_NAME , strTemp);
 
 
-	//ÎÄ¼şÏµÍ³
+	//æ–‡ä»¶ç³»ç»Ÿ
 	CRT_STATIC(m_wndSTFileSys , IDC_ST_FILE_SYSTEM , IDS_FILE_SYSTEM);
 	strTemp.LoadString(IDS_NTFS_PART);
 	CRT_EDIT(m_wndETFileSys , IDC_ET_FILE_SYSTEM , strTemp);
 
-	//·ÖÇø´óĞ¡
+	//åˆ†åŒºå¤§å°
 	CRT_STATIC(m_wndSTPartSize , IDC_ST_PART_SIZE , IDS_PART_SIZE);
 	size = pNtfs->GetSecCount();
 	size.QuadPart *= SECTOR_SIZE;
@@ -107,99 +107,99 @@ void CNtfsInfoView::OnInitialUpdate()
 	strTemp = GetSizeToString(size);
 	CRT_EDIT(m_wndETPartSize , IDC_ET_PART_SIZE , strTemp);
 
-	//×ÜÉÈÇøÊı
+	//æ€»æ‰‡åŒºæ•°
 	CRT_STATIC(m_wndSTSectorCount , IDC_ST_SECTOR_COUNT , IDS_SECTOR_COUNT);
 	size = pNtfs->GetSecCount();
 	size.HighPart == 0 ? strTemp.Format(_T("%X") ,size.LowPart) : strTemp.Format(_T("%X%08X") , size.HighPart , size.LowPart);
 	CRT_EDIT(m_wndETSectorCount , IDC_ET_SECTOR_COUNT , strTemp);
 
-	//Ã¿´ØÉÈÇøÊı
+	//æ¯ç°‡æ‰‡åŒºæ•°
 	CRT_STATIC(m_wndSTSectorPerClust , IDC_ST_SECTOR_PER_CLUST , IDS_SECTOR_PER_CLUST);
 	strTemp.Format(_T("%X") , pNtfs->GetSecPerClust());
 	CRT_EDIT(m_wndETSectorPerClust , IDC_ET_SECTOR_PER_CLUST , strTemp);
 
-	//MFTµÄµÚÒ»¸ö´ØºÅ
+	//MFTçš„ç¬¬ä¸€ä¸ªç°‡å·
 	CRT_STATIC(m_wndSTMFTClust , IDC_ST_MFT_CLUST , IDS_MFT);
 	size = pNtfs->GetClustForMFT();
 	size.HighPart == 0 ? strTemp.Format(_T("%X") ,size.LowPart) : strTemp.Format(_T("%X%08X") , size.HighPart , size.LowPart);
 	CRT_EDIT(m_wndETMFTClust , IDC_ET_MFT_CLUST , strTemp);
 
-	//MFTMirrµÄµÚÒ»¸ö´ØºÅ
+	//MFTMirrçš„ç¬¬ä¸€ä¸ªç°‡å·
 	CRT_STATIC(m_wndSTMFTMirrClust , IDC_ST_MFTMIRR_CLUST , IDS_MFTMIRR);
 	size = pNtfs->GetClustForMFTMirr();
 	size.HighPart == 0 ? strTemp.Format(_T("%X") ,size.LowPart) : strTemp.Format(_T("%X%08X") , size.HighPart , size.LowPart);
 	CRT_EDIT(m_wndETMFTMirrClust , IDC_ET_MFTMIRR_CLUST , strTemp);
 
 
-	//Ê£ÓàÉÈÇø
+	//å‰©ä½™æ‰‡åŒº
 	CRT_STATIC_AREA(m_wndSTRemainSectorArea , IDC_ST_REMAIN_SECTOR_ARER , IDS_REMAIN_PART_NAME);
-	//Ê£ÓàÉÈÇøµÄÆğÊ¼ÉÈÇøºÅ
+	//å‰©ä½™æ‰‡åŒºçš„èµ·å§‹æ‰‡åŒºå·
 	CRT_STATIC(m_wndSTRemainStartSector , IDC_ST_REMAIN_SECTOR_POS , IDS_START_SECTOR);
 	dwSize =(DWORD)(pNtfs->GetSecCount().QuadPart % pNtfs->GetSecPerClust());
 	size.QuadPart = pNtfs->GetSecCount().QuadPart - dwSize;
 	size.HighPart == 0 ? strTemp.Format(_T("%X") ,size.LowPart) : strTemp.Format(_T("%X%08X") , size.HighPart , size.LowPart);
 	CRT_EDIT(m_wndETRemainStartSector , IDC_ET_REMAIN_SECTOR_POS , strTemp);
 
-	//Ê£ÓàÉÈÇøÊı
+	//å‰©ä½™æ‰‡åŒºæ•°
 	CRT_STATIC(m_wndSTRemainCount , IDC_ST_REMAIN_SECTOR_COUNT , IDS_REMAIN_SECTOR_COUNT);
 	strTemp.Format(_T("%X") , dwSize);
 	CRT_EDIT(m_wndETRemainCount , IDC_ET_REMAIN_SECTOR_COUNT , strTemp);
 
-	//Ê£ÓàÉÈÇø´óĞ¡
+	//å‰©ä½™æ‰‡åŒºå¤§å°
 	CRT_STATIC(m_wndSTRemainSize , IDC_ST_REMAIN_SECTOR_SIZE , IDS_REMAIN_SECTOR_SIZE);
 	strTemp = GetSizeToString(dwSize * SECTOR_SIZE);
 	CRT_EDIT(m_wndETRemainSize , IDC_ET_REMAIN_SECTOR_SIZE , strTemp);
 
-	//Êı¾İä¯ÀÀ¿ØÖÆÇøÓò
+	//æ•°æ®æµè§ˆæ§åˆ¶åŒºåŸŸ
 	CRT_STATIC_AREA(m_wndSTDataScanArea , IDC_ST_DATA_SCAN_AREA , IDS_DATA_SCAN_AREA);
 
-	//ÉÈÇøä¯ÀÀ¿ØÖÆ
-	CRT_SCAN_CTRLS(m_wndSTSectorScan   , IDS_SECTOR_SCAN  , IDC_ST_SECTOR_SCAN ,	//±êÇ©
-				   m_wndETSectorNum    , IDC_ET_SECTOR_NUM ,						//ÓÃÓÚÏÔÊ¾ÉÈÇøºÅ
-				   m_wndBtnPreSector   , IDC_BTN_PRE_SECTOR ,						//Ç°Ò»¸öÉÈÇø
-				   m_wndBtnNextSector  , IDC_BTN_NEXT_SECTOR ,						//ÏÂÒ»¸öÉÈÇø
-				   m_wndBtnFirstSector , IDC_BTN_FIRST_SECTOR ,						//µÚÒ»¸öÉÈÇø
-				   m_wndBtnLastSector  , IDC_BTN_LAST_SECTOR);						//×îºóÒ»¸öÉÈÇø
+	//æ‰‡åŒºæµè§ˆæ§åˆ¶
+	CRT_SCAN_CTRLS(m_wndSTSectorScan   , IDS_SECTOR_SCAN  , IDC_ST_SECTOR_SCAN ,	//æ ‡ç­¾
+				   m_wndETSectorNum    , IDC_ET_SECTOR_NUM ,						//ç”¨äºæ˜¾ç¤ºæ‰‡åŒºå·
+				   m_wndBtnPreSector   , IDC_BTN_PRE_SECTOR ,						//å‰ä¸€ä¸ªæ‰‡åŒº
+				   m_wndBtnNextSector  , IDC_BTN_NEXT_SECTOR ,						//ä¸‹ä¸€ä¸ªæ‰‡åŒº
+				   m_wndBtnFirstSector , IDC_BTN_FIRST_SECTOR ,						//ç¬¬ä¸€ä¸ªæ‰‡åŒº
+				   m_wndBtnLastSector  , IDC_BTN_LAST_SECTOR);						//æœ€åä¸€ä¸ªæ‰‡åŒº
 
-	//´Øä¯ÀÀ¿ØÖÆ
-	CRT_SCAN_CTRLS(	m_wndSTClustScan   , IDS_CLUST_SCAN  , IDC_ST_CLUST_SCAN ,	//±êÇ©
-					m_wndETClustNum    , IDC_ET_CLUST_NUM ,						//ÓÃÓÚÏÔÊ¾ÉÈÇøºÅ
-					m_wndBtnPreClust   , IDC_BTN_PRE_CLUST ,						//Ç°Ò»¸öÉÈÇø
-					m_wndBtnNextClust  , IDC_BTN_NEXT_CLUST ,						//ÏÂÒ»¸öÉÈÇø
-					m_wndBtnFirstClust , IDC_BTN_FIRST_CLUST ,						//µÚÒ»¸öÉÈÇø
-					m_wndBtnLastClust  , IDC_BTN_LAST_CLUST);						//×îºóÒ»¸öÉÈÇø
+	//ç°‡æµè§ˆæ§åˆ¶
+	CRT_SCAN_CTRLS(	m_wndSTClustScan   , IDS_CLUST_SCAN  , IDC_ST_CLUST_SCAN ,	//æ ‡ç­¾
+					m_wndETClustNum    , IDC_ET_CLUST_NUM ,						//ç”¨äºæ˜¾ç¤ºæ‰‡åŒºå·
+					m_wndBtnPreClust   , IDC_BTN_PRE_CLUST ,						//å‰ä¸€ä¸ªæ‰‡åŒº
+					m_wndBtnNextClust  , IDC_BTN_NEXT_CLUST ,						//ä¸‹ä¸€ä¸ªæ‰‡åŒº
+					m_wndBtnFirstClust , IDC_BTN_FIRST_CLUST ,						//ç¬¬ä¸€ä¸ªæ‰‡åŒº
+					m_wndBtnLastClust  , IDC_BTN_LAST_CLUST);						//æœ€åä¸€ä¸ªæ‰‡åŒº
 
-	//Ç¿ĞĞ¸üĞÂÒ»´ÎÊı¾İÊÓÍ¼
+	//å¼ºè¡Œæ›´æ–°ä¸€æ¬¡æ•°æ®è§†å›¾
 	this->OnUpdate(NULL , 0 , NULL );
 }
 
 
 int CNtfsInfoView::RePositionCtrl()
 {
-	CRect	cr;			//µ±Ç°ÊÓÍ¼µÄ¿É¿Í»§ÇøµÄ´óĞ¡
-	CRect	cr2;		//×Ô¿öÄÚµÄ¿Í»§Çø
+	CRect	cr;			//å½“å‰è§†å›¾çš„å¯å®¢æˆ·åŒºçš„å¤§å°
+	CRect	cr2;		//è‡ªå†µå†…çš„å®¢æˆ·åŒº
 	CRect	ctlRc1;
 	CString strTemp;
-	int		top = 5 ;		//¿Ø¼şµÄ¶¥²¿Î»ÖÃ
-	int		topbak = 0;	//¶¥²¿Î»ÖÃµÄÒ»¸ö±¸·İ  ¿ÉÄÜÔÚÆäËûµÄµØ·½ĞèÒªÊ¹ÓÃ
+	int		top = 5 ;		//æ§ä»¶çš„é¡¶éƒ¨ä½ç½®
+	int		topbak = 0;	//é¡¶éƒ¨ä½ç½®çš„ä¸€ä¸ªå¤‡ä»½  å¯èƒ½åœ¨å…¶ä»–çš„åœ°æ–¹éœ€è¦ä½¿ç”¨
 	int		width = 0 ;
 	int btnW , btnH;
-	//°´Å¥µÄÎ¨¶À
+	//æŒ‰é’®çš„å”¯ç‹¬
 	btnW = this->m_szChar.cx * 2 + 2 * CTRL_X_GAP;
 	btnH = CTRL_Y_GAP + m_szChar.cy;
 
-	//»ñµÃµ±Ç°ÊÓÍ¼µÄ¿Í»§Çø´óĞ¡
+	//è·å¾—å½“å‰è§†å›¾çš„å®¢æˆ·åŒºå¤§å°
 	::GetWindowRect(this->GetSafeHwnd() , &cr);
-	cr.DeflateRect(11 , 7);		//ÊÓÍ¼ÖĞ»æÖÆ¿Ø¼şµÄÇøÓò
-	this->ScreenToClient(&cr);  //¿Í»§ÇøÖĞ¿Õ¼ä¿ÉÒÔ·ÀÖ¹µÄÇøÓò
+	cr.DeflateRect(11 , 7);		//è§†å›¾ä¸­ç»˜åˆ¶æ§ä»¶çš„åŒºåŸŸ
+	this->ScreenToClient(&cr);  //å®¢æˆ·åŒºä¸­ç©ºé—´å¯ä»¥é˜²æ­¢çš„åŒºåŸŸ
 	cr2 = cr;
-	cr2.DeflateRect(2 * CTRL_X_GAP , 0);	//×Ó¿òÖĞµÄ¿Ø¼ş»ÓÖ®ÇøÓò
+	cr2.DeflateRect(2 * CTRL_X_GAP , 0);	//å­æ¡†ä¸­çš„æ§ä»¶æŒ¥ä¹‹åŒºåŸŸ
 
-	//µ÷ÕûµÚÒ»¸ö¾²Ì¬¿Ø¼şµÄÎ»ÖÃ
+	//è°ƒæ•´ç¬¬ä¸€ä¸ªé™æ€æ§ä»¶çš„ä½ç½®
 	CRect c1stRc;
 	m_wndSTName.GetWindowRect(c1stRc);
 	if (c1stRc.Height() == 0)
-	{//ÊÇµÚÒ»´Îµ÷ÕûÎ»ÖÃ 
+	{//æ˜¯ç¬¬ä¸€æ¬¡è°ƒæ•´ä½ç½® 
 		top += 3 * CTRL_Y_GAP;
 		topbak = top;
 	}else{
@@ -208,79 +208,79 @@ int CNtfsInfoView::RePositionCtrl()
 		topbak = top;
 	}
 
-	//Éè±¸Ãû×Ö
+	//è®¾å¤‡åå­—
 	MV_STATIC_NO_PRE(m_wndSTName , cr2 , top);
 	MV_EDITE(m_wndSTName , m_wndETDevName  , cr2 , top);
 
- 	//Éè±¸ÇøÓòĞòºÅ
+ 	//è®¾å¤‡åŒºåŸŸåºå·
  	MV_STATIC(m_wndETDevName , m_wndSTDevAreaIdx , cr2 , top);
  	MV_EDITE(m_wndSTDevAreaIdx , m_wndETDevAreaIdx , cr2, top);
 
-	//ÆğÊ¼ÉÈÇøºÅ
+	//èµ·å§‹æ‰‡åŒºå·
 	MV_STATIC(m_wndETDevAreaIdx , m_wndSTStartSector , cr2 , top);
 	MV_EDITE(m_wndSTStartSector , m_wndETStartSector , cr2 , top);
 
-	//Éè±¸ĞÅÏ¢ÇøÓò 
+	//è®¾å¤‡ä¿¡æ¯åŒºåŸŸ 
 	MV_STATIC_AREA(m_wndETStartSector , m_wndSTDevInfoArea , topbak , top );
 	
 	top += 7 * CTRL_Y_GAP;
 	topbak = top;
 
-	//·ÖÇøÃû×Ö
+	//åˆ†åŒºåå­—
 	MV_STATIC_NO_PRE(m_wndSTPartName , cr2 , top);
 	MV_EDITE(m_wndSTPartName ,m_wndETPartName ,   cr2 , top);
 
-	//ÎÄ¼şÏµÍ³
+	//æ–‡ä»¶ç³»ç»Ÿ
 	MV_STATIC(m_wndETPartName ,m_wndSTFileSys , cr2 , top);
 	MV_EDITE(m_wndSTFileSys ,m_wndETFileSys ,   cr2 , top);
 
-	//·ÖÇø´óĞ¡
+	//åˆ†åŒºå¤§å°
 	MV_STATIC(m_wndETFileSys ,m_wndSTPartSize , cr2 , top);
 	MV_EDITE(m_wndSTPartSize ,m_wndETPartSizeByte ,   cr2 , top);
 	m_wndETPartSizeByte.GetWindowRect(&ctlRc1);
 	m_wndETPartSize.MoveWindow(cr2.left + CTRL_X_GAP , top += ctlRc1.Height() ,cr2.Width() - CTRL_X_GAP , ctlRc1.Height() , FALSE );
 
-	//×ÜÉÈÇøÊı
+	//æ€»æ‰‡åŒºæ•°
 	MV_STATIC(m_wndETPartSize ,m_wndSTSectorCount , cr2 , top);
 	MV_EDITE(m_wndSTSectorCount ,m_wndETSectorCount ,   cr2 , top);
 
-	//Ã¿´ØÉÈÇøÊı
+	//æ¯ç°‡æ‰‡åŒºæ•°
 	MV_STATIC(m_wndETSectorCount ,m_wndSTSectorPerClust , cr2 , top);
 	MV_EDITE(m_wndSTSectorPerClust ,m_wndETSectorPerClust ,   cr2 , top);
 
- 	//MFTµÄµÚÒ»¸ö´ØºÅ
+ 	//MFTçš„ç¬¬ä¸€ä¸ªç°‡å·
 	MV_STATIC(m_wndETSectorPerClust ,m_wndSTMFTClust , cr2 , top);
 	MV_EDITE(m_wndSTMFTClust ,m_wndETMFTClust ,   cr2 , top);
 
- 	//MFTMirrµÄµÚÒ»¸ö´ØºÅ
+ 	//MFTMirrçš„ç¬¬ä¸€ä¸ªç°‡å·
 	MV_STATIC(m_wndETMFTClust ,m_wndSTMFTMirrClust , cr2 , top);
 	MV_EDITE(m_wndSTMFTMirrClust ,m_wndETMFTMirrClust ,   cr2 , top);
 
-	//Éè±¸ĞÅÏ¢ÇøÓò
+	//è®¾å¤‡ä¿¡æ¯åŒºåŸŸ
 	MV_STATIC_AREA(m_wndETMFTMirrClust , m_wndSTPartInfoArea  , topbak , top  );
 
 	top += 7 * CTRL_Y_GAP;
 	topbak = top;
 
-	//Ê£ÓàÉÈÇøµÄÆğÊ¼ÉÈÇøºÅ
+	//å‰©ä½™æ‰‡åŒºçš„èµ·å§‹æ‰‡åŒºå·
 	MV_STATIC_NO_PRE(m_wndSTRemainStartSector , cr2 , top);
 	MV_EDITE(m_wndSTRemainStartSector ,m_wndETRemainStartSector , cr2 , top);
 
-	//Ê£ÓàÉÈÇøÊı
+	//å‰©ä½™æ‰‡åŒºæ•°
 	MV_STATIC(m_wndETRemainStartSector ,m_wndSTRemainCount , cr2 , top);
 	MV_EDITE(m_wndSTRemainCount ,m_wndETRemainCount ,   cr2 , top);
 
-	//Ê£ÓàÉÈÇø´óĞ¡
+	//å‰©ä½™æ‰‡åŒºå¤§å°
 	MV_STATIC(m_wndETRemainCount ,m_wndSTRemainSize , cr2 , top);
 	MV_EDITE(m_wndSTRemainSize ,m_wndETRemainSize ,   cr2 , top);
 
-	//·ÖÇøĞÅÏ¢ÏÔÊ¾ÇøÓò
+	//åˆ†åŒºä¿¡æ¯æ˜¾ç¤ºåŒºåŸŸ
 	MV_STATIC_AREA(m_wndETRemainSize , m_wndSTRemainSectorArea  , topbak , top  );
 
 	top += (7 * CTRL_Y_GAP );
 	topbak = top;
 
-	//ÉÈÇøä¯ÀÀ
+	//æ‰‡åŒºæµè§ˆ
 	MV_SCAN_CTRLS(top , cr2 , btnW , btnH ,	m_wndSTSectorScan ,
 		m_wndBtnFirstSector ,
 		m_wndBtnLastSector , 
@@ -291,7 +291,7 @@ int CNtfsInfoView::RePositionCtrl()
 	m_wndETSectorNum.GetWindowRect(&ctlRc1);
 	top +=(ctlRc1.Height() + CTRL_Y_GAP);
 
-	//´Øä¯ÀÀ
+	//ç°‡æµè§ˆ
 	MV_SCAN_CTRLS(top , cr2 , btnW , btnH ,	m_wndSTClustScan ,
 		m_wndBtnFirstClust ,
 		m_wndBtnLastClust , 
@@ -299,10 +299,10 @@ int CNtfsInfoView::RePositionCtrl()
 		m_wndBtnNextClust ,
 		m_wndETClustNum);
 
-	//´ÅÅÌĞÅÏ¢µÄÇøÓò
+	//ç£ç›˜ä¿¡æ¯çš„åŒºåŸŸ
 	MV_STATIC_AREA( m_wndETClustNum  ,m_wndSTDataScanArea , topbak , top);
 
-	//ÉèÖÃ¹ö¶¯ÌõµÄ¹ö¶¯·¶Î§
+	//è®¾ç½®æ»šåŠ¨æ¡çš„æ»šåŠ¨èŒƒå›´
 	m_wndETClustNum.GetWindowRect(ctlRc1);
 	SetScrollSizes(MM_TEXT , CSize( cr.Width() - cr2.Width() + 7 * (btnW + CTRL_X_GAP) ,
 		top + ctlRc1.Height() + 2 * CTRL_Y_GAP ));
@@ -325,7 +325,7 @@ void CNtfsInfoView::OnSize(UINT nType, int cx, int cy)
 
 void CNtfsInfoView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*/)
 {
-	//¸üĞÂÊôÖĞĞèÒª¸üĞÂµÄÊı¾İÏÔÊ¾ 
+	//æ›´æ–°å±ä¸­éœ€è¦æ›´æ–°çš„æ•°æ®æ˜¾ç¤º 
 	CNtfsDoc* pDoc = this->GetDocument();
 	LONG_INT liCurSec = {0};
 	CString strTemp;
@@ -333,17 +333,17 @@ void CNtfsInfoView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*
 	if (!IsWindow(m_wndETSectorNum.GetSafeHwnd()))
 		return ;
 
-	if (this == pSender)  //×Ô¼º³ö·¢µÄ¸üĞÂ£¿
+	if (this == pSender)  //è‡ªå·±å‡ºå‘çš„æ›´æ–°ï¼Ÿ
 		return ;
 
-	//µ±Ç°ÉÈÇøºÅÏÔÊ¾³öÀ´
+	//å½“å‰æ‰‡åŒºå·æ˜¾ç¤ºå‡ºæ¥
 	liCurSec = pDoc->GetCurSec();
 
-	//½«ÒªÏÔÊ¾µÄÊı¾İ×ª»»³É×Ö·û´®
+	//å°†è¦æ˜¾ç¤ºçš„æ•°æ®è½¬æ¢æˆå­—ç¬¦ä¸²
 	liCurSec.HighPart ? strTemp.Format(_T("%X%08X") , liCurSec.HighPart , liCurSec.LowPart):strTemp.Format(_T("%X") , liCurSec.LowPart);
 	this->m_wndETSectorNum.SetWindowText(strTemp);
 
-	//´ØºÅ
+	//ç°‡å·
 	BYTE secPerClust = pDoc->m_pNtfs->GetSecPerClust();
 	liCurSec.QuadPart /= secPerClust; 
 	liCurSec.HighPart ? strTemp.Format(_T("%X%08X") , liCurSec.HighPart , liCurSec.LowPart):strTemp.Format(_T("%X") , liCurSec.LowPart);
@@ -353,18 +353,18 @@ void CNtfsInfoView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*
 
 BOOL CNtfsInfoView::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam==VK_RETURN )
 	{    
 		CWnd* pFocus = GetFocus();
 		if(&m_wndETSectorNum ==  pFocus)
-		{//µ±Ç°ÉÈÇø±à¼­¿òÉÏ°´ÁË»Ø³µ
+		{//å½“å‰æ‰‡åŒºç¼–è¾‘æ¡†ä¸ŠæŒ‰äº†å›è½¦
 			OnEnterCurSector();
 		}
 
 		if(&m_wndETClustNum ==  pFocus)
-		{//µ±Ç°´ØºÅ±à¼­¿òÉÏ°´ÁË»Ø³µ
+		{//å½“å‰ç°‡å·ç¼–è¾‘æ¡†ä¸ŠæŒ‰äº†å›è½¦
 			OnEnterCurClust();
 		}
 	}
@@ -384,7 +384,7 @@ void CNtfsInfoView::OnEnterCurSector()
 	LONG_INT	liSecCnt = {0};
 	BYTE		secPerClust = pDoc->m_pNtfs->GetSecPerClust();
 
-	//»ñµÃÊäÈëµÄÉÈÇøºÅ
+	//è·å¾—è¾“å…¥çš„æ‰‡åŒºå·
 	m_wndETSectorNum.GetWindowText(strCurSector);
 	strCurSector.TrimLeft();
 	strCurSector.TrimRight();
@@ -393,13 +393,13 @@ void CNtfsInfoView::OnEnterCurSector()
 
 	len = strCurSector.GetLength();
 	if (0 == len)
-		return ;	//Ã»ÓĞÈÎºÎÊı¾İ
+		return ;	//æ²¡æœ‰ä»»ä½•æ•°æ®
 
 	for(i = 0 ; i < len ; ++i)
 	{
 		chr = strCurSector.GetAt(i);
 		if (!isHexChar(chr))
-		{//ÎŞĞ§×Ö·û 
+		{//æ— æ•ˆå­—ç¬¦ 
 			strCap.LoadString(IDS_WARNING);
 			strCurSector.LoadString(IDS_INVALID_CHAR);
 			strTemp.Format(_T("%c") , chr);
@@ -409,11 +409,11 @@ void CNtfsInfoView::OnEnterCurSector()
 		}
 	}
 
-	//½øĞĞÊı¾İ×ª»»
+	//è¿›è¡Œæ•°æ®è½¬æ¢
 	liSec = HexStrToLONG_INT(strCurSector);
 	liSecCnt = pDoc->GetSecCount();
 	if (liSecCnt.QuadPart <= liSec.QuadPart)
-	{//Ô½½çÁË 
+	{//è¶Šç•Œäº† 
 		strCap.LoadString(IDS_WARNING);
 		strCurSector.LoadString(IDS_SECTOR_NUM_ERR);
 		::MessageBox(this->GetSafeHwnd() , strCurSector , strCap , MB_OK | MB_ICONWARNING );
@@ -423,7 +423,7 @@ void CNtfsInfoView::OnEnterCurSector()
 
 	liSecCnt = liSec;
 	liSecCnt.QuadPart /= secPerClust;
-	//ÉèÖÃ´ØºÅ
+	//è®¾ç½®ç°‡å·
 	liSecCnt.HighPart ? strTemp.Format(_T("%X%08X") , liSecCnt.HighPart , liSecCnt.LowPart):strTemp.Format(_T("%X") , liSecCnt.LowPart);
 	this->m_wndETClustNum.SetWindowText(strTemp);
 
@@ -445,23 +445,23 @@ void CNtfsInfoView::OnEnterCurClust()
 	LONG_INT	liClustCnt = {0};
 	BYTE		secPerClust = pDoc->m_pNtfs->GetSecPerClust();
 
-	//»ñµÃÊäÈëµÄÉÈÇøºÅ
+	//è·å¾—è¾“å…¥çš„æ‰‡åŒºå·
 	m_wndETClustNum.GetWindowText(strCurClust);
 	strCurClust.TrimLeft();
 	strCurClust.TrimRight();
 
-	//ÖØÖÃµ½Ä¬ÈÏÉÈÇøÁ´±í
+	//é‡ç½®åˆ°é»˜è®¤æ‰‡åŒºé“¾è¡¨
 	pDoc->ReSetSectorList();
 
 	len = strCurClust.GetLength();
 	if (0 == len)
-		return ;	//Ã»ÓĞÈÎºÎÊı¾İ
+		return ;	//æ²¡æœ‰ä»»ä½•æ•°æ®
 
 	for(i = 0 ; i < len ; ++i)
 	{
 		chr = strCurClust.GetAt(i);
 		if (!isHexChar(chr))
-		{//ÎŞĞ§×Ö·û 
+		{//æ— æ•ˆå­—ç¬¦ 
 			strCap.LoadString(IDS_WARNING);
 			strCurClust.LoadString(IDS_INVALID_CHAR);
 			strTemp.Format(_T("%c") , chr);
@@ -471,12 +471,12 @@ void CNtfsInfoView::OnEnterCurClust()
 		}
 	}
 
-	//½øĞĞÊı¾İ×ª»»
+	//è¿›è¡Œæ•°æ®è½¬æ¢
 	liClust = HexStrToLONG_INT(strCurClust);
 	liClustCnt.QuadPart = pDoc->GetSecCount().QuadPart / secPerClust;
 
 	if (liClustCnt.QuadPart <= liClust.QuadPart)
-	{//Ô½½çÁË 
+	{//è¶Šç•Œäº† 
 		strCap.LoadString(IDS_WARNING);
 		strCurClust.LoadString(IDS_CLUST_NUM_ERR);
 		::MessageBox(this->GetSafeHwnd() , strCurClust , strCap , MB_OK | MB_ICONWARNING );
@@ -485,7 +485,7 @@ void CNtfsInfoView::OnEnterCurClust()
 
 	liClustCnt = liClust;
 	liClustCnt.QuadPart *= secPerClust;
-	//ÉèÖÃÉÈÇøºÅ
+	//è®¾ç½®æ‰‡åŒºå·
 	liClustCnt.HighPart ? strTemp.Format(_T("%X%08X") , liClustCnt.HighPart , liClustCnt.LowPart):strTemp.Format(_T("%X") , liClustCnt.LowPart);
 	this->m_wndETSectorNum.SetWindowText(strTemp);
 

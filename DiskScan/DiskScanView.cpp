@@ -1,4 +1,4 @@
-// DiskScanView.cpp : implementation of the CDiskScanView class
+ï»¿// DiskScanView.cpp : implementation of the CDiskScanView class
 //
 
 #include "stdafx.h"
@@ -93,7 +93,7 @@ void CHexDataView::OnInitialUpdate()
 	CDataDoc* pDoc = this->GetDocument();
 
 	m_wndData = new DataWnd;
-	//Èç¹û´°¿Ú»¹Ã»´´½¨µÄ»°£¬ÏÖÔÚ´´½¨
+	//å¦‚æžœçª—å£è¿˜æ²¡åˆ›å»ºçš„è¯ï¼ŒçŽ°åœ¨åˆ›å»º
 	if(!IsWindow(this->m_wndData->GetSafeHwnd())) {
 		RECT  r;
 		this->GetClientRect(&r);
@@ -101,23 +101,23 @@ void CHexDataView::OnInitialUpdate()
 		m_wndData->ShowWindow(SW_SHOW);
 	}
 
-	//³õÊ¼»¯¹ö¶¯ÌõµÄ¹ö¶¯·¶Î§
+	//åˆå§‹åŒ–æ»šåŠ¨æ¡çš„æ»šåŠ¨èŒƒå›´
 	SetScrollSizes(MM_TEXT , CSize(m_wndData->GetMinWidth() - 10 , 10));
 
 
-	//¿ªÊ¼×öÒ»Ð©ÐèÒªµÄ³õÊ¼»¯¹¤×÷
-	//ÉèÖÃÒªÏÔÊ¾µÄÊý¾Ý
+	//å¼€å§‹åšä¸€äº›éœ€è¦çš„åˆå§‹åŒ–å·¥ä½œ
+	//è®¾ç½®è¦æ˜¾ç¤ºçš„æ•°æ®
 	m_wndData->SetSecCount(pDoc->GetSecCount());
 	//this->m_wndData->SetDataSec(start , m_pDisk->GetSecCount() );
 	
 // 	if (pDoc->IsKindOf(RUNTIME_CLASS(CDiskDoc)))
-// 	{//Èç¹ûÊÇ¸ø´ÅÅÌÏÔÊ¾Êý¾ÝµÄ»°ÐèÒª¼ÆËã ²»¿É·ÖÅä¿Õ¼äµÄ´óÐ¡
-// 		//¿ªÆô¼ÆËã²»¿É·ÖÅä¿Õ¼äµÄ´óÐ¡Ïß³Ì
+// 	{//å¦‚æžœæ˜¯ç»™ç£ç›˜æ˜¾ç¤ºæ•°æ®çš„è¯éœ€è¦è®¡ç®— ä¸å¯åˆ†é…ç©ºé—´çš„å¤§å°
+// 		//å¼€å¯è®¡ç®—ä¸å¯åˆ†é…ç©ºé—´çš„å¤§å°çº¿ç¨‹
 // 		CloseHandle(::CreateThread(NULL , NULL , 
 // 			GetUnPartableSectorCntThread , this , 0 , 0 ));
 // 	}
 
-	CFormView::OnInitialUpdate();   //´Ëº¯Êý»á´¥·¢ µ÷ÓÃOnUpdate  ËùÒÔÓÐÐ©¹¤×÷ÐèÒªÔÚ´ËÖ®Ç°Ö´ÐÐ
+	CFormView::OnInitialUpdate();   //æ­¤å‡½æ•°ä¼šè§¦å‘ è°ƒç”¨OnUpdate  æ‰€ä»¥æœ‰äº›å·¥ä½œéœ€è¦åœ¨æ­¤ä¹‹å‰æ‰§è¡Œ
 	ResizeParentToFit();
 }
 
@@ -129,7 +129,7 @@ void CHexDataView::OnSize(UINT nType, int cx, int cy)
 	CFormView::OnSize(nType, cx, cy);
 	
 	// TODO: Add your message handler code here
-	//Í¨ÖªÊý¾ÝÇøÓòÖØÐÂµ÷Õû´óÐ¡
+	//é€šçŸ¥æ•°æ®åŒºåŸŸé‡æ–°è°ƒæ•´å¤§å°
 	if(m_wndData && ::IsWindow(m_wndData->GetSafeHwnd())){
 		m_wndData->SetWindowPos(NULL ,  0 , 0 , m_wndData->GetMinWidth() ,
 			cy , SWP_NOMOVE | SWP_NOREDRAW);
@@ -146,16 +146,16 @@ int CHexDataView::GetMinWidth()
 void CHexDataView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint) 
 {
 
-	if(this == pSender)  //×Ô¼ºÍ¨Öª¸Ä±äµÄ£¿£¿£¿
+	if(this == pSender)  //è‡ªå·±é€šçŸ¥æ”¹å˜çš„ï¼Ÿï¼Ÿï¼Ÿ
 		return ;
 	
-	//»ñµÃ¹ØÁªµÄÎÄµµ¶ÔÏó
+	//èŽ·å¾—å…³è”çš„æ–‡æ¡£å¯¹è±¡
 	CDataDoc* pDoc = this->GetDocument();
 	LONG_INT start = {0};
 	LONG_INT cnt = {0};
 	ASSERT(pDoc != NULL);
 
-	//ÏÔÊ¾µ±Ç°ÒªÏÔÊ¾µÄÊý¾Ý
+	//æ˜¾ç¤ºå½“å‰è¦æ˜¾ç¤ºçš„æ•°æ®
 	this->m_wndData->SetCurSec(pDoc->GetCurSec());
 	this->m_wndData->SetStartSector(pDoc->m_pCurSecList->GetStartSector());
 
@@ -167,7 +167,7 @@ LRESULT CHexDataView::OnGetData(WPARAM isNext, LPARAM ptr)
 	CDataDoc * pDoc = this->GetDocument();
 	DataWnd::PDATA_BUF buf = (DataWnd::PDATA_BUF)ptr;
 
-	//¶ÁÈ¡Ö¸¶¨µÄÊý¾Ý
+	//è¯»å–æŒ‡å®šçš„æ•°æ®
 	if(0 == pDoc->ReadData((void*)(buf->mBuf) , &(buf->mOff), 0 != isNext, SEC_SIZE))
 		buf->mOff.QuadPart = -1;
 	
@@ -175,12 +175,12 @@ LRESULT CHexDataView::OnGetData(WPARAM isNext, LPARAM ptr)
 }
 LRESULT CHexDataView::OnChangeWidth(WPARAM width, LPARAM ptr)
 {
-	//×Ó¿Ø¼þµÄ´óÐ¡¸Ä±äÁË
+	//å­æŽ§ä»¶çš„å¤§å°æ”¹å˜äº†
 
-	//ÉèÖÃ¹ö¶¯ÌõµÄ¹ö¶¯·¶Î§
+	//è®¾ç½®æ»šåŠ¨æ¡çš„æ»šåŠ¨èŒƒå›´
 	SetScrollSizes(MM_TEXT , CSize(int(width - 10) , 50));
 
-	//ÉèÖÃ¹ö¶¯ÌõµÄ×î´óÊý¾ÝÇøÓò¿í¶È
+	//è®¾ç½®æ»šåŠ¨æ¡çš„æœ€å¤§æ•°æ®åŒºåŸŸå®½åº¦
 	((CChildFrm*)this->GetParentFrame())->m_wndSplitter.SetMinWidth(int(width));
 
 	return 0;
@@ -214,7 +214,7 @@ void CHexDataView::SetSel( LONG_INT start, LONG_INT end )
 // 	//AfxMessageBox(_T("fdas"));
 // 	CDataDoc* pDoc = this->GetDocument();
 // 
-// 	//µ÷ÓÃÎÄµµµÄ´¦Àí·½·¨
+// 	//è°ƒç”¨æ–‡æ¡£çš„å¤„ç†æ–¹æ³•
 // 	if (pDoc->IsKindOf(RUNTIME_CLASS(CDiskDoc)))
 // 		((CDiskDoc*)pDoc)->GotUnpartableSecCont();
 // 	

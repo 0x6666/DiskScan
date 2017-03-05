@@ -1,4 +1,4 @@
-// ÓÃÓÚÏÔÊ¾Ê®Áù½øÖÆÊý¾ÝµÄÊÓÍ¼
+ï»¿// ç”¨äºŽæ˜¾ç¤ºåå…­è¿›åˆ¶æ•°æ®çš„è§†å›¾
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -33,29 +33,29 @@ public:
 // Operations
 public:
 	//////////////////////////////////////////////////////////////////////////
-	//ÉèÖÃ¿ÉÒÔÏÔÊ¾µÄÉÈÇø×ÜÊý
+	//è®¾ç½®å¯ä»¥æ˜¾ç¤ºçš„æ‰‡åŒºæ€»æ•°
 	//param
-	//		cnt		ÉÈÇø×ÜÊý
+	//		cnt		æ‰‡åŒºæ€»æ•°
 	//////////////////////////////////////////////////////////////////////////
 	void SetSecCount(LONG_INT cnt);
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÉèÖÃ¿ÉÒÔÏÔÊ¾µÄÆðÊ¼ºÅ
+	//è®¾ç½®å¯ä»¥æ˜¾ç¤ºçš„èµ·å§‹å·
 	//param
-	//		sec		ÉÈÇø×ÜÊý
+	//		sec		æ‰‡åŒºæ€»æ•°
 	//////////////////////////////////////////////////////////////////////////
 	void SetStartSector(LONG_INT sec);
 
 	//////////////////////////////////////////////////////////////////////////
-	//»ñµÃÊÓÍ¼ÏÔÊ¾ÐèÒªµÄ×îÐ¡´óÐ¡
+	//èŽ·å¾—è§†å›¾æ˜¾ç¤ºéœ€è¦çš„æœ€å°å¤§å°
 	//////////////////////////////////////////////////////////////////////////
 	int GetMinWidth(); 
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÉèÖÃÊÓÍ¼ÖÐµÄÊý¾ÝÑ¡ÔñÇøÓò 
+	//è®¾ç½®è§†å›¾ä¸­çš„æ•°æ®é€‰æ‹©åŒºåŸŸ 
 	//param
-	//		start	Ñ¡ÔñÇøµÄÆðÊ¼Î»ÖÃ
-	//		end		Ñ¡ÔñÇøµÄ½áÊøÎ»ÖÃ
+	//		start	é€‰æ‹©åŒºçš„èµ·å§‹ä½ç½®
+	//		end		é€‰æ‹©åŒºçš„ç»“æŸä½ç½®
 	//////////////////////////////////////////////////////////////////////////
 	void SetSel( LONG_INT start, LONG_INT end );
 
@@ -82,10 +82,10 @@ protected:
 protected:
 	//{{AFX_MSG(CDiskScanView)
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg LRESULT OnGetData(WPARAM, LPARAM);			//¿Õ¼äÐèÒª»ñÈ¡Êý¾Ý
-	afx_msg LRESULT OnChangeWidth(WPARAM, LPARAM);		//¿Ø¼þµÄ¿ñ¶È¸Ä±äÁË
-	afx_msg LRESULT OnChangeSector(WPARAM , LPARAM);	//ÏÔÊ¾µÄµÚÒ»¸öÉÈÇøÒÑ¾­ÉúÁË¸Ä±ä
-//	afx_msg LRESULT OnGotUnPartableSecCnt(WPARAM cnt, LPARAM ptr);//»ñÈ¡ÁË²»¿É·ÖÅä¿Õ¼äÉÈÇøÊýµÄÏûÏ¢º¯Êý
+	afx_msg LRESULT OnGetData(WPARAM, LPARAM);			//ç©ºé—´éœ€è¦èŽ·å–æ•°æ®
+	afx_msg LRESULT OnChangeWidth(WPARAM, LPARAM);		//æŽ§ä»¶çš„ç‹‚åº¦æ”¹å˜äº†
+	afx_msg LRESULT OnChangeSector(WPARAM , LPARAM);	//æ˜¾ç¤ºçš„ç¬¬ä¸€ä¸ªæ‰‡åŒºå·²ç»ç”Ÿäº†æ”¹å˜
+//	afx_msg LRESULT OnGotUnPartableSecCnt(WPARAM cnt, LPARAM ptr);//èŽ·å–äº†ä¸å¯åˆ†é…ç©ºé—´æ‰‡åŒºæ•°çš„æ¶ˆæ¯å‡½æ•°
 	
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()

@@ -1,4 +1,4 @@
-// DataDoc.cpp : implementation file
+ï»¿// DataDoc.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -109,7 +109,7 @@ BOOL CDataDoc::ReadData( void* buf , PLONG_INT offset , BOOL isNext/* = TRUE */,
 
 void CDataDoc::SetPathName( LPCTSTR lpszPathName, BOOL bAddToMRU /*= FALSE*/ )
 {
-	//Ê²Ã´ÊÂ¶¼²»Òª×öÁË¾Í¿ÉÒÔÁË
+	//ä»€ä¹ˆäº‹éƒ½ä¸è¦åšäº†å°±å¯ä»¥äº†
 	//CDocument::SetPathName(lpszPathName , FALSE);
 }
 
@@ -134,7 +134,7 @@ void CDataDoc::SetSel( LONG_INT start , LONG_INT end )
 	CHexDataView* pView = GetHexDataView();
 
 	if (NULL == pView)
-	{//Ã»ÓĞÕÒµ½Ê®Áù½øÖÆÊÓÍ¼
+	{//æ²¡æœ‰æ‰¾åˆ°åå…­è¿›åˆ¶è§†å›¾
 		return ;
 	}
 
@@ -146,7 +146,7 @@ void CDataDoc::SetCurSector( LONG_INT sector )
 {
 	this->m_liCurSec = sector;
 
-	//¸üĞÂËùÓĞµÄÊÓÍ¼
+	//æ›´æ–°æ‰€æœ‰çš„è§†å›¾
 	UpdateAllViews(NULL);
 }
 
@@ -160,7 +160,7 @@ void CDataDoc::ReSetSectorList()
 	if ((m_pCurSecList != NULL))
 	{
 		if (m_pCurSecList == &m_secList)
-		{//²»ĞèÒªĞŞ¸Ä
+		{//ä¸éœ€è¦ä¿®æ”¹
 			return ;
 		}
 		delete m_pCurSecList;
@@ -170,7 +170,7 @@ void CDataDoc::ReSetSectorList()
 	CHexDataView* pView = GetHexDataView();
 
 	if (NULL == pView)
-	{//Ã»ÓĞÕÒµ½Ê®Áù½øÖÆÊÓÍ¼
+	{//æ²¡æœ‰æ‰¾åˆ°åå…­è¿›åˆ¶è§†å›¾
 		return ;
 	}
 
@@ -188,7 +188,7 @@ BOOL CDataDoc::SetSectorList( SectorList* pSecList )
 	if ((m_pCurSecList != NULL) && (m_pCurSecList != &m_secList) )
 	{
 		if (0 == pSecList->m_strName.CompareNoCase(m_pCurSecList->m_strName))
-		{//²»ĞèÒªĞŞ¸Ä
+		{//ä¸éœ€è¦ä¿®æ”¹
 			return FALSE;
 		}
 		delete m_pCurSecList;
@@ -199,7 +199,7 @@ BOOL CDataDoc::SetSectorList( SectorList* pSecList )
 	CHexDataView* pView = GetHexDataView();
 
 	if (NULL == pView)
-	{//Ã»ÓĞÕÒµ½Ê®Áù½øÖÆÊÓÍ¼
+	{//æ²¡æœ‰æ‰¾åˆ°åå…­è¿›åˆ¶è§†å›¾
 		return FALSE;
 	}
 
@@ -217,9 +217,9 @@ BOOL CDataDoc::SetSectorListNoCopy( SectorList* pSecList )
 		return FALSE;
 	}
 	if ((m_pCurSecList != NULL) && (m_pCurSecList != &m_secList))
-	{//ĞèÒªÉ¾³ıÔ­ÓĞµÄÉÈÇøÁ´±í
+	{//éœ€è¦åˆ é™¤åŸæœ‰çš„æ‰‡åŒºé“¾è¡¨
 		if (0 == pSecList->m_strName.CompareNoCase(m_pCurSecList->m_strName))
-		{//²»ĞèÒªĞŞ¸Ä
+		{//ä¸éœ€è¦ä¿®æ”¹
 			return FALSE;
 		}
 		delete m_pCurSecList;
@@ -240,7 +240,7 @@ BOOL CDataDoc::SetSectorListNoCopy( SectorList* pSecList )
 CHexDataView* CDataDoc::GetHexDataView()
 {
 	if (NULL == m_pHexView)
-	{//»ñµÃÊ®Áù½øÖÆÊÓÍ¼ 
+	{//è·å¾—åå…­è¿›åˆ¶è§†å›¾ 
 		POSITION pos = this->GetFirstViewPosition();
 		CView*	p;
 		while(NULL != pos)
@@ -263,7 +263,7 @@ CHexDataView* CDataDoc::GetHexDataView()
 // 
 // void CDataDoc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult) 
 // {
-// 	//ÁĞ±íµÄ¶îË«»÷ÊÂ¼ş
+// 	//åˆ—è¡¨çš„é¢åŒå‡»äº‹ä»¶
 // 	*pResult = 0;
 // }
 /////////////////////////////////////////////////////////////////////////////
@@ -274,7 +274,7 @@ CHexDataView* CDataDoc::GetHexDataView()
 // 	if (!CDocument::OnOpenDocument(lpszPathName))
 // 		return FALSE;
 // 
-// 	// TODO:  ?¨²¡ä?¨¬¨ª?¨®?¨²¡Á¡§¨®?¦Ì?¡ä¡ä?¡§¡ä¨²??
+// 	// TODO:  ?Ãºâ€²?Ã¬Ã­?Ã³?ÃºÃ—Â¨Ã³?Î¼?â€²â€²?Â¨â€²Ãº??
 // 
 // 	return TRUE;
 // }

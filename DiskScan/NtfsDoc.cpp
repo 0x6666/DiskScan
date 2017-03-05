@@ -1,4 +1,4 @@
-// NtfsDoc.cpp : implementation file
+ï»¿// NtfsDoc.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -14,7 +14,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//ÅÐ¶Ïµ±Ç°ÁÐ±íÖÐÑ¡ÔñµÄÊÇ·ñÊÇÒ»¸öNTFSÎÄ¼þ
+//åˆ¤æ–­å½“å‰åˆ—è¡¨ä¸­é€‰æ‹©çš„æ˜¯å¦æ˜¯ä¸€ä¸ªNTFSæ–‡ä»¶
 #define IsSelNTFSFile(pList , item , strTemp) (strTemp = \
 	(pList)->GetItemText(item , 3 ),0 != strTemp.GetLength() )
 /////////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ CNtfsDoc::~CNtfsDoc()
 {
 // 	if (this->m_pEveIsRun)
 // 	{
-// 		m_pEveIsRun->SetEvent();  //»¹ÊÇÏÈ³ö·¢°É
+// 		m_pEveIsRun->SetEvent();  //è¿˜æ˜¯å…ˆå‡ºå‘å§
 // 		delete m_pEveIsRun;
 // 	}
 }
@@ -88,8 +88,8 @@ void CNtfsDoc::Dump(CDumpContext& dc) const
 
 BOOL CNtfsDoc::OnOpenDocument(LPCTSTR lpszPathName)
 {
-	//Èç¹û´ò¿ªµÄÊÇÒ»¸ö¾íµÄ»°¾Í¾ÍÖ»ÊÇÒ»¸ö¾íµÄµÄÃû×Ö Èç"\\\\?\\C:"
-	//Èç¹ûÊÇÒ»¸öÎïÀíµÄ»°´«¹ýÀ´µÄÊÇÒ»¸öÎïÀíµÄÃû×ÖºÍÒ»¸öÆ«ÒÆ£¬Èç"\\\\.\\PhysicalDrive ABCDEF10"
+	//å¦‚æžœæ‰“å¼€çš„æ˜¯ä¸€ä¸ªå·çš„è¯å°±å°±åªæ˜¯ä¸€ä¸ªå·çš„çš„åå­— å¦‚"\\\\?\\C:"
+	//å¦‚æžœæ˜¯ä¸€ä¸ªç‰©ç†çš„è¯ä¼ è¿‡æ¥çš„æ˜¯ä¸€ä¸ªç‰©ç†çš„åå­—å’Œä¸€ä¸ªåç§»ï¼Œå¦‚"\\\\.\\PhysicalDrive ABCDEF10"
 	CString sPath = m_strOpenParam = lpszPathName;
 	CString strTemp = _T("");
 	CString strOff  =_T("");
@@ -98,43 +98,43 @@ BOOL CNtfsDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	CView * view;
 	WCHAR  volName[MAX_PATH] = {0};
 
-	//´´½¨Í¼±êÁÐ±í
+	//åˆ›å»ºå›¾æ ‡åˆ—è¡¨
 	m_upImgList->Create(12,12,ILC_COLORDDB|ILC_MASK , 0 , 1);
 	//this->m_pImgList->Create(16 , 16 ,ILC_COLOR32|ILC_MASK , 0 , 4);
-	HICON hIcon = AfxGetApp()->LoadIcon(IDI_FILE);//ÎÄ¼þ  0
+	HICON hIcon = AfxGetApp()->LoadIcon(IDI_FILE);//æ–‡ä»¶  0
 	m_upImgList->Add(hIcon);
-	hIcon = AfxGetApp()->LoadIcon(IDI_FOLDER);//Ä¿Â¼     1
+	hIcon = AfxGetApp()->LoadIcon(IDI_FOLDER);//ç›®å½•     1
 	m_upImgList->Add(hIcon);
 
-	//»ñµÃÐèÒªµÄÄÚÈÝÁÐ±í
+	//èŽ·å¾—éœ€è¦çš„å†…å®¹åˆ—è¡¨
 	POSITION pos = GetFirstViewPosition();
 	view = 	GetNextView(pos);
 	this->m_pContentList = &((CChildFrm*)(view->GetParentFrame()))->m_DisList;
-	//¶ÔÁÐ±í½øÐÐ³õÊ¼»¯
+	//å¯¹åˆ—è¡¨è¿›è¡Œåˆå§‹åŒ–
 	InitContentListHead();
 	this->m_pContentList->SetImageList(m_upImgList.get(), LVSIL_SMALL);
 
-	//¼òµ¥µÄÊý¾Ý³õÊ¼»¯
+	//ç®€å•çš„æ•°æ®åˆå§‹åŒ–
 	this->m_liCurSec.QuadPart = 0;
 	this->m_liStartSec.QuadPart = 0;
 
-	//ÔÚÕâÀï½øÐÐ¾íµÄ´ò¿ª´¦Àí
+	//åœ¨è¿™é‡Œè¿›è¡Œå·çš„æ‰“å¼€å¤„ç†
 
-	//ÊÍ·ÅÁ½±ßµÄ¿Õ¸ñ
+	//é‡Šæ”¾ä¸¤è¾¹çš„ç©ºæ ¼
 	sPath.TrimLeft();	
 	sPath.TrimRight();
 
-	//»ñµÃÉè±¸µÄÃû×Ö
+	//èŽ·å¾—è®¾å¤‡çš„åå­—
 	strTemp = GetPathParam(sPath , PT_DEVNAME);
 	strOff = GetPathParam(sPath , PT_OFFSET);
-	if (strOff.GetLength() != 0) //ÓÐÆ«ÒÆ²ÎÊý
+	if (strOff.GetLength() != 0) //æœ‰åç§»å‚æ•°
 		m_liStartSec = HexStrToLONG_INT(strOff);
 
-	//Òª´ò¿ªµÄÉè±¸Ãû×Ö
+	//è¦æ‰“å¼€çš„è®¾å¤‡åå­—
 	this->m_strTitle = strTemp;
 	res = this->m_pNtfs->OpenDev(/*(LPCSTR)(LPCTSTR)strTemp*/strTemp.GetBuffer(), &m_liStartSec);
 	if (res != DR_OK)
-	{//TODO ´ò¿ªÉè±¸Ê§°Ü
+	{//TODO æ‰“å¼€è®¾å¤‡å¤±è´¥
 		sPath.LoadString(IDS_OPEN_FALIED);
 		sPath.Replace(STR_POS , lpszPathName);
 		strTemp.LoadString(IDS_ERROR);
@@ -143,7 +143,7 @@ BOOL CNtfsDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		return FALSE;
 	}
 
-	//´ò¿ªÉè±¸³É¹¦
+	//æ‰“å¼€è®¾å¤‡æˆåŠŸ
 	strTemp = GetPathParam(sPath , PT_INDEX);
 
 	if (strTemp.GetLength() != 0)
@@ -152,22 +152,22 @@ BOOL CNtfsDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		this->m_strTitle += strTemp;
 	}
 
-	//¼ÓÉÏ¾í±ê
+	//åŠ ä¸Šå·æ ‡
 	this->m_strTitle += _T(" ");
 	this->m_pNtfs->GetVolumeName( volName , MAX_PATH );
 	this->m_strTitle += volName;
 
-	//ÉèÖÃÏÔÊ¾·¶Î§
+	//è®¾ç½®æ˜¾ç¤ºèŒƒå›´
 	this->m_secList.AddSector(0 , m_pNtfs->GetSecCount());
 	this->m_secList.m_strName = m_strTitle;
 	
 	//this->SetSectorList(&m_secList);
 	
-	//ÉèÖÃµ±Ç°ÒªÏÔÊ¾µÄÁÐ±í
+	//è®¾ç½®å½“å‰è¦æ˜¾ç¤ºçš„åˆ—è¡¨
 	SetCurPath(_T("/"));
 
 	if (NULL == this->m_pNtfsFileDlg)
-	{//ÊôÐÔ¶Ô»°¿ò»¹Ã»ÓÐ´´½¨
+	{//å±žæ€§å¯¹è¯æ¡†è¿˜æ²¡æœ‰åˆ›å»º
 		m_pNtfsFileDlg = new CNtfsFileDlg( this );
 		m_pNtfsFileDlg->Create(CNtfsFileDlg::IDD , AfxGetMainWnd());
 		m_pNtfsFileDlg->UpdateWindow();
@@ -204,41 +204,41 @@ LONG_INT CNtfsDoc::GetSecCount()
 void CNtfsDoc::InitContentListHead()
 {
 	CString  strHead;
-	//ÉèÖÃÍ¼Æ¬ÁÐ±í
+	//è®¾ç½®å›¾ç‰‡åˆ—è¡¨
 
-	//  ID  ÎÄ¼þÃû MFT¼ÇÂ¼ Êµ¼Ê´óÐ¡  ·ÖÅä´óÐ¡ ´´½¨Ê±¼ä MFTÐÞ¸ÄÊ±¼ä  Êý¾ÝÐÞ¸ÄÊ±¼ä ·ÃÎÊÊ±¼ä 
+	//  ID  æ–‡ä»¶å MFTè®°å½• å®žé™…å¤§å°  åˆ†é…å¤§å° åˆ›å»ºæ—¶é—´ MFTä¿®æ”¹æ—¶é—´  æ•°æ®ä¿®æ”¹æ—¶é—´ è®¿é—®æ—¶é—´ 
 	strHead.LoadString(IDS_ID);
-	m_pContentList->InsertColumn( 0, strHead , LVCFMT_LEFT, 30 );//²åÈëÁÐ
+	m_pContentList->InsertColumn( 0, strHead , LVCFMT_LEFT, 30 );//æ’å…¥åˆ—
 
-	//ÎÄ¼þÃû
+	//æ–‡ä»¶å
 	strHead.LoadString(IDS_FILE_NAME);
 	m_pContentList->InsertColumn( 1, strHead , LVCFMT_LEFT, 80 );
 
-	//MFT¼ÇÂ¼ºÅ
+	//MFTè®°å½•å·
 	strHead.LoadString(IDS_MFT_RECODE);
 	m_pContentList->InsertColumn( 2, strHead , LVCFMT_RIGHT, 70 );
 
-	//ÎÄ¼þÊý¾ÝµÄÊµ¼Ê´óÐ¡
+	//æ–‡ä»¶æ•°æ®çš„å®žé™…å¤§å°
 	strHead.LoadString(IDS_REAL_SIZE);
 	m_pContentList->InsertColumn( 3, strHead , LVCFMT_RIGHT, 60 );
 
-	//ÎÄ¼þµÄ·ÖÅä´óÐ¡   Èç¹û·ÖÅä´óÐ¡Îª0£¬µ«ÊÇÊµ¼Ê´óÐ¡²»ÊÇ0µÄ»°ÎÄ¼þµÄÊý¾ÝÎ»³£×¤
+	//æ–‡ä»¶çš„åˆ†é…å¤§å°   å¦‚æžœåˆ†é…å¤§å°ä¸º0ï¼Œä½†æ˜¯å®žé™…å¤§å°ä¸æ˜¯0çš„è¯æ–‡ä»¶çš„æ•°æ®ä½å¸¸é©»
 	strHead.LoadString(IDS_ALLOC_SIZE);
 	m_pContentList->InsertColumn( 4, strHead , LVCFMT_RIGHT, 60 );
 
-	//´´½¨Ê±¼ä
+	//åˆ›å»ºæ—¶é—´
 	strHead.LoadString(IDS_CREATE_TIME);
 	m_pContentList->InsertColumn( 5, strHead , LVCFMT_LEFT, 140 );
 
-	//MFTÐÞ¸ÄÊ±¼ä IDS_MFT_MODIFY_TIME
+	//MFTä¿®æ”¹æ—¶é—´ IDS_MFT_MODIFY_TIME
 	strHead.LoadString(IDS_MFT_MODIFY_TIME);
 	m_pContentList->InsertColumn( 6, strHead , LVCFMT_LEFT, 140 );
 
-	//ÎÄ¼þµÄÐÞ¸ÄÊ±¼ä
+	//æ–‡ä»¶çš„ä¿®æ”¹æ—¶é—´
 	strHead.LoadString(IDS_FILE_MODIFY_TIME);
 	m_pContentList->InsertColumn( 7, strHead , LVCFMT_LEFT, 140 );
 
-	//·ÃÎÊÊ±¼ä
+	//è®¿é—®æ—¶é—´
 	strHead.LoadString(IDS_ACCESS_TIME);
 	m_pContentList->InsertColumn( 8, strHead , LVCFMT_LEFT, 80 );
 }
@@ -247,13 +247,13 @@ void CNtfsDoc::SetCurPath( CString path )
 {
 	this->m_strCurPath = path;
 
-//	m_pEveIsRun->SetEvent();  //ÉèÖÃÊÂ¼þ  ±íÊ¾ÐèÒªÍË³öÏÖÓÐÏß³Ì
+//	m_pEveIsRun->SetEvent();  //è®¾ç½®äº‹ä»¶  è¡¨ç¤ºéœ€è¦é€€å‡ºçŽ°æœ‰çº¿ç¨‹
 
 	if (m_hThread != NULL && m_hThread != INVALID_HANDLE_VALUE)
-	{//Ïß³Ì»¹Ã»½áÊø
+	{//çº¿ç¨‹è¿˜æ²¡ç»“æŸ
 		m_bIsRun = FALSE;
 		if(WAIT_TIMEOUT == WaitForSingleObject(m_hThread , 500))
-		{//³¬Ê± 
+		{//è¶…æ—¶ 
 			DWORD exitCode;
 			if(GetExitCodeThread(m_hThread , &exitCode)){
 				TerminateThread(m_hThread , exitCode);
@@ -261,7 +261,7 @@ void CNtfsDoc::SetCurPath( CString path )
 		}
 	}
 
-	//´´½¨ÃÀ¾çÏß³Ì
+	//åˆ›å»ºç¾Žå‰§çº¿ç¨‹
 	m_bIsRun = TRUE;
 	//m_pEveIsRun->ResetEvent();
 	CloseHandle(m_hThread);
@@ -283,66 +283,66 @@ void CNtfsDoc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 	
 	*pResult = 0;
 	
-	//ÕâÀï»¹Ã»ÓÐ»ñµÃÁÐ±íµÄÖ¸Õë
+	//è¿™é‡Œè¿˜æ²¡æœ‰èŽ·å¾—åˆ—è¡¨çš„æŒ‡é’ˆ
 	if (this->m_pContentList == NULL) return ;
 	
-	//»ñµÃÁÐ±íµÄµÚÒ»Ñ¡ÖÐÏî
+	//èŽ·å¾—åˆ—è¡¨çš„ç¬¬ä¸€é€‰ä¸­é¡¹
 	pos = m_pContentList->GetFirstSelectedItemPosition();
-	if (pos == NULL){//Ã»ÓÐÑ¡ÔñÈÎºÎÊý¾Ý
+	if (pos == NULL){//æ²¡æœ‰é€‰æ‹©ä»»ä½•æ•°æ®
 		TRACE0("No items were selected!\n");
 		*pResult = 0;
 		return ;
 	}
 	
-	//»ñµÃÑ¡ÖÐÖÐÏîµÄË÷Òý
+	//èŽ·å¾—é€‰ä¸­ä¸­é¡¹çš„ç´¢å¼•
 	nItem = m_pContentList->GetNextSelectedItem(pos);
-	sRealSize = m_pContentList->GetItemText(nItem , 3 );  //Í¨¹ýÊµ¼Ê´óÐ¡À´ÅÐ¶ÏÊÇ·ñÊÇÎÊÎÄ¼þ
+	sRealSize = m_pContentList->GetItemText(nItem , 3 );  //é€šè¿‡å®žé™…å¤§å°æ¥åˆ¤æ–­æ˜¯å¦æ˜¯é—®æ–‡ä»¶
 	if (0 == sRealSize.GetLength())
-	{//Ñ¡ÔñµÄÊÇÄ¿Â¼
+	{//é€‰æ‹©çš„æ˜¯ç›®å½•
 		path = this->m_strCurPath;
 		iTemp = path.GetLength();
 		
-		if (iTemp < 1) return; //TODO  Ó¦¸ÃÊÇÓÐÎÊÌâÁË
+		if (iTemp < 1) return; //TODO  åº”è¯¥æ˜¯æœ‰é—®é¢˜äº†
 		
-		//»ñµÃÎÄ¼þÃû
+		//èŽ·å¾—æ–‡ä»¶å
 		strName = m_pContentList->GetItemText(nItem , 1 );
 		if (0 == strName.Compare(_T(".")))
-		{//½øÈëµÄÊÇµ±Ç°Ä¿Â¼
+		{//è¿›å…¥çš„æ˜¯å½“å‰ç›®å½•
 			
 		}else if(0 == strName.Compare(_T("..")))
-		{//Òª½øÈëµÄÊÇ¸¸Ä¿Â¼ 
+		{//è¦è¿›å…¥çš„æ˜¯çˆ¶ç›®å½• 
 			for ( --iTemp ; iTemp > 0 && !IsPathSeparator(path.GetAt(iTemp)) ; --iTemp);
 			if (iTemp <= 0)  
-				path = _T("/");  //ÕâÕâÇé¿öÓ¦¸Ã²»»á³öÏÖ
+				path = _T("/");  //è¿™è¿™æƒ…å†µåº”è¯¥ä¸ä¼šå‡ºçŽ°
 			else{
 				path = path.Mid(0 , iTemp);
 			}
 			
 		}else{
-			//ÊÂÒµÆÕÍ¨µÄÎÄ¼þ
+			//äº‹ä¸šæ™®é€šçš„æ–‡ä»¶
 			if (IsPathSeparator(path.GetAt(iTemp - 1)))
 				path = path + strName;
 			else
 				path = path + _T("/") + strName;
 		}
 
-		//ÅÐ¶ÏÂ·¾¶ÊÇ·ñ¿ÉÒÔ´ò¿ª
+		//åˆ¤æ–­è·¯å¾„æ˜¯å¦å¯ä»¥æ‰“å¼€
 		res = this->m_pNtfs->OpenFile((LPCTSTR)path , &nfile);
 		if (res != DR_OK)
-		{//TODO ´ò¿ªÖ¸¶¨µÄÎÄ¼þ»òÕßÄ¿Â¼Ê§°Ü
+		{//TODO æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶æˆ–è€…ç›®å½•å¤±è´¥
 			path.LoadString(IDS_OPEN_FALIED);
 			sTemp.LoadString(IDS_PROMPT);
 			path.Replace(STR_POS  , strName);
 
 			MessageBox(NULL , path , sTemp , MB_OK |MB_ICONWARNING );
 		}else{
-			//´ò¿ª³É¹¦
-			//ÒªÏÔÊ¾µÄÊý¾ÝµÄÉÈÇøºÅ
+			//æ‰“å¼€æˆåŠŸ
+			//è¦æ˜¾ç¤ºçš„æ•°æ®çš„æ‰‡åŒºå·
 			this->m_liCurSec = nfile.GetMftStartSec();
 			nfile.Close();
 			SetCurPath(path);
 
-			//¸üÐÂÊÓÍ¼
+			//æ›´æ–°è§†å›¾
 			UpdateAllViews(NULL);
 		}		
 	}	
@@ -352,7 +352,7 @@ void CNtfsDoc::OnClickContextList( NMHDR* pNMHDR, LRESULT* pResult )
 {
 	*pResult = 0;
 	
-	//¶¨Î»µ½MFT¼ÇÂ¼Î»ÖÃ
+	//å®šä½åˆ°MFTè®°å½•ä½ç½®
 	OnNtfsPosMft();
 }
 
@@ -364,43 +364,43 @@ CString CNtfsDoc::GetSelPath(CString &strName)
 	CString		strPath = _T("/");
 	int			nLen = 0;
 		 
-	//ÕâÀï»¹Ã»ÓÐ»ñµÃÁÐ±íµÄÖ¸Õë
+	//è¿™é‡Œè¿˜æ²¡æœ‰èŽ·å¾—åˆ—è¡¨çš„æŒ‡é’ˆ
 	if (this->m_pContentList == NULL) return strPath;
-	//»ñµÃÑ¡ÖÐÖÐÏîµÄË÷Òý
+	//èŽ·å¾—é€‰ä¸­ä¸­é¡¹çš„ç´¢å¼•
 	nItem = m_pContentList->GetSelectionMark();
-	if(-1 == nItem) return strPath;//Ã»ÓÐÑ¡ÔñÈÎºÎÒ»ÐÐ
+	if(-1 == nItem) return strPath;//æ²¡æœ‰é€‰æ‹©ä»»ä½•ä¸€è¡Œ
 
-	//»ñµÃÑ¡ÔñÁËµÄÎÄ¼þÃû
+	//èŽ·å¾—é€‰æ‹©äº†çš„æ–‡ä»¶å
 	strName = m_pContentList->GetItemText(nItem , 1 );
 
-	//Ô­Â·¾¶
+	//åŽŸè·¯å¾„
 	strPath = this->m_strCurPath;
-	//Ô­Â·¾¶µÄ³¤¶È
+	//åŽŸè·¯å¾„çš„é•¿åº¦
 	nLen = strPath.GetLength();
 
 	if (!IsSelNTFSFile(m_pContentList , nItem , strTemp))
-	{//Ñ¡ÔñµÄÊÇÄ¿Â¼
+	{//é€‰æ‹©çš„æ˜¯ç›®å½•
 
 		if (0 == strName.Compare(_T(".")))
-		{//½øÈëµÄÊÇµ±Ç°Ä¿Â¼
+		{//è¿›å…¥çš„æ˜¯å½“å‰ç›®å½•
 			
 		}else if(0 == strName.Compare(_T("..")))
-		{//Òª½øÈëµÄÊÇ¸¸Ä¿Â¼ 
+		{//è¦è¿›å…¥çš„æ˜¯çˆ¶ç›®å½• 
 			for ( --nLen ; nLen > 0 && !IsPathSeparator(strPath.GetAt(nLen)) ; --nLen);
 			if (nLen <= 0)  
-				strPath = _T("/");  //ÕâÕâÇé¿öÓ¦¸Ã²»»á³öÏÖ
+				strPath = _T("/");  //è¿™è¿™æƒ…å†µåº”è¯¥ä¸ä¼šå‡ºçŽ°
 			else{
 				strPath = strPath.Mid(0 , nLen);
 			}
 		}else{
-			//ÊÇÆÕÍ¨µÄÄ¿Â¼
+			//æ˜¯æ™®é€šçš„ç›®å½•
 			if (IsPathSeparator(strPath.GetAt(nLen - 1)))
 				strPath = strPath + strName;
 			else
 				strPath = strPath + _T("/") + strName;
 		}
-	} else {  //µã»÷µÄÊÇÒ»¸öÎÄ¼þ 
-		//ÊÇÒ»¸öÎÄ¼þ
+	} else {  //ç‚¹å‡»çš„æ˜¯ä¸€ä¸ªæ–‡ä»¶ 
+		//æ˜¯ä¸€ä¸ªæ–‡ä»¶
 		if (IsPathSeparator(strPath.GetAt(nLen - 1)))
 			strPath = strPath + strName;
 		else
@@ -418,9 +418,9 @@ CRuntimeClass* CNtfsDoc::GetInofViewClass()
 void CNtfsDoc::OnBnClickedPreSector()
 {
 	ReSetSectorList();
-	/*AfxMessageBox(_T("ÉÏÒ»ÉÈÇø"));*/
+	/*AfxMessageBox(_T("ä¸Šä¸€æ‰‡åŒº"));*/
 	if (0 != this->m_liCurSec.QuadPart )
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		--this->m_liCurSec.QuadPart;
 		UpdateAllViews(NULL);
 	}
@@ -428,14 +428,14 @@ void CNtfsDoc::OnBnClickedPreSector()
 
 void CNtfsDoc::OnBnClickedNextSector()
 {
-	/*	AfxMessageBox(_T("ÏÂÒ»ÉÈÇø"));*/
-	//×ÜÉÈÇøÊý
+	/*	AfxMessageBox(_T("ä¸‹ä¸€æ‰‡åŒº"));*/
+	//æ€»æ‰‡åŒºæ•°
 	LONG_INT liSecCnt = this->m_pNtfs->GetSecCount();
 
 	ReSetSectorList();
 
 	if (this->m_liCurSec.QuadPart != liSecCnt.QuadPart - 1)
-	{//µ±Ç°²»ÊÇ×îºóÒ»¸öÉÈÇø
+	{//å½“å‰ä¸æ˜¯æœ€åŽä¸€ä¸ªæ‰‡åŒº
 		++this->m_liCurSec.QuadPart;
 		UpdateAllViews(NULL);
 	}
@@ -445,9 +445,9 @@ void CNtfsDoc::OnBnClickedFirstSector()
 {
 	ReSetSectorList();
 	/*A
-	fxMessageBox(_T("µÚÒ»¸öÉÈÇø"));*/
+	fxMessageBox(_T("ç¬¬ä¸€ä¸ªæ‰‡åŒº"));*/
 	if (0 != this->m_liCurSec.QuadPart )
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		this->m_liCurSec.QuadPart = 0;
 		UpdateAllViews(NULL);
 	}
@@ -455,14 +455,14 @@ void CNtfsDoc::OnBnClickedFirstSector()
 
 void CNtfsDoc::OnBnClickedLastSector()
 {
-	/*	AfxMessageBox(_T("×îºóÒ»¸öÉÈÇø"));*/
-	//×ÜÉÈÇøÊý
+	/*	AfxMessageBox(_T("æœ€åŽä¸€ä¸ªæ‰‡åŒº"));*/
+	//æ€»æ‰‡åŒºæ•°
 	LONG_INT liSecCnt = this->m_pNtfs->GetSecCount();
 
 	ReSetSectorList();
 
 	if (this->m_liCurSec.QuadPart != liSecCnt.QuadPart - 1)
-	{//µ±Ç°²»ÊÇ×îºóÒ»¸öÉÈÇø
+	{//å½“å‰ä¸æ˜¯æœ€åŽä¸€ä¸ªæ‰‡åŒº
 		this->m_liCurSec.QuadPart = liSecCnt.QuadPart - 1;
 		UpdateAllViews(NULL);
 	}
@@ -472,12 +472,12 @@ void CNtfsDoc::OnBnClickedPreClust()
 {
 	BYTE secPerClust = this->m_pNtfs->GetSecPerClust();
 	LONG_INT liClust = {0};
-	liClust.QuadPart = this->m_liCurSec.QuadPart /secPerClust; //´ØºÅ
+	liClust.QuadPart = this->m_liCurSec.QuadPart /secPerClust; //ç°‡å·
 
 	ReSetSectorList();
 
 	if (0 !=  liClust.QuadPart)
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		this->m_liCurSec.QuadPart = (--liClust.QuadPart) *  secPerClust;
 		UpdateAllViews(NULL);
 	}
@@ -486,15 +486,15 @@ void CNtfsDoc::OnBnClickedPreClust()
 void CNtfsDoc::OnBnClickedNextClust()
 {
 	BYTE secPerClust = this->m_pNtfs->GetSecPerClust();
-	LONG_INT liClust = {0};			//µ±Ç°ËùÔÚµÄ´ØºÅ
-	LONG_INT liClustCnt = {0};		//´ØÊý
-	liClust.QuadPart = this->m_liCurSec.QuadPart /secPerClust; //´ØºÅ
+	LONG_INT liClust = {0};			//å½“å‰æ‰€åœ¨çš„ç°‡å·
+	LONG_INT liClustCnt = {0};		//ç°‡æ•°
+	liClust.QuadPart = this->m_liCurSec.QuadPart /secPerClust; //ç°‡å·
 	liClustCnt.QuadPart = m_pNtfs->GetSecCount().QuadPart / secPerClust;
 
 	ReSetSectorList();
 
 	if ( liClust.QuadPart < liClustCnt.QuadPart - 1)
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		this->m_liCurSec.QuadPart = (++liClust.QuadPart) *  secPerClust;
 		UpdateAllViews(NULL);
 	}
@@ -504,7 +504,7 @@ void CNtfsDoc::OnBnClickedFirstClust()
 {
 	this->ReSetSectorList();
 	if (0 != this->m_liCurSec.QuadPart )
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		this->m_liCurSec.QuadPart = 0;
 		UpdateAllViews(NULL);
 	}
@@ -513,15 +513,15 @@ void CNtfsDoc::OnBnClickedFirstClust()
 void CNtfsDoc::OnBnClickedLastClust()
 {
 	BYTE secPerClust = this->m_pNtfs->GetSecPerClust();
-	LONG_INT liClust = {0};			//µ±Ç°ËùÔÚµÄ´ØºÅ
-	LONG_INT liClustCnt = {0};		//´ØÊý
-	liClust.QuadPart = this->m_liCurSec.QuadPart /secPerClust; //´ØºÅ
+	LONG_INT liClust = {0};			//å½“å‰æ‰€åœ¨çš„ç°‡å·
+	LONG_INT liClustCnt = {0};		//ç°‡æ•°
+	liClust.QuadPart = this->m_liCurSec.QuadPart /secPerClust; //ç°‡å·
 	liClustCnt.QuadPart = m_pNtfs->GetSecCount().QuadPart / secPerClust;
 
 	ReSetSectorList();
 
 	if ( liClust.QuadPart < liClustCnt.QuadPart)
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		this->m_liCurSec.QuadPart = (--liClustCnt.QuadPart) *  secPerClust;
 		UpdateAllViews(NULL);
 	}
@@ -532,17 +532,17 @@ void CNtfsDoc::OnRClickContextList(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 
-	CRect	cRect;//¿Í»§Çø
-	CPoint	p;	//Êó±êµ±Ç°Î»ÖÃ
+	CRect	cRect;//å®¢æˆ·åŒº
+	CPoint	p;	//é¼ æ ‡å½“å‰ä½ç½®
 	CMenu	menu;
 	CMenu*	pMenu;
 
 	::GetWindowRect(AfxGetMainWnd()->GetSafeHwnd()/*this->m_pContentList->GetParent()->GetSafeHwnd()*/ , &cRect);
 	::GetCursorPos(&p);
 	if(!cRect.PtInRect(p)) 
-		return ;//Ö»ÔÚÁÐ±í¿ÕÖÐÏÔÊ¾¿ì½Ý²Ëµ¥
+		return ;//åªåœ¨åˆ—è¡¨ç©ºä¸­æ˜¾ç¤ºå¿«æ·èœå•
 
-	//¿ì½Ý²Ëµ¥
+	//å¿«æ·èœå•
 	menu.LoadMenu(IDR_NTFS_FILE_MENU);
 	pMenu = menu.GetSubMenu(0);
 	pMenu->TrackPopupMenu(TPM_LEFTALIGN|TPM_TOPALIGN , p.x , p.y , AfxGetMainWnd()/*this->m_pContentList->GetParent()*/ , NULL);
@@ -553,17 +553,17 @@ void CNtfsDoc::OnNtfsFileAttr()
 	DRES res = DR_OK;
 	DNtfsFile   nfile;
 	CString		strTemp;
-	//»ñµÃµ±Ç°Ñ¡ÔñµÄÎÄ¼þµÄÍêÕûÂ·¾¶
+	//èŽ·å¾—å½“å‰é€‰æ‹©çš„æ–‡ä»¶çš„å®Œæ•´è·¯å¾„
 	CString strName;
 	CString strSelPath = this->GetSelPath(strName);
 	if (0 == strSelPath.GetLength())
-	{//·Â·ðÓÐµã²»¶Ô¾¢°¡£¡
+	{//ä»¿ä½›æœ‰ç‚¹ä¸å¯¹åŠ²å•Šï¼
 		return;
 	}
 
-	//ÉèÖÃÐèÒªÏÔÊ¾µÄÎÄ¼þµÄÂ·¾¶
+	//è®¾ç½®éœ€è¦æ˜¾ç¤ºçš„æ–‡ä»¶çš„è·¯å¾„
 	if(FALSE == this->m_pNtfsFileDlg->SetFilePath(strSelPath))
-	{//ÉèÖÃ³É¹¦
+	{//è®¾ç½®æˆåŠŸ
 		CString strTitle;
 		CString strMsg;
 
@@ -574,10 +574,10 @@ void CNtfsDoc::OnNtfsFileAttr()
 		return;
 	}
 
-	//ÅÐ¶ÏÂ·¾¶ÊÇ·ñ¿ÉÒÔ´ò¿ª
+	//åˆ¤æ–­è·¯å¾„æ˜¯å¦å¯ä»¥æ‰“å¼€
 	res = this->m_pNtfs->OpenFile(strSelPath , &nfile);
 	if (res != DR_OK)
-	{//TODO ´ò¿ªÖ¸¶¨µÄÎÄ¼þ»òÕßÄ¿Â¼Ê§°Ü
+	{//TODO æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶æˆ–è€…ç›®å½•å¤±è´¥
 		strName.LoadString(IDS_OPEN_FALIED);
 		strTemp.LoadString(IDS_PROMPT);
 		strName.Replace(STR_POS  , strSelPath);
@@ -586,13 +586,13 @@ void CNtfsDoc::OnNtfsFileAttr()
 		return;
 	}
 
-	//ÉÈÇøÁÐ±í
+	//æ‰‡åŒºåˆ—è¡¨
 	SectorList secList;
-	secList.AddSector(nfile.GetMftStartSec() , 2 );  //Ò»°ãÃ¿Ò»¸öMFT¼ÇÂ¼ÊÇ1K(2¸öÉÈÇø)
+	secList.AddSector(nfile.GetMftStartSec() , 2 );  //ä¸€èˆ¬æ¯ä¸€ä¸ªMFTè®°å½•æ˜¯1K(2ä¸ªæ‰‡åŒº)
 	secList.m_strName = strSelPath;
 	this->SetSectorList(&secList);
 
-	//ÖØÐÂÏÔÊ¾ÎÄ¼þÐÅÏ¢¶Ô»°¿ò
+	//é‡æ–°æ˜¾ç¤ºæ–‡ä»¶ä¿¡æ¯å¯¹è¯æ¡†
 	::ShowWindow(m_pNtfsFileDlg->GetSafeHwnd() , SW_SHOW);
 }
 
@@ -605,13 +605,13 @@ void CNtfsDoc::OnNtfsPosMft()
 	CString		strTemp;
 	CString		strName;
 	
-	//»ñµÃµ±Ç°Ñ¡ÖÐµÄÎÄ¼þ»òÄ¿Â¼µÄÂ·¾¶
+	//èŽ·å¾—å½“å‰é€‰ä¸­çš„æ–‡ä»¶æˆ–ç›®å½•çš„è·¯å¾„
 	strPath = GetSelPath(strName);
 
-	//ÅÐ¶ÏÂ·¾¶ÊÇ·ñ¿ÉÒÔ´ò¿ª
+	//åˆ¤æ–­è·¯å¾„æ˜¯å¦å¯ä»¥æ‰“å¼€
 	res = this->m_pNtfs->OpenFile((LPCTSTR)strPath , &nfile);
 	if (res != DR_OK)
-	{//TODO ´ò¿ªÖ¸¶¨µÄÎÄ¼þ»òÕßÄ¿Â¼Ê§°Ü
+	{//TODO æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶æˆ–è€…ç›®å½•å¤±è´¥
 		strName.LoadString(IDS_OPEN_FALIED);
 		strTemp.LoadString(IDS_PROMPT);
 		strName.Replace(STR_POS  , strPath);
@@ -620,17 +620,17 @@ void CNtfsDoc::OnNtfsPosMft()
 		return;
 	}
 
-	//ÒªÏÔÊ¾µÄÊý¾ÝµÄÉÈÇøºÅ
+	//è¦æ˜¾ç¤ºçš„æ•°æ®çš„æ‰‡åŒºå·
 	this->m_liCurSec = nfile.GetMftStartSec();
 
-	//ÉÈÇøÁÐ±í
+	//æ‰‡åŒºåˆ—è¡¨
 	SectorList secList;
-	secList.AddSector(m_liCurSec , 2 );  //Ò»°ãÃ¿Ò»¸öMFT¼ÇÂ¼ÊÇ1K(2¸öÉÈÇø)
+	secList.AddSector(m_liCurSec , 2 );  //ä¸€èˆ¬æ¯ä¸€ä¸ªMFTè®°å½•æ˜¯1K(2ä¸ªæ‰‡åŒº)
 	secList.m_strName = strPath;
 	this->SetSectorList(&secList);
 
 	nfile.Close();			
-	//¸üÐÂÊÓÍ¼
+	//æ›´æ–°è§†å›¾
 	UpdateAllViews(NULL);
 }
 
@@ -638,23 +638,23 @@ void CNtfsDoc::OnNtfsPosParaentDir()
 {
  	DNtfsFile		file;
  	DRES			res = DR_OK;
- 	LONG_INT		liSector;				//ÉÈÇøºÅ
+ 	LONG_INT		liSector;				//æ‰‡åŒºå·
 	LONG_INT		liEnd;
  	CString			strName;
-	//µ±Ç°ÁÐ±íµÄÂ·¾¶  Ò²ÊÇËùÎ½µÄ¸¸Ä¿Â¼
+	//å½“å‰åˆ—è¡¨çš„è·¯å¾„  ä¹Ÿæ˜¯æ‰€è°“çš„çˆ¶ç›®å½•
 	CString strCurPath = this->m_strCurPath;
-	//»ñµÃµ±Ç°Ñ¡ÖÐµÄÂ·¾¶
+	//èŽ·å¾—å½“å‰é€‰ä¸­çš„è·¯å¾„
 	CString strSelPath = GetSelPath(strName);
 	if (1 == strSelPath.GetLength() && IsPathSeparator(strSelPath.GetAt(0)))
-	{//ÊÇ¸ùÄ¿Â¼
+	{//æ˜¯æ ¹ç›®å½•
 		return;
 	}
 
-	//´ò¿ªÖ¸¶¨µÄÎÄ¼þ
+	//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶
 	res = this->m_pNtfs->OpenFile(strSelPath , &file);
 
 	if ( DR_OK != res )
-	{//´ò¿ªÖ¸¶¨µÄÎÄ¼þÊ§°Ü
+	{//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶å¤±è´¥
 		CString strTitle;
 		CString strMsg;
 
@@ -665,19 +665,19 @@ void CNtfsDoc::OnNtfsPosParaentDir()
 		return;
 	}
 
-	//È«ÅÌ²é¿´Ä£Ê½
+	//å…¨ç›˜æŸ¥çœ‹æ¨¡å¼
 	ReSetSectorList();
 
 	liSector = file.GetFDTOffset();
 	liSector.QuadPart /= SECTOR_SIZE;
-	//ÉèÖÃµ±Ç°ÉÈÇø
+	//è®¾ç½®å½“å‰æ‰‡åŒº
 	this->SetCurSector(liSector);
 
-	//×Ö½ÚÆ«ÒÆ
+	//å­—èŠ‚åç§»
 	liSector = file.GetFDTOffset();
 	liEnd.QuadPart = liSector.QuadPart + file.GetFDTLen();
 
-	//Ñ¡Ôñ
+	//é€‰æ‹©
 	this->SetSel(liSector , liEnd);
 }
 
@@ -687,7 +687,7 @@ void CNtfsDoc::OnNtfsServeAs()
 	int i = 0;
 	int len = 0;
 	CString	strName;
-	//»ñµÃµ±Ç°Ñ¡ÖÐµÄÎÄ¼þ
+	//èŽ·å¾—å½“å‰é€‰ä¸­çš„æ–‡ä»¶
 	CString strFilePath = this->GetSelPath(strName);
 	CString strFileName;
 	CString	strWrite;
@@ -696,17 +696,17 @@ void CNtfsDoc::OnNtfsServeAs()
 	for (i = len - 1 ; i > 0 && !IsPathSeparator(strFilePath.GetAt(i)); --i);
 	strFileName = strFilePath.Mid( i + 1 );
 
-	//ÎÄ¼þÑ¡Ôñ¶Ô»°¿ò
+	//æ–‡ä»¶é€‰æ‹©å¯¹è¯æ¡†
 	CFileDialog fDlg(FALSE , NULL , strFileName , OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT );
 	if(IDCANCEL == fDlg.DoModal())
-	{//È¡ÏûÁË 
+	{//å–æ¶ˆäº† 
 		return;
 	}
 
-	//»ñµÃÒªÐ´µÄÂ·¾¶Ãû
+	//èŽ·å¾—è¦å†™çš„è·¯å¾„å
 	strWrite = fDlg.GetPathName();
 
-	//¿ªÆôÒ»¸öÎÄ¼þ¸´ÖÆ½ø¶ÈÌõ¶Ô»°¿ò
+	//å¼€å¯ä¸€ä¸ªæ–‡ä»¶å¤åˆ¶è¿›åº¦æ¡å¯¹è¯æ¡†
 
 	CCopyProcessDlg ccpDlg(strFilePath , strWrite , this);
 	ccpDlg.DoModal();
@@ -714,25 +714,25 @@ void CNtfsDoc::OnNtfsServeAs()
 
 
 void CNtfsDoc::OnUpdateNtfsServeAs(CCmdUI *pCmdUI)
-{//Ö»ÓÐÎÄ¼þ²Å¿ÉÁí´æÎª 
+{//åªæœ‰æ–‡ä»¶æ‰å¯å¦å­˜ä¸º 
 	CString strTemp;
 	int nSelItem = this->m_pContentList->GetSelectionMark();
 	if (-1 == nSelItem)
-	{ //Ã»ÓÐÑ¡ÔñÈÎºÎ¶«Î÷
+	{ //æ²¡æœ‰é€‰æ‹©ä»»ä½•ä¸œè¥¿
 		return ;
 	}
 
 	if (IsSelNTFSFile(m_pContentList , nSelItem , strTemp))
-	{//Ñ¡ÔñµÄÊÇÎÄ¼þ
+	{//é€‰æ‹©çš„æ˜¯æ–‡ä»¶
 		pCmdUI->Enable(TRUE);
-	}else//Ñ¡ÔñµÄÊÇÄ¿Â¼
+	}else//é€‰æ‹©çš„æ˜¯ç›®å½•
 		pCmdUI->Enable(FALSE);
 }
 
 
 void CNtfsDoc::OnCloseDocument()
 {
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 
 	if(NULL != m_pNtfsFileDlg)
 	{
@@ -752,32 +752,32 @@ void CNtfsDoc::OnCloseDocument()
 
 void CNtfsDoc::SetCurFile( CString strPath )
 {
-	//¸¸Ä¿Â¼
+	//çˆ¶ç›®å½•
 	CString strParent;
 	int i = 0;
 	int len = strPath.GetLength();
 	DNtfsFile   nfile;
 	if (len == 0) return;
 	else if(len == 1){
-		//¸ùÄ¿Â¼
+		//æ ¹ç›®å½•
 		if (this->m_strCurPath.GetLength() != 1 )
-		{//²»Í¬  ±¾À´¾Í²»ÔÚ¸ùÄ¿Â¼
+		{//ä¸åŒ  æœ¬æ¥å°±ä¸åœ¨æ ¹ç›®å½•
 			SetCurPath(strPath);
 			this->m_pNtfs->OpenFile(strPath  , &nfile);
 			this->m_liCurSec = nfile.GetMftStartSec();
 			nfile.Close();
-			//¸üÐÂÊÓÍ¼
+			//æ›´æ–°è§†å›¾
 			UpdateAllViews(NULL);
 		}
 		
 		//return;
 	}else {
-		//·Ç¸ùÄ¿Â¼ 
+		//éžæ ¹ç›®å½• 
 		for(i = len-1 ; (i > 0) &&  !IsPathSeparator(strPath.GetAt(i))  ; --i);
 		if (0 == i)
 		{
 			if (IsPathSeparator(strPath.GetAt(0)))
-			{//¸¸Ä¿Â¼ÊÇÄ¿Â¼
+			{//çˆ¶ç›®å½•æ˜¯ç›®å½•
 				strParent = _T("/");
 			}else{
 				CString strTitle;
@@ -788,12 +788,12 @@ void CNtfsDoc::SetCurFile( CString strPath )
 				::MessageBox(NULL , strMsg , strTitle , MB_OK|MB_ICONWARNING);
 				return;
 			}
-		}else  //ÊÇÒ»¸ö³£¹æÄ¿Â¼
+		}else  //æ˜¯ä¸€ä¸ªå¸¸è§„ç›®å½•
 			strParent = strPath.Left(i);
 
-		//¿ÉÒÔÏÈÅÐ¶ÏÒ»ÏÂÊÇ·ñÐèÒªÖØÐÂÒ»ÏÂÂ·¾¶
+		//å¯ä»¥å…ˆåˆ¤æ–­ä¸€ä¸‹æ˜¯å¦éœ€è¦é‡æ–°ä¸€ä¸‹è·¯å¾„
 		len = strParent.GetLength();
-		i = len + 1; //Ê¹i != len  
+		i = len + 1; //ä½¿i != len  
 		if ( len == m_strCurPath.GetLength())
 		{
 			TCHAR tc1 , tc2;
@@ -805,23 +805,23 @@ void CNtfsDoc::SetCurFile( CString strPath )
 					continue;
 			}
 
-		}/*else//ÐÂ¾ÉÂ·¾¶²»Í¬ */
+		}/*else//æ–°æ—§è·¯å¾„ä¸åŒ */
 			/*SetCurPath(strParent);*/
 		if (i != len)
-		{//ÐÂ¾ÉÂ·¾¶²»Í¬ 
+		{//æ–°æ—§è·¯å¾„ä¸åŒ 
 			
 			this->m_pNtfs->OpenFile(strParent  , &nfile);
 			this->m_liCurSec = nfile.GetMftStartSec();
 			nfile.Close();
-			//¸üÐÂÊÓÍ¼
+			//æ›´æ–°è§†å›¾
 			UpdateAllViews(NULL);
 			SetCurPath(strParent);
 		}
 	}
 
-	//ÉèÖÃÐèÒªÏÔÊ¾µÄÎÄ¼þµÄÂ·¾¶
+	//è®¾ç½®éœ€è¦æ˜¾ç¤ºçš„æ–‡ä»¶çš„è·¯å¾„
 	if(FALSE == this->m_pNtfsFileDlg->SetFilePath(strPath))
-	{//ÉèÖÃ³É¹¦
+	{//è®¾ç½®æˆåŠŸ
 		CString strTitle;
 		CString strMsg;
 
@@ -832,6 +832,6 @@ void CNtfsDoc::SetCurFile( CString strPath )
 		return;
 	}
 
-	//ÖØÐÂÏÔÊ¾ÎÄ¼þÐÅÏ¢¶Ô»°¿ò
+	//é‡æ–°æ˜¾ç¤ºæ–‡ä»¶ä¿¡æ¯å¯¹è¯æ¡†
 	::ShowWindow(this->m_pNtfsFileDlg->GetSafeHwnd() , SW_SHOW);
 }

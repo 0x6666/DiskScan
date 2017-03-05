@@ -1,12 +1,12 @@
 /***********************************************************************
  * Module:		DiskDll.dll
- * FileName£º	DList.cpp
- * Author:		ÑîËÉ
+ * FileNameï¼š	DList.cpp
+ * Author:		æ¨æ¾
  * Created:		2012-3-20
- * Purpose:		Ò»¸öË«¶ËÁ´±íµÄÊµÏÖ
+ * Purpose:		ä¸€ä¸ªåŒç«¯é“¾è¡¨çš„å®ç°
  *
- * Modefied:	2012-05-31 ĞŞ¸´Ò»¸öBUG¡£Ö®Ç°ÔÚÁ´±íÖĞ²åÈëÒ»¸ö½ÚµãÊ±£¬Ã»ÓĞ
- *				µİÔö½Úµã×ÜÊı£¬¿ÉÄÜµ¼ÖÂÄ£¿éÄÚ´æ·ÃÎÊ´íÎó¡£
+ * Modefied:	2012-05-31 ä¿®å¤ä¸€ä¸ªBUGã€‚ä¹‹å‰åœ¨é“¾è¡¨ä¸­æ’å…¥ä¸€ä¸ªèŠ‚ç‚¹æ—¶ï¼Œæ²¡æœ‰
+ *				é€’å¢èŠ‚ç‚¹æ€»æ•°ï¼Œå¯èƒ½å¯¼è‡´æ¨¡å—å†…å­˜è®¿é—®é”™è¯¯ã€‚
  ***********************************************************************/
 
 
@@ -30,7 +30,7 @@ int DList::AddPart(PVOID data)
 	if(!data)
 		return FALSE;
 	
-	PNode node = new Node; //ĞÂ½¨Ò»¸ö½Úµã
+	PNode node = new Node; //æ–°å»ºä¸€ä¸ªèŠ‚ç‚¹
 	node->mData = data;
 
 	this->mPTail->mNext = node;
@@ -47,7 +47,7 @@ VOID* DList::GetPart(int index)
 	int		i	 = 0; 
 	PNode	temp = 0; 
 
-	//Ë÷ÒıÔ½½çÁË
+	//ç´¢å¼•è¶Šç•Œäº†
 	if(index < 0 || index >= mCount )
 		return NULL;
 
@@ -64,22 +64,22 @@ PVOID DList::DeletePart(int index)
 	PNode	res = NULL;
 	PVOID	data = NULL;
 
-	//Ë÷ÒıÔ½½ç
+	//ç´¢å¼•è¶Šç•Œ
 	if(index < 0 || index >= mCount )
 		return NULL;
 	
 	for(i = 0; i != index ;++i) pre = pre->mNext;
 	
-	//ÒªÉ¾³ıµÄ½Úµã
+	//è¦åˆ é™¤çš„èŠ‚ç‚¹
 	res = pre->mNext;
 	pre->mNext = res->mNext;
 
 	if(!res->mNext)
-	{///ÒªÉ¾³ıµÄÊÇ×îºóÒ»¸ö
+	{///è¦åˆ é™¤çš„æ˜¯æœ€åä¸€ä¸ª
 		this->mPTail = pre;	
 	}
 	
-	//ÊıÁ¿µİ¼õ
+	//æ•°é‡é€’å‡
 	--mCount;
 	data = res->mData;
 	delete res ;
@@ -89,7 +89,7 @@ PVOID DList::DeletePart(int index)
 
 void DList::Clear()
 {
-	//ÒªÉ¾³ıÃ¿Ò»¸ö½Úµã
+	//è¦åˆ é™¤æ¯ä¸€ä¸ªèŠ‚ç‚¹
 	Node* node = mHead.mNext;
 	Node* temp = node;
 	while (temp)
@@ -114,9 +114,9 @@ BOOL DList::SortList(NODE_COMPARE cmpFun)
 {
 	if(!mHead.mNext)
 		return FALSE;
-	//¶ÔÁ´±íµÄÊµÌåÅÅĞò
+	//å¯¹é“¾è¡¨çš„å®ä½“æ’åº
 	mHead.mNext = InsertSort(mHead.mNext , cmpFun);
-	//´¦ÀíÎ²Ö¸Õë
+	//å¤„ç†å°¾æŒ‡é’ˆ
 	this->mPTail = &mHead;
 	while(mPTail->mNext) mPTail = mPTail->mNext;
 
@@ -125,36 +125,36 @@ BOOL DList::SortList(NODE_COMPARE cmpFun)
 
 DList::Node* DList::InsertSort(Node * head , NODE_COMPARE cmpFun)
 {
-	Node *first;	//ÎªÔ­Á´±íÊ£ÏÂÓÃÓÚÖ±½Ó²åÈëÅÅĞòµÄ½ÚµãÍ·Ö¸Õë
-	Node *t;		//ÁÙÊ±Ö¸Õë±äÁ¿£º²åÈë½Úµã
-	Node *p;		//ÁÙÊ±Ö¸Õë±äÁ¿
-	Node *q;		//ÁÙÊ±Ö¸Õë±äÁ¿
+	Node *first;	//ä¸ºåŸé“¾è¡¨å‰©ä¸‹ç”¨äºç›´æ¥æ’å…¥æ’åºçš„èŠ‚ç‚¹å¤´æŒ‡é’ˆ
+	Node *t;		//ä¸´æ—¶æŒ‡é’ˆå˜é‡ï¼šæ’å…¥èŠ‚ç‚¹
+	Node *p;		//ä¸´æ—¶æŒ‡é’ˆå˜é‡
+	Node *q;		//ä¸´æ—¶æŒ‡é’ˆå˜é‡
 
-	first = head->mNext;	//Ô­Á´±íÊ£ÏÂÓÃÓÚÖ±½Ó²åÈëÅÅĞòµÄ½ÚµãÁ´±í
-	head->mNext = NULL;		//Ö»º¬ÓĞÒ»¸ö½ÚµãµÄÁ´±íµÄÓĞĞòÁ´±í
+	first = head->mNext;	//åŸé“¾è¡¨å‰©ä¸‹ç”¨äºç›´æ¥æ’å…¥æ’åºçš„èŠ‚ç‚¹é“¾è¡¨
+	head->mNext = NULL;		//åªå«æœ‰ä¸€ä¸ªèŠ‚ç‚¹çš„é“¾è¡¨çš„æœ‰åºé“¾è¡¨
 
-	while (first != NULL)	//±éÀúÊ£ÏÂÎŞĞòµÄÁ´±í
+	while (first != NULL)	//éå†å‰©ä¸‹æ— åºçš„é“¾è¡¨
 	{
-		//×¢Òâ£ºÕâÀïforÓï¾ä¾ÍÊÇÌåÏÖÖ±½Ó²åÈëÅÅĞòË¼ÏëµÄµØ·½
+		//æ³¨æ„ï¼šè¿™é‡Œforè¯­å¥å°±æ˜¯ä½“ç°ç›´æ¥æ’å…¥æ’åºæ€æƒ³çš„åœ°æ–¹
 		for (t=first, q=head; ((q!=NULL) && (*cmpFun)(q->mData , t->mData));
-			p=q, q=q->mNext); //ÎŞĞò½ÚµãÔÚÓĞĞòÁ´±íÖĞÕÒ²åÈëµÄÎ»ÖÃ
+			p=q, q=q->mNext); //æ— åºèŠ‚ç‚¹åœ¨æœ‰åºé“¾è¡¨ä¸­æ‰¾æ’å…¥çš„ä½ç½®
 
-		//ÍË³öforÑ­»·£¬¾ÍÊÇÕÒµ½ÁË²åÈëµÄÎ»ÖÃ
-		first = first->mNext; //ÎŞĞòÁ´±íÖĞµÄ½ÚµãÀë¿ª£¬ÒÔ±ãËü²åÈëµ½ÓĞĞòÁ´±íÖĞ 
+		//é€€å‡ºforå¾ªç¯ï¼Œå°±æ˜¯æ‰¾åˆ°äº†æ’å…¥çš„ä½ç½®
+		first = first->mNext; //æ— åºé“¾è¡¨ä¸­çš„èŠ‚ç‚¹ç¦»å¼€ï¼Œä»¥ä¾¿å®ƒæ’å…¥åˆ°æœ‰åºé“¾è¡¨ä¸­ 
 
-		if (q == head) //²åÔÚµÚÒ»¸ö½ÚµãÖ®Ç°
+		if (q == head) //æ’åœ¨ç¬¬ä¸€ä¸ªèŠ‚ç‚¹ä¹‹å‰
 			head = t;    
-		else //pÊÇqµÄÇ°Çı
+		else //pæ˜¯qçš„å‰é©±
 			p->mNext = t;   
 
-		t->mNext = q; //Íê³É²åÈë¶¯×÷
+		t->mNext = q; //å®Œæˆæ’å…¥åŠ¨ä½œ
 	}
 	return head;
 }
 
 BOOL DList::InsertNode(int index, VOID* data)
 {
-	//Ë÷ÒıÔ½½çÁË,»òÕßÒªÌí¼ÓµÄÊı¾İ²»´æÔÚ
+	//ç´¢å¼•è¶Šç•Œäº†,æˆ–è€…è¦æ·»åŠ çš„æ•°æ®ä¸å­˜åœ¨
 	if(index < 0 || index > mCount || !data)
 		return FALSE;
 	
@@ -166,7 +166,7 @@ BOOL DList::InsertNode(int index, VOID* data)
 	node->mNext = temp->mNext;
 	temp->mNext = node;
 
-	//²åÈëÁË½ÚµãÊÇĞèÒª½«×ÜÊıÒ²µİÔöÒ»ÏÂ   2012-5-31 15:42
+	//æ’å…¥äº†èŠ‚ç‚¹æ˜¯éœ€è¦å°†æ€»æ•°ä¹Ÿé€’å¢ä¸€ä¸‹   2012-5-31 15:42
 	++mCount;
 
 	return TRUE;

@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 #include "NtfsDoc.h"
 
 
-// CNtfsFileDlg ¶Ô»°¿ò
+// CNtfsFileDlg å¯¹è¯æ¡†
 
 class CNtfsDoc;
 
@@ -11,45 +11,45 @@ class CNtfsFileDlg : public CDialog
 	DECLARE_DYNAMIC(CNtfsFileDlg)
 
 public:
-	CNtfsFileDlg(CNtfsDoc* pDoc , CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
+	CNtfsFileDlg(CNtfsDoc* pDoc , CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
 	virtual ~CNtfsFileDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_NTFS_FILE };
 
 
-	//NTFSÎÄµµÀà
+	//NTFSæ–‡æ¡£ç±»
 	CNtfsDoc*	m_pDoc;
-	//µ±Ç°µÄÎÄ¼ş
+	//å½“å‰çš„æ–‡ä»¶
 	std::unique_ptr<DNtfsFile> m_upFile;
-	//µ±Ç°ÎÄ¼şÂ·¾¶
+	//å½“å‰æ–‡ä»¶è·¯å¾„
 	CString		m_strFilePath;
 
 	//////////////////////////////////////////////////////////////////////////
-	//ÉèÖÃµ±Ç°ÎÄ¼şµÄÂ·¾¶
+	//è®¾ç½®å½“å‰æ–‡ä»¶çš„è·¯å¾„
 	//param
-	//		strSelPath	ÎÄ¼şÂ·¾¶
-	//return ²Ù×÷ÊÇ·ñÒÑ³É¹¦
+	//		strSelPath	æ–‡ä»¶è·¯å¾„
+	//return æ“ä½œæ˜¯å¦å·²æˆåŠŸ
 	//////////////////////////////////////////////////////////////////////////
 	BOOL SetFilePath( CString strSelPath );
 
 	//////////////////////////////////////////////////////////////////////////
-	//¸üĞÂÒªÏÔÊ¾µÄÊı¾İ
+	//æ›´æ–°è¦æ˜¾ç¤ºçš„æ•°æ®
 	void UpdateFileData();
 
 	//////////////////////////////////////////////////////////////////////////
-	//¸üĞÂDOSÊôĞÔ
+	//æ›´æ–°DOSå±æ€§
 	void UpdateDosAttr();
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
 	DECLARE_MESSAGE_MAP()
 	
 public:
 	virtual BOOL OnInitDialog();
 	//////////////////////////////////////////////////////////////////////////
-	//ÊôĞÔÁĞ±íµÄµã»÷ÊÂ¼ş
+	//å±æ€§åˆ—è¡¨çš„ç‚¹å‡»äº‹ä»¶
 	afx_msg void OnNMClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult);
 	void   OnCheckBox(DWORD id);
 	afx_msg void OnBnClickedCkReadOnly();
@@ -64,9 +64,9 @@ public:
 	afx_msg void OnBnClickedCkDevice();
 	afx_msg void OnBnClickedCkNormal();
 	afx_msg void OnBnClickedCkReparsePoint();
-	afx_msg void OnPosStdAttrHead();	//ÔÚµ±Ç°ÎÄ¼şµÄÊôĞÔÇøÓòÑ¡Ôñµ±Ç°ÊôĞÔµÄ±ê×¼ÊôĞÔÍ·
-	afx_msg void OnSeverAttr();			//½«µ±Ç°ÊôĞÔ±£´æµ½ÎÄ¼ş
+	afx_msg void OnPosStdAttrHead();	//åœ¨å½“å‰æ–‡ä»¶çš„å±æ€§åŒºåŸŸé€‰æ‹©å½“å‰å±æ€§çš„æ ‡å‡†å±æ€§å¤´
+	afx_msg void OnSeverAttr();			//å°†å½“å‰å±æ€§ä¿å­˜åˆ°æ–‡ä»¶
 //	afx_msg void OnUpdateSeverAttr(CCmdUI *pCmdUI);
-	afx_msg void OnPosStdAttrData();	//ÔÚµ±Ç°ÎÄ¼şµÄÊôĞÔÇøÓòÑ¡Ôñµ±Ç°ÊôĞÔµÄ±ê×¼ÊôĞÔÊı¾İÇøÓò
+	afx_msg void OnPosStdAttrData();	//åœ¨å½“å‰æ–‡ä»¶çš„å±æ€§åŒºåŸŸé€‰æ‹©å½“å‰å±æ€§çš„æ ‡å‡†å±æ€§æ•°æ®åŒºåŸŸ
 	afx_msg void OnNMRClickNtfsFileAttrList(NMHDR *pNMHDR, LRESULT *pResult);
 };

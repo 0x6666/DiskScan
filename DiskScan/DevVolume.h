@@ -1,4 +1,4 @@
-#if !defined(AFX_DEVVOLUME_H__35BAF1AF_9B90_44C6_80F8_17D69E94B21B__INCLUDED_)
+ï»¿#if !defined(AFX_DEVVOLUME_H__35BAF1AF_9B90_44C6_80F8_17D69E94B21B__INCLUDED_)
 #define AFX_DEVVOLUME_H__35BAF1AF_9B90_44C6_80F8_17D69E94B21B__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -9,8 +9,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CDevVolume dialog
-#define SEL_DISK	1	//Ñ¡ÔñÁËÒ»¸ö´ÅÅÌ
-#define SEL_VOLUME	2	//Ñ¡ÔñÁËÒ»¸ö·ÖÇø
+#define SEL_DISK	1	//é€‰æ‹©äº†ä¸€ä¸ªç£ç›˜
+#define SEL_VOLUME	2	//é€‰æ‹©äº†ä¸€ä¸ªåˆ†åŒº
 
 class CDevVolumeDlg : public CDialog
 {
@@ -25,21 +25,21 @@ public:
 	enum { IDD = IDD_DVE_VOLUME };
 
 	//////////////////////////////////////////////////////////////////////////
-	//»ñµÃÑ¡ÔñÁËµÄÉè±¸Ãû×Ö
+	//è·å¾—é€‰æ‹©äº†çš„è®¾å¤‡åå­—
 	//////////////////////////////////////////////////////////////////////////
 	CString GetSelDevName();
 	CString		m_strSelItem;
 
-	int			m_bSelDisk;	//0 ´íÎó £¬SEL_DISKÑ¡ÔñÁË´ÅÅÌ £¬ SEL_VOLUMEÑ¡ÔñÁË·ÖÇø
+	int			m_bSelDisk;	//0 é”™è¯¯ ï¼ŒSEL_DISKé€‰æ‹©äº†ç£ç›˜ ï¼Œ SEL_VOLUMEé€‰æ‹©äº†åˆ†åŒº
 private:
 	CTreeCtrl	m_wndDevVolume;
 	//}}AFX_DATA
 	HTREEITEM	m_hPhsycDisk;
 	HTREEITEM	m_hLogicDrivre;
 
-	//Í¼Æ¬ÁĞ±í
+	//å›¾ç‰‡åˆ—è¡¨
 	std::unique_ptr<CImageList> m_pImageList;
-	//³õÊ¼»¯Í¼±êÁĞ±í
+	//åˆå§‹åŒ–å›¾æ ‡åˆ—è¡¨
 	void InitImageList();
 
 // Overrides

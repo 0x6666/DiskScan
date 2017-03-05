@@ -1,4 +1,4 @@
-// Fat32Doc.cpp : implementation file
+ï»¿// Fat32Doc.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -22,10 +22,10 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CFat32Doc
 
-//ÅĞ¶ÏÑ¡ÔñµÄÊÇ·ñÊÇÎÄ¼ş
-//pList ÁĞ±í¿Ø¼ş
-//item	ÁĞ±íÏî
-//strTemp ¸¨Öú×Ö·û´®
+//åˆ¤æ–­é€‰æ‹©çš„æ˜¯å¦æ˜¯æ–‡ä»¶
+//pList åˆ—è¡¨æ§ä»¶
+//item	åˆ—è¡¨é¡¹
+//strTemp è¾…åŠ©å­—ç¬¦ä¸²
 #define IsSelFAT32File(pList , item , strTemp) (strTemp = \
 	(pList)->GetItemText(item , 3 ),0 != strTemp.GetLength() )
 
@@ -49,7 +49,7 @@ CFat32Doc::CFat32Doc()
 
 CFat32Doc::~CFat32Doc()
 {
-	//ÊÍ·ÅĞèÒªÊÍ·ÅµÄ×ÊÔ´
+	//é‡Šæ”¾éœ€è¦é‡Šæ”¾çš„èµ„æº
 	if (m_pFat32)
 	{
 		m_pFat32->CloseDev();
@@ -120,54 +120,54 @@ void CFat32Doc::Dump(CDumpContext& dc) const
 
 BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName) 
 {
-	//Èç¹û´ò¿ªµÄÊÇÒ»¸ö¾íµÄ»°¾Í¾ÍÖ»ÊÇÒ»¸ö¾íµÄµÄÃû×Ö Èç"\\\\?\\C:"
-	//Èç¹ûÊÇÒ»¸öÎïÀíµÄ»°´«¹ıÀ´µÄÊÇÒ»¸öÎïÀíµÄÃû×ÖºÍÒ»¸öÆ«ÒÆ£¬Èç"\\\\.\\PhysicalDrive ABCDEF10"
+	//å¦‚æœæ‰“å¼€çš„æ˜¯ä¸€ä¸ªå·çš„è¯å°±å°±åªæ˜¯ä¸€ä¸ªå·çš„çš„åå­— å¦‚"\\\\?\\C:"
+	//å¦‚æœæ˜¯ä¸€ä¸ªç‰©ç†çš„è¯ä¼ è¿‡æ¥çš„æ˜¯ä¸€ä¸ªç‰©ç†çš„åå­—å’Œä¸€ä¸ªåç§»ï¼Œå¦‚"\\\\.\\PhysicalDrive ABCDEF10"
 	CString sPath = lpszPathName;
 	CString strTemp = _T("");
 	CString strOff = _T("");
 	DRES res = DR_OK;
 	CView * view;
 
-	//´´½¨Í¼±êÁĞ±í
+	//åˆ›å»ºå›¾æ ‡åˆ—è¡¨
 	m_pImgList->Create(12,12,ILC_COLORDDB|ILC_MASK , 0 , 1);
 	//m_pImgList->Create(16 , 16 ,ILC_COLOR32|ILC_MASK , 0 , 4);
-	HICON hIcon = AfxGetApp()->LoadIcon(IDI_FILE);//ÎÄ¼ş  0
+	HICON hIcon = AfxGetApp()->LoadIcon(IDI_FILE);//æ–‡ä»¶  0
 	m_pImgList->Add(hIcon);
-	hIcon = AfxGetApp()->LoadIcon(IDI_FOLDER);//Ä¿Â¼     1
+	hIcon = AfxGetApp()->LoadIcon(IDI_FOLDER);//ç›®å½•     1
 	m_pImgList->Add(hIcon);	
 
 
-	//»ñµÃĞèÒªµÄÄÚÈİÁĞ±í
+	//è·å¾—éœ€è¦çš„å†…å®¹åˆ—è¡¨
 	POSITION pos = GetFirstViewPosition();
 	view = 	GetNextView(pos);
 	m_pContentList = &((CChildFrm*)(view->GetParentFrame()))->m_DisList;
-	//¶ÔÁĞ±í½øĞĞ³õÊ¼»¯
+	//å¯¹åˆ—è¡¨è¿›è¡Œåˆå§‹åŒ–
 	InitContentListHead();
 	m_pContentList->SetImageList(m_pImgList , LVSIL_SMALL);
 
-	//¼òµ¥µÄÊı¾İ³õÊ¼»¯
+	//ç®€å•çš„æ•°æ®åˆå§‹åŒ–
 	m_liCurSec.QuadPart = 0;
 	m_liStartSec.QuadPart = 0;
 
-	//ÔÚÕâÀï½øĞĞ¾íµÄ´ò¿ª´¦Àí
+	//åœ¨è¿™é‡Œè¿›è¡Œå·çš„æ‰“å¼€å¤„ç†
 
-	//ÊÍ·ÅÁ½±ßµÄ¿Õ¸ñ
+	//é‡Šæ”¾ä¸¤è¾¹çš„ç©ºæ ¼
 	sPath.TrimLeft();
 	sPath.TrimRight();
 
-	//»ñµÃÉè±¸µÄÃû×Ö
+	//è·å¾—è®¾å¤‡çš„åå­—
 	strTemp = GetPathParam(sPath , PT_DEVNAME);
 	strOff = GetPathParam(sPath , PT_OFFSET);
-	if (strOff.GetLength() != 0) //ÓĞÆ«ÒÆ²ÎÊı
+	if (strOff.GetLength() != 0) //æœ‰åç§»å‚æ•°
 	{
 		m_liStartSec = HexStrToLONG_INT(strOff);
 		m_strDevStartSec = strOff;
 	}
-//Òª´ò¿ªµÄÉè±¸Ãû×Ö
+//è¦æ‰“å¼€çš„è®¾å¤‡åå­—
 	m_strTitle = strTemp;
 	res = m_pFat32->OpenDev(strTemp.GetBuffer(), m_liStartSec);
 	if (res != DR_OK)
-	{//TODO ´ò¿ªÉè±¸Ê§°Ü
+	{//TODO æ‰“å¼€è®¾å¤‡å¤±è´¥
 		sPath.LoadString(IDS_OPEN_FALIED);
 		sPath.Replace(STR_POS , lpszPathName);
 		strTemp.LoadString(IDS_ERROR);
@@ -176,7 +176,7 @@ BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName)
 		return FALSE;
 	}
 
-	//´ò¿ªÉè±¸³É¹¦
+	//æ‰“å¼€è®¾å¤‡æˆåŠŸ
 	strTemp = GetPathParam(sPath , PT_INDEX);
 	if (strTemp.GetLength() != 0)
 	{
@@ -185,7 +185,7 @@ BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName)
 		m_strDevAreaIdx = strTemp;
 	}	
 	
-	//¼ÓÉÏ¾í±ê
+	//åŠ ä¸Šå·æ ‡
 	m_strTitle += _T(" ");
 	WCHAR volName[DEVICE_NAME_LEN + 1] = { 0 };
 	m_pFat32->GetVolumeName(volName, DEVICE_NAME_LEN + 1);
@@ -194,11 +194,11 @@ BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName)
 	m_secList.AddSector(0 , m_pFat32->GetSecCount());
 	m_secList.m_strName = m_strTitle;
 
-	//ÉèÖÃµ±Ç°ÒªÏÔÊ¾µÄÁĞ±í
+	//è®¾ç½®å½“å‰è¦æ˜¾ç¤ºçš„åˆ—è¡¨
 	SetCurPath(_T("/"));
 
 	if (NULL == m_pDlgFileAttr)
-	{//ÊôĞÔ¶Ô»°¿ò»¹Ã»ÓĞ´´½¨
+	{//å±æ€§å¯¹è¯æ¡†è¿˜æ²¡æœ‰åˆ›å»º
 		m_pDlgFileAttr = new CFat32FileDlg( this );
 		m_pDlgFileAttr->Create(CFat32FileDlg::IDD , AfxGetMainWnd());
 		m_pDlgFileAttr->UpdateWindow();
@@ -209,16 +209,16 @@ BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName)
 }
 
 void CFat32Doc::InitContentListHead()
-{//¿ªÊ¼³õÊ¼»¯ÁĞ±íÓĞ
+{//å¼€å§‹åˆå§‹åŒ–åˆ—è¡¨æœ‰
 
 	CString  strHead;
-	//ÉèÖÃÍ¼Æ¬ÁĞ±í
+	//è®¾ç½®å›¾ç‰‡åˆ—è¡¨
 // 	m_pContentList->SetImageList(&(((CMainFrame*)::AfxGetMainWnd())->m_wndImageList)
 // 		,TVSIL_NORMAL);
 	
-	//  ID  ÎÄ¼şÃû ÆğÊ¼ÉÈÇøºÅ  ×ÜÉÈÇøÊı  Êµ¼Ê´óĞ¡  ·ÖÅä´óĞ¡ ´´½¨Ê±¼ä ĞŞ¸ÄÊ±¼ä ·ÃÎÊÊ±¼ä 
+	//  ID  æ–‡ä»¶å èµ·å§‹æ‰‡åŒºå·  æ€»æ‰‡åŒºæ•°  å®é™…å¤§å°  åˆ†é…å¤§å° åˆ›å»ºæ—¶é—´ ä¿®æ”¹æ—¶é—´ è®¿é—®æ—¶é—´ 
 	strHead.LoadString(IDS_ID);
-	m_pContentList->InsertColumn( 0, strHead , LVCFMT_LEFT, 30 );//²åÈëÁĞ
+	m_pContentList->InsertColumn( 0, strHead , LVCFMT_LEFT, 30 );//æ’å…¥åˆ—
 	
 	strHead.LoadString(IDS_FILE_NAME);
 	m_pContentList->InsertColumn( 1, strHead , LVCFMT_LEFT, 80 );
@@ -277,34 +277,34 @@ void CFat32Doc::OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = 0;
 	
-	//ÕâÀï»¹Ã»ÓĞ»ñµÃÁĞ±íµÄÖ¸Õë
+	//è¿™é‡Œè¿˜æ²¡æœ‰è·å¾—åˆ—è¡¨çš„æŒ‡é’ˆ
 	if (m_pContentList == NULL) return ;
 	nItem = m_pContentList->GetSelectionMark();
-	if (-1 == nItem)//Ã»ÓĞÑ¡Ôñ?
+	if (-1 == nItem)//æ²¡æœ‰é€‰æ‹©?
 		return;
 	if (IsSelFAT32File(m_pContentList , nItem , strTemp))
-	{//Ë«»÷µÄÊÇÎÄ¼ş
+	{//åŒå‡»çš„æ˜¯æ–‡ä»¶
 		return ;
 	}
 
-	//»ñµÃÑ¡ÔñÄ¿Â¼µÄÂ·¾¶
+	//è·å¾—é€‰æ‹©ç›®å½•çš„è·¯å¾„
 	strPath = GetSelPath(strName);
 
-	//ÅĞ¶ÏÂ·¾¶ÊÇ·ñ¿ÉÒÔ´ò¿ª
+	//åˆ¤æ–­è·¯å¾„æ˜¯å¦å¯ä»¥æ‰“å¼€
 	res = m_pFat32->OpenFile(strPath , &dfile);
 	if (res != DR_OK)
-	{//TODO ´ò¿ªÖ¸¶¨µÄÎÄ¼ş»òÕßÄ¿Â¼Ê§°Ü
+	{//TODO æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶æˆ–è€…ç›®å½•å¤±è´¥
 		strPath.LoadString(IDS_OPEN_FALIED);
 		strTemp.LoadString(IDS_PROMPT);
 		strPath.Replace(STR_POS  , strName );
 		MessageBox(NULL , strPath , strTemp , MB_OK |MB_ICONWARNING );
 	}else{
-		//´ò¿ª³É¹¦
-		//ÒªÏÔÊ¾µÄÊı¾İµÄÉÈÇøºÅ
+		//æ‰“å¼€æˆåŠŸ
+		//è¦æ˜¾ç¤ºçš„æ•°æ®çš„æ‰‡åŒºå·
 		m_liCurSec.QuadPart = dfile.GetStartSec();
 		dfile.Close();
 		SetCurPath(strPath);
-		//¸üĞÂÊÓÍ¼
+		//æ›´æ–°è§†å›¾
 		UpdateAllViews(NULL);
 	}		
 }
@@ -327,9 +327,9 @@ void CFat32Doc::SetCurPath( CString path )
 	m_bIsRun = FALSE;
 
 	if (m_hThread != NULL && m_hThread != INVALID_HANDLE_VALUE)
-	{//Ïß³Ì»¹Ã»½áÊø
+	{//çº¿ç¨‹è¿˜æ²¡ç»“æŸ
 		if(WAIT_TIMEOUT == WaitForSingleObject(m_hThread , 500))
-		{//³¬Ê± 
+		{//è¶…æ—¶ 
 			DWORD exitCode;
 			if(GetExitCodeThread(m_hThread , &exitCode)){
 				TerminateThread(m_hThread , exitCode);
@@ -337,7 +337,7 @@ void CFat32Doc::SetCurPath( CString path )
 		}
 	}
 
-	//´´½¨Ã¶¾ÙÏß³Ì
+	//åˆ›å»ºæšä¸¾çº¿ç¨‹
 	CloseHandle(m_hThread);
 	m_hThread = ::CreateThread(NULL , 0 , EnumFAT32File , this , 0 , NULL);
 }
@@ -351,11 +351,11 @@ CRuntimeClass* CFat32Doc::GetInofViewClass()
 
 void CFat32Doc::OnBnClickedPreSector()
 {
-	//ÖØÖÃÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®é»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	ReSetSectorList();
 
 	if (0 != m_liCurSec.QuadPart )
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		--m_liCurSec.QuadPart;
 		UpdateAllViews(NULL);
 	}
@@ -363,14 +363,14 @@ void CFat32Doc::OnBnClickedPreSector()
 
 void CFat32Doc::OnBnClickedNextSector()
 {
-	//×ÜÉÈÇøÊı
+	//æ€»æ‰‡åŒºæ•°
 	DWORD dwSecCnt = m_pFat32->GetSecCount();
 
-	//ÖØÖÃÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®é»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	ReSetSectorList();
 
 	if (m_liCurSec.QuadPart < dwSecCnt - 1)
-	{//µ±Ç°²»ÊÇ×îºóÒ»¸öÉÈÇø
+	{//å½“å‰ä¸æ˜¯æœ€åä¸€ä¸ªæ‰‡åŒº
 		++m_liCurSec.QuadPart;
 		UpdateAllViews(NULL);
 	}
@@ -378,11 +378,11 @@ void CFat32Doc::OnBnClickedNextSector()
 
 void CFat32Doc::OnBnClickedFirstSector()
 {
-	//ÖØÖÃÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®é»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	ReSetSectorList();
 
 	if (0 != m_liCurSec.QuadPart )
-	{//µ±Ç°ÏÔÊ¾µÄ²»ÊÇµÚÒ»ÉÈÇø
+	{//å½“å‰æ˜¾ç¤ºçš„ä¸æ˜¯ç¬¬ä¸€æ‰‡åŒº
 		m_liCurSec.QuadPart = 0;
 		UpdateAllViews(NULL);
 	}
@@ -390,14 +390,14 @@ void CFat32Doc::OnBnClickedFirstSector()
 
 void CFat32Doc::OnBnClickedLastSector()
 {
-	//×ÜÉÈÇøÊı
+	//æ€»æ‰‡åŒºæ•°
 	DWORD dwSecCnt = m_pFat32->GetSecCount();
 
-	//ÖØÖÃÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®é»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	ReSetSectorList();
 
 	if (m_liCurSec.QuadPart != dwSecCnt - 1)
-	{//µ±Ç°²»ÊÇ×îºóÒ»¸öÉÈÇø
+	{//å½“å‰ä¸æ˜¯æœ€åä¸€ä¸ªæ‰‡åŒº
 		m_liCurSec.QuadPart = dwSecCnt - 1;
 		UpdateAllViews(NULL);
 	}
@@ -405,97 +405,97 @@ void CFat32Doc::OnBnClickedLastSector()
 
 void CFat32Doc::OnBnClickedPreClust()
 {
-	//µ±Ç°ÉÈÇøºÅ
+	//å½“å‰æ‰‡åŒºå·
 	LONG_INT liCurSec = m_liCurSec;
-	//µ±Ç°ÉÈÇøºÅËùÔÚµÄ´ØºÅ
+	//å½“å‰æ‰‡åŒºå·æ‰€åœ¨çš„ç°‡å·
 	DWORD dwCurClust = m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
 	
-	//ÖØÖÃÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®é»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	ReSetSectorList();
 
 	if (0 == dwCurClust)
-	{//ÎŞĞ§µÄ´ØºÅ
+	{//æ— æ•ˆçš„ç°‡å·
 		return;
 	}
 
-	//Ç°Ò»´Ø
+	//å‰ä¸€ç°‡
 	--dwCurClust;
 	m_liCurSec.QuadPart = m_pFat32->ClustToSect(dwCurClust);
 
-	//¸üĞÂËùÓĞµÄÊÓÍ¼
+	//æ›´æ–°æ‰€æœ‰çš„è§†å›¾
 	UpdateAllViews(NULL);
 
 }
 
 void CFat32Doc::OnBnClickedNextClust()
 {
-	//µ±Ç°ÉÈÇøºÅ
+	//å½“å‰æ‰‡åŒºå·
 	LONG_INT liCurSec = m_liCurSec;
-	//µ±Ç°ÉÈÇøºÅËùÔÚµÄ´ØºÅ
+	//å½“å‰æ‰‡åŒºå·æ‰€åœ¨çš„ç°‡å·
 	DWORD dwCurClust = m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
 
-	//ÖØÖÃÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®é»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	ReSetSectorList();
 
-	if (0 == dwCurClust)//µ±Ç°»¹ÔÚµÚ¶şºÅ´ØÖ®Ç°
+	if (0 == dwCurClust)//å½“å‰è¿˜åœ¨ç¬¬äºŒå·ç°‡ä¹‹å‰
 		dwCurClust = 2;
 	else if (m_pFat32->GetMaxClustNum() == dwCurClust)
-	{//ÒÑ¾­ÊÇ×îºóÒ»´ØÁË
+	{//å·²ç»æ˜¯æœ€åä¸€ç°‡äº†
 		return ;
 	}else
 		++dwCurClust;
 	m_liCurSec.QuadPart = m_pFat32->ClustToSect(dwCurClust);
 
-	//¸üĞÂËùÓĞµÄÊÓÍ¼
+	//æ›´æ–°æ‰€æœ‰çš„è§†å›¾
 	UpdateAllViews(NULL);
 }
 
 void CFat32Doc::OnBnClickedFirstClust()
 {
-	//µ±Ç°ÉÈÇøºÅ
+	//å½“å‰æ‰‡åŒºå·
 	LONG_INT liCurSec = m_liCurSec;
-	//µ±Ç°ÉÈÇøºÅËùÔÚµÄ´ØºÅ
+	//å½“å‰æ‰‡åŒºå·æ‰€åœ¨çš„ç°‡å·
 	DWORD dwCurClust = m_pFat32->SectToClust((DWORD)liCurSec.QuadPart);
 
-	//ÖØÖÃÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®é»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	ReSetSectorList();
 
 	if ( 2 != dwCurClust )
 	{
 		m_liCurSec.QuadPart = m_pFat32->ClustToSect(2);
 
-		//¸üĞÂËùÓĞµÄÊÓÍ¼
+		//æ›´æ–°æ‰€æœ‰çš„è§†å›¾
 		UpdateAllViews(NULL);
 	}
 }
 
 void CFat32Doc::OnBnClickedLastClust()
 {
-	//Òª¼ÆËã×îºóÒ»´ØµÄ´ØºÅ
-	//×ÜÉÈÇøÊı
+	//è¦è®¡ç®—æœ€åä¸€ç°‡çš„ç°‡å·
+	//æ€»æ‰‡åŒºæ•°
 	DWORD dwSecCnt = m_pFat32->GetSecCount();
-	//Êı¾İÇøµÄÉÈÇøºÅ
+	//æ•°æ®åŒºçš„æ‰‡åŒºå·
 	DWORD firstClustSec = m_pFat32->ClustToSect(2);
-	//Ã¿´ØÉÈÇøÊı
+	//æ¯ç°‡æ‰‡åŒºæ•°
 	BYTE secPerClust = m_pFat32->GetSecPerClust();
 
-	//ÖØÖÃÄ¬ÈÏÉÈÇøÁĞ±í
+	//é‡ç½®é»˜è®¤æ‰‡åŒºåˆ—è¡¨
 	ReSetSectorList();
 
 	if (0 == secPerClust)
-	{//·Â·ğÉè±¸»¹Ã»ÓĞ´ò¿ª
+	{//ä»¿ä½›è®¾å¤‡è¿˜æ²¡æœ‰æ‰“å¼€
 		return ;
 	}
 
-	//Êı¾İÇøµÄ×Ü´ØÊı
+	//æ•°æ®åŒºçš„æ€»ç°‡æ•°
 	DWORD dwClustCnt = (dwSecCnt - firstClustSec) / secPerClust;
 
-	//×îºóÒ»´ØµÄ´ØºÅ
+	//æœ€åä¸€ç°‡çš„ç°‡å·
 	(dwClustCnt += 2)--;
 
 	m_liCurSec.QuadPart = m_pFat32->ClustToSect(dwClustCnt);
 
-	//¸üĞÂËùÓĞµÄÊÓÍ¼
+	//æ›´æ–°æ‰€æœ‰çš„è§†å›¾
 	UpdateAllViews(NULL);
 
 }
@@ -505,17 +505,17 @@ void CFat32Doc::OnRClickContextList(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 
-	CRect	cRect;//¿Í»§Çø
-	CPoint	p;	//Êó±êµ±Ç°Î»ÖÃ
+	CRect	cRect;//å®¢æˆ·åŒº
+	CPoint	p;	//é¼ æ ‡å½“å‰ä½ç½®
 	CMenu	menu;
 	CMenu*	pMenu;
 
 	::GetWindowRect(AfxGetMainWnd()->GetSafeHwnd()/*m_pContentList->GetParent()->GetSafeHwnd()*//*AfxGetMainWnd()->GetSafeHwnd()*/ , &cRect);
 	::GetCursorPos(&p);
 	if(!cRect.PtInRect(p)) 
-		return ;//Ö»ÔÚÁĞ±í¿ÕÖĞÏÔÊ¾¿ì½İ²Ëµ¥
+		return ;//åªåœ¨åˆ—è¡¨ç©ºä¸­æ˜¾ç¤ºå¿«æ·èœå•
 
-	//¿ì½İ²Ëµ¥
+	//å¿«æ·èœå•
 	menu.LoadMenu(IDR_FAT32_FILE_MENU);
 	pMenu = menu.GetSubMenu(0);
 	pMenu->TrackPopupMenu(TPM_LEFTALIGN|TPM_TOPALIGN , p.x , p.y , AfxGetMainWnd()/*m_pContentList->GetParent()*//*AfxGetMainWnd()*/ , NULL);
@@ -523,21 +523,21 @@ void CFat32Doc::OnRClickContextList(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CFat32Doc::OnFat32PosData()
 {
-	CString		strPath;			//Â·¾¶
-	CString		strName;		//ËùÑ¡ÔñµÄÎÄ¼şÃû
+	CString		strPath;			//è·¯å¾„
+	CString		strName;		//æ‰€é€‰æ‹©çš„æ–‡ä»¶å
 	CString		strTemp;
 	LONG_INT	liStart = {0};
 	DFat32File  dfile;
 	DRES		res = DR_OK;
 
-	//»ñµÃµ±Ç°Ñ¡ÔñµÄÎÄ¼şµÄÂ·¾¶
+	//è·å¾—å½“å‰é€‰æ‹©çš„æ–‡ä»¶çš„è·¯å¾„
 	strPath = GetSelPath(strName);
 
 
-	//ÅĞ¶ÏÂ·¾¶ÊÇ·ñ¿ÉÒÔ´ò¿ª
+	//åˆ¤æ–­è·¯å¾„æ˜¯å¦å¯ä»¥æ‰“å¼€
 	res = m_pFat32->OpenFile(strPath , &dfile);
 	if (res != DR_OK)
-	{//TODO ´ò¿ªÖ¸¶¨µÄÎÄ¼ş»òÕßÄ¿Â¼Ê§°Ü
+	{//TODO æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶æˆ–è€…ç›®å½•å¤±è´¥
 		strPath.LoadString(IDS_OPEN_FALIED);
 		strTemp.LoadString(IDS_PROMPT);
 		strPath.Replace(STR_POS  , strName);
@@ -546,29 +546,29 @@ void CFat32Doc::OnFat32PosData()
 		return;
 	}
 
-	//ÒªÏÔÊ¾µÄÊı¾İµÄÉÈÇøºÅ
+	//è¦æ˜¾ç¤ºçš„æ•°æ®çš„æ‰‡åŒºå·
 	m_liCurSec.QuadPart = dfile.GetStartSec();
 
 	if (0 == m_liCurSec.QuadPart)
-	{//Êı¾İÇø²»¿ÉÄÜ³öÏÖ Îª0µÄÉ½ÇøºÅ
-		//Îª¿Õ¾ÍÖ±½ÓÊ¹ÓÃ´ÅÅÌµÄ 
+	{//æ•°æ®åŒºä¸å¯èƒ½å‡ºç° ä¸º0çš„å±±åŒºå·
+		//ä¸ºç©ºå°±ç›´æ¥ä½¿ç”¨ç£ç›˜çš„ 
 		ReSetSectorList();
 	}else{
 		SectorList* secList = new SectorList();
-		secList->m_strName = strPath;  //ÇøÓòÃû×Ö
-		secList->AddSector(m_liCurSec , m_pFat32->GetSecPerClust() );   //ÏÈÊ¹ÓÃÒ»¸ö´Ø
+		secList->m_strName = strPath;  //åŒºåŸŸåå­—
+		secList->AddSector(m_liCurSec , m_pFat32->GetSecPerClust() );   //å…ˆä½¿ç”¨ä¸€ä¸ªç°‡
 		if (FALSE == SetSectorListNoCopy(secList))
 		{
 			delete secList;
 			secList = 0;
 		}
 
-		//´´½¨Ïß³ÌÀ´»ñÈ¡´ØÁ´
+		//åˆ›å»ºçº¿ç¨‹æ¥è·å–ç°‡é“¾
 		m_bIsGetSeclistRun = FALSE;
 		if (m_hGetSectorListThread != NULL && m_hGetSectorListThread != INVALID_HANDLE_VALUE)
-		{//Ïß³Ì»¹Ã»½áÊø
+		{//çº¿ç¨‹è¿˜æ²¡ç»“æŸ
 			if(WAIT_TIMEOUT == WaitForSingleObject(m_hGetSectorListThread , 500))
-			{//³¬Ê± 
+			{//è¶…æ—¶ 
 				DWORD exitCode;
 				if(GetExitCodeThread(m_hGetSectorListThread , &exitCode)){
 					TerminateThread(m_hGetSectorListThread , exitCode);
@@ -576,31 +576,31 @@ void CFat32Doc::OnFat32PosData()
 			}
 		}
 
-		//´´½¨Ã¶¾ÙÏß³Ì
+		//åˆ›å»ºæšä¸¾çº¿ç¨‹
 		CloseHandle(m_hGetSectorListThread);
 		m_hGetSectorListThread = ::CreateThread(NULL , 0 , GetFAT32FileSectorList , this , 0 , NULL);
-		Sleep(50); //ĞİÏ¢Ò»ÏÂ
+		Sleep(50); //ä¼‘æ¯ä¸€ä¸‹
 	}
 
 
 	dfile.Close();			
-	//¸üĞÂÊÓÍ¼
+	//æ›´æ–°è§†å›¾
 	UpdateAllViews(NULL);
 }
 
 void CFat32Doc::OnFat32FileAttr()
 {
 	CString strName;
-	//»ñµÃµ±Ç°Ñ¡ÔñµÄÎÄ¼şµÄÍêÕûÂ·¾¶
+	//è·å¾—å½“å‰é€‰æ‹©çš„æ–‡ä»¶çš„å®Œæ•´è·¯å¾„
 	CString strSelPath = GetSelPath(strName);
 	if (0 == strSelPath.GetLength())
-	{//·Â·ğÓĞµã²»¶Ô¾¢°¡£¡
+	{//ä»¿ä½›æœ‰ç‚¹ä¸å¯¹åŠ²å•Šï¼
 		return;
 	}
 
-	//ÉèÖÃĞèÒªÏÔÊ¾µÄÎÄ¼şµÄÂ·¾¶
+	//è®¾ç½®éœ€è¦æ˜¾ç¤ºçš„æ–‡ä»¶çš„è·¯å¾„
 	if(FALSE == m_pDlgFileAttr->SetFilePath(strSelPath))
-	{//ÉèÖÃ³É¹¦
+	{//è®¾ç½®æˆåŠŸ
 		CString strTitle;
 		CString strMsg;
 
@@ -611,7 +611,7 @@ void CFat32Doc::OnFat32FileAttr()
 		return;
 	}
 
-	//ÖØĞÂÏÔÊ¾ÎÄ¼şĞÅÏ¢¶Ô»°¿ò
+	//é‡æ–°æ˜¾ç¤ºæ–‡ä»¶ä¿¡æ¯å¯¹è¯æ¡†
 	::ShowWindow(m_pDlgFileAttr->GetSafeHwnd() , SW_SHOW);
 }
 
@@ -619,28 +619,28 @@ void CFat32Doc::OnFat32PosParaentDir()
 {
 	DFat32File		file;
 	DRES			res = DR_OK;
-	DWORD			parentIndex = 0;		//ÔÚ¸¸Ä¿Â¼ÖĞµÄ¶ÌÎÄ¼şÃûÈë¿ÚÏîµÄË÷Òı
-	DWORD			dwClust;				//´ØºÅ
+	DWORD			parentIndex = 0;		//åœ¨çˆ¶ç›®å½•ä¸­çš„çŸ­æ–‡ä»¶åå…¥å£é¡¹çš„ç´¢å¼•
+	DWORD			dwClust;				//ç°‡å·
 	DWORD			dwSector;
-	LONG_INT		liSector;				//ÉÈÇøºÅ
+	LONG_INT		liSector;				//æ‰‡åŒºå·
 	LONG_INT		liEnd = {0};
 	int				iTemp;
 	int				i;
 	CString			strName;
-	//µ±Ç°ÁĞ±íµÄÂ·¾¶  Ò²ÊÇËùÎ½µÄ¸¸Ä¿Â¼
+	//å½“å‰åˆ—è¡¨çš„è·¯å¾„  ä¹Ÿæ˜¯æ‰€è°“çš„çˆ¶ç›®å½•
 	CString strCurPath = m_strCurPath;
-	//»ñµÃµ±Ç°Ñ¡ÖĞµÄÂ·¾¶
+	//è·å¾—å½“å‰é€‰ä¸­çš„è·¯å¾„
 	CString strSelPath = GetSelPath(strName);
 	if (1 == strSelPath.GetLength() && IsPathSeparator(strSelPath.GetAt(0)))
-	{//ÊÇ¸ùÄ¿Â¼
+	{//æ˜¯æ ¹ç›®å½•
 		return;
 	}
 
-	//´ò¿ªÖ¸¶¨µÄÎÄ¼ş
+	//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶
 	res = m_pFat32->OpenFile(strSelPath , &file);
 
 	if ( DR_OK != res )
-	{//´ò¿ªÖ¸¶¨µÄÎÄ¼şÊ§°Ü
+	{//æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶å¤±è´¥
 		CString strTitle;
 		CString strMsg;
 
@@ -651,35 +651,35 @@ void CFat32Doc::OnFat32PosParaentDir()
 		return;
 	}
 
-	//»ñÈ¡Ñ¡ÔñÎÄ¼şÔÚ¸¸Ä¿Â¼ÖĞµÄÎ»ÖÃ
+	//è·å–é€‰æ‹©æ–‡ä»¶åœ¨çˆ¶ç›®å½•ä¸­çš„ä½ç½®
 	parentIndex = file.GetParentIndex();
 	file.Close();
 
-	//´ò¿ª¸¸Ä¿Â¼
+	//æ‰“å¼€çˆ¶ç›®å½•
 	res = m_pFat32->OpenFile(strCurPath , &file);
 	dwClust = file.GetStartClust();
 
 
-	//ÒªÏÔÊ¾µÄÊı¾İµÄÉÈÇøºÅ
+	//è¦æ˜¾ç¤ºçš„æ•°æ®çš„æ‰‡åŒºå·
 	dwSector = m_pFat32->ClustToSect(dwClust);
 	if (0 == dwSector)
-	{//Êı¾İÇø²»¿ÉÄÜ³öÏÖ Îª0µÄÉ½ÇøºÅ
-		//Îª¿Õ¾ÍÖ±½ÓÊ¹ÓÃ´ÅÅÌµÄ 
+	{//æ•°æ®åŒºä¸å¯èƒ½å‡ºç° ä¸º0çš„å±±åŒºå·
+		//ä¸ºç©ºå°±ç›´æ¥ä½¿ç”¨ç£ç›˜çš„ 
 		ReSetSectorList();
 	}
 	else
 	{
 		SectorList* secList = new SectorList();
-		secList->m_strName = strCurPath;  //ÇøÓòÃû×Ö
-		secList->AddSector(dwSector , m_pFat32->GetSecPerClust() );   //ÏÈÊ¹ÓÃÒ»¸ö´Ø
+		secList->m_strName = strCurPath;  //åŒºåŸŸåå­—
+		secList->AddSector(dwSector , m_pFat32->GetSecPerClust() );   //å…ˆä½¿ç”¨ä¸€ä¸ªç°‡
 		if(TRUE == SetSectorListNoCopy(secList))
 		{
-			//´´½¨Ïß³ÌÀ´»ñÈ¡´ØÁ´
+			//åˆ›å»ºçº¿ç¨‹æ¥è·å–ç°‡é“¾
 			m_bIsGetSeclistRun = FALSE;
 			if (m_hGetSectorListThread != NULL && m_hGetSectorListThread != INVALID_HANDLE_VALUE)
-			{//Ïß³Ì»¹Ã»½áÊø
+			{//çº¿ç¨‹è¿˜æ²¡ç»“æŸ
 				if(WAIT_TIMEOUT == WaitForSingleObject(m_hGetSectorListThread , 500))
-				{//³¬Ê± 
+				{//è¶…æ—¶ 
 					DWORD exitCode;
 					if(GetExitCodeThread(m_hGetSectorListThread , &exitCode)){
 						TerminateThread(m_hGetSectorListThread , exitCode);
@@ -687,10 +687,10 @@ void CFat32Doc::OnFat32PosParaentDir()
 				}
 			}
 
-			//´´½¨Ã¶¾ÙÏß³Ì
+			//åˆ›å»ºæšä¸¾çº¿ç¨‹
 			CloseHandle(m_hGetSectorListThread);
 			m_hGetSectorListThread = ::CreateThread(NULL , 0 , GetFAT32FileSectorList , this , 0 , NULL);
-			Sleep(50); //ĞİÏ¢Ò»ÏÂ
+			Sleep(50); //ä¼‘æ¯ä¸€ä¸‹
 		}
 		else
 		{
@@ -698,36 +698,36 @@ void CFat32Doc::OnFat32PosParaentDir()
 		}
 	}
 
-	//¼ÆËãÄ¿Â¼ËùÔÚ´ØºÅ  Ã¿Ò»¸öÄ¿Â¼Èë¿Ú32¸ö×Ö½Ú
+	//è®¡ç®—ç›®å½•æ‰€åœ¨ç°‡å·  æ¯ä¸€ä¸ªç›®å½•å…¥å£32ä¸ªå­—èŠ‚
 
-	//´ØÊı
+	//ç°‡æ•°
 	iTemp = (parentIndex * 32) / (m_pFat32->GetSecPerClust() * SECTOR_SIZE);
-	//²éÕÒ¾ßÌåµÄ´ØºÅ
+	//æŸ¥æ‰¾å…·ä½“çš„ç°‡å·
 	for (i = 0 ; i < iTemp ; ++i)
 		dwClust = m_pFat32->GetFATFromFAT1(dwClust);
 
-	//ÉÈÇøºÅ
+	//æ‰‡åŒºå·
 	liSector.QuadPart = m_pFat32->ClustToSect(dwClust);
 	liSector.QuadPart +=((parentIndex * 32) / SECTOR_SIZE) % m_pFat32->GetSecPerClust();
 
-	//ÉèÖÃµ±Ç°ÉÈÇø
+	//è®¾ç½®å½“å‰æ‰‡åŒº
 	SetCurSector(liSector);
 	
-	//×Ö½ÚÆ«ÒÆ
+	//å­—èŠ‚åç§»
 	liSector.QuadPart *= SECTOR_SIZE;
 	liSector.QuadPart += ((parentIndex % (SECTOR_SIZE / 32)) * 32 );
 	liEnd.QuadPart = liSector.QuadPart + 32;
 
-	//Ñ¡Ôñ
+	//é€‰æ‹©
 	SetSel(liSector , liEnd);
 }
 
 void CFat32Doc::OnFat32ServeAs()
-{//½«ÎÄ¼şµÄÊı¾İÁíÍâ±£´æÆğÀ´
+{//å°†æ–‡ä»¶çš„æ•°æ®å¦å¤–ä¿å­˜èµ·æ¥
 	int i = 0;
 	int len = 0;
 	CString strName;
-	//»ñµÃµ±Ç°Ñ¡ÖĞµÄÎÄ¼ş
+	//è·å¾—å½“å‰é€‰ä¸­çš„æ–‡ä»¶
 	CString strFilePath = GetSelPath(strName);
 	CString strFileName;
 	CString	strWrite;
@@ -736,17 +736,17 @@ void CFat32Doc::OnFat32ServeAs()
 	for (i = len - 1 ; i > 0 && !IsPathSeparator(strFilePath.GetAt(i)); --i);
 	strFileName = strFilePath.Mid( i + 1 );
 	
-	//ÎÄ¼şÑ¡Ôñ¶Ô»°¿ò
+	//æ–‡ä»¶é€‰æ‹©å¯¹è¯æ¡†
 	CFileDialog fDlg(FALSE , NULL , strFileName , OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT );
 	if(IDCANCEL == fDlg.DoModal())
-	{//È¡ÏûÁË 
+	{//å–æ¶ˆäº† 
 		return;
 	}
 
-	//»ñµÃÒªĞ´µÄÂ·¾¶Ãû
+	//è·å¾—è¦å†™çš„è·¯å¾„å
 	strWrite = fDlg.GetPathName();
 	
-	//¿ªÆôÒ»¸öÎÄ¼ş¸´ÖÆ½ø¶ÈÌõ¶Ô»°¿ò
+	//å¼€å¯ä¸€ä¸ªæ–‡ä»¶å¤åˆ¶è¿›åº¦æ¡å¯¹è¯æ¡†
 
 	CCopyProcessDlg ccpDlg(strFilePath , strWrite , this);
 	ccpDlg.DoModal();
@@ -758,24 +758,24 @@ void CFat32Doc::OnUpdateFat32ServeAs(CCmdUI *pCmdUI)
 	CString strName;
 	int nSelItem = m_pContentList->GetSelectionMark();
 	if (-1 == nSelItem)
-	{ //Ã»ÓĞÑ¡ÔñÈÎºÎ¶«Î÷
+	{ //æ²¡æœ‰é€‰æ‹©ä»»ä½•ä¸œè¥¿
 		return ;
 	}
 
 	strName = m_pContentList->GetItemText(nSelItem , 1);
 
 	if (_T('*') != strName.GetAt(0) && IsSelFAT32File(m_pContentList , nSelItem , strTemp))
-	{//Ñ¡ÔñµÄÊÇÎÄ¼ş
+	{//é€‰æ‹©çš„æ˜¯æ–‡ä»¶
 		pCmdUI->Enable(TRUE);
-	}else//Ñ¡ÔñµÄÊÇÄ¿Â¼
+	}else//é€‰æ‹©çš„æ˜¯ç›®å½•
 		pCmdUI->Enable(FALSE);
 }
 
 void CFat32Doc::OnCloseDocument()
 {
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 	if (NULL != m_pDlgFileAttr)
-	{//Ïú»Ù´°¿Ú
+	{//é”€æ¯çª—å£
 		m_pDlgFileAttr->DestroyWindow();
 		delete m_pDlgFileAttr;
 	}
@@ -791,43 +791,43 @@ CString CFat32Doc::GetSelPath(CString& strName)
 	CString		strTemp;
 	//CString		strName;
 	CString		strPath = _T("/");
-	int			pathLen;		//Ô­Â·¾¶µÄ³¤¶È
+	int			pathLen;		//åŸè·¯å¾„çš„é•¿åº¦
 
-	if (m_pContentList == NULL)//ÕâÀï»¹Ã»ÓĞ»ñµÃÁĞ±íµÄÖ¸Õë?
+	if (m_pContentList == NULL)//è¿™é‡Œè¿˜æ²¡æœ‰è·å¾—åˆ—è¡¨çš„æŒ‡é’ˆ?
 		return strPath;
 	nItem = m_pContentList->GetSelectionMark();
-	if (-1 == nItem) {//Ã»ÓĞÑ¡ÖĞÈÎºÎÓĞĞ§Êı¾İ
+	if (-1 == nItem) {//æ²¡æœ‰é€‰ä¸­ä»»ä½•æœ‰æ•ˆæ•°æ®
 		return strPath;
 	}
 
-	//»ñµÃÎÄ¼şÃû
+	//è·å¾—æ–‡ä»¶å
 	strName = m_pContentList->GetItemText( nItem , 1 );
 	strPath = m_strCurPath;
 	pathLen = strPath.GetLength();
 
 	if (!IsSelFAT32File(m_pContentList , nItem , strTemp ))
-	{//Ñ¡ÔñµÄÊÇÄ¿Â¼
+	{//é€‰æ‹©çš„æ˜¯ç›®å½•
 
 		if (0 == strName.Compare(_T(".")))
-		{//½øÈëµÄÊÇµ±Ç°Ä¿Â¼
+		{//è¿›å…¥çš„æ˜¯å½“å‰ç›®å½•
 
 		}else if(0 == strName.Compare(_T("..")))
-		{//Òª½øÈëµÄÊÇ¸¸Ä¿Â¼ 
+		{//è¦è¿›å…¥çš„æ˜¯çˆ¶ç›®å½• 
 			for ( --pathLen ; pathLen > 0 && !IsPathSeparator(strPath.GetAt(pathLen)) ; --pathLen);
 			if (pathLen <= 0)  
-				strPath = _T("/");  //ÕâÕâÇé¿öÓ¦¸Ã²»»á³öÏÖ
+				strPath = _T("/");  //è¿™è¿™æƒ…å†µåº”è¯¥ä¸ä¼šå‡ºç°
 			else{
 				strPath = strPath.Mid(0 , pathLen);
 			}
 		}else{
-			//ÊÇÆÕÍ¨µÄÄ¿Â¼
+			//æ˜¯æ™®é€šçš„ç›®å½•
 			if (IsPathSeparator(strPath.GetAt(pathLen - 1)))
 				strPath = strPath + strName;
 			else
 				strPath = strPath + _T("/") + strName;
 		}
-	} else {  //µã»÷µÄÊÇÒ»¸öÄ¿Â¼
-		//ÊÇÒ»¸öÎÄ¼ş
+	} else {  //ç‚¹å‡»çš„æ˜¯ä¸€ä¸ªç›®å½•
+		//æ˜¯ä¸€ä¸ªæ–‡ä»¶
 		if (IsPathSeparator(strPath.GetAt(pathLen - 1)))
 			strPath = strPath + strName;
 		else
@@ -839,31 +839,31 @@ CString CFat32Doc::GetSelPath(CString& strName)
 
 void CFat32Doc::SetCurFile( CString strPath )
 {
-	//¸¸Ä¿Â¼
+	//çˆ¶ç›®å½•
 	CString strParent;
 	int i = 0;
 	int len = strPath.GetLength();
 	DFat32File dfile;
 	if (len == 0) return;
 	else if(len == 1){
-		//¸ùÄ¿Â¼
+		//æ ¹ç›®å½•
 		if (m_strCurPath.GetLength() != 0)
-		{//Ô­Â·¾¶²»ÔÚ¸ùÄ¿Â¼ 
+		{//åŸè·¯å¾„ä¸åœ¨æ ¹ç›®å½• 
 			m_pFat32->OpenFile(strPath  , &dfile);
 			m_liCurSec.QuadPart = dfile.GetStartSec();
 			dfile.Close();
-			//¸üĞÂÊÓÍ¼
+			//æ›´æ–°è§†å›¾
 			UpdateAllViews(NULL);
 			SetCurPath(strPath);
 		}
 		//return;
 	}else {
-		//·Ç¸ùÄ¿Â¼ 
+		//éæ ¹ç›®å½• 
 		for(i = len-1 ; (i > 0) &&  !IsPathSeparator(strPath.GetAt(i))  ; --i);
 		if (0 == i)
 		{
 			if (IsPathSeparator(strPath.GetAt(0)))
-			{//¸¸Ä¿Â¼ÊÇÄ¿Â¼
+			{//çˆ¶ç›®å½•æ˜¯ç›®å½•
 				strParent = _T("/");
 			}else{
 				CString strTitle;
@@ -874,10 +874,10 @@ void CFat32Doc::SetCurFile( CString strPath )
 				::MessageBox(NULL , strMsg , strTitle , MB_OK|MB_ICONWARNING);
 				return;
 			}
-		}else  //ÊÇÒ»¸ö³£¹æÄ¿Â¼
+		}else  //æ˜¯ä¸€ä¸ªå¸¸è§„ç›®å½•
 			strParent = strPath.Left(i);
 		
-		//¿ÉÒÔÏÈÅĞ¶ÏÒ»ÏÂÊÇ·ñĞèÒªÖØĞÂÒ»ÏÂÂ·¾¶
+		//å¯ä»¥å…ˆåˆ¤æ–­ä¸€ä¸‹æ˜¯å¦éœ€è¦é‡æ–°ä¸€ä¸‹è·¯å¾„
 		len = strParent.GetLength();
 		i = len + 1;
 		if ( len == m_strCurPath.GetLength())
@@ -891,22 +891,22 @@ void CFat32Doc::SetCurFile( CString strPath )
 					continue;
 			}
 			
-		}/*else//ĞÂ¾ÉÂ·¾¶²»Í¬ */
+		}/*else//æ–°æ—§è·¯å¾„ä¸åŒ */
 			/*SetCurPath(strParent);*/
 		if (i != len)
-		{//ĞÂ¾ÉÂ·¾¶²»Í¬ 
+		{//æ–°æ—§è·¯å¾„ä¸åŒ 
 			m_pFat32->OpenFile(strParent  , &dfile);
 			m_liCurSec.QuadPart = dfile.GetStartSec();
 			dfile.Close();
-			//¸üĞÂÊÓÍ¼
+			//æ›´æ–°è§†å›¾
 			UpdateAllViews(NULL);
 			SetCurPath(strParent);
 		}
 	}
 
-	//ÉèÖÃĞèÒªÏÔÊ¾µÄÎÄ¼şµÄÂ·¾¶
+	//è®¾ç½®éœ€è¦æ˜¾ç¤ºçš„æ–‡ä»¶çš„è·¯å¾„
 	if(FALSE == m_pDlgFileAttr->SetFilePath(strPath))
-	{//ÉèÖÃ³É¹¦
+	{//è®¾ç½®æˆåŠŸ
 		CString strTitle;
 		CString strMsg;
 
@@ -917,18 +917,18 @@ void CFat32Doc::SetCurFile( CString strPath )
 		return;
 	}
 
-	//ÖØĞÂÏÔÊ¾ÎÄ¼şĞÅÏ¢¶Ô»°¿ò
+	//é‡æ–°æ˜¾ç¤ºæ–‡ä»¶ä¿¡æ¯å¯¹è¯æ¡†
 	::ShowWindow(m_pDlgFileAttr->GetSafeHwnd() , SW_SHOW);
 }
 
 void CFat32Doc::OnCheckDeleteFile()
-{//²é¿´ÒÑ¾­É¾³ıÀ´µÄÎÄ¼ş
+{//æŸ¥çœ‹å·²ç»åˆ é™¤æ¥çš„æ–‡ä»¶
 	m_bIsChkDelFileRun = FALSE;
 
 	if (m_hChkDelFile != NULL && m_hChkDelFile != INVALID_HANDLE_VALUE)
-	{//Ïß³Ì»¹Ã»½áÊø
+	{//çº¿ç¨‹è¿˜æ²¡ç»“æŸ
 		if(WAIT_TIMEOUT == WaitForSingleObject(m_hChkDelFile , 500))
-		{//³¬Ê± 
+		{//è¶…æ—¶ 
 			DWORD exitCode;
 			if(GetExitCodeThread(m_hChkDelFile , &exitCode)){
 				TerminateThread(m_hChkDelFile , exitCode);
@@ -936,14 +936,14 @@ void CFat32Doc::OnCheckDeleteFile()
 		}
 	}
 
-	//´´½¨Ã¶¾ÙÏß³Ì
+	//åˆ›å»ºæšä¸¾çº¿ç¨‹
 	CloseHandle(m_hChkDelFile);
 	m_hChkDelFile = ::CreateThread(NULL , 0 , EnumDelFAT32File , this , 0 , NULL);
 }
 
 void CFat32Doc::OnUpdateCheckDeleteFile(CCmdUI *pCmdUI)
 {
-	//ÅĞ¶Ï×îºóÒ»Ìõ¼ÇÂ¼ÊÇ·ñÊÇ±íÒÑ¾­É¾³ı
+	//åˆ¤æ–­æœ€åä¸€æ¡è®°å½•æ˜¯å¦æ˜¯è¡¨å·²ç»åˆ é™¤
 	int cnt = m_pContentList->GetItemCount();
 	CString strName = m_pContentList->GetItemText(cnt-1 , 1);
 	if (strName.GetAt(0) == _T('*'))

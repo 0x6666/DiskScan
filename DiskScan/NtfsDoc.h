@@ -1,4 +1,4 @@
-#if !defined(AFX_NTFSDOC_H__95A2B6E1_7B61_44DF_A00F_21E37DA3D086__INCLUDED_)
+﻿#if !defined(AFX_NTFSDOC_H__95A2B6E1_7B61_44DF_A00F_21E37DA3D086__INCLUDED_)
 #define AFX_NTFSDOC_H__95A2B6E1_7B61_44DF_A00F_21E37DA3D086__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -48,135 +48,135 @@ protected:
 public:
 
 	//////////////////////////////////////////////////////////////////////////
-	//��һ��ָ�����豸�����ĵ������������ֱ�ӵ��ã����ĵ�ģ����ã�����ֻ��
-	//Ҫ���ö�Ӧģ���ͬ���������ɡ�����lpszPathName���ʽΪ
-	//	devName [-IDX <����> -OFF <ƫ��>]
-	//	devName   Ҫ�򿪵��豸������
-	//	����	  Ҫ�򿪵��豸�ڴ����ϵ��������  ʮ�������ַ���ʾ
-	//  ƫ��	  Ҫ�򿪵��豸�ڴ����ϵ�ƫ��      ʮ�������ַ���ʾ
+	//打开一个指定的设备或者文档。这个方法不直接调用，由文档模板调用，我们只需
+	//要调用对应模板的同名方法即可。参数lpszPathName其格式为
+	//	devName [-IDX <索引> -OFF <偏移>]
+	//	devName   要打开的设备的名字
+	//	索引	  要打开的设备在磁盘上的区域序号  十六进制字符表示
+	//  偏移	  要打开的设备在磁盘上的偏移      十六进制字符表示
 	//////////////////////////////////////////////////////////////////////////
 	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ǰ�ĵ����������豸��ȡ����
+	//向当前文档所处理的设备读取数据
 	//param
-	//		buf		���ݻ���
-	//		offset	�������豸���ϵ�����ƫ��
-	//		isNext	���ָ���Ĳ������Ƿ�Ҫ����һ����Ч���� 
-	//				TRUE ���offset���������ȡ��һ����Ч����
-	//				FALSE ����������ڶ�ȡ��һ����Ч����
-	//		size	��Ҫ��ȡ�����ݵĴ�С
-	//return ��ȡ�����Ƿ�ɹ�
+	//		buf		数据缓存
+	//		offset	数据在设备的上的扇区偏移
+	//		isNext	如果指定的不存在是否要往下一个有效扇区 
+	//				TRUE 如果offset不存在则读取下一个有效扇区
+	//				FALSE 如果不存在在读取上一个有效扇区
+	//		size	将要读取的数据的大小
+	//return 读取数据是否成功
 	//////////////////////////////////////////////////////////////////////////
 	virtual BOOL ReadData(void* buf , PLONG_INT offset , BOOL isNext = TRUE , DWORD size = SECTOR_SIZE);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ�ĵ����������豸����������,�������ʵ��
+	//获得当前文档所处理的设备的扇区总数,子类必须实现
 	//////////////////////////////////////////////////////////////////////////
 	virtual LONG_INT GetSecCount();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ʼ��m_pContentList��ָ����б��ı�ͷ
+	//初始化m_pContentList所指向的列表的表头
 	//////////////////////////////////////////////////////////////////////////
 	virtual	void InitContentListHead();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���õ�ǰѡ���·��
+	//设置当前选择的路径
 	//param
-	//		strPath	��ǰѡ���·��
+	//		strPath	当前选择的路径
 	virtual	void SetCurFile(CString strPath);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��õ�ǰ�ĵ�������ʾ��ϸ��Ϣ����ͼ��
-	//return ����ʱʶ�����
+	//获得当前文档用来显示详细信息的视图类
+	//return 运行时识别的类
 	virtual CRuntimeClass* GetInofViewClass();
 
 	//////////////////////////////////////////////////////////////////////////
-	//���õ�ǰ�б�Ҫ��ʾ��·��
+	//设置当前列表要显示的路径
 	//////////////////////////////////////////////////////////////////////////
-	void SetCurPath( CString path );//���õ�ǰҪ��ʾ��·��
+	void SetCurPath( CString path );//设置当前要显示的路径
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//����Ϣ��m_pContentList�ĵ���¼�����Ӧ����Ҳ��Ҫ������ȥʵ��
+	//此消息是m_pContentList的点击事件的相应函数也需要由子类去实现
 	//////////////////////////////////////////////////////////////////////////
 	afx_msg /*virtual*/ void OnClickContextList(NMHDR* pNMHDR, LRESULT* pResult);  
 	
 	//////////////////////////////////////////////////////////////////////////
-	//����Ϣ��m_pContentList��˫�����¼�����Ӧ����Ҳ��Ҫ������ȥʵ��
+	//此消息是m_pContentList的双击击事件的相应函数也需要由子类去实现
 	//////////////////////////////////////////////////////////////////////////
 	afx_msg /*virtual*/ void OnDbClickContextList(NMHDR* pNMHDR, LRESULT* pResult);
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ͼ��������Ϣ����ʾ��һ������
+	//视图发来的消息，显示上一个扇区
 	afx_msg void OnBnClickedPreSector();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ͼ��������Ϣ����ʾ��һ������
+	//视图发来的消息，显示下一个扇区
 	afx_msg void OnBnClickedNextSector();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ͼ��������Ϣ����ʾ��һ������
+	//视图发来的消息，显示第一个扇区
 	afx_msg void OnBnClickedFirstSector();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ͼ��������Ϣ����ʾ���һ������
+	//视图发来的消息，显示最后一个扇区
 	afx_msg void OnBnClickedLastSector();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ͼ��������Ϣ����ʾ��һ����
+	//视图发来的消息，显示上一个簇
 	afx_msg void OnBnClickedPreClust();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ͼ��������Ϣ����ʾ��һ������
+	//视图发来的消息，显示下一个扇区
 	afx_msg void OnBnClickedNextClust();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ͼ��������Ϣ����ʾ��һ������
+	//视图发来的消息，显示第一个扇区
 	afx_msg void OnBnClickedFirstClust();
 
 	//////////////////////////////////////////////////////////////////////////
-	//��ͼ��������Ϣ����ʾ���һ������
+	//视图发来的消息，显示最后一个扇区
 	afx_msg void OnBnClickedLastClust();
 
 		//////////////////////////////////////////////////////////////////////////
-	//���б����һ����б�,��Ҫ��ʾ��ݲ˵�
+	//在列表中右击了列表,需要显示快捷菜单
 	//////////////////////////////////////////////////////////////////////////
 	afx_msg void OnRClickContextList(NMHDR *pNMHDR, LRESULT *pResult);
 
 
 public:
-	// Ntfs��ʵ��
+	// Ntfs卷实例
 	std::unique_ptr<DNtfs> m_pNtfs;
-	// ���ļ�ϵͳ����ʼ����
+	// 本文件系统的起始扇区
 	LONG_INT m_liStartSec;
-	// ��ǰ�б���ʾ��·��
+	// 当前列表显示的路径
 	CString m_strCurPath;
-	//�ĵ���ʱ���� 
+	//文档打开时参数 
 	CString m_strOpenParam;	
 
-	//NTFS�ļ����ԶԻ���
+	//NTFS文件属性对话框
 	CNtfsFileDlg* m_pNtfsFileDlg;
 
-	//ͼ���б�
+	//图标列表
 	std::unique_ptr<CImageList> m_upImgList;
 
-	//��ȡ�ļ��б��߳�
+	//读取文件列表线程
 	HANDLE m_hThread;
-	volatile BOOL   m_bIsRun; //�߳��Ƿ�������  ���̴߳��� 
+	volatile BOOL   m_bIsRun; //线程是否在运行  多线程处理 
 /*	CEvent*  m_pEveIsRun;*/
 
-	//���ļ����ԶԻ���
+	//打开文件属性对话框
 	afx_msg void OnNtfsFileAttr();
-	//��λ��MFT��¼
+	//定位到MFT记录
 	afx_msg void OnNtfsPosMft();
-	//��λMFT��¼��
+	//定位MFT记录表
 	afx_msg void OnNtfsPosParaentDir();
-	//�ļ�����Ϊ
+	//文件另存为
 	afx_msg void OnNtfsServeAs();
 	afx_msg void OnUpdateNtfsServeAs(CCmdUI *pCmdUI);
 
-	//����б��е�ǰѡ�е��ļ�/Ŀ¼��·��
+	//获得列表中当前选中的文件/目录的路径
 	CString GetSelPath(CString &strName);
 	virtual void OnCloseDocument();
 };
