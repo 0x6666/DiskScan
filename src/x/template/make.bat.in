@@ -1,0 +1,7 @@
+@echo off
+
+if "%1" == "" (
+	msbuild /m @CMAKE_PROJECT_NAME@.sln 
+) else (
+	msbuild /m @CMAKE_PROJECT_NAME@.sln /t:%1 
+)

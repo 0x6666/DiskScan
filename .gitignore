@@ -1,10 +1,2 @@
-*.sdf
-*.v12.suo
-*.vcxproj.filters
-*.vcxproj.user
-DiskScan/UpgradeLog.htm
-DiskScan/ipch/
-DiskScan/DiskScan.opensdf
-ipch/
-*.opensdf
-*.aps
+output
+.vs
