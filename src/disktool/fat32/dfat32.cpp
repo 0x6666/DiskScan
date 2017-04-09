@@ -113,7 +113,7 @@ void DFat32::CloseDev()
 
 DRES DFat32::ReadData(void* buf , DWORD off , DWORD dwReadCnt)
 {
-	if (IsDevOpened())
+	if (!IsDevOpened())
 		return DR_NO_OPEN;
 
 	//需要判断读取数据时是否越界

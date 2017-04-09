@@ -210,17 +210,20 @@ void CDevVolumeDlg::OnDblclkDevAndVolume(NMHDR* pNMHDR, LRESULT* pResult)
 		strSel = strSel.Left(strSel.Find(_T('\t')));
 
 		if (hParent == m_hPhsycDisk)
-		{//物理存储设备
+		{
+			//物理存储设备
 			this->m_strSelItem.Format(_T("%s%s") , DISK_PRE_NAME , (LPCSTR)(LPCTSTR)strSel );
 			this->m_bSelDisk = SEL_DISK;
-		}else if (hParent == m_hLogicDrivre)
-		{//逻辑驱动器
-			this->m_strSelItem.Format(_T("%s%s") , "\\\\?\\" , (LPCSTR)(LPCTSTR)strSel );
+		}
+		else if (hParent == m_hLogicDrivre)
+		{
+			//逻辑驱动器
+			this->m_strSelItem.Format(_T("%s%s"), _T("\\\\?\\"), strSel );
 			this->m_bSelDisk = SEL_VOLUME;
 		}
 
 		//关闭对话框
- 		EndDialog(IDOK); 
+ 		EndDialog(IDOK);
 	}
 	
 	*pResult = 0;

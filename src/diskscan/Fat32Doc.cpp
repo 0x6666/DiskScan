@@ -123,8 +123,8 @@ BOOL CFat32Doc::OnOpenDocument(LPCTSTR lpszPathName)
 	//如果打开的是一个卷的话就就只是一个卷的的名字 如"\\\\?\\C:"
 	//如果是一个物理的话传过来的是一个物理的名字和一个偏移，如"\\\\.\\PhysicalDrive ABCDEF10"
 	CString sPath = lpszPathName;
-	CString strTemp = _T("");
-	CString strOff = _T("");
+	CString strTemp;
+	CString strOff;
 	DRES res = DR_OK;
 	CView * view;
 

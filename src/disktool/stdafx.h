@@ -18,4 +18,10 @@
 #include "disktool.h"
 #include "stut_connf.h"
 
+#ifdef _UNICODE
+#define _T(x)       L ## x
+#else
+#define _T(x)       x
+#endif //_UNICODE
+
 #endif //__DISKTOOL_H__

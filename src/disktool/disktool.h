@@ -216,7 +216,7 @@ DECLARE_HANDLE(FINDER);
 
 
 /*/一些常量的定义///////////////////////////////////////////////////////////////////////*/
-#define DISK_PRE_NAME	L"\\\\.\\PhysicalDrive"	//磁盘设备名字的前缀
+#define DISK_PRE_NAME	_T("\\\\.\\PhysicalDrive")	//磁盘设备名字的前缀
 #define EXT_DPT_FLAG	0x705A5A5A5A			//扩展分区表的起始标记
 
 //车老板说windows最多可以挂载0x80个物理磁盘
