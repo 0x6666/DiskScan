@@ -66,19 +66,33 @@ x_package_begin(7z STATIC)
 		CPP/7zip/Archive/Common/ParseProperties.cpp
 
 		CPP/7zip/Archive/7z/7zCompressionMode.cpp
+		CPP/7zip/Archive/7z/7zCompressionMode.h
 		CPP/7zip/Archive/7z/7zDecode.cpp
+		CPP/7zip/Archive/7z/7zDecode.h
 		CPP/7zip/Archive/7z/7zEncode.cpp
+		CPP/7zip/Archive/7z/7zEncode.h
 		CPP/7zip/Archive/7z/7zExtract.cpp
+		#CPP/7zip/Archive/7z/7zExtract.h
 		CPP/7zip/Archive/7z/7zFolderInStream.cpp
+		CPP/7zip/Archive/7z/7zFolderInStream.h
 		CPP/7zip/Archive/7z/7zHandler.cpp
+		CPP/7zip/Archive/7z/7zHandler.h
 		CPP/7zip/Archive/7z/7zHandlerOut.cpp
+		#CPP/7zip/Archive/7z/7zHandlerOut.h
 		CPP/7zip/Archive/7z/7zHeader.cpp
+		CPP/7zip/Archive/7z/7zHeader.h
 		CPP/7zip/Archive/7z/7zIn.cpp
+		CPP/7zip/Archive/7z/7zIn.h
 		CPP/7zip/Archive/7z/7zOut.cpp
+		CPP/7zip/Archive/7z/7zOut.h
 		CPP/7zip/Archive/7z/7zProperties.cpp
+		CPP/7zip/Archive/7z/7zProperties.h
 		CPP/7zip/Archive/7z/7zSpecStream.cpp
+		CPP/7zip/Archive/7z/7zSpecStream.h
 		CPP/7zip/Archive/7z/7zUpdate.cpp
+		CPP/7zip/Archive/7z/7zUpdate.h
 		CPP/7zip/Archive/7z/7zRegister.cpp
+		#CPP/7zip/Archive/7z/7zRegister.h
 
 		CPP/7zip/Compress/CodecExports.cpp
 		CPP/7zip/Compress/Bcj2Coder.cpp

@@ -5,7 +5,6 @@
 #if !defined(AFX_DISKSCANDOC_H__16D6846F_000D_4155_AB34_F679DBFDAF55__INCLUDED_)
 #define AFX_DISKSCANDOC_H__16D6846F_000D_4155_AB34_F679DBFDAF55__INCLUDED_
 
-#include "..\DISKTOOL\disktool.h"	// Added by ClassView
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000

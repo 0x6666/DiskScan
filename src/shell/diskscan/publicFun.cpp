@@ -3,8 +3,6 @@
 #include "publicFun.h"
 #include "DiskScanView.h"
 #include "Fat32Doc.h"
-#include "..\DiskTool\disktool.h"
-#include "..\StrTool\StrTool.h"
 #include "NtfsDoc.h"
 #include "CopyProcessDlg.h"
 

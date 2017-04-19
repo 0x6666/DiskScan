@@ -5,7 +5,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 #include "DataDoc.h"
-#include "..\DiskTool\disktool.h"
 #include "Fat32FileAttr.h"
 // Fat32Doc.h : header file
 

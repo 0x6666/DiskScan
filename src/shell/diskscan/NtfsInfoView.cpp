@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "DiskScan.h"
 #include "NtfsInfoView.h"
-#include "..\DiskTool\disktool.h"
 
 
 #pragma  warning(disable:4996)

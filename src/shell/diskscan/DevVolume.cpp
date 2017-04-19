@@ -5,7 +5,6 @@
 #include "diskscan.h"
 #include "DevVolume.h"
 #include "MainFrm.h"
-#include "../DiskTool/disktool.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

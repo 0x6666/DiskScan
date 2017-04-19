@@ -5,7 +5,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 #include "DataDoc.h"
-#include "..\DISKTOOL\disktool.h"	// Added by ClassView
 #include "NtfsFileDlg.h"
 #include <afxmt.h>
 // NtfsDoc.h : header file

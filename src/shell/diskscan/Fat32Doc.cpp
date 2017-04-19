@@ -5,7 +5,6 @@
 #include "diskscan.h"
 #include "Fat32Doc.h"
 #include "ChildFrm.h"
-#include "..\DiskTool\disktool.h"
 #include "MainFrm.h"
 #include "Fat32InfoView.h"
 #include "Fat32FileAttr.h"

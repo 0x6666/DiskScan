@@ -3,8 +3,6 @@
 // DataWnd window
 #include "stdafx.h"
 #include "DiskScan.h"
-/*#include "DataType.h"*/
-#include "..\DISKTOOL\disktool.h"	// Added by ClassView
 #ifndef	_DATA_CTRL_
 #define	_DATA_CTRL_
 
