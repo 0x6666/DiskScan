@@ -6,15 +6,17 @@
 #include "CPP/Common/MyUnknown.h"
 
 // {93A0559B-01F7-4BEC-B2BB-E9BCEEC2AC1C}
-DEFINE_GUID(IID_I7zCompress, 0x93a0559b, 0x1f7, 0x4bec, 0xb2, 0xbb, 0xe9, 0xbc, 0xee, 0xc2, 0xac, 0x1c);
+DEFINE_GUID(IID_I7zCompresser, 0x93a0559b, 0x1f7, 0x4bec, 0xb2, 0xbb, 0xe9, 0xbc, 0xee, 0xc2, 0xac, 0x1c);
 
-interface /*__declspec(novtable)*/ I7zCompress : public IUnknown
+interface /*__declspec(novtable)*/ I7zCompresser : public IUnknown
 {
 	STDMETHOD(AddFile) (LPCWSTR szPath, LPCWSTR szInnerPath) PURE;
 	STDMETHOD(Folder) (LPCWSTR szPath) PURE;
 	STDMETHOD(Compress) (LPCWSTR szOutPath) PURE;
-	virtual ~I7zCompress() {};
+	virtual ~I7zCompresser() {};
 };
+
+HRESULT _Create7zCompresser(I7zCompresser** compresser);
 
 
 // {A4D4EB39-C2B2-4DD5-BC40-108E02A1FABA}
