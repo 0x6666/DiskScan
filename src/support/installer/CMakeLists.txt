@@ -6,4 +6,9 @@ x_package_begin(installer EXECUTABLE)
 	x_package_sources( PCH(stdafx.cpp stdafx.h)
 		main.cpp
 	)
+
+	x_link_packages(
+		7zdec
+	)
+
 x_package_end()

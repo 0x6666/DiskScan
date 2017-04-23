@@ -2,6 +2,7 @@
 #ifndef __7Z_H__
 #define __7Z_H__
 
+#include "CPP/Common/MyCom.h"
 #include "CPP/Common/MyUnknown.h"
 
 // {93A0559B-01F7-4BEC-B2BB-E9BCEEC2AC1C}
@@ -22,7 +23,8 @@ DEFINE_GUID(IID_I7zExtracter, 0xa4d4eb39, 0xc2b2, 0x4dd5, 0xbc, 0x40, 0x10, 0x8e
 interface /*__declspec(novtable)*/ I7zExtracter : public IUnknown
 {
 	STDMETHOD(Open7zFile)(IN LPCWSTR szPath) PURE;
-	STDMETHOD(SetOutDirectory)(IN LPCWSTR szPath) PURE;
+	STDMETHOD(OpenBuf)(IN void* pBuf, IN UINT32 size) PURE;
+	STDMETHOD(ExtractTo)(IN LPCWSTR szPath) PURE;
 	STDMETHOD(NumFiles)(OUT UINT32*) PURE;
 	STDMETHOD(IsDir)(IN UINT32, OUT BOOL*) PURE;
 	STDMETHOD(GetFileName)(IN UINT32, OUT LPWSTR pBuf, IN OUT UINT32* pSize) PURE;

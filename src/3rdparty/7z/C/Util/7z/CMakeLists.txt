@@ -6,12 +6,14 @@ x_package_begin(7zdec STATIC)
 		UNICODE
 		_7ZIP_PPMD_SUPPPORT
 	)
-	x_package_sources(
 
+	x_package_sources(
 		#7zMain.c
 		Precomp.c
 		Precomp.h
 
+		pkg/stdafx.h
+		pkg/stdafx.cpp
 		pkg/7zdec.h
 		pkg/7zdec.cpp
 
@@ -33,6 +35,10 @@ x_package_begin(7zdec STATIC)
 		../../LzmaDec.c
 		../../Ppmd7.c
 		../../Ppmd7Dec.c
+	)
+
+	x_export_header(
+		pkg/7zdec.h
 	)
 
 x_package_end()
