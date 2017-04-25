@@ -22,7 +22,7 @@ struct CDirItem
 
 class C7zCompresser
 	: public I7zCompresser
-	, public IArchiveUpdateCallback2
+	, public IArchiveUpdateCallback
 	, private CMyUnknownImp
 {
 public:
@@ -31,7 +31,8 @@ public:
 	C7zCompresser();
 	~C7zCompresser();
 
-	INTERFACE_IArchiveUpdateCallback2()
+
+	INTERFACE_IArchiveUpdateCallback(override)
 
 	STDMETHOD(AddFile) (LPCWSTR szPath, LPCWSTR szInnerPath) override;
 	STDMETHOD(Folder) (LPCWSTR szPath) override;

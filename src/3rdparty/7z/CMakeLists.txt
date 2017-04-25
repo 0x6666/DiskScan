@@ -38,6 +38,8 @@ x_package_begin(Format7zR STATIC)
 		CPP/7zip/Common/InOutTempBuffer.h
 		CPP/7zip/Common/FilterCoder.cpp
 		CPP/7zip/Common/FilterCoder.h
+		CPP/7zip/Common/FileStreams.h
+		CPP/7zip/Common/FileStreams.cpp
 		CPP/7zip/Common/LimitedStreams.cpp
 		CPP/7zip/Common/LimitedStreams.h
 		CPP/7zip/Common/MethodId.cpp

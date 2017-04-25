@@ -3,6 +3,7 @@
 #include "c7z.h"
 
 #include <CPP/7zip/Common/FileStreams.h>
+#include <CPP/7zip/Archive/7z/7zHandler.h>
 #include <CPP/7zip/Archive/IArchive.h>
 #include <CPP/Windows/PropVariant.h>
 #include <CPP/Windows/FileFind.h>
@@ -15,11 +16,6 @@ STDAPI CreateObject(const GUID *clsid, const GUID *iid, void **outObject);
 
 DEFINE_GUID(CLSID_CFormat7z,
 	0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0x07, 0x00, 0x00);
-DEFINE_GUID(CLSID_CFormatXz,
-	0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0x0C, 0x00, 0x00);
-
-#define CLSID_Format CLSID_CFormat7z
-// #define CLSID_Format CLSID_CFormatXz
 
 C7zCompresser::C7zCompresser()
 {
@@ -92,12 +88,13 @@ STDMETHODIMP C7zCompresser::SetCompleted(const UInt64 *completeValue)
 STDMETHODIMP C7zCompresser::Compress(LPCWSTR szOutPath)
 {
 	CMyComPtr<COutFileStream> outFileStream(new COutFileStream);
-	if (!outFileStream->Create(us2fs(szOutPath), false))
+	if (!outFileStream->Create(us2fs(szOutPath), true))
 		return E_FAIL;
 
-	CMyComPtr<IOutArchive> outArchive;
-	if (CreateObject(&CLSID_Format, &IID_IOutArchive, (void **)&outArchive) != S_OK)
-		return E_FAIL;
+	CMyComPtr<IOutArchive> outArchive = new NArchive::N7z::CHandler;
+	//CMyComPtr<IOutArchive> outArchive;
+	//if (CreateObject(&CLSID_CFormat7z, &IID_IOutArchive, (void **)&outArchive) != S_OK)
+	//	return E_FAIL;
 
 	return outArchive->UpdateItems(outFileStream, m_files.Size(), this);
 }
@@ -166,27 +163,6 @@ STDMETHODIMP C7zCompresser::GetStream(UInt32 index, ISequentialInStream **inStre
 
 STDMETHODIMP C7zCompresser::SetOperationResult(Int32 operationResult)
 {
-	return S_OK;
-}
-
-STDMETHODIMP C7zCompresser::GetVolumeSize(UInt32 index, UInt64 *size)
-{
-	return S_FALSE;
-}
-
-STDMETHODIMP C7zCompresser::GetVolumeStream(UInt32 index, ISequentialOutStream **volumeStream)
-{
-	wchar_t temp[16];
-	ConvertUInt32ToString(index + 1, temp);
-	UString res = temp;
-	while (res.Len() < 2)
-		res.InsertAtFront(L'0');
-	UString fileName = L'.';
-	fileName += res;
-	CMyComPtr<COutFileStream> streamLoc(new COutFileStream);
-	if (!streamLoc->Create(us2fs(fileName), false))
-		return ::GetLastError();
-	*volumeStream = streamLoc.Detach();
 	return S_OK;
 }
 
