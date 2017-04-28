@@ -121,28 +121,28 @@ macro(_global_ignore_cmp_warn)
 endmacro(_global_ignore_cmp_warn)
 
 function(_x_find_env)
-	if(NOT X_ENV_PATH)
+	if(NOT XG_ENV_PATH)
 		if(OS_WIN)
 			get_filename_component(
-				X_ENV_PATH 
+				XG_ENV_PATH 
 				"[HKEY_CURRENT_USER\\Software\\kingsoft\\Office\\wpsenv;qt-kso-integration]" 
 				ABSOLUTE 
 				)
-			if(NOT X_ENV_PATH)
-				message(FATAL_ERROR "Can not found X_ENV_PATH!")
+			if(NOT XG_ENV_PATH)
+				message(FATAL_ERROR "Can not found XG_ENV_PATH!")
 			endif()
-			message("X_ENV_PATH path: ${X_ENV_PATH}")
-			set(X_ENV_PATH "${X_ENV_PATH}" CACHE PATH "env path")
+			message("XG_ENV_PATH path: ${XG_ENV_PATH}")
+			set(XG_ENV_PATH "${XG_ENV_PATH}" CACHE PATH "env path")
 		else()
-			message(FATAL_ERROR "todo: X_ENV_PATH")
+			message(FATAL_ERROR "todo: XG_ENV_PATH")
 		endif()
 	endif()
 endfunction()
 
 function(_x_find_qt)
-	if(NOT X_ENV_PATH)
+	if(NOT XG_ENV_PATH)
 		_x_find_env()
-		set(_path "${X_ENV_PATH}/3rdparty/qt")
+		set(_path "${XG_ENV_PATH}/3rdparty/qt")
 		if(EXISTS "${_path}")
 			set(X_QT_PATH "${_path}" CACHE FILEPATH "qt path")
 		else()
