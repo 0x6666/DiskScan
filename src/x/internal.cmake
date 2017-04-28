@@ -11,6 +11,7 @@ endif()
 
 # out put
 set(XG_OUTPUT_ROOT "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}")
+set(XG_X_TOOLS "${CMAKE_BINARY_DIR}/x_tools")
 set(XG_OUTPUT_ROOT_RELEASE "${XG_OUTPUT_ROOT}")
 set(XG_OUTPUT_ROOT_DEBUG "${XG_OUTPUT_ROOT}d")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${XG_OUTPUT_ROOT}/lib")
@@ -151,6 +152,58 @@ function(_x_find_qt)
 endfunction()
 
 #_x_find_qt()
+
+FUNCTION(_x_find_cl)
+	IF(NOT XG_CL_PATH)
+		EXECUTE_PROCESS(COMMAND "where" "cl.exe"
+			TIMEOUT 10
+			RESULT_VARIABLE _res_val
+			OUTPUT_VARIABLE _out_val
+			ERROR_QUIET
+			#ERROR_VARIABLE _err_val
+			)
+		IF("${_res_val}!" STREQUAL "0!")
+			set(XG_CL_PATH "${_out_val}" CACHE FILEPATH "cl path")
+			#MESSAGE("${XG_CL_PATH}")
+		ELSE()
+			message(FATAL_ERROR "Can not found cl.exe")
+		ENDIF()
+	ENDIF()
+ENDFUNCTION()
+
+FUNCTION(_x_find_symbal_tool)
+	IF(NOT XG_SYMBAL_TOOL OR NOT EXISTS "${XG_SYMBAL_TOOL}")
+		IF(NOT EXISTS "${XG_X_TOOLS}/st.exe")
+			_x_find_cl()
+			IF(NOT EXISTS "${XG_X_TOOLS}/st")
+				file(MAKE_DIRECTORY "${XG_X_TOOLS}/st")
+			ENDIF()
+			
+			EXECUTE_PROCESS(COMMAND "${XG_CL_PATH}" "/O2" "/Ot" "/Ox" "${XG_CMAKE_DIR}/tools/gem_symbal.cpp" "/Fe${XG_X_TOOLS}/st.exe"
+				TIMEOUT 10
+				WORKING_DIRECTORY "${XG_X_TOOLS}/st"
+				RESULT_VARIABLE _res_val
+				#OUTPUT_VARIABLE _out_val
+				OUTPUT_QUIET
+				#ERROR_VARIABLE _err_val
+				ERROR_QUIET
+				)
+			#MESSAGE("${_res_val}")
+			#MESSAGE("${_out_val}")
+			#MESSAGE("${_err_val}")
+		ENDIF()
+
+		IF(NOT EXISTS "${XG_X_TOOLS}/st.exe")
+			message(FATAL_ERROR "Can not build st.exe")
+		ELSE()
+			set(XG_SYMBAL_TOOL "${XG_X_TOOLS}/st.exe" CACHE FILEPATH "st path")
+			#ssMESSAGE("${XG_SYMBAL_TOOL}")
+		ENDIF()
+
+	ENDIF()
+ENDFUNCTION(_x_find_symbal_tool)
+
+_x_find_symbal_tool()
 
 macro(_generate_make_bat)
 	if(CMAKE_GENERATOR MATCHES "^Visual Studio")

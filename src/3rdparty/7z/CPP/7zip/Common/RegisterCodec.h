@@ -26,11 +26,13 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw();
 #define REGISTER_CODEC_CREATE(name, cls) REGISTER_CODEC_CREATE_2(name, cls, ICompressCoder)
 
 #define REGISTER_CODEC_NAME(x) CRegisterCodec ## x
-#define REGISTER_CODEC_VAR static const CCodecInfo g_CodecInfo =
+#define REGISTER_CODEC_VAR extern const __declspec(selectany) CCodecInfo g_CodecInfo =
+//#define REGISTER_CODEC_VAR static const CCodecInfo g_CodecInfo =
 
 #define REGISTER_CODEC(x) struct REGISTER_CODEC_NAME(x) { \
     REGISTER_CODEC_NAME(x)() { RegisterCodec(&g_CodecInfo); }}; \
-    static REGISTER_CODEC_NAME(x) g_RegisterCodec;
+	__declspec(selectany) REGISTER_CODEC_NAME(x) g_RegisterCodec;
+	//static REGISTER_CODEC_NAME(x) g_RegisterCodec;
 
 
 #define REGISTER_CODECS_NAME(x) CRegisterCodecs ## x
