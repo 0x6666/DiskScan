@@ -22,5 +22,11 @@ int main(int argc, char** argv)
 	if (FAILED(hr))
 		return 0;
 
+	spCmps->AddFile(L"E:/Code/C++/diskscan/output/DiskScan/bin/diskscan.exe", L"bin\\");
+	spCmps->AddFile(L"E:/Code/C++/diskscan/output/DiskScan/bin/disktool.dll", L"bin\\");
+	spCmps->AddFile(L"E:/Code/C++/diskscan/output/DiskScan/bin/strtool.dll", L"bin\\");
+
+	spCmps->Compress(L"E:/Code/C++/diskscan/output/DiskScan/pkg/bin.7z");
+
 	return 0;
 }

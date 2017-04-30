@@ -13,7 +13,7 @@ endif()
 set(XG_OUTPUT_ROOT "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}")
 set(XG_X_TOOLS "${CMAKE_BINARY_DIR}/x_tools")
 set(XG_OUTPUT_ROOT_RELEASE "${XG_OUTPUT_ROOT}")
-set(XG_OUTPUT_ROOT_DEBUG "${XG_OUTPUT_ROOT}d")
+set(XG_OUTPUT_ROOT_DEBUG "${XG_OUTPUT_ROOT}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${XG_OUTPUT_ROOT}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${XG_OUTPUT_ROOT_DEBUG}/lib")
@@ -25,22 +25,22 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${XG_OUTPUT_ROOT_DEBUG}/bin")
 
 # 全局数据
-set(XG_PACKAGES CACHE INTERNAL "all packages" FORCE)
+set(XG_TARGETS CACHE INTERNAL "all targets" FORCE)
 
-macro(_ensure_pkg_exist _pkg_name)
-	if (NOT TARGET ${_pkg_name})
-		message(FATAL_ERROR "package \"${_pkg_name}\" not found!")
+macro(_ensure_tgt_exist _tgt_name)
+	if (NOT TARGET ${_tgt_name})
+		message(FATAL_ERROR "target \"${_tgt_name}\" not found!")
 	endif()
-endmacro(_ensure_pkg_exist)
+endmacro(_ensure_tgt_exist)
 
-macro(_def_package _pkg_name)
-	foreach(_p ${XG_PACKAGES})
-		if (${_p} STREQUAL ${_pkg_name})
-			message(FATAL_ERROR "package \"${_pkg_name}\" already defined!")
+macro(_def_target _tgt_name)
+	foreach(_p ${XG_TARGETS})
+		if (${_p} STREQUAL ${_tgt_name})
+			message(FATAL_ERROR "target \"${_tgt_name}\" already defined!")
 		endif()
 	endforeach()
-	set(XG_PACKAGES ${XG_PACKAGES} ${_pkg_name} CACHE INTERNAL "all packages" FORCE)
-endmacro(_def_package)
+	set(XG_TARGETS ${XG_TARGETS} ${_tgt_name} CACHE INTERNAL "all targets" FORCE)
+endmacro(_def_target)
 
 # 查找是否含有某个选项
 # example: _find_radio_option(values "R1|R2|R3" "R2" _result)
@@ -81,8 +81,8 @@ macro(_append_target_property _target _property _value)
 	endif()
 endmacro()
 
-macro(_create_export_header_ref _f _pkgn)
-	set(_pub_h "${CMAKE_BINARY_DIR}/export_header/${_pkgn}/${_f}")
+macro(_create_export_header_ref _f _tgtn)
+	set(_pub_h "${CMAKE_BINARY_DIR}/export_header/${_tgtn}/${_f}")
 	_create_include_ref("${_f}" "${_pub_h}")
 endmacro()
 
@@ -155,7 +155,26 @@ endfunction()
 
 FUNCTION(_x_find_cl)
 	IF(NOT XG_CL_PATH)
-		EXECUTE_PROCESS(COMMAND "where" "cl.exe"
+		set(XG_CL_PATH "cl.exe" CACHE FILEPATH "cl path")
+	#	EXECUTE_PROCESS(COMMAND "where" "cl.exe"
+	#		TIMEOUT 10
+	#		RESULT_VARIABLE _res_val
+	#		OUTPUT_VARIABLE _out_val
+	#		ERROR_QUIET
+	#		#ERROR_VARIABLE _err_val
+	#		)
+	#	IF("${_res_val}!" STREQUAL "0!")
+	#		set(XG_CL_PATH "${_out_val}" CACHE FILEPATH "cl path")
+	#		#MESSAGE("${XG_CL_PATH}")
+	#	ELSE()
+	#		message(FATAL_ERROR "Can not found cl.exe")
+	#	ENDIF()
+	ENDIF()
+ENDFUNCTION()
+
+function(_x_find_dumpbin)
+	IF(NOT XG_DUMPBIN_PATH)
+		EXECUTE_PROCESS(COMMAND "where" "dumpbin.exe"
 			TIMEOUT 10
 			RESULT_VARIABLE _res_val
 			OUTPUT_VARIABLE _out_val
@@ -163,34 +182,42 @@ FUNCTION(_x_find_cl)
 			#ERROR_VARIABLE _err_val
 			)
 		IF("${_res_val}!" STREQUAL "0!")
-			set(XG_CL_PATH "${_out_val}" CACHE FILEPATH "cl path")
-			#MESSAGE("${XG_CL_PATH}")
+			set(XG_DUMPBIN_PATH
+			"dumpbin.exe"#"${_out_val}"
+			CACHE FILEPATH "dumpbin path")
+			#MESSAGE("${XG_DUMPBIN_PATH}")
 		ELSE()
-			message(FATAL_ERROR "Can not found cl.exe")
+			message(FATAL_ERROR "Can not found dumpbin.exe")
 		ENDIF()
 	ENDIF()
-ENDFUNCTION()
+endfunction(_x_find_dumpbin)
+
 
 FUNCTION(_x_find_symbal_tool)
-	IF(NOT XG_SYMBAL_TOOL OR NOT EXISTS "${XG_SYMBAL_TOOL}")
-		IF(NOT EXISTS "${XG_X_TOOLS}/st.exe")
-			_x_find_cl()
+	IF(NOT XG_SYMBAL_TOOL OR
+		NOT EXISTS "${XG_SYMBAL_TOOL}" OR
+		"${XG_CMAKE_DIR}/tools/gem_symbal.cpp" IS_NEWER_THAN "${XG_SYMBAL_TOOL}")
 			IF(NOT EXISTS "${XG_X_TOOLS}/st")
 				file(MAKE_DIRECTORY "${XG_X_TOOLS}/st")
 			ENDIF()
-			
-			EXECUTE_PROCESS(COMMAND "${XG_CL_PATH}" "/O2" "/Ot" "/Ox" "${XG_CMAKE_DIR}/tools/gem_symbal.cpp" "/Fe${XG_X_TOOLS}/st.exe"
+			_x_find_cl()
+			message("build st.exe")
+			EXECUTE_PROCESS(COMMAND "${XG_CL_PATH}" "/EHsc" "/O2" "/Ot" "/Ox" "${XG_CMAKE_DIR}/tools/gem_symbal.cpp" "/Fe${XG_X_TOOLS}/st.exe" "/Fd${XG_X_TOOLS}/st.pdb"
 				TIMEOUT 10
 				WORKING_DIRECTORY "${XG_X_TOOLS}/st"
 				RESULT_VARIABLE _res_val
-				#OUTPUT_VARIABLE _out_val
-				OUTPUT_QUIET
-				#ERROR_VARIABLE _err_val
-				ERROR_QUIET
+				OUTPUT_VARIABLE _out_val
+				ERROR_VARIABLE _err_val
+				#OUTPUT_QUIET
+				#ERROR_QUIET
 				)
 			#MESSAGE("${_res_val}")
 			#MESSAGE("${_out_val}")
 			#MESSAGE("${_err_val}")
+			if(NOT "${_res_val}!" STREQUAL "0!")
+				#message(FATAL_ERROR "${_res_val}")
+				message(FATAL_ERROR "${_out_val}")
+			endif()
 		ENDIF()
 
 		IF(NOT EXISTS "${XG_X_TOOLS}/st.exe")
@@ -199,11 +226,7 @@ FUNCTION(_x_find_symbal_tool)
 			set(XG_SYMBAL_TOOL "${XG_X_TOOLS}/st.exe" CACHE FILEPATH "st path")
 			#ssMESSAGE("${XG_SYMBAL_TOOL}")
 		ENDIF()
-
-	ENDIF()
 ENDFUNCTION(_x_find_symbal_tool)
-
-_x_find_symbal_tool()
 
 macro(_generate_make_bat)
 	if(CMAKE_GENERATOR MATCHES "^Visual Studio")
@@ -211,32 +234,32 @@ macro(_generate_make_bat)
 	endif()
 endmacro()
 
-macro(_get_target_impt_lib _pkg_name _impt_lib)
-	get_property(_pkg_type TARGET ${_pkg_name} PROPERTY XT_PACKAGE_TYPE)
-	if (NOT _pkg_type)
-		message(FATAL_ERROR "${_pkg_name}'type not found")
+macro(_get_target_impt_lib _tgt_name _impt_lib)
+	get_property(_tgt_type TARGET ${_tgt_name} PROPERTY XT_TARGET_TYPE)
+	if (NOT _tgt_type)
+		message(FATAL_ERROR "${_tgt_name}'type not found")
 	endif()
 
-	if("${_pkg_type}" STREQUAL "EXTERN")
-		get_property(${_impt_lib} TARGET ${_pkg_name} PROPERTY XT_IMPT_IMPLIB)
+	if("${_tgt_type}" STREQUAL "EXTERN")
+		get_property(${_impt_lib} TARGET ${_tgt_name} PROPERTY XT_IMPT_IMPLIB)
 	else()
 		if(OS_WIN)
-			set(${_impt_lib} "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/${_pkg_name}.lib")
+			set(${_impt_lib} "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/${_tgt_name}.lib")
 		elseif(OS_LINUX)
-			if("${_pkg_type}" STREQUAL "SHARED")
-				set(${_impt_lib} "${CMAKE_LIBRARY_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/lib${_pkg_name}.so")
-			elseif("${_pkg_type}" STREQUAL "STATIC")
-				set(${_impt_lib} "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/$lib{_pkg_name}.a")
+			if("${_tgt_type}" STREQUAL "SHARED")
+				set(${_impt_lib} "${CMAKE_LIBRARY_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/lib${_tgt_name}.so")
+			elseif("${_tgt_type}" STREQUAL "STATIC")
+				set(${_impt_lib} "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/$lib{_tgt_name}.a")
 			else()
-				message(FATAL_ERROR "can't link to executable target ${_pkg_name}")
+				message(FATAL_ERROR "can't link to executable target ${_tgt_name}")
 			endif()
 		elseif(OS_MAC)
-			if("${_pkg_type}" STREQUAL "SHARED")
-				set(${_impt_lib} "${CMAKE_LIBRARY_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/lib${_pkg_name}.dylib")
-			elseif("${_pkg_type}" STREQUAL "STATIC")
-				set(${_impt_lib} "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/$lib{_pkg_name}.a")
+			if("${_tgt_type}" STREQUAL "SHARED")
+				set(${_impt_lib} "${CMAKE_LIBRARY_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/lib${_tgt_name}.dylib")
+			elseif("${_tgt_type}" STREQUAL "STATIC")
+				set(${_impt_lib} "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${X_BUILD_CFG}}/$lib{_tgt_name}.a")
 			else()
-				message(FATAL_ERROR "can't link to executable target ${_pkg_name}")
+				message(FATAL_ERROR "can't link to executable target ${_tgt_name}")
 			endif()
 		endif()
 	endif()
@@ -244,26 +267,35 @@ macro(_get_target_impt_lib _pkg_name _impt_lib)
 endmacro(_get_target_impt_lib)
 
 #处理链接依赖关系
-macro(_deal_package_link)
-	foreach(_pkg ${XG_PACKAGES})
-		get_property(_link_pkgs TARGET ${_pkg} PROPERTY XT_LINK_PACKAGES)
-		if (NOT _link_pkgs)
+macro(_deal_target_link)
+	foreach(_tgt ${XG_TARGETS})
+		get_property(_link_tgts TARGET ${_tgt} PROPERTY XT_LINK_TARGETS)
+		if (NOT _link_tgts)
 			#continue()
 		else()
 			set(_link_arg)
 			set(_dep_arg)
-			foreach(_lp ${_link_pkgs})
-				_ensure_pkg_exist(${_lp})
+			foreach(_lp ${_link_tgts})
+				_ensure_tgt_exist(${_lp})
 				_get_target_impt_lib(${_lp} _impt_lib)
 				set(_link_arg "${_link_arg} ${_impt_lib} ")
 				set(_dep_arg "${_dep_arg}${_impt_lib};")
+				get_property(_sym_file TARGET ${_lp} PROPERTY XT_SYMPBAL_FILE)
+				if(_sym_file)
+					source_group("ImpSymbalFile" FILES ${_sym_file})
+					#get_property(_src TARGET ${_tgt} PROPERTY SOURCES)
+					#list(APPEND _src ${_sym_file})
+					set_property(TARGET ${_tgt} APPEND PROPERTY SOURCES ${_sym_file})
+					#target_sources(${_tgt} PRIVATE  ${_sym_file})
+				endif()
+				#set_property(TARGET ${X_TARGET_NAME} PROPERTY XT_SYMPBAL_FILE "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${X_TARGET_NAME}.c")
 			endforeach()
-			_append_target_property(${_pkg} LINK_FLAGS ${_link_arg})
-			set_property(TARGET ${_pkg} APPEND PROPERTY LINK_DEPENDS ${_dep_arg})
-			add_dependencies(${_pkg} ${_link_pkgs})
+			_append_target_property(${_tgt} LINK_FLAGS ${_link_arg})
+			set_property(TARGET ${_tgt} APPEND PROPERTY LINK_DEPENDS ${_dep_arg})
+			add_dependencies(${_tgt} ${_link_tgts})
 		endif()
 	endforeach()
-endmacro(_deal_package_link)
+endmacro(_deal_target_link)
 
 # for mfc
 macro(replace_flags var these those)
@@ -355,5 +387,3 @@ macro(_set_pch_ref)
 		endif()
 	endif()
 endmacro(_set_pch_ref)
-
-

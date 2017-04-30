@@ -1,13 +1,13 @@
 
 #主要构建7z-sdk/CPP/7zip/Bundles/Format7zR
 #支持压缩解压7z/LZMA/BCJ/BCJ2
-x_package_begin(Format7zR STATIC)
+x_target_begin(Format7zR STATIC)
 	x_add_definitions(
 		_UNICODE
 		UNICODE
 		_NO_CRYPTO
 	)
-	x_package_sources( #PCH(StdAfx.cpp StdAfx.h)
+	x_target_sources( #PCH(StdAfx.cpp StdAfx.h)
 
 		7z.h
 		stdafx.h
@@ -199,7 +199,9 @@ x_package_begin(Format7zR STATIC)
 		C/7zCrcOpt.c
 	)
 
+	x_gen_symbal_file()
+
 	x_export_header(
 		7z.h
 	)
-x_package_end()
+x_target_end()

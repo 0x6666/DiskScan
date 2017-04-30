@@ -1,13 +1,13 @@
 
 #7z decoder program (decoding 7z files)
-x_package_begin(7zdec STATIC)
+x_target_begin(7zdec STATIC)
 	x_add_definitions(
 		_UNICODE
 		UNICODE
 		_7ZIP_PPMD_SUPPPORT
 	)
 
-	x_package_sources(
+	x_target_sources(
 		#7zMain.c
 		Precomp.c
 		Precomp.h
@@ -41,4 +41,4 @@ x_package_begin(7zdec STATIC)
 		pkg/7zdec.h
 	)
 
-x_package_end()
+x_target_end()

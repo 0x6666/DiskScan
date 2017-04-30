@@ -1,14 +1,14 @@
 
-x_package_begin(installer EXECUTABLE)
+x_target_begin(installer EXECUTABLE)
 	x_add_definitions(
 		_UNICODE
 	)
-	x_package_sources( PCH(stdafx.cpp stdafx.h)
+	x_target_sources( PCH(stdafx.cpp stdafx.h)
 		main.cpp
 	)
 
-	x_link_packages(
+	x_link_targets(
 		7zdec
 	)
 
-x_package_end()
+x_target_end()

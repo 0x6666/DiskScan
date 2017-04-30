@@ -1,5 +1,5 @@
 
-x_package_begin(diskscan EXECUTABLE)
+x_target_begin(diskscan EXECUTABLE)
 	x_add_definitions(
 		_UNICODE
 		UNICODE
@@ -8,7 +8,7 @@ x_package_begin(diskscan EXECUTABLE)
 	x_enable_mfc(1)
 	x_uac_exe_level(requireAdministrator)
 
-	x_package_sources( PCH (StdAfx.cpp StdAfx.h)
+	x_target_sources( PCH (StdAfx.cpp StdAfx.h)
 		ChildFrm.cpp
 		ChildFrm.h
 		ColumnSplitter.cpp
@@ -56,7 +56,7 @@ x_package_begin(diskscan EXECUTABLE)
 		resource.h
 	)
 
-	x_link_packages(
+	x_link_targets(
 		disktool
 		strtool
 	)
@@ -67,4 +67,4 @@ x_package_begin(diskscan EXECUTABLE)
 		#4018
 	)
 
-x_package_end()
+x_target_end()

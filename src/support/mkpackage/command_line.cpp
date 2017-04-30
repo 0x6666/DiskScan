@@ -24,6 +24,7 @@ static const std::vector<CLData>& getCmds()
 			if (argv[i][0] == L'-')
 			{
 				cmds.push_back(data);
+				data = CLData();
 				data.cmd = &argv[i][1];
 			}
 			else

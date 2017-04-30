@@ -1,9 +1,9 @@
 
-x_package_begin(disktool SHARED)
+x_target_begin(disktool SHARED)
 	x_add_definitions(
 		_UNICODE
 	)
-	x_package_sources( PCH (stdafx.cpp stdafx.h)
+	x_target_sources( PCH (stdafx.cpp stdafx.h)
 		fat32/dfat32.cpp
 		fat32/dfat32file.cpp
 		disk/disk.cpp
@@ -19,7 +19,7 @@ x_package_begin(disktool SHARED)
 		#resource.h
 		#DataType.cpp
 	)
-	x_link_packages(
+	x_link_targets(
 		strtool
 	)
 	x_export_header(
@@ -30,4 +30,4 @@ x_package_begin(disktool SHARED)
 		4251
 		#4018
 	)
-x_package_end()
+x_target_end()

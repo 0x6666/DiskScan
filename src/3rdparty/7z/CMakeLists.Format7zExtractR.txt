@@ -1,6 +1,6 @@
 
 #extracting from 7z/LZMA/BCJ/BCJ2.
-x_package_begin(Format7zExtractR STATIC)
+x_target_begin(Format7zExtractR STATIC)
 	x_add_definitions(
 		_UNICODE
 		UNICODE
@@ -8,7 +8,7 @@ x_package_begin(Format7zExtractR STATIC)
 		EXTRACT_ONLY
 	)
 
-	x_package_sources(
+	x_target_sources(
 		CPP/7zip/Archive/Archive2.def
 
 		CPP/Common/CrcReg.cpp
@@ -135,4 +135,4 @@ x_package_begin(Format7zExtractR STATIC)
 		C/7zCrc.c
 		C/7zCrcOpt.c
 	)
-x_package_end()
+x_target_end()
